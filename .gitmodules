@@ -1,0 +1,6 @@
+[submodule "bloodystats"]
+	path = bloodystats
+	url = https://github.com/Bloodmallet/bloodystats.git
+[submodule "bloodytrinkets"]
+	path = bloodytrinkets
+	url = https://github.com/Bloodmallet/bloodytrinkets.git
