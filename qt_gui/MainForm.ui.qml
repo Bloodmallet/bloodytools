@@ -7,7 +7,17 @@ Rectangle {
 
     width: 750
     height: 500
-    color: "#ffffff"
+    gradient: Gradient {
+        GradientStop {
+            position: 0.429
+            color: "#ffffff"
+        }
+
+        GradientStop {
+            position: 1
+            color: "#505050"
+        }
+    }
     property alias button: button
 
     property alias mouseArea1: mouseArea1
@@ -25,21 +35,24 @@ Rectangle {
 
         Text {
             id: programmTitle
-            x: 272
-            width: 206
-            height: 46
             text: qsTr("Bloodytools")
+            anchors.bottom: rectangle.top
+            anchors.bottomMargin: 0
+            anchors.right: parent.right
+            anchors.rightMargin: 40
+            anchors.left: parent.left
+            anchors.leftMargin: 40
+            horizontalAlignment: Text.AlignHCenter
             font.weight: Font.DemiBold
             anchors.top: parent.top
             anchors.topMargin: 20
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: 34
+            font.pixelSize: 120
             elide: Text.ElideNone
             topPadding: 0
             font.letterSpacing: 3
             font.wordSpacing: 0
             style: Text.Normal
-            fontSizeMode: Text.VerticalFit
+            fontSizeMode: Text.Fit
         }
 
         Rectangle {
@@ -94,7 +107,7 @@ Rectangle {
                         anchors.top: parent.top
                         anchors.bottomMargin: 0
                         anchors.topMargin: 30
-                        source: "img/repair-tools-cross.svg"
+                        source: "img/tools.svg"
                     }
 
                     Text {
