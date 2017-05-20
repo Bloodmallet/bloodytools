@@ -36,9 +36,3 @@ DISTFILES += \
     img/repair-tools-cross.svg \
     img/horizontal-bars-chart.txt \
     img/repair-tools-cross.txt \
-    ../../erstVersuch/img/horizontal-bars-chart.png \
-    ../../erstVersuch/img/repair-tools-cross.png \
-    ../../erstVersuch/img/horizontal-bars-chart.svg \
-    ../../erstVersuch/img/repair-tools-cross.svg \
-    ../../erstVersuch/img/horizontal-bars-chart.txt \
-    ../../erstVersuch/img/repair-tools-cross.txt
