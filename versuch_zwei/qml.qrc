@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>MainForm.ui.qml</file>
+        <file>img/horizontal-bars-chart.png</file>
+        <file>img/horizontal-bars-chart.svg</file>
+        <file>img/horizontal-bars-chart.txt</file>
+        <file>img/repair-tools-cross.png</file>
+        <file>img/repair-tools-cross.svg</file>
+        <file>img/repair-tools-cross.txt</file>
+        <file>main.cpp</file>
+    </qresource>
+</RCC>
