@@ -9,5 +9,6 @@
         <file>img/repair-tools-cross.svg</file>
         <file>img/repair-tools-cross.txt</file>
         <file>main.cpp</file>
+        <file>img/tools.svg</file>
     </qresource>
 </RCC>

@@ -11,14 +11,14 @@ Window {
 
 
     MainForm {
-        mouseArea1.onClicked: {
+        switchToBloodystatsFakeButton_m.onClicked: {
             console.log(qsTr("Clicked on Bloodystats mousearea."))
         }
-        button.onClicked: {
+        switchToBloodytrinkets_b.onClicked: {
             console.log(qsTr("Clicked on Bloodytrinkets button."))
         }
         anchors.fill: parent
-        mouseArea.onClicked: {
+        rootArea_m.onClicked: {
             console.log(qsTr('Clicked on background.'))
         }
     }

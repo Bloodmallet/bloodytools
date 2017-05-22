@@ -7,6 +7,10 @@ Rectangle {
 
     width: 750
     height: 500
+    property alias switchToBloodytrinkets_b: switchToBloodytrinkets_b
+    property alias bloodystatsIcon_i: bloodystatsIcon_i
+    property alias switchToBloodystatsFakeButton_m: switchToBloodystatsFakeButton_m
+    property alias rootArea_m: rootArea_m
     gradient: Gradient {
         GradientStop {
             position: 0.429
@@ -18,15 +22,11 @@ Rectangle {
             color: "#505050"
         }
     }
-    property alias button: button
 
-    property alias mouseArea1: mouseArea1
-    property alias image: image
-    property alias mouseArea: mouseArea
     border.color: "#000000"
 
     MouseArea {
-        id: mouseArea
+        id: rootArea_m
         anchors.rightMargin: 0
         anchors.bottomMargin: 0
         anchors.leftMargin: 0
@@ -34,9 +34,9 @@ Rectangle {
         anchors.fill: parent
 
         Text {
-            id: programmTitle
+            id: programmTitle_t
             text: qsTr("Bloodytools")
-            anchors.bottom: rectangle.top
+            anchors.bottom: mainStateSwitch_r.top
             anchors.bottomMargin: 0
             anchors.right: parent.right
             anchors.rightMargin: 40
@@ -56,7 +56,7 @@ Rectangle {
         }
 
         Rectangle {
-            id: rectangle
+            id: mainStateSwitch_r
             color: "#00ffffff"
             border.width: 0
             anchors.right: parent.right
@@ -69,7 +69,7 @@ Rectangle {
             anchors.topMargin: 80
 
             Rectangle {
-                id: switchToBloodystats
+                id: switchToBloodystats_r
                 x: 0
                 y: 0
                 color: "#ffffff"
@@ -85,54 +85,54 @@ Rectangle {
                 border.width: 2
 
                 MouseArea {
-                    id: mouseArea1
+                    id: switchToBloodystatsFakeButton_m
                     anchors.fill: parent
 
                     Image {
-                        id: image
+                        id: bloodystatsIcon_i
                         x: 0
                         y: 0
-                        width: 36
-                        height: 36
+                        width: 0
+                        height: 0
                         anchors.right: parent.right
-                        anchors.rightMargin: 40
+                        anchors.rightMargin: 100
                         anchors.left: parent.left
-                        anchors.leftMargin: 40
+                        anchors.leftMargin: 100
                         fillMode: Image.PreserveAspectFit
                         opacity: 1
                         clip: false
                         visible: true
                         z: 1
-                        anchors.bottom: text1.top
+                        anchors.bottom: bloodystatsTitle_t.top
                         anchors.top: parent.top
                         anchors.bottomMargin: 0
-                        anchors.topMargin: 30
+                        anchors.topMargin: 50
                         source: "img/tools.svg"
                     }
 
                     Text {
-                        id: text1
+                        id: bloodystatsTitle_t
                         x: 40
                         y: 240
-                        height: 75
+                        height: 50
                         text: qsTr("Bloodystats")
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                         anchors.right: parent.right
-                        anchors.rightMargin: 40
+                        anchors.rightMargin: 50
                         anchors.left: parent.left
-                        anchors.leftMargin: 40
+                        anchors.leftMargin: 50
                         fontSizeMode: Text.Fit
                         transformOrigin: Item.Center
                         anchors.bottom: parent.bottom
-                        anchors.bottomMargin: 50
-                        font.pixelSize: 86
+                        anchors.bottomMargin: 70
+                        font.pixelSize: 30
                     }
                 }
             }
 
             Button {
-                id: button
+                id: switchToBloodytrinkets_b
                 x: 0
                 y: 0
                 width: 315
@@ -154,133 +154,100 @@ Rectangle {
                 anchors.topMargin: 20
 
                 Image {
-                    id: image1
+                    id: bloodytrinketsIcon_i
                     y: 24
+                    width: 0
+                    height: 0
                     anchors.left: parent.left
-                    anchors.leftMargin: 40
+                    anchors.leftMargin: 100
                     fillMode: Image.PreserveAspectFit
                     anchors.right: parent.right
-                    anchors.rightMargin: 40
-                    anchors.bottom: text2.top
+                    anchors.rightMargin: 100
+                    anchors.bottom: bloodytrinketsTitle_t.top
                     anchors.bottomMargin: 0
                     anchors.top: parent.top
-                    anchors.topMargin: 30
+                    anchors.topMargin: 50
                     source: "img/horizontal-bars-chart.png"
                 }
 
                 Text {
-                    id: text2
+                    id: bloodytrinketsTitle_t
                     y: 234
-                    height: 75
+                    height: 50
                     text: qsTr("Bloodytrinkets")
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
                     anchors.right: parent.right
-                    anchors.rightMargin: 40
+                    anchors.rightMargin: 50
                     anchors.left: parent.left
-                    anchors.leftMargin: 40
+                    anchors.leftMargin: 50
                     fontSizeMode: Text.Fit
                     padding: -3
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 50
-                    font.pixelSize: 86
+                    anchors.bottomMargin: 70
+                    font.pixelSize: 30
                 }
             }
         }
-    }
-
-    Image {
-        id: image2
-        x: 49
-        y: 18
-        width: 100
-        height: 100
-        opacity: 0
-        source: "qrc:/qtquickplugin/images/template_image.png"
     }
     states: [
         State {
             name: "bloodystats_settings"
 
             PropertyChanges {
-                target: image2
-                x: 8
-                y: 8
-                width: 57
-                height: 40
-                sourceSize.height: 0
-                sourceSize.width: 0
-                fillMode: Image.PreserveAspectFit
-                source: "img/bloodytols_icon.png"
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: image1
+                target: bloodytrinketsIcon_i
                 visible: false
             }
 
             PropertyChanges {
-                target: programmTitle
+                target: programmTitle_t
                 x: 67
                 anchors.horizontalCenterOffset: -203
                 anchors.topMargin: 8
             }
 
             PropertyChanges {
-                target: button
+                target: switchToBloodytrinkets_b
                 visible: false
             }
 
             PropertyChanges {
-                target: switchToBloodystats
+                target: switchToBloodystats_r
                 visible: false
             }
 
             PropertyChanges {
-                target: rectangle
+                target: mainStateSwitch_r
                 visible: false
             }
         },
         State {
             name: "bloodytrinkets_settings"
-            PropertyChanges {
-                target: image2
-                x: 8
-                y: 8
-                width: 57
-                height: 40
-                opacity: 1
-                sourceSize.width: 0
-                sourceSize.height: 0
-                fillMode: Image.PreserveAspectFit
-                source: "img/bloodytols_icon.png"
-            }
 
             PropertyChanges {
-                target: image1
+                target: bloodytrinketsIcon_i
                 visible: false
             }
 
             PropertyChanges {
-                target: programmTitle
+                target: programmTitle_t
                 x: 67
                 anchors.horizontalCenterOffset: -203
                 anchors.topMargin: 8
             }
 
             PropertyChanges {
-                target: button
+                target: switchToBloodytrinkets_b
                 visible: false
             }
 
             PropertyChanges {
-                target: switchToBloodystats
+                target: switchToBloodystats_r
                 visible: false
             }
 
             PropertyChanges {
-                target: rectangle
+                target: mainStateSwitch_r
                 visible: false
             }
         }
