@@ -278,32 +278,32 @@ Rectangle {
     }
 
     Column {
-        id: column
+        id: settings_area
         width: 200
         height: 400
         opacity: 0
 
         Text {
-            id: text1
+            id: example_settings_group
             text: qsTr("Text")
             opacity: 0
             font.pixelSize: 12
         }
 
         Row {
-            id: row
+            id: example_settings_group_organizer
             width: 200
             height: 400
             opacity: 0
 
             Column {
-                id: column3
+                id: example_settings_group_left_column
                 width: 200
                 height: 400
                 opacity: 0
 
                 Row {
-                    id: row1
+                    id: example_settings_group_first_setting
                     width: 200
                     height: 400
                     opacity: 0
@@ -323,7 +323,7 @@ Rectangle {
                 }
 
                 Row {
-                    id: row3
+                    id: example_settings_group_third_setting
                     width: 200
                     height: 400
                     opacity: 0
@@ -344,13 +344,13 @@ Rectangle {
             }
 
             Column {
-                id: column4
+                id: example_settings_group_right_column
                 width: 200
                 height: 400
                 opacity: 0
 
                 Row {
-                    id: row2
+                    id: example_settings_group_second_setting
                     width: 200
                     height: 400
                     opacity: 0
@@ -369,7 +369,7 @@ Rectangle {
                 }
 
                 Row {
-                    id: row4
+                    id: example_settings_group_fourth_setting
                     width: 200
                     height: 400
                     opacity: 0
@@ -502,47 +502,68 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: column
+                target: settings_area
+                x: 20
+                y: 80
+                width: 710
                 opacity: 1
             }
 
             PropertyChanges {
-                target: text1
+                target: example_settings_group
+                text: qsTr("example settings group")
+                font.bold: true
+                font.pixelSize: 22
                 opacity: 1
             }
 
             PropertyChanges {
-                target: row
+                target: example_settings_group_organizer
+                width: 710
                 opacity: 1
             }
 
             PropertyChanges {
-                target: column3
+                target: example_settings_group_left_column
+                width: 355
                 opacity: 1
             }
 
             PropertyChanges {
-                target: column4
+                target: example_settings_group_right_column
+                width: 355
                 opacity: 1
             }
 
             PropertyChanges {
-                target: row1
+                target: example_settings_group_first_setting
+                height: 50
                 opacity: 1
             }
 
             PropertyChanges {
-                target: row2
+                target: example_settings_group_second_setting
+                height: 50
                 opacity: 1
             }
 
             PropertyChanges {
                 target: text2
+                width: 150
+                height: 40
+                text: qsTr("Milchtrinker")
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 18
                 opacity: 1
             }
 
             PropertyChanges {
                 target: text3
+                width: 150
+                height: 40
+                text: qsTr("Milchmarke")
+                font.pixelSize: 18
+                verticalAlignment: Text.AlignVCenter
                 opacity: 1
             }
 
@@ -557,27 +578,40 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: row3
+                target: example_settings_group_third_setting
+                height: 50
                 opacity: 1
             }
 
             PropertyChanges {
-                target: row4
+                target: example_settings_group_fourth_setting
+                height: 50
                 opacity: 1
             }
 
             PropertyChanges {
                 target: text4
+                width: 150
+                height: 40
+                text: qsTr("Gläser pro Woche")
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 18
                 opacity: 1
             }
 
             PropertyChanges {
                 target: text5
+                width: 150
+                height: 40
+                text: qsTr("Lieblingskuh")
+                font.pixelSize: 18
+                verticalAlignment: Text.AlignVCenter
                 opacity: 1
             }
 
             PropertyChanges {
                 target: slider
+                scale: 0.8
                 opacity: 1
             }
 
