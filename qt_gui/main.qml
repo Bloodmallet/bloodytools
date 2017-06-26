@@ -8,6 +8,8 @@ Window {
     title: qsTr("Bloodytools")
     minimumHeight: 500
     minimumWidth: 750
+    maximumHeight: 500
+    maximumWidth: 750
 
 
     MainForm {

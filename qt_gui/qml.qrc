@@ -10,5 +10,6 @@
         <file>img/repair-tools-cross.txt</file>
         <file>main.cpp</file>
         <file>img/tools.svg</file>
+        <file>img/bloodytools_icon.png</file>
     </qresource>
 </RCC>
