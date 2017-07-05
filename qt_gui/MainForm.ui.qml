@@ -313,8 +313,8 @@ Rectangle {
 
             PropertyChanges {
                 target: settings_area
-                x: 20
-                y: 80
+                x: 10
+                y: 20
                 width: 710
                 height: 350
                 clip: true
@@ -324,7 +324,7 @@ Rectangle {
             PropertyChanges {
                 target: example_settings_group
                 height: 30
-                text: qsTr("How to treat a lady")
+                text: qsTr("General settings")
                 font.bold: true
                 font.pixelSize: 22
                 opacity: 1
@@ -365,7 +365,7 @@ Rectangle {
                 target: text2
                 width: 150
                 height: 40
-                text: qsTr("Hug her")
+                text: qsTr("PTR")
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 18
                 opacity: 1
@@ -375,7 +375,7 @@ Rectangle {
                 target: text3
                 width: 150
                 height: 40
-                text: qsTr("Special action")
+                text: qsTr("Fight style")
                 font.pixelSize: 18
                 verticalAlignment: Text.AlignVCenter
                 opacity: 1
@@ -393,7 +393,7 @@ Rectangle {
                 clip: false
                 currentIndex: 0
                 opacity: 1
-                model: [ "Kiss her neck", "Caress her back", "Bite her ear" ]
+                model: [ "Patchwerk", "HeavyMovement", "Beastlord" ]
                 font.pixelSize: 18
             }
 
@@ -414,7 +414,7 @@ Rectangle {
                 target: text4
                 width: 150
                 height: 40
-                text: qsTr("Bug her")
+                text: qsTr("Target error")
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 18
                 opacity: 1
@@ -424,7 +424,7 @@ Rectangle {
                 target: text5
                 width: 150
                 height: 40
-                text: qsTr("Know her name")
+                text: qsTr("Name of the run")
                 font.pixelSize: 18
                 verticalAlignment: Text.AlignVCenter
                 opacity: 1
@@ -441,7 +441,7 @@ Rectangle {
 
             PropertyChanges {
                 target: textField
-                text: qsTr("Insert her Name here")
+                text: qsTr("Insert name here")
                 font.pixelSize: 18
                 opacity: 1
             }
@@ -450,6 +450,7 @@ Rectangle {
                 target: row
                 width: 710
                 height: 30
+                clip: true
                 anchors.rightMargin: 510
                 anchors.leftMargin: 0
                 opacity: 1
@@ -652,7 +653,7 @@ Rectangle {
             PropertyChanges {
                 target: text10
                 height: 30
-                text: qsTr("Peters preferences")
+                text: qsTr("Advanced settings")
                 font.bold: true
                 font.pixelSize: 22
                 opacity: 1
@@ -700,7 +701,7 @@ Rectangle {
                 target: text11
                 width: 150
                 height: 40
-                text: qsTr("Food")
+                text: qsTr("Upper bound")
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 18
                 opacity: 1
@@ -710,7 +711,7 @@ Rectangle {
                 target: text12
                 width: 150
                 height: 40
-                text: qsTr("Freetime")
+                text: qsTr("Default actions")
                 font.pixelSize: 18
                 verticalAlignment: Text.AlignVCenter
                 opacity: 1
@@ -720,7 +721,7 @@ Rectangle {
                 target: text13
                 width: 150
                 height: 40
-                text: qsTr("Loves")
+                text: qsTr("Calculation method")
                 font.pixelSize: 18
                 verticalAlignment: Text.AlignVCenter
                 opacity: 1
@@ -730,7 +731,7 @@ Rectangle {
                 target: text14
                 width: 150
                 height: 40
-                text: qsTr("Special Care")
+                text: qsTr("Something loads")
                 font.pixelSize: 18
                 verticalAlignment: Text.AlignVCenter
                 opacity: 1
@@ -759,245 +760,37 @@ Rectangle {
             PropertyChanges {
                 target: comboBox1
                 width: 200
-                model: [ "Bikinis", "Boobs", "Pizza", "Beeeeewbs" ]
+                model: [ "Differential Evolution", "2fast2begr8" ]
                 font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: rectangle3
+                x: 10
+                y: 60
+                width: 730
+                height: 370
+                radius: 7
+                border.width: 2
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: item3
+                width: 220
+                height: 30
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: item4
+                width: 220
+                height: 30
                 opacity: 1
             }
         }
     ]
-    Column {
-        id: settings_area
-        width: 200
-        height: 400
-        opacity: 0
-
-
-        Row {
-            id: row
-            width: 200
-            height: 400
-            opacity: 0
-
-            Text {
-                id: example_settings_group
-                text: qsTr("Text")
-                opacity: 0
-                font.pixelSize: 12
-            }
-        }
-        Row {
-            id: example_settings_group_organizer
-            width: 200
-            height: 400
-            opacity: 0
-
-            Column {
-                id: example_settings_group_left_column
-                width: 200
-                height: 400
-                opacity: 0
-
-                Row {
-                    id: example_settings_group_first_setting
-                    width: 200
-                    height: 400
-                    opacity: 0
-
-                    Text {
-                        id: text2
-                        text: qsTr("Text")
-                        opacity: 0
-                        font.pixelSize: 12
-                    }
-
-                    CheckBox {
-                        id: checkBox
-                        text: qsTr("Check Box")
-                        opacity: 0
-                    }
-                }
-
-                Row {
-                    id: example_settings_group_third_setting
-                    width: 200
-                    height: 400
-                    opacity: 0
-
-                    Text {
-                        id: text4
-                        text: qsTr("Text")
-                        opacity: 0
-                        font.pixelSize: 12
-                    }
-
-                    Slider {
-                        id: slider
-                        opacity: 0
-                        value: 0.5
-                    }
-                }
-            }
-
-            Column {
-                id: example_settings_group_right_column
-                width: 200
-                height: 400
-                opacity: 0
-
-                Row {
-                    id: example_settings_group_second_setting
-                    width: 200
-                    height: 400
-                    opacity: 0
-
-                    Text {
-                        id: text3
-                        text: qsTr("Text")
-                        opacity: 0
-                        font.pixelSize: 12
-                    }
-
-                    ComboBox {
-                        id: comboBox
-                        opacity: 0
-                    }
-                }
-
-                Row {
-                    id: example_settings_group_fourth_setting
-                    width: 200
-                    height: 400
-                    opacity: 0
-
-                    Text {
-                        id: text5
-                        text: qsTr("Text")
-                        opacity: 0
-                        font.pixelSize: 12
-                    }
-
-                    TextField {
-                        id: textField
-                        text: qsTr("Text Field")
-                        opacity: 0
-                    }
-                }
-            }
-        }
-
-        Row {
-            id: row6
-            width: 200
-            height: 400
-            opacity: 0
-
-            Text {
-                id: text10
-                text: qsTr("Text")
-                opacity: 0
-                font.pixelSize: 12
-            }
-        }
-
-        Row {
-            id: row7
-            width: 200
-            height: 400
-            opacity: 0
-
-            Column {
-                id: column4
-                width: 200
-                height: 400
-                opacity: 0
-
-                Row {
-                    id: row8
-                    width: 200
-                    height: 400
-                    opacity: 0
-
-                    Text {
-                        id: text11
-                        text: qsTr("Text")
-                        opacity: 0
-                        font.pixelSize: 12
-                    }
-
-                    ProgressBar {
-                        id: progressBar
-                        opacity: 0
-                        value: 0.5
-                    }
-                }
-
-                Row {
-                    id: row9
-                    width: 200
-                    height: 400
-                    opacity: 0
-
-                    Text {
-                        id: text12
-                        text: qsTr("Text")
-                        opacity: 0
-                        font.pixelSize: 12
-                    }
-
-                    Switch {
-                        id: switch1
-                        text: qsTr("Switch")
-                        opacity: 0
-                    }
-                }
-            }
-
-            Column {
-                id: column5
-                width: 200
-                height: 400
-                opacity: 0
-
-                Row {
-                    id: row10
-                    width: 200
-                    height: 400
-                    opacity: 0
-
-                    Text {
-                        id: text14
-                        text: qsTr("Text")
-                        opacity: 0
-                        font.pixelSize: 12
-                    }
-
-                    BusyIndicator {
-                        id: busyIndicator
-                        opacity: 0
-                    }
-                }
-
-                Row {
-                    id: row11
-                    width: 200
-                    height: 400
-                    opacity: 0
-
-                    Text {
-                        id: text13
-                        text: qsTr("Text")
-                        opacity: 0
-                        font.pixelSize: 12
-                    }
-
-                    ComboBox {
-                        id: comboBox1
-                        opacity: 0
-                    }
-                }
-            }
-        }
-    }
 
     Row {
         id: row5
@@ -1049,6 +842,265 @@ Rectangle {
                 anchors.fill: parent
                 opacity: 0
                 font.pixelSize: 12
+            }
+        }
+    }
+
+    Rectangle {
+        id: rectangle3
+        width: 200
+        height: 200
+        color: "#ffffff"
+        opacity: 0
+
+        Column {
+            id: settings_area
+            x: 0
+            y: 0
+            width: 200
+            height: 400
+            opacity: 0
+
+
+
+            Row {
+                id: row
+                width: 200
+                height: 400
+                opacity: 0
+
+
+                Item {
+                    id: item3
+                    width: 200
+                    height: 200
+                    opacity: 0
+                }
+                Text {
+                    id: example_settings_group
+                    text: qsTr("Text")
+                    opacity: 0
+                    font.pixelSize: 12
+                }
+            }
+            Row {
+                id: example_settings_group_organizer
+                width: 200
+                height: 400
+                opacity: 0
+
+                Column {
+                    id: example_settings_group_left_column
+                    width: 200
+                    height: 400
+                    opacity: 0
+
+                    Row {
+                        id: example_settings_group_first_setting
+                        width: 200
+                        height: 400
+                        opacity: 0
+
+                        Text {
+                            id: text2
+                            text: qsTr("Text")
+                            opacity: 0
+                            font.pixelSize: 12
+                        }
+
+                        CheckBox {
+                            id: checkBox
+                            text: qsTr("Check Box")
+                            opacity: 0
+                        }
+                    }
+
+                    Row {
+                        id: example_settings_group_third_setting
+                        width: 200
+                        height: 400
+                        opacity: 0
+
+                        Text {
+                            id: text4
+                            text: qsTr("Text")
+                            opacity: 0
+                            font.pixelSize: 12
+                        }
+
+                        Slider {
+                            id: slider
+                            opacity: 0
+                            value: 0.5
+                        }
+                    }
+                }
+
+                Column {
+                    id: example_settings_group_right_column
+                    width: 200
+                    height: 400
+                    opacity: 0
+
+                    Row {
+                        id: example_settings_group_second_setting
+                        width: 200
+                        height: 400
+                        opacity: 0
+
+                        Text {
+                            id: text3
+                            text: qsTr("Text")
+                            opacity: 0
+                            font.pixelSize: 12
+                        }
+
+                        ComboBox {
+                            id: comboBox
+                            opacity: 0
+                        }
+                    }
+
+                    Row {
+                        id: example_settings_group_fourth_setting
+                        width: 200
+                        height: 400
+                        opacity: 0
+
+                        Text {
+                            id: text5
+                            text: qsTr("Text")
+                            opacity: 0
+                            font.pixelSize: 12
+                        }
+
+                        TextField {
+                            id: textField
+                            text: qsTr("Text Field")
+                            opacity: 0
+                        }
+                    }
+                }
+            }
+
+            Row {
+                id: row6
+                width: 200
+                height: 400
+                opacity: 0
+
+
+                Item {
+                    id: item4
+                    width: 200
+                    height: 200
+                    opacity: 0
+                }
+                Text {
+                    id: text10
+                    text: qsTr("Text")
+                    opacity: 0
+                    font.pixelSize: 12
+                }
+            }
+
+            Row {
+                id: row7
+                width: 200
+                height: 400
+                opacity: 0
+
+                Column {
+                    id: column4
+                    width: 200
+                    height: 400
+                    opacity: 0
+
+                    Row {
+                        id: row8
+                        width: 200
+                        height: 400
+                        opacity: 0
+
+                        Text {
+                            id: text11
+                            text: qsTr("Text")
+                            opacity: 0
+                            font.pixelSize: 12
+                        }
+
+                        ProgressBar {
+                            id: progressBar
+                            opacity: 0
+                            value: 0.5
+                        }
+                    }
+
+                    Row {
+                        id: row9
+                        width: 200
+                        height: 400
+                        opacity: 0
+
+                        Text {
+                            id: text12
+                            text: qsTr("Text")
+                            opacity: 0
+                            font.pixelSize: 12
+                        }
+
+                        Switch {
+                            id: switch1
+                            text: qsTr("Switch")
+                            opacity: 0
+                        }
+                    }
+                }
+
+                Column {
+                    id: column5
+                    width: 200
+                    height: 400
+                    opacity: 0
+
+                    Row {
+                        id: row10
+                        width: 200
+                        height: 400
+                        opacity: 0
+
+                        Text {
+                            id: text14
+                            text: qsTr("Text")
+                            opacity: 0
+                            font.pixelSize: 12
+                        }
+
+                        BusyIndicator {
+                            id: busyIndicator
+                            opacity: 0
+                        }
+                    }
+
+                    Row {
+                        id: row11
+                        width: 200
+                        height: 400
+                        opacity: 0
+
+                        Text {
+                            id: text13
+                            text: qsTr("Text")
+                            opacity: 0
+                            font.pixelSize: 12
+                        }
+
+                        ComboBox {
+                            id: comboBox1
+                            opacity: 0
+                        }
+                    }
+                }
             }
         }
     }
