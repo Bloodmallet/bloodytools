@@ -7,7 +7,6 @@ Rectangle {
     width: 750
     height: 500
     property alias top_menu_profiler_profile_picker: top_menu_profiler_profile_picker
-    property alias comboBox: comboBox
     property alias mainWindow: mainWindow
     property alias bloodystatsIcon_i: bloodystatsIcon_i
     property alias switchToBloodystatsFakeButton_m: switchToBloodystatsFakeButton_m
@@ -195,7 +194,6 @@ Rectangle {
         }
     }
 
-
     Rectangle {
         id: top_menu_background
         x: 0
@@ -208,9 +206,6 @@ Rectangle {
             id: top_menu_organizer
             anchors.fill: parent
             opacity: 0
-
-
-
 
             Column {
                 id: top_menu_placeholder1
@@ -356,7 +351,6 @@ Rectangle {
             opacity: 0
             onClicked: mainWindow.state = "settings_bloodystats"
         }
-
     }
     states: [
         State {
@@ -381,142 +375,6 @@ Rectangle {
                 width: 710
                 height: 350
                 clip: true
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: example_settings_group
-                height: 30
-                text: qsTr("General settings")
-                font.weight: Font.DemiBold
-                font.bold: true
-                font.pixelSize: 22
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: example_settings_group_organizer
-                width: 710
-                height: 100
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: example_settings_group_left_column
-                width: 355
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: example_settings_group_right_column
-                width: 355
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: example_settings_group_first_setting
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: example_settings_group_second_setting
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text2
-                width: 150
-                height: 40
-                text: qsTr("PTR")
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text3
-                width: 150
-                height: 40
-                text: qsTr("Fight style")
-                font.pixelSize: 18
-                verticalAlignment: Text.AlignVCenter
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: checkBox
-                text: qsTr(" ")
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: comboBox
-                width: 200
-                clip: false
-                currentIndex: 0
-                opacity: 1
-                model: [ "Patchwerk", "HeavyMovement", "Beastlord" ]
-                font.pixelSize: 18
-            }
-
-            PropertyChanges {
-                target: example_settings_group_third_setting
-                height: 50
-                spacing: 0
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: example_settings_group_fourth_setting
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text4
-                width: 150
-                height: 40
-                text: qsTr("Target error")
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text5
-                width: 150
-                height: 40
-                text: qsTr("Name of the run")
-                font.pixelSize: 18
-                verticalAlignment: Text.AlignVCenter
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: slider
-                stepSize: 1
-                to: 7
-                value: 2
-                scale: 0.8
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: textField
-                text: qsTr("Insert name here")
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: row
-                width: 710
-                height: 30
-                clip: true
-                anchors.rightMargin: 510
-                anchors.leftMargin: 0
                 opacity: 1
             }
 
@@ -706,137 +564,6 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: row6
-                width: 710
-                height: 30
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: row7
-                width: 710
-                height: 80
-                clip: true
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text10
-                height: 30
-                text: qsTr("Advanced settings")
-                font.weight: Font.DemiBold
-                font.bold: true
-                font.pixelSize: 22
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: column4
-                width: 355
-                height: 200
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: column5
-                width: 355
-                height: 200
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: row8
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: row9
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: row10
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: row11
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text11
-                width: 150
-                height: 40
-                text: qsTr("Upper bound")
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text12
-                width: 150
-                height: 40
-                text: qsTr("Default actions")
-                font.pixelSize: 18
-                verticalAlignment: Text.AlignVCenter
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text13
-                width: 150
-                height: 40
-                text: qsTr("Calculation method")
-                font.pixelSize: 18
-                verticalAlignment: Text.AlignVCenter
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text14
-                width: 150
-                height: 40
-                text: qsTr("Something loads")
-                font.pixelSize: 18
-                verticalAlignment: Text.AlignVCenter
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: busyIndicator
-                height: 40
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: progressBar
-                height: 40
-                scale: 1
-                value: 0.7
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: switch1
-                text: qsTr("off")
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: comboBox1
-                width: 200
-                model: [ "Differential Evolution", "2fast" ]
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
                 target: settings_mainarea_bloodystats_background
                 x: 10
                 y: 60
@@ -844,20 +571,6 @@ Rectangle {
                 height: 370
                 radius: 7
                 border.width: 2
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: item3
-                width: 248
-                height: 30
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: item4
-                width: 230
-                height: 30
                 opacity: 1
             }
 
@@ -948,13 +661,33 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: listView
-                width: 350
-                height: 110
-                spacing: 2
-                contentHeight: 40
+                target: row
+                width: 710
+                height: 40
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: text1
+                width: 710
+                height: 40
+                text: qsTr("General")
+                font.pixelSize: 24
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: options_grid
+                width: 710
+                height: 300
+                cellHeight: 25
+                cellWidth: 350
+                clip: true
                 contentWidth: 350
-                flickableDirection: Flickable.HorizontalAndVerticalFlick
+                contentHeight: 50
                 opacity: 1
             }
         },
@@ -978,142 +711,6 @@ Rectangle {
                 y: 20
                 width: 710
                 height: 350
-                opacity: 1
-                clip: true
-            }
-
-            PropertyChanges {
-                target: example_settings_group
-                height: 30
-                text: qsTr("General settings")
-                font.weight: Font.DemiBold
-                font.bold: true
-                font.pixelSize: 22
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: example_settings_group_organizer
-                width: 710
-                height: 100
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: example_settings_group_left_column
-                width: 355
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: example_settings_group_right_column
-                width: 355
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: example_settings_group_first_setting
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: example_settings_group_second_setting
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text2
-                width: 150
-                height: 40
-                text: qsTr("PTR")
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text3
-                width: 150
-                height: 40
-                text: qsTr("Fight style")
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: checkBox
-                text: qsTr(" ")
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: comboBox
-                width: 200
-                currentIndex: 0
-                font.pixelSize: 18
-                model: [ "Patchwerk", "HeavyMovement", "Beastlord" ]
-                opacity: 1
-                clip: false
-            }
-
-            PropertyChanges {
-                target: example_settings_group_third_setting
-                height: 50
-                spacing: 0
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: example_settings_group_fourth_setting
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text4
-                width: 150
-                height: 40
-                text: qsTr("Target error")
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text5
-                width: 150
-                height: 40
-                text: qsTr("Name of the run")
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: slider
-                value: 2
-                to: 7
-                scale: 0.8
-                stepSize: 1
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: textField
-                text: qsTr("Insert name here")
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: row
-                width: 710
-                height: 30
-                anchors.rightMargin: 510
-                anchors.leftMargin: 0
                 opacity: 1
                 clip: true
             }
@@ -1306,136 +903,6 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: row6
-                width: 710
-                height: 30
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: row7
-                width: 710
-                height: 200
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text10
-                height: 30
-                text: qsTr("Advanced settings")
-                font.weight: Font.DemiBold
-                font.bold: true
-                font.pixelSize: 22
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: column4
-                width: 355
-                height: 200
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: column5
-                width: 355
-                height: 200
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: row8
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: row9
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: row10
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: row11
-                height: 50
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text11
-                width: 150
-                height: 40
-                text: qsTr("Upper bound")
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text12
-                width: 150
-                height: 40
-                text: qsTr("Default actions")
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text13
-                width: 150
-                height: 40
-                text: qsTr("Calculation method")
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: text14
-                width: 150
-                height: 40
-                text: qsTr("Something loads")
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 18
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: busyIndicator
-                height: 40
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: progressBar
-                height: 40
-                value: 0.7
-                scale: 1
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: switch1
-                text: qsTr("off")
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: comboBox1
-                width: 200
-                font.pixelSize: 18
-                model: [ "Differential Evolution", "2fast" ]
-                opacity: 1
-            }
-
-            PropertyChanges {
                 target: settings_mainarea_bloodystats_background
                 x: 10
                 y: 60
@@ -1444,20 +911,6 @@ Rectangle {
                 radius: 7
                 visible: false
                 border.width: 2
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: item3
-                width: 248
-                height: 30
-                opacity: 1
-            }
-
-            PropertyChanges {
-                target: item4
-                width: 230
-                height: 30
                 opacity: 1
             }
 
@@ -1653,8 +1106,6 @@ Rectangle {
             opacity: 0
         }
 
-
-
         Rectangle {
             id: bloodystats_settings_footer_simulate
             width: 200
@@ -1725,301 +1176,172 @@ Rectangle {
             height: 400
             opacity: 0
 
-
-
             Row {
                 id: row
                 width: 200
                 height: 400
                 opacity: 0
 
-
-                Item {
-                    id: item3
-                    width: 200
-                    height: 200
-                    opacity: 0
-                }
                 Text {
-                    id: example_settings_group
+                    id: text1
                     text: qsTr("Text")
-                    opacity: 0
                     font.pixelSize: 12
-                }
-            }
-            Row {
-                id: example_settings_group_organizer
-                width: 200
-                height: 400
-                opacity: 0
-
-                Column {
-                    id: example_settings_group_left_column
-                    width: 200
-                    height: 400
                     opacity: 0
-
-                    Row {
-                        id: example_settings_group_first_setting
-                        width: 200
-                        height: 400
-                        opacity: 0
-
-                        Text {
-                            id: text2
-                            text: qsTr("Text")
-                            opacity: 0
-                            font.pixelSize: 12
-                        }
-
-                        CheckBox {
-                            id: checkBox
-                            text: qsTr("Check Box")
-                            opacity: 0
-                        }
-                    }
-
-                    Row {
-                        id: example_settings_group_third_setting
-                        width: 200
-                        height: 400
-                        opacity: 0
-
-                        Text {
-                            id: text4
-                            text: qsTr("Text")
-                            opacity: 0
-                            font.pixelSize: 12
-                        }
-
-                        Slider {
-                            id: slider
-                            opacity: 0
-                            value: 0.5
-                        }
-                    }
-                }
-
-                Column {
-                    id: example_settings_group_right_column
-                    width: 200
-                    height: 400
-                    opacity: 0
-
-                    Row {
-                        id: example_settings_group_second_setting
-                        width: 200
-                        height: 400
-                        opacity: 0
-
-                        Text {
-                            id: text3
-                            text: qsTr("Text")
-                            opacity: 0
-                            font.pixelSize: 12
-                        }
-
-                        ComboBox {
-                            id: comboBox
-                            opacity: 0
-                        }
-                    }
-
-                    Row {
-                        id: example_settings_group_fourth_setting
-                        width: 200
-                        height: 400
-                        opacity: 0
-
-                        Text {
-                            id: text5
-                            text: qsTr("Text")
-                            opacity: 0
-                            font.pixelSize: 12
-                        }
-
-                        TextField {
-                            id: textField
-                            text: qsTr("Text Field")
-                            opacity: 0
-                        }
-                    }
                 }
             }
 
-            Row {
-                id: row6
-                width: 200
-                height: 400
-                opacity: 0
-
-
-                Item {
-                    id: item4
-                    width: 200
-                    height: 200
-                    opacity: 0
-                }
-                Text {
-                    id: text10
-                    text: qsTr("Text")
-                    opacity: 0
-                    font.pixelSize: 12
-                }
-            }
-
-            Row {
-                id: row7
-                width: 200
-                height: 400
-                opacity: 0
-
-                Column {
-                    id: column4
-                    width: 200
-                    height: 400
-                    opacity: 0
-
-                    Row {
-                        id: row8
-                        width: 200
-                        height: 400
-                        opacity: 0
-
-                        Text {
-                            id: text11
-                            text: qsTr("Text")
-                            opacity: 0
-                            font.pixelSize: 12
-                        }
-
-                        ProgressBar {
-                            id: progressBar
-                            opacity: 0
-                            value: 0.5
-                        }
-                    }
-
-                    Row {
-                        id: row9
-                        width: 200
-                        height: 400
-                        opacity: 0
-
-                        Text {
-                            id: text12
-                            text: qsTr("Text")
-                            opacity: 0
-                            font.pixelSize: 12
-                        }
-
-                        Switch {
-                            id: switch1
-                            text: qsTr("Switch")
-                            opacity: 0
-                        }
-                    }
-                }
-
-                Column {
-                    id: column5
-                    width: 200
-                    height: 400
-                    opacity: 0
-
-                    Row {
-                        id: row10
-                        width: 200
-                        height: 400
-                        opacity: 0
-
-                        Text {
-                            id: text14
-                            text: qsTr("Text")
-                            opacity: 0
-                            font.pixelSize: 12
-                        }
-
-                        BusyIndicator {
-                            id: busyIndicator
-                            opacity: 0
-                        }
-                    }
-
-                    Row {
-                        id: row11
-                        width: 200
-                        height: 400
-                        opacity: 0
-
-                        Text {
-                            id: text13
-                            text: qsTr("Text")
-                            opacity: 0
-                            font.pixelSize: 12
-                        }
-
-                        ComboBox {
-                            id: comboBox1
-                            opacity: 0
-                        }
-                    }
-                }
-            }
-
-            ListView {
-                id: listView
+            GridView {
+                id: options_grid
                 x: 0
                 y: 0
-                width: 110
-                height: 160
-                delegate: Item {
-                    width: 350
-                    height: 35
-                    Row {
-                        id: row2
-                        width: 350
-                        height: 35
-
-                        Text {
-                            height: 35
-                            text: name
-                            verticalAlignment: Text.AlignTop
-                            font.pointSize: 12
-                            anchors.verticalCenter: parent.verticalCenter
-                            font.bold: true
-                        }
-
-                        TextEdit {
-                            id: textEdit
-                            width: 200
-                            height: 35
-                            text: value_entry
-                            font.pointSize: 12
-                        }
-                        spacing: 10
-                    }
-                }
+                width: 140
+                height: 140
+                cellHeight: 70
                 opacity: 0
+                cellWidth: 70
                 model: ListModel {
                     ListElement {
-                        name: "wow class"
-                        value_entry: "shaman"
+                        option_name: "Class"
+                        option_value: "Shaman"
+                    }
+                    ListElement {
+                        option_name: "Spec"
+                        option_value: "Elemental"
+                    }
+                    ListElement {
+                        option_name: "Race"
+                        option_value: "Draenei"
+                    }
+                    ListElement {
+                        option_name: "Talents"
+                        option_value: "3111231"
+                    }
+                    ListElement {
+                        option_name: "Fight style"
+                        option_value: "Patchwerk"
                     }
 
                     ListElement {
-                        name: "wow race"
-                        value_entry: "draenei"
+                        option_name: "Profile"
+                        option_value: "T20M"
+                    }
+                    ListElement {
+                        option_name: "Tier set number"
+                        option_value: "20"
+                    }
+                    ListElement {
+                        option_name: "Force 2p bonus"
+                        option_value: "False"
+                    }
+                    ListElement {
+                        option_name: "Force 4p bonus"
+                        option_value: "False"
                     }
 
                     ListElement {
-                        name: "wow spec"
-                        value_entry: "elemental"
+                        option_name: "Crit lower bound"
+                        option_value: "3500"
+                    }
+                    ListElement {
+                        option_name: "Haste lower bound"
+                        option_value: "3500"
+                    }
+                    ListElement {
+                        option_name: "Mastery lower bound"
+                        option_value: "3500"
+                    }
+                    ListElement {
+                        option_name: "Versatility lower bound"
+                        option_value: "2000"
+                    }
+                    ListElement {
+                        option_name: "General upper bound"
+                        option_value: "13500"
                     }
 
                     ListElement {
-                        name: "talents"
-                        value_entry: "3111231"
+                        option_name: "Calculation method"
+                        option_value: "differential_evolution"
+                    }
+                    ListElement {
+                        option_name: "Output"
+                        option_value: "txt"
+                    }
+                    ListElement {
+                        option_name: "Custom character stats"
+                        option_value: "False"
+                    }
+                    ListElement {
+                        option_name: "Custom fight style"
+                        option_value: "False"
+                    }
+                    ListElement {
+                        option_name: "Generate html"
+                        option_value: "False"
+                    }
+                    ListElement {
+                        option_name: "SimC path"
+                        option_value: "../simc.exe"
+                    }
+                    ListElement {
+                        option_name: "Default actions"
+                        option_value: "True"
+                    }
+                    ListElement {
+                        option_name: "Iterations"
+                        option_value: "250000"
+                    }
+                    ListElement {
+                        option_name: "Target error"
+                        option_value: "0.1"
+                    }
+                    ListElement {
+                        option_name: "Threads"
+                        option_value: ""
+                    }
+                    ListElement {
+                        option_name: "PTR"
+                        option_value: "False"
+                    }
+                }
+                delegate: Item {
+                    width: 350
+                    height: 25
+
+                    Row {
+                        id: options_grid_row
+                        width: 350
+                        height: 25
+
+                        Text {
+                            id: options_grid_row_name
+                            y: 3
+                            width: 175
+                            height: 25
+                            text: option_name
+                            verticalAlignment: Text.AlignTop
+                            font.pixelSize: 16
+                        }
+
+                        Rectangle {
+                            id: rectangle
+                            y: 2
+                            width: 172
+                            height: 22
+                            color: "#ffffff"
+                            radius: 1
+                            border.color: "#aaaaaa"
+                            border.width: 1
+
+                            TextEdit {
+                                id: options_grid_row_value
+                                x: 2
+                                width: 170
+                                height: 25
+                                text: option_value
+                                font.pixelSize: 16
+                            }
+                        }
                     }
                 }
             }
@@ -2040,8 +1362,6 @@ Rectangle {
             width: 200
             height: 400
             opacity: 0
-
-
 
             Row {
                 id: row1
@@ -2076,7 +1396,6 @@ Rectangle {
                     font.pixelSize: 12
                     opacity: 0
                 }
-
 
                 Image {
                     id: profiler_bloodystats_profile1_save
