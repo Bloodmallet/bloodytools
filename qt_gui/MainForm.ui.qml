@@ -6,6 +6,7 @@ Rectangle {
 
     width: 750
     height: 500
+    property alias top_menu_profiler_profile_picker: top_menu_profiler_profile_picker
     property alias comboBox: comboBox
     property alias mainWindow: mainWindow
     property alias bloodystatsIcon_i: bloodystatsIcon_i
@@ -196,7 +197,7 @@ Rectangle {
 
 
     Rectangle {
-        id: rectangle
+        id: top_menu_background
         x: 0
         width: 200
         height: 200
@@ -204,7 +205,7 @@ Rectangle {
         opacity: 0
 
         Row {
-            id: row1
+            id: top_menu_organizer
             anchors.fill: parent
             opacity: 0
 
@@ -212,25 +213,25 @@ Rectangle {
 
 
             Column {
-                id: column3
+                id: top_menu_placeholder1
                 width: 200
                 height: 400
                 opacity: 0
             }
             Column {
-                id: column
+                id: top_menu_bloodytools_group
                 width: 200
                 height: 400
                 opacity: 0
 
                 Row {
-                    id: row2
+                    id: top_menu_bloodytools_organizer
                     width: 200
                     height: 400
                     opacity: 0
 
                     Image {
-                        id: image
+                        id: top_menu_bloodytools_icon
                         width: 100
                         height: 100
                         opacity: 0
@@ -238,7 +239,7 @@ Rectangle {
                     }
 
                     Text {
-                        id: text1
+                        id: top_menu_bloodytools_text
                         text: qsTr("Text")
                         opacity: 0
                         font.pixelSize: 12
@@ -246,19 +247,19 @@ Rectangle {
                 }
             }
             Column {
-                id: column1
+                id: top_menu_submenu_sign_group
                 width: 200
                 height: 400
                 opacity: 0
 
                 Row {
-                    id: row3
+                    id: top_menu_submenu_organizer
                     width: 200
                     height: 400
                     opacity: 0
 
                     Text {
-                        id: text6
+                        id: top_menu_submenu_sign
                         text: qsTr("Text")
                         opacity: 0
                         font.pixelSize: 12
@@ -266,19 +267,19 @@ Rectangle {
                 }
             }
             Column {
-                id: column2
+                id: top_menu_bloodystats_group
                 width: 200
                 height: 400
                 opacity: 0
 
                 Row {
-                    id: row4
+                    id: top_menu_bloodystats_organizer
                     width: 200
                     height: 400
                     opacity: 0
 
                     Image {
-                        id: image1
+                        id: top_menu_bloodystats_icon
                         width: 100
                         height: 100
                         opacity: 0
@@ -286,14 +287,76 @@ Rectangle {
                     }
 
                     Text {
-                        id: text7
+                        id: top_menu_bloodystats_text
                         text: qsTr("Text")
                         opacity: 0
                         font.pixelSize: 12
+                    }
+                }
+            }
+
+            Column {
+                id: top_menu_placeholder2
+                width: 200
+                height: 400
+                opacity: 0
+            }
+
+            Column {
+                id: top_menu_profiler_group
+                width: 200
+                height: 400
+                opacity: 0
+
+                Row {
+                    id: top_menu_profiler_organizer
+                    width: 200
+                    height: 400
+                    opacity: 0
+
+                    ComboBox {
+                        id: top_menu_profiler_profile_picker
+                        opacity: 0
+                    }
+
+                    Image {
+                        id: top_menu_profiles_settings
+                        width: 100
+                        height: 100
+                        source: "img/settings.svg"
+                        opacity: 0
+
+                        MouseArea {
+                            id: top_menu_settings_mousearea
+                            anchors.fill: parent
+                            opacity: 0
+                            onClicked: mainWindow.state == "settings_bloodystats" ? mainWindow.state = "profiler_bloodystats" : mainWindow.state = "settings_bloodystats"
+                        }
                     }
                 }
             }
         }
+
+        MouseArea {
+            id: top_menu_bloodytools_mousearea
+            x: 19
+            y: 0
+            width: 100
+            height: 100
+            opacity: 0
+            onClicked: mainWindow.state = ""
+        }
+
+        MouseArea {
+            id: top_menu_bloodystats_mousearea
+            x: 18
+            y: -2
+            width: 100
+            height: 100
+            opacity: 0
+            onClicked: mainWindow.state = "settings_bloodystats"
+        }
+
     }
     states: [
         State {
@@ -325,6 +388,7 @@ Rectangle {
                 target: example_settings_group
                 height: 30
                 text: qsTr("General settings")
+                font.weight: Font.DemiBold
                 font.bold: true
                 font.pixelSize: 22
                 opacity: 1
@@ -457,7 +521,7 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: rectangle
+                target: top_menu_background
                 x: -4
                 y: -6
                 width: 758
@@ -471,15 +535,16 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: row1
+                target: top_menu_organizer
+                clip: true
                 spacing: 5
                 opacity: 1
             }
 
             PropertyChanges {
-                target: image
+                target: top_menu_bloodytools_icon
                 x: 2
-                y: 7
+                y: 10
                 width: 35
                 height: 35
                 fillMode: Image.PreserveAspectFit
@@ -488,9 +553,10 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: text1
-                y: 13
+                target: top_menu_bloodytools_text
+                y: 18
                 text: qsTr("Bloodytools")
+                font.weight: Font.DemiBold
                 font.bold: true
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 18
@@ -498,7 +564,7 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: column
+                target: top_menu_bloodytools_group
                 width: 145
                 height: 50
                 clip: true
@@ -507,23 +573,23 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: row2
-                width: 155
+                target: top_menu_bloodytools_organizer
+                width: 145
                 height: 50
                 spacing: 5
                 opacity: 1
             }
 
             PropertyChanges {
-                target: column1
+                target: top_menu_submenu_sign_group
                 width: 15
                 height: 50
                 opacity: 1
             }
 
             PropertyChanges {
-                target: text6
-                y: 11
+                target: top_menu_submenu_sign
+                y: 17
                 text: qsTr(">")
                 font.bold: true
                 font.pixelSize: 20
@@ -531,12 +597,14 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: row3
+                target: top_menu_submenu_organizer
+                width: 15
+                height: 50
                 opacity: 1
             }
 
             PropertyChanges {
-                target: column2
+                target: top_menu_bloodystats_group
                 width: 165
                 height: 50
                 spacing: 0
@@ -545,39 +613,40 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: row4
+                target: top_menu_bloodystats_organizer
                 spacing: 5
                 opacity: 1
             }
 
             PropertyChanges {
-                target: image1
-                y: 7
-                width: 35
-                height: 35
+                target: top_menu_bloodystats_icon
+                y: 13
+                width: 30
+                height: 30
                 fillMode: Image.PreserveAspectFit
-                source: "img/repair-tools-cross.svg"
+                source: "img/tools.svg"
                 opacity: 1
             }
 
             PropertyChanges {
-                target: text7
-                y: 13
+                target: top_menu_bloodystats_text
+                y: 17
                 text: qsTr("Bloodystats")
+                font.weight: Font.DemiBold
                 font.bold: true
                 font.pixelSize: 18
                 opacity: 1
             }
 
             PropertyChanges {
-                target: column3
+                target: top_menu_placeholder1
                 width: 14
                 height: 50
                 opacity: 1
             }
 
             PropertyChanges {
-                target: row5
+                target: bloodystats_settings_footer
                 x: 20
                 y: 440
                 width: 710
@@ -586,21 +655,21 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: item1
+                target: bloodystats_settings_footer_placeholder1
                 width: 315
                 height: 40
                 opacity: 1
             }
 
             PropertyChanges {
-                target: item2
+                target: bloodystats_settings_footer_placeholder2
                 width: 35
                 height: 40
                 opacity: 1
             }
 
             PropertyChanges {
-                target: rectangle1
+                target: bloodystats_settings_footer_simulate
                 width: 150
                 height: 40
                 radius: 7
@@ -609,7 +678,7 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: rectangle2
+                target: bloodystats_settings_footer_save_simulate
                 width: 210
                 height: 40
                 radius: 7
@@ -618,7 +687,7 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: text8
+                target: bloodystats_settings_footer_simulate_text
                 text: qsTr("Simulate")
                 font.pixelSize: 18
                 verticalAlignment: Text.AlignVCenter
@@ -627,7 +696,7 @@ Rectangle {
             }
 
             PropertyChanges {
-                target: text9
+                target: bloodystats_settings_footer_save_simulate_text
                 width: 15
                 text: qsTr("Save & Simulate")
                 font.pixelSize: 18
@@ -646,7 +715,8 @@ Rectangle {
             PropertyChanges {
                 target: row7
                 width: 710
-                height: 200
+                height: 80
+                clip: true
                 opacity: 1
             }
 
@@ -654,6 +724,7 @@ Rectangle {
                 target: text10
                 height: 30
                 text: qsTr("Advanced settings")
+                font.weight: Font.DemiBold
                 font.bold: true
                 font.pixelSize: 22
                 opacity: 1
@@ -760,13 +831,13 @@ Rectangle {
             PropertyChanges {
                 target: comboBox1
                 width: 200
-                model: [ "Differential Evolution", "2fast2begr8" ]
+                model: [ "Differential Evolution", "2fast" ]
                 font.pixelSize: 18
                 opacity: 1
             }
 
             PropertyChanges {
-                target: rectangle3
+                target: settings_mainarea_bloodystats_background
                 x: 10
                 y: 60
                 width: 730
@@ -778,28 +849,805 @@ Rectangle {
 
             PropertyChanges {
                 target: item3
-                width: 220
+                width: 248
                 height: 30
                 opacity: 1
             }
 
             PropertyChanges {
                 target: item4
-                width: 220
+                width: 230
                 height: 30
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_placeholder2
+                width: 117
+                height: 50
+                clip: false
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_profiler_group
+                width: 260
+                height: 50
+                clip: true
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_profiler_organizer
+                width: 260
+                height: 50
+                spacing: 4
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_profiler_profile_picker
+                x: 0
+                y: 10
+                width: 220
+                height: 35
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_profiles_settings
+                y: 10
+                width: 35
+                height: 35
+                source: "img/settings.svg"
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: rootArea_m
+                visible: false
+            }
+
+            PropertyChanges {
+                target: top_menu_settings_mousearea
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_bloodytools_mousearea
+                x: 14
+                y: 0
+                width: 153
+                height: 50
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_bloodystats_mousearea
+                x: 188
+                y: 0
+                width: 157
+                height: 50
+            }
+
+            PropertyChanges {
+                target: footer_simulate_mousearea
+                x: 334
+                y: 440
+                width: 150
+                height: 40
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: footer_simulate_save_mousearea
+                x: 520
+                y: 440
+                width: 210
+                height: 40
+            }
+
+            PropertyChanges {
+                target: listView
+                width: 350
+                height: 110
+                spacing: 2
+                contentHeight: 40
+                contentWidth: 350
+                flickableDirection: Flickable.HorizontalAndVerticalFlick
+                opacity: 1
+            }
+        },
+        State {
+            name: "profiler_bloodystats"
+            PropertyChanges {
+                target: mainStateSwitch_r
+                visible: false
+            }
+
+            PropertyChanges {
+                target: programmTitle_t
+                horizontalAlignment: Text.AlignHCenter
+                font.letterSpacing: 3
+                visible: false
+            }
+
+            PropertyChanges {
+                target: settings_area
+                x: 10
+                y: 20
+                width: 710
+                height: 350
+                opacity: 1
+                clip: true
+            }
+
+            PropertyChanges {
+                target: example_settings_group
+                height: 30
+                text: qsTr("General settings")
+                font.weight: Font.DemiBold
+                font.bold: true
+                font.pixelSize: 22
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: example_settings_group_organizer
+                width: 710
+                height: 100
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: example_settings_group_left_column
+                width: 355
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: example_settings_group_right_column
+                width: 355
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: example_settings_group_first_setting
+                height: 50
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: example_settings_group_second_setting
+                height: 50
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: text2
+                width: 150
+                height: 40
+                text: qsTr("PTR")
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: text3
+                width: 150
+                height: 40
+                text: qsTr("Fight style")
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: checkBox
+                text: qsTr(" ")
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: comboBox
+                width: 200
+                currentIndex: 0
+                font.pixelSize: 18
+                model: [ "Patchwerk", "HeavyMovement", "Beastlord" ]
+                opacity: 1
+                clip: false
+            }
+
+            PropertyChanges {
+                target: example_settings_group_third_setting
+                height: 50
+                spacing: 0
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: example_settings_group_fourth_setting
+                height: 50
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: text4
+                width: 150
+                height: 40
+                text: qsTr("Target error")
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: text5
+                width: 150
+                height: 40
+                text: qsTr("Name of the run")
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: slider
+                value: 2
+                to: 7
+                scale: 0.8
+                stepSize: 1
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: textField
+                text: qsTr("Insert name here")
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: row
+                width: 710
+                height: 30
+                anchors.rightMargin: 510
+                anchors.leftMargin: 0
+                opacity: 1
+                clip: true
+            }
+
+            PropertyChanges {
+                target: top_menu_background
+                x: "-4"
+                y: "-6"
+                width: 758
+                height: 50
+                radius: 7
+                anchors.bottomMargin: 446
+                border.width: 2
+                opacity: 1
+                anchors.topMargin: "-9"
+                clip: true
+            }
+
+            PropertyChanges {
+                target: top_menu_organizer
+                spacing: 5
+                clip: true
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_bloodytools_icon
+                x: 2
+                y: 10
+                width: 35
+                height: 35
+                source: "img/bloodytools_icon.png"
+                fillMode: Image.PreserveAspectFit
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_bloodytools_text
+                y: 18
+                text: qsTr("Bloodytools")
+                verticalAlignment: Text.AlignVCenter
+                font.weight: Font.DemiBold
+                font.bold: true
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_bloodytools_group
+                width: 145
+                height: 50
+                spacing: 0
+                opacity: 1
+                clip: true
+            }
+
+            PropertyChanges {
+                target: top_menu_bloodytools_organizer
+                width: 145
+                height: 50
+                spacing: 5
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_submenu_sign_group
+                width: 15
+                height: 50
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_submenu_sign
+                y: 17
+                text: qsTr(">")
+                font.bold: true
+                font.pixelSize: 20
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_submenu_organizer
+                height: 50
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_bloodystats_group
+                width: 165
+                height: 50
+                spacing: 0
+                opacity: 1
+                clip: true
+            }
+
+            PropertyChanges {
+                target: top_menu_bloodystats_organizer
+                spacing: 5
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_bloodystats_icon
+                y: 13
+                width: 30
+                height: 30
+                source: "img/tools.svg"
+                fillMode: Image.PreserveAspectFit
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_bloodystats_text
+                y: 17
+                text: qsTr("Bloodystats")
+                font.weight: Font.DemiBold
+                font.bold: true
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_placeholder1
+                width: 14
+                height: 50
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: bloodystats_settings_footer
+                x: 20
+                y: 440
+                width: 710
+                height: 40
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: bloodystats_settings_footer_placeholder1
+                width: 315
+                height: 40
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: bloodystats_settings_footer_placeholder2
+                width: 35
+                height: 40
+                visible: false
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: bloodystats_settings_footer_simulate
+                width: 150
+                height: 40
+                radius: 7
+                visible: false
+                border.width: 2
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: bloodystats_settings_footer_save_simulate
+                width: 210
+                height: 40
+                radius: 7
+                visible: false
+                border.width: 2
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: bloodystats_settings_footer_simulate_text
+                text: qsTr("Simulate")
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: bloodystats_settings_footer_save_simulate_text
+                width: 15
+                text: qsTr("Save & Simulate")
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: row6
+                width: 710
+                height: 30
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: row7
+                width: 710
+                height: 200
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: text10
+                height: 30
+                text: qsTr("Advanced settings")
+                font.weight: Font.DemiBold
+                font.bold: true
+                font.pixelSize: 22
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: column4
+                width: 355
+                height: 200
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: column5
+                width: 355
+                height: 200
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: row8
+                height: 50
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: row9
+                height: 50
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: row10
+                height: 50
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: row11
+                height: 50
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: text11
+                width: 150
+                height: 40
+                text: qsTr("Upper bound")
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: text12
+                width: 150
+                height: 40
+                text: qsTr("Default actions")
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: text13
+                width: 150
+                height: 40
+                text: qsTr("Calculation method")
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: text14
+                width: 150
+                height: 40
+                text: qsTr("Something loads")
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: busyIndicator
+                height: 40
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: progressBar
+                height: 40
+                value: 0.7
+                scale: 1
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: switch1
+                text: qsTr("off")
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: comboBox1
+                width: 200
+                font.pixelSize: 18
+                model: [ "Differential Evolution", "2fast" ]
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: settings_mainarea_bloodystats_background
+                x: 10
+                y: 60
+                width: 730
+                height: 370
+                radius: 7
+                visible: false
+                border.width: 2
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: item3
+                width: 248
+                height: 30
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: item4
+                width: 230
+                height: 30
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_placeholder2
+                width: 127
+                height: 50
+                visible: false
+                clip: false
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_profiler_group
+                width: 260
+                height: 50
+                visible: false
+                clip: true
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_profiler_organizer
+                width: 260
+                height: 50
+                spacing: 4
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_profiler_profile_picker
+                x: 0
+                y: 10
+                width: 220
+                height: 35
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_profiles_settings
+                y: 10
+                width: 35
+                height: 35
+                source: "img/settings.svg"
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: rootArea_m
+                visible: false
+            }
+
+            PropertyChanges {
+                target: bloodystats_settings_footer_profiler_save
+                width: 150
+                height: 40
+                radius: 7
+                border.width: 2
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: bloodystats_settings_footer_profiler_save_text
+                text: qsTr("Save")
+                font.pixelSize: 18
+                font.weight: Font.DemiBold
+                font.bold: true
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: profiler_bloodystats_background
+                x: 10
+                y: 60
+                width: 730
+                height: 370
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: top_menu_bloodytools_mousearea
+                width: 148
+                height: 50
+            }
+
+            PropertyChanges {
+                target: top_menu_bloodystats_mousearea
+                x: 188
+                y: 0
+                width: 157
+                height: 50
+            }
+
+            PropertyChanges {
+                target: profiler_bloodystats_organizer
+                width: 730
+                height: 370
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: profiler_bloodystats_default_entry
+                width: 730
+                height: 40
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: profiler_bloodystats_default_name_text
+                width: 600
+                height: 40
+                color: "#606060"
+                text: qsTr("default")
+                styleColor: "#000000"
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: profiler_bloodystats_profile1
+                width: 730
+                height: 40
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: profiler_bloodystats_profile1_text
+                width: 600
+                height: 40
+                text: qsTr("choose your own name here")
+                font.pixelSize: 18
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: row1
+                width: 730
+                height: 15
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: profiler_bloodystats_profile1_delete
+                width: 25
+                height: 40
+                text: qsTr("-")
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 24
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: profiler_bloodystats_profile1_save
+                width: 28
+                height: 28
+                source: "img/save.svg"
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: profiler_bloodystats_add_profile
+                width: 730
+                height: 40
+                opacity: 1
+            }
+
+            PropertyChanges {
+                target: profiler_bloodystats_add_profile_add_text
+                width: 40
+                height: 40
+                text: qsTr("+")
+                horizontalAlignment: Text.AlignHCenter
+                font.bold: true
+                font.pixelSize: 24
                 opacity: 1
             }
         }
     ]
 
     Row {
-        id: row5
+        id: bloodystats_settings_footer
         width: 200
         height: 400
         opacity: 0
 
         Item {
-            id: item1
+            id: bloodystats_settings_footer_placeholder1
             width: 200
             height: 200
             opacity: 0
@@ -808,14 +1656,14 @@ Rectangle {
 
 
         Rectangle {
-            id: rectangle1
+            id: bloodystats_settings_footer_simulate
             width: 200
             height: 200
             color: "#ffffff"
             opacity: 0
 
             Text {
-                id: text8
+                id: bloodystats_settings_footer_simulate_text
                 text: qsTr("Text")
                 anchors.fill: parent
                 opacity: 0
@@ -823,31 +1671,47 @@ Rectangle {
             }
         }
         Item {
-            id: item2
+            id: bloodystats_settings_footer_placeholder2
             width: 200
             height: 200
             opacity: 0
         }
 
         Rectangle {
-            id: rectangle2
+            id: bloodystats_settings_footer_save_simulate
             width: 200
             height: 200
             color: "#ffffff"
             opacity: 0
 
             Text {
-                id: text9
+                id: bloodystats_settings_footer_save_simulate_text
                 text: qsTr("Text")
                 anchors.fill: parent
                 opacity: 0
                 font.pixelSize: 12
             }
         }
+
+        Rectangle {
+            id: bloodystats_settings_footer_profiler_save
+            width: 200
+            height: 200
+            color: "#ffffff"
+            opacity: 0
+
+            Text {
+                id: bloodystats_settings_footer_profiler_save_text
+                text: qsTr("Text")
+                anchors.fill: parent
+                font.pixelSize: 12
+                opacity: 0
+            }
+        }
     }
 
     Rectangle {
-        id: rectangle3
+        id: settings_mainarea_bloodystats_background
         width: 200
         height: 200
         color: "#ffffff"
@@ -1102,6 +1966,164 @@ Rectangle {
                     }
                 }
             }
+
+            ListView {
+                id: listView
+                x: 0
+                y: 0
+                width: 110
+                height: 160
+                delegate: Item {
+                    width: 350
+                    height: 35
+                    Row {
+                        id: row2
+                        width: 350
+                        height: 35
+
+                        Text {
+                            height: 35
+                            text: name
+                            verticalAlignment: Text.AlignTop
+                            font.pointSize: 12
+                            anchors.verticalCenter: parent.verticalCenter
+                            font.bold: true
+                        }
+
+                        TextEdit {
+                            id: textEdit
+                            width: 200
+                            height: 35
+                            text: value_entry
+                            font.pointSize: 12
+                        }
+                        spacing: 10
+                    }
+                }
+                opacity: 0
+                model: ListModel {
+                    ListElement {
+                        name: "wow class"
+                        value_entry: "shaman"
+                    }
+
+                    ListElement {
+                        name: "wow race"
+                        value_entry: "draenei"
+                    }
+
+                    ListElement {
+                        name: "wow spec"
+                        value_entry: "elemental"
+                    }
+
+                    ListElement {
+                        name: "talents"
+                        value_entry: "3111231"
+                    }
+                }
+            }
         }
+    }
+
+    Rectangle {
+        id: profiler_bloodystats_background
+        x: 20
+        y: 60
+        width: 200
+        height: 200
+        color: "#ffffff"
+        opacity: 0
+
+        Column {
+            id: profiler_bloodystats_organizer
+            width: 200
+            height: 400
+            opacity: 0
+
+
+
+            Row {
+                id: row1
+                width: 200
+                height: 400
+                opacity: 0
+            }
+            Row {
+                id: profiler_bloodystats_default_entry
+                width: 200
+                height: 400
+                opacity: 0
+
+                Text {
+                    id: profiler_bloodystats_default_name_text
+                    text: qsTr("Text")
+                    font.pixelSize: 12
+                    opacity: 0
+                }
+            }
+            Row {
+                id: profiler_bloodystats_profile1
+                width: 200
+                height: 400
+                opacity: 0
+
+                TextEdit {
+                    id: profiler_bloodystats_profile1_text
+                    width: 80
+                    height: 20
+                    text: qsTr("Text Edit")
+                    font.pixelSize: 12
+                    opacity: 0
+                }
+
+
+                Image {
+                    id: profiler_bloodystats_profile1_save
+                    width: 100
+                    height: 100
+                    source: "img/save.svg"
+                    opacity: 0
+                }
+                Text {
+                    id: profiler_bloodystats_profile1_delete
+                    text: qsTr("Text")
+                    font.pixelSize: 12
+                    opacity: 0
+                }
+            }
+
+            Row {
+                id: profiler_bloodystats_add_profile
+                width: 200
+                height: 400
+                opacity: 0
+
+                Text {
+                    id: profiler_bloodystats_add_profile_add_text
+                    text: qsTr("Text")
+                    font.pixelSize: 12
+                    opacity: 0
+                }
+            }
+        }
+    }
+
+    MouseArea {
+        id: footer_simulate_mousearea
+        width: 100
+        height: 100
+        opacity: 0
+        onClicked: mainWindow.state = ""
+    }
+
+    MouseArea {
+        id: footer_simulate_save_mousearea
+        x: 6
+        y: -3
+        width: 100
+        height: 100
+        opacity: 0
+        onClicked: mainWindow.state = ""
     }
 }

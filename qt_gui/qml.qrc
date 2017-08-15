@@ -11,5 +11,7 @@
         <file>main.cpp</file>
         <file>img/tools.svg</file>
         <file>img/bloodytools_icon.png</file>
+        <file>img/settings.svg</file>
+        <file>img/save.svg</file>
     </qresource>
 </RCC>

@@ -37,4 +37,5 @@ DISTFILES += \
     img/horizontal-bars-chart.txt \
     img/repair-tools-cross.txt \
     img/tools.svg \
-    img/bloodytools_icon.png
+    img/bloodytools_icon.png \
+    img/settings.svg
