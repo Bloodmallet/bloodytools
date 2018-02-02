@@ -11,76 +11,27 @@ logger = logging.getLogger(__name__)
 
 class Error( Exception ):
   """Base class for exceptions in this module"""
-  pass
+  def __init__( self, message):
+    self.message = message
 
 
 class AlreadySetError( Error ):
-  """
-  Exception raised if a value already exists.
-
-  Attributes:
-    value -- value which was tried to set
-    message -- explanation of the error
-  """
-  def __init__( self, value, message ):
-    self.value = value
-    self.message = message
-    logger.exception(self.message)
+  pass
 
 
 class InputError( Error ):
-  """
-  Exception raised for errors in the input.
-
-  Attributes:
-    expression -- input expression in which the error occurred
-    message -- explanation of the error
-  """
-  def __init__( self, expression, message ):
-    self.expression = expression
-    self.message = message
-    logger.exception(self.message)
+  pass
 
 
 class NotSetYetError( Error ):
-  """
-  Exception raised when simulations aren't done yet.
-
-  Attributes:
-    value -- value which was tried to get
-    message -- explanation of the error
-  """
-  def __init__( self, value, message ):
-    self.value = value
-    self.message = message
-    logger.exception(self.message)
+  pass
 
 
 class StillInProgressError( Error ):
-  """
-  Exception raised when simulation is still in progress.
+  pass
 
-  Attributes:
-    value -- value which was tried to get
-    message -- explanation of the error
-  """
-  def __init__( self, value, message ):
-    self.value = value
-    self.message = message
-    logger.exception(self.message)
-
-
-class SimulationError(object):
-  """
-  Exception raised when simulations aren't done yet.
-
-  Attributes:
-    value -- value which was tried to get
-    message -- explanation of the error
-  """
-  def __init__(self, simulation_output):
-    super(SimulationError, self).__init__()
-    self.simulation_output = simulation_output
+class SimulationError( Error ):
+  pass
 
 
 class simulation_data():
@@ -97,7 +48,7 @@ class simulation_data():
     html="",
     iterations="250000",
     log="0",
-    name=None,
+    name="",
     optimize_expressions="1",
     ptr="0",
     ready_trigger="1",
@@ -108,22 +59,22 @@ class simulation_data():
     super( simulation_data, self ).__init__()
 
     # simc setting to calculate scale factors (stat weights)
-    self.calculate_scale_factors = calculate_scale_factors
-
+    if calculate_scale_factors == "0" or calculate_scale_factors == "1":
+      self.calculate_scale_factors = calculate_scale_factors
+    else:
+      self.calculate_scale_factors = "0"
     # simc setting to manage default apl usage
-    logger.debug("Initialising default_actions.")
-    self.default_actions = default_actions
-
+    if default_actions == "0" or default_actions == "1":
+      self.default_actions = default_actions
+    else:
+      self.default_actions = "1"
     # simc setting to manage the accuracy of used apl lines (leave it at 1.0)
-    logger.debug("Initialising default_skill.")
     try:
       self.default_skill = str( float( default_skill ) )
     except Exception as e:
       logger.error( "{} -- Using default value instead.".format( e ) )
       self.default_skill = "1.0"
-
     # describes the location and type of the simc executable
-    logger.debug("Initialising executionable.")
     # if no value was set, determine a standard value
     if executionable == None:
       if sys.platform == 'win32':
@@ -138,36 +89,51 @@ class simulation_data():
       except Exception as e:
         logger.error( e )
         raise e
-
     # simc setting to determine the fight style
-    logger.debug("Initialising fight_style.")
     if fight_style == "custom" or simc_checks.is_fight_style( fight_style ):
       self.fight_style = fight_style
     else:
       logger.warning( "{} -- Using default value instead.".format( fight_style ) )
       self.fight_style = "patchwerk"
-
     # simc setting to enable/diable the fixed fight length
-    self.fixed_time = fixed_time
+    if fixed_time == "0" or fixed_time == "1":
+      self.fixed_time = fixed_time
+    else:
+      self.fixed_time = "1"
     # simc setting to enable html output
-    self.html = html
+    if type(html) == str:
+      self.html = html
+    else:
+      self.html = ""
     # simc setting to determine the maximum number of run iterations
     #   (target_error and iterations determine the actually simulated
     #   iterations count)
     self.iterations = str( int( iterations ) )
     # simc setting to enable/disable a log file
-    self.log = log
+    if log == "0" or log == "1":
+      self.log = log
+    else:
+      self.log = "0"
     # optional name for the data
     if not name:
       self.name = uuid.uuid4()
     else:
       self.name = name
     # simc setting to enable/disable optimize expressions
-    self.optimize_expressions = optimize_expressions
+    if optimize_expressions == "0" or optimize_expressions == "1":
+      self.optimize_expressions = optimize_expressions
+    else:
+      self.optimize_expressions = "1"
     # simc setting to enable/disable ptr data
-    self.ptr = ptr
+    if ptr == "0" or ptr == "1":
+      self.ptr = ptr
+    else:
+      self.ptr = "0"
     # simc setting to enable/disable ready_trigger
-    self.ready_trigger = ready_trigger
+    if ready_trigger == "0" or ready_trigger == "1":
+      self.ready_trigger = ready_trigger
+    else:
+      self.ready_trigger = "1"
     # specific data to be run, like talent combinations, specific gear or
     #   traits
     if type( simc_arguments ) == list or simc_arguments == []:
@@ -175,11 +141,21 @@ class simulation_data():
     else:
       self.simc_arguments = [simc_arguments]
     # simc setting to determine the target_error
-    self.target_error = target_error
+    try:
+      self.target_error = str( float( target_error ) )
+    except Exception as e:
+      self.target_error = "0.1"
     # simc setting to determine the number of used threads, empty string uses
     #   all available
-    self.threads = threads
+    if type(threads) == int or type(threads) == str or type(threads) == float:
+      try:
+        self.threads = str( int( float( threads ) ) )
+      except Exception as e:
+        self.threads = ""
+    else:
+      self.threads = ""
 
+    # set independant default values
     # creation time of the simulation object
     self.so_creation_time = datetime.datetime.utcnow()
     # simulation dps result
@@ -194,7 +170,7 @@ class simulation_data():
     self.so_simulation_start_time = None
 
 
-  def is_equal(self, simulation_data):
+  def is_equal(self, simulation_instance):
     """
     @brief      Determines if the current and given simulation_data share the
                 same base. The following attributes are considered base:
@@ -203,39 +179,42 @@ class simulation_data():
                 optimize_expressions, ptr, ready_trigger, target_error, threads
 
     @param      self             The object
-    @param      simulation_data  The other simulation data
+    @param      simulation_instance  The other simulation data
 
     @return     True if equal base values, False otherwise.
     """
-    if self.calculate_scale_factors != simulation_data.calculate_scale_factors:
-      return False
-    if self.default_actions != simulation_data.default_actions:
-      return False
-    if self.default_skill != simulation_data.default_skill:
-      return False
-    if self.executionable != simulation_data.executionable:
-      return False
-    if self.fight_style != simulation_data.fight_style:
-      return False
-    if self.fixed_time != simulation_data.fixed_time:
-      return False
-    if self.html != simulation_data.html:
-      return False
-    if self.iterations != simulation_data.iterations:
-      return False
-    if self.log != simulation_data.log:
-      return False
-    if self.optimize_expressions != simulation_data.optimize_expressions:
-      return False
-    if self.ptr != simulation_data.ptr:
-      return False
-    if self.ready_trigger != simulation_data.ready_trigger:
-      return False
-    if self.target_error != simulation_data.target_error:
-      return False
-    if self.threads != simulation_data.threads:
-      return False
-    return True
+    try:
+      if self.calculate_scale_factors != simulation_instance.calculate_scale_factors:
+        return False
+      if self.default_actions != simulation_instance.default_actions:
+        return False
+      if self.default_skill != simulation_instance.default_skill:
+        return False
+      if self.executionable != simulation_instance.executionable:
+        return False
+      if self.fight_style != simulation_instance.fight_style:
+        return False
+      if self.fixed_time != simulation_instance.fixed_time:
+        return False
+      if self.html != simulation_instance.html:
+        return False
+      if self.iterations != simulation_instance.iterations:
+        return False
+      if self.log != simulation_instance.log:
+        return False
+      if self.optimize_expressions != simulation_instance.optimize_expressions:
+        return False
+      if self.ptr != simulation_instance.ptr:
+        return False
+      if self.ready_trigger != simulation_instance.ready_trigger:
+        return False
+      if self.target_error != simulation_instance.target_error:
+        return False
+      if self.threads != simulation_instance.threads:
+        return False
+      return True
+    except Exception as e:
+      False
 
 
   def get_dps( self ):
@@ -246,12 +225,7 @@ class simulation_data():
 
     @return     The dps.
     """
-    if self.dps:
-      return int( self.dps )
-    if self.so_simulation_start_time < datetime.datetime.utcnow() and not self.so_simulation_end_time:
-      raise StillInProgressError( "dps", "Dps simulation is still in progress." )
-    else:
-      raise NotSetYetError( "dps", "No dps was saved yet." )
+    return self.dps
 
 
   def set_dps( self, dps, external=True ):
@@ -267,15 +241,14 @@ class simulation_data():
     """
     # set external_simulation flag, defaults to True, so external simulations
     #  don't need to pay attention to this
-    try:
-      self.external_simulation = bool( external )
-    except Exception as e:
-      raise e
+    if type( external ) == bool:
+      self.external_simulation = external
+    else:
+      raise TypeError
 
     # raise AlreadySetError if one tries to overwrite previously set data
     if self.dps:
-      raise AlreadySetError( "dps",
-        "A value for dps was already set to {}.".format( self.get_dps() ) )
+      raise AlreadySetError( "A value for dps was already set to {}.".format( self.get_dps() ) )
 
     try:
       # slightly more robust than simply cast to int, due to possible float
@@ -284,22 +257,28 @@ class simulation_data():
     except Exception as e:
       raise e
 
+    if self.so_simulation_end_time != None:
+      self.so_simulation_end_time = datetime.datetime.utcnow()
+
     return True
 
 
-  def get_avg( self, simulation_data ):
+  def get_avg( self, simulation_instance ):
     """
-    @brief      Gets the average of the current the given simulation_data.
+    @brief      Gets the average of the current the given simulation_instance.
 
-    @param      self             The object
-    @param      simulation_data  The simulation data
+    @param      self                 The object
+    @param      simulation_instance  The simulation data
 
     @return     The average as int.
     """
-    return int( ( self.get_dps() + simulation_data.get_dps() ) / 2 )
+    if self.get_dps() and simulation_instance.get_dps():
+      return int( ( self.get_dps() + simulation_instance.get_dps() ) / 2 )
+    else:
+      return None
 
 
-  def get_simulation_duation( self ):
+  def get_simulation_duration( self ):
     """
     @brief      Return the time, the simulation took. Will raise NotDoneYetError
                 if simulation didn't start or end yet.
@@ -308,14 +287,10 @@ class simulation_data():
 
     @return     The simulation duation.
     """
-    if not self.so_simulation_start_time:
-      raise NotSetYetError( "so_simulation_start_time",
-        "Simulation didn't start yet. No simulation duration possible." )
-    if not self.so_simulation_end_time:
-      raise NotSetYetError( "so_simulation_end_time",
-        "Simulation isn't done yet. No simulation duration possible." )
-
-    return self.so_simulation_end_time - self.so_simulation_start_time
+    if self.so_simulation_start_time and self.so_simulation_end_time:
+      return self.so_simulation_end_time - self.so_simulation_start_time
+    else:
+      None
 
 
   def set_full_report( self, report ):
@@ -331,7 +306,7 @@ class simulation_data():
       self.full_report = report
       return True
     else:
-      raise TypeError("Report as type {} found but string expected.".format( type( report ) ) )
+      raise TypeError("Report as type {} found but string was expected.".format( type( report ) ) )
 
 
   def set_simulation_end_time( self ):
@@ -351,8 +326,7 @@ class simulation_data():
       else:
         return True
     else:
-      raise AlreadySetError( "so_simulation_end_time",
-        "End time was already set. Setting it twice is not allowed." )
+      raise AlreadySetError( "Simulation end time was already set. Setting it twice is not allowed." )
 
 
   def set_simulation_start_time( self ):
@@ -480,22 +454,19 @@ class simulation_group():
               SimulationCrafts own profilesets feature. Dps values are saved in
               the simulation_data.
   """
-  def __init__( self, simulation_data, name="" ):
+  def __init__( self, simulation_instance, name="" ):
     super( simulation_group, self ).__init__()
-    if type( simulation_data ) == list:
-      self.profiles = simulation_data
-    elif type( simulation_data ) == simulation_data:
-      self.profiles = [ simulation_data ]
+    if type( simulation_instance ) == list:
+      self.profiles = simulation_instance
+    elif type( simulation_instance ) == simulation_instance:
+      self.profiles = [ simulation_instance ]
     else:
-      logger.error( "Wrong type {} of simulation_data (need list of or single simulation_data).".format( type( simulation_data ) ) )
-      raise TypeError( "simulation_group initiation",
-        "Wrong type " + str( type( simulation_data ) ) + " of simulation_data (need list/single simulation_data)." )
+      raise TypeError( "Simulation_instance has wrong type '{}' (needed list or single simulation_data).".format(type(simulation_instance)) )
     # optional name of the simulation_group
     self.name = name
 
     if not selfcheck():
-      raise InputError( "simulation_group",
-        "simulation_data base data wasn't coherent.")
+      raise InputError( "simulation_instance base data wasn't coherent." )
 
 
   def selfcheck( self ):
@@ -537,22 +508,21 @@ class simulation_group():
 
 
 
-  def add( self, simulation_data ):
+  def add( self, simulation_instance ):
     """
-    @brief      Add another simulation_data object to the group
+    @brief      Add another simulation_instance object to the group
 
     @param      self                    The object
-    @param      simulation_data  The simulation information
+    @param      simulation_instance  The simulation information
 
     @return     True, if adding data was successfull. Exception otherwise.
     """
-    if type( simulation_data ) == simulation_data:
+    if type( simulation_instance ) == simulation_data:
       try:
-        self.profiles.append( simulation_data )
+        self.profiles.append( simulation_instance )
       except Exception as e:
         raise e
       else:
         return True
     else:
-      raise TypeError( "simulation_group.add",
-        "Wrong type of simulation_data (need simulation_data)." )
+      raise TypeError( "Simulation_instance has wrong type '{}' (needed simulation_data).".format(type(simulation_instance)) )
