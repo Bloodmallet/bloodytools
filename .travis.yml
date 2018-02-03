@@ -1,0 +1,15 @@
+# This script is used by the Travis-CI (continuous integration) testing
+# framework to run Bloodytools tests with every GitHub push or pull-request.
+language: python
+
+python:
+  - "3.6"
+
+branches:
+  only:
+    - dev
+
+script:
+  # Test Bloodytools.
+  - python bloodytools/simulation_objects/simulation_objects_tests.py
+
