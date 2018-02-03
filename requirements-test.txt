@@ -1,2 +1,2 @@
-# necesary for coverage check
+# necessary for coverage check
 coveralls
