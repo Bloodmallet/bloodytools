@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # date data
 import datetime
 # wow game data and simc input checks
