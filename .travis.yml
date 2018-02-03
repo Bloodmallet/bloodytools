@@ -11,5 +11,7 @@ branches:
 
 script:
   # Test Bloodytools.
-  - python bloodytools/simulation_objects/simulation_objects_tests.py
+  - ls
+  - cd ./bloodytools/
+  - python ./bloodytools/simulation_objects/simulation_objects_tests.py
 
