@@ -3,11 +3,12 @@
 language: python
 
 python:
-  - 3.3
-  - 3.4
-  - 3.5
   - 3.6
-  - 2.7
+  - 3.5
+  # can maybe added later when tests for simc-support are added for older versions
+  #- 3.4
+  #- 3.3
+  #- 2.7
 
 branches:
   only:
