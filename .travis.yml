@@ -10,6 +10,23 @@ branches:
     - dev
 
 script:
-  # Test Bloodytools.
+  # Test simulation_objects.
   - python ./bloodytools/simulation_objects/simulation_objects_tests.py
 
+# makes travis send a notification to discord with these values
+before_script:
+  - export AUTHOR_NAME="$(git log -1 $TRAVIS_COMMIT --pretty="%aN")"
+
+# makes travis send a notification to discord
+after_success:
+  - chmod +x success.sh
+  - ./success.sh
+
+# makes travis send a notification to discord
+after_failure:
+  - chmod +x fail.sh
+  - ./fail.sh
+
+# no email notifications, this shall be handled/viewed via discord
+notifications:
+  email: false
