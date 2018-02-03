@@ -1,6 +1,6 @@
 Bloody( tools )
 ===========
-[![Build Status](https://travis-ci.org/Bloodmallet/bloodytools.svg?branch=dev)](https://travis-ci.org/Bloodmallet/bloodytools)
+[![Build Status](https://travis-ci.org/Bloodmallet/bloodytools.svg?branch=dev)](https://travis-ci.org/Bloodmallet/bloodytools) [![Coverage Status](https://coveralls.io/repos/github/Bloodmallet/bloodytools/badge.svg?branch=master)](https://coveralls.io/github/Bloodmallet/bloodytools?branch=master)
 
 > Automatation tool for several different aspects of all dps and some tank specs in World of Warcraft using SimulationCraft.
 

@@ -9,6 +9,10 @@ branches:
   only:
     - dev
 
+install:
+  - pip install -r ./requirements.txt
+  - pip install -r ./requirements-test.txt
+
 script:
   # Test simulation_objects.
   - python ./bloodytools/simulation_objects/simulation_objects_tests.py
@@ -21,6 +25,7 @@ before_script:
 after_success:
   - chmod +x success.sh
   - ./success.sh
+  - coveralls
 
 # makes travis send a notification to discord
 after_failure:
