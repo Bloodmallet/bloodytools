@@ -16,7 +16,7 @@ install:
 script:
   # Test simulation_objects.
   - python ./bloodytools/simulation_objects/simulation_objects_tests.py
-  - coverage run --source=bloodytools/simulation_objects ./bloodytools/simulation_objects/simulation_objects_tests
+  - coverage run --source=bloodytools/simulation_objects ./bloodytools/simulation_objects/simulation_objects_tests.py
 
 # makes travis send a notification to discord with these values
 before_script:
