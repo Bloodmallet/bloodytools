@@ -25,6 +25,7 @@ script:
 # makes travis send a notification to discord with these values
 before_script:
   - export AUTHOR_NAME="$(git log -1 $TRAVIS_COMMIT --pretty="%aN")"
+  - export PYTHON_VERSION="$(python --version)"
 
 # makes travis send a notification to discord
 after_success:
