@@ -9,6 +9,8 @@ import sys
 import uuid
 import logging
 
+import subprocess
+
 logger = logging.getLogger(__name__)
 
 class Error( Exception ):
@@ -308,7 +310,7 @@ class simulation_data():
       self.full_report = report
       return True
     else:
-      raise TypeError("Report as type {} found but string was expected.".format( type( report ) ) )
+      raise TypeError("Report of type '{}'' found but string was expected.".format( type( report ) ) )
 
 
   def set_simulation_end_time( self ):
@@ -368,31 +370,20 @@ class simulation_data():
     argument.append( "default_skill="+ self.default_skill )
     argument.append( "ptr="          + self.ptr )
     argument.append( "threads="      + self.threads )
-    argument.append( "ready_trigger="+ self.ready_trigger )
+    #argument.append( "ready_trigger="+ self.ready_trigger )
 
-    for simc_argument in simc_arguments:
+    for simc_argument in self.simc_arguments:
       argument.append( simc_argument )
 
+    fail_counter = 0
     # should prevent additional empty windows popping up...on win32 systems without breaking different OS
     if sys.platform == 'win32':
-      # call simulationcraft in the background. grab output for processing and get dps value
+      # call simulationcraft in the background. Save output for processing
       startupinfo = subprocess.STARTUPINFO()
       startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
-      simulation_output = subprocess.run(
-        argument,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        universal_newlines=True,
-        startupinfo=startupinfo
-      )
+      while not hasattr(self, "success") and fail_counter < 5:
 
-
-      fail_counter = 0
-      while simulation_output.returncode != 0 and fail_counter < 5:
-        logger.error( "ERROR: An Error occured during simulation." )
-        logger.error( "args: " + str( simulation_output.args ) )
-        logger.error( "stdout: " + str( simulation_output.stdout ) )
         simulation_output = subprocess.run(
           argument,
           stdout=subprocess.PIPE,
@@ -400,51 +391,51 @@ class simulation_data():
           universal_newlines=True,
           startupinfo=startupinfo
         )
-        fail_counter += 1
+
+        if simulation_output.returncode != 0:
+          fail_counter += 1
+        else:
+          self.success = True
 
     else:
-      simulation_output = subprocess.run(
-        argument,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        universal_newlines=True
-      )
 
+      while not hasattr(self, "success") and fail_counter < 5:
 
-      fail_counter = 0
-      while simulation_output.returncode != 0 and fail_counter < 5:
-        logger.error( "ERROR: An Error occured during simulation." )
-        logger.error( "args: " + str( simulation_output.args ) )
-        logger.error( "stdout: " + str( simulation_output.stdout ) )
         simulation_output = subprocess.run(
           argument,
           stdout=subprocess.PIPE,
           stderr=subprocess.STDOUT,
           universal_newlines=True
         )
-        fail_counter += 1
+
+        if simulation_output.returncode != 0:
+          fail_counter += 1
+        else:
+          self.success = True
 
     if fail_counter >= 5:
+      logger.error( "ERROR: An Error occured during simulation." )
+      logger.error( "args: " + str( simulation_output.args ) )
+      logger.error( "stdout: " + str( simulation_output.stdout ) )
       self.error = simulation_output.stdout
       raise SimulationError( self.error )
 
-    # set simulation end time
-    self.set_simulation_end_time()
     # save output
-    self.set_full_report( simulation_output )
+    self.set_full_report( simulation_output.stdout )
 
-    actor_flag = True
+    is_actor = True
     run_dps = "DPS: 0.0"
     for line in simulation_output.stdout.splitlines():
       # needs this check to prevent grabbing the boss dps
-      if "DPS:" in line and actor_flag:
+      if "DPS:" in line and is_actor:
         run_dps = line
-        actor_flag = False
+        is_actor = False
 
     dps_value = run_dps.split()[ 1 ]
 
     # save dps value
     self.set_dps( dps_value, external=False )
+    self.set_simulation_end_time()
 
     return self.get_dps()
 

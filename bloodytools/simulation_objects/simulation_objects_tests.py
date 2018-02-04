@@ -5,6 +5,7 @@ import logging
 import unittest
 import uuid
 import time
+import os
 
 import simulation_objects
 
@@ -280,6 +281,34 @@ class TestSimulationDataMethods(unittest.TestCase):
     self.assertTrue( self.sd.set_full_report( report ) )
     self.assertEqual( self.sd.full_report, report )
 
+  def test_set_simulation_end_time(self):
+    before = datetime.datetime.utcnow()
+    self.assertTrue( self.sd.set_simulation_end_time() )
+    after = datetime.datetime.utcnow()
+    self.assertTrue( self.sd.so_simulation_end_time >= before )
+    self.assertTrue( self.sd.so_simulation_end_time <= after )
+    self.assertEqual( type( self.sd.so_simulation_end_time ), datetime.datetime )
+    with self.assertRaises( simulation_objects.AlreadySetError ):
+      self.sd.set_simulation_end_time()
+
+  def test_set_simulation_start_time(self):
+    self.assertEqual( self.sd.so_simulation_start_time, None )
+    before = datetime.datetime.utcnow()
+    self.assertTrue( self.sd.set_simulation_start_time() )
+    after = datetime.datetime.utcnow()
+    self.assertTrue( self.sd.so_simulation_start_time >= before )
+    self.assertTrue( self.sd.so_simulation_start_time <= after )
+    self.assertEqual( type( self.sd.so_simulation_start_time ), datetime.datetime )
+    self.assertTrue( self.sd.set_simulation_start_time() )
+
+  # Does fail in travis. Currently intended as local test. Would need a working simc environement to actually run a test.
+  @unittest.skipUnless(os.path.isfile("D:\Programme\SimulationCraft\simc.exe"), "SimulationCraft wasn't found. This test is written for local dev for now. Don't worry.")
+  def test_simulate(self):
+    self.sd.executionable = "D:\Programme\SimulationCraft\simc.exe"
+    self.sd.target_error = "1.0"
+    self.sd.simc_arguments = [ "D:\Programme\SimulationCraft\profiles\Tier21\T21_Shaman_Elemental.simc" ]
+    self.assertEqual( type( self.sd.simulate() ), int )
+    self.assertTrue( self.sd.get_dps() > 0 )
 
 
 if __name__ == '__main__':
