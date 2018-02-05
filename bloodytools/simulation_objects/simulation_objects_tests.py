@@ -304,9 +304,9 @@ class TestSimulationDataMethods(unittest.TestCase):
   # Does fail in travis. Currently intended as local test. Would need a working simc environement to actually run a test.
   @unittest.skipUnless(os.path.isfile("./SimulationCraft/engine/simc"), "SimulationCraft wasn't found. This test is written for Travis.")
   def test_simulate(self):
-    self.sd.executionable = "SimulationCraft\engine\simc"
+    self.sd.executionable = "./SimulationCraft/engine/simc"
     self.sd.target_error = "1.0"
-    self.sd.simc_arguments = [ "SimulationCraft\profiles\Tier21\T21_Shaman_Elemental.simc" ]
+    self.sd.simc_arguments = [ "./SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc" ]
     self.assertEqual( type( self.sd.simulate() ), int )
     self.assertTrue( self.sd.get_dps() > 0 )
 

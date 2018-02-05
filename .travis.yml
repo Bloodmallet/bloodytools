@@ -19,6 +19,7 @@ branches:
 #      - python3-pip
 
 before_install:
+  # activate out of the box python 3.6 environement
   - source ~/virtualenv/python3.6/bin/activate
 
 install:
