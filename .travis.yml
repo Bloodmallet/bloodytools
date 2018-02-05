@@ -19,16 +19,14 @@ addons:
       - python3-pip
 
 install:
+  - echo "Installing project requirements and test requirements."
   - pip3 install --user -r ./requirements.txt
   - pip3 install --user -r ./requirements-test.txt
+  - echo "Loading SimulationCraft and building its executable."
   - git clone https://github.com/simulationcraft/simc.git SimulationCraft
   - cd SimulationCraft/engine
-  - ls
-  - make OPENSSL=1 optimized
-  - ls
-  - cd ..
-  - ls
-  - cd ..
+  - make optimized
+  - cd ../..
 
 script:
   # Test simulation_objects and collect coverage information at the same time.
