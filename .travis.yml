@@ -17,6 +17,7 @@ addons:
   apt:
     packages:
       - python3-pip
+      - python3-venv
 
 install:
   - ls
@@ -24,6 +25,8 @@ install:
   - python3 --version
   - pip --version
   - pip3 --version
+  - pyvenv env
+  - ./env/bin/activate
   - pip3 install -r ./requirements.txt
   - pip3 install -r ./requirements-test.txt
   - git clone https://github.com/simulationcraft/simc.git SimulationCraft
