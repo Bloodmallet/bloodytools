@@ -18,11 +18,14 @@ addons:
     packages:
       - python3-pip
 
+before_install:
+  - source ~/virtualenv/python3.6/bin/activate
+
 install:
-  - echo "Installing project requirements and test requirements."
+  # Installing project requirements and test requirements.
   - pip3 install --user -r ./requirements.txt
   - pip3 install --user -r ./requirements-test.txt
-  - echo "Loading SimulationCraft and building its executable."
+  # Loading SimulationCraft and building its executable.
   - git clone https://github.com/simulationcraft/simc.git SimulationCraft
   - cd SimulationCraft/engine
   - make optimized
