@@ -22,8 +22,12 @@ install:
   - pip3 install --user -r ./requirements.txt
   - pip3 install --user -r ./requirements-test.txt
   - git clone https://github.com/simulationcraft/simc.git SimulationCraft
-  - cd SimulationCraft
-  - make
+  - cd SimulationCraft/engine
+  - ls
+  - make OPENSSL=1 optimized
+  - ls
+  - cd ..
+  - ls
   - cd ..
 
 script:
