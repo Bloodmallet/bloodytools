@@ -13,10 +13,10 @@ branches:
   only:
     - dev
 
-addons:
-  apt:
-    packages:
-      - python3-pip
+#addons:
+#  apt:
+#    packages:
+#      - python3-pip
 
 before_install:
   - source ~/virtualenv/python3.6/bin/activate
@@ -24,8 +24,8 @@ before_install:
 install:
   - python --version
   # Installing project requirements and test requirements.
-  - pip3 install --user -r ./requirements.txt
-  - pip3 install --user -r ./requirements-test.txt
+  - pip install -r ./requirements.txt
+  - pip install -r ./requirements-test.txt
   # Loading SimulationCraft and building its executable.
   - git clone https://github.com/simulationcraft/simc.git SimulationCraft
   - cd SimulationCraft/engine
