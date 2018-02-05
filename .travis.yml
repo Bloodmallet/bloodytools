@@ -19,16 +19,11 @@ addons:
       - python3-pip
 
 install:
-  - ls
-  - python --version
-  - python3 --version
-  - pip --version
-  - pip3 --version
   - pip3 install --user -r ./requirements.txt
   - pip3 install --user -r ./requirements-test.txt
   - git clone https://github.com/simulationcraft/simc.git SimulationCraft
   - cd SimulationCraft
-  - ./configure && make
+  - make
   - cd ..
 
 script:
