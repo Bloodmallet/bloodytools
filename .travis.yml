@@ -11,12 +11,8 @@ python:
 
 branches:
   only:
+    # only trigger CI on dev branch
     - dev
-
-#addons:
-#  apt:
-#    packages:
-#      - python3-pip
 
 before_install:
   # activate out of the box python 3.6 environement
@@ -24,36 +20,37 @@ before_install:
 
 install:
   - python --version
-  # Installing project requirements and test requirements.
+  # Install project requirements and test requirements
   - pip install -r ./requirements.txt
   - pip install -r ./requirements-test.txt
-  # Loading SimulationCraft and building its executable.
+  # Load SimulationCraft
   - git clone https://github.com/simulationcraft/simc.git SimulationCraft
   - cd SimulationCraft/engine
+  # Build SimulationCraft executable
   - make optimized
   - chmod +x simc
   - cd ../..
 
 script:
-  # Test simulation_objects and collect coverage information at the same time.
+  # Test simulation_objects and collect coverage information at the same time
   - coverage run --source=bloodytools/simulation_objects --omit=*_tests.py ./bloodytools/simulation_objects/simulation_objects_tests.py
 
-# makes travis send a notification to discord with these values
 before_script:
+  # Save values for discord notifactions
   - export AUTHOR_NAME="$(git log -1 $TRAVIS_COMMIT --pretty="%aN")"
   - export PYTHON_VERSION="$(python --version)"
 
-# makes travis send a notification to discord
 after_success:
+  # Send notification to discord
   - chmod +x success.sh
   - ./success.sh
   - coveralls
 
-# makes travis send a notification to discord
 after_failure:
+  # Send notification to discord
   - chmod +x fail.sh
   - ./fail.sh
 
-# no email notifications, this shall be handled/viewed via discord
 notifications:
+  # Deactivate email notifications
   email: false
