@@ -1,20 +1,23 @@
-# This script is used by the Travis-CI (continuous integration) testing
-# framework to run Bloodytools tests with every GitHub push or pull-request.
-language: python
+dist: trusty
+sudo: false
+
+language: cpp
+
+compiler:
+  - gcc
 
 python:
   - 3.6
-  - 3.5
-  # can maybe added later when tests for simc-support are added for older versions
-  #- 3.4
-  #- 3.3
-  #- 2.7
 
 branches:
   only:
     - dev
 
 install:
+  - git clone https://github.com/simulationcraft/simc.git Bloodmallet/SimulationCraft
+  - ls
+  - python3 -m venv env
+  - ./env/Scripts/activate
   - pip install -r ./requirements.txt
   - pip install -r ./requirements-test.txt
 
