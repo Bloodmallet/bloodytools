@@ -232,9 +232,35 @@ class TestSimulationDataMethods(unittest.TestCase):
     self.assertTrue( sd1.is_equal( sd2 ) )
     self.assertTrue( sd2.is_equal( sd1 ) )
     self.assertTrue( sd1.is_equal( sd1 ) )
-    sd3 = simulation_objects.simulation_data( iterations="124153", threads="8" )
-    self.assertFalse( sd3.is_equal( sd1 ) )
-    self.assertFalse( sd3.is_equal( "Döner" ) )
+    self.assertFalse( sd1.is_equal( "Döner" ) )
+    sd_calculate_scale_factors = simulation_objects.simulation_data( calculate_scale_factors="1" )
+    self.assertFalse( sd_calculate_scale_factors.is_equal( sd1 ) )
+    sd_default_actions = simulation_objects.simulation_data( default_actions="0" )
+    self.assertFalse( sd_default_actions.is_equal( sd1 ) )
+    sd_default_skill = simulation_objects.simulation_data( default_skill="0.5" )
+    self.assertFalse( sd_default_skill.is_equal( sd1 ) )
+    sd_executionable = simulation_objects.simulation_data( executionable="1" )
+    self.assertFalse( sd_executionable.is_equal( sd1 ) )
+    sd_fight_style = simulation_objects.simulation_data( fight_style="helterskelter" )
+    self.assertFalse( sd_fight_style.is_equal( sd1 ) )
+    sd_fixed_time = simulation_objects.simulation_data( fixed_time="0" )
+    self.assertFalse( sd_fixed_time.is_equal( sd1 ) )
+    sd_html = simulation_objects.simulation_data( html="test.html" )
+    self.assertFalse( sd_html.is_equal( sd1 ) )
+    sd_iterations = simulation_objects.simulation_data( iterations="124153" )
+    self.assertFalse( sd_iterations.is_equal( sd1 ) )
+    sd_log = simulation_objects.simulation_data( log="1" )
+    self.assertFalse( sd_log.is_equal( sd1 ) )
+    sd_optimize_expressions = simulation_objects.simulation_data( optimize_expressions="0" )
+    self.assertFalse( sd_optimize_expressions.is_equal( sd1 ) )
+    sd_ptr = simulation_objects.simulation_data( ptr="1" )
+    self.assertFalse( sd_ptr.is_equal( sd1 ) )
+    sd_ready_trigger = simulation_objects.simulation_data( ready_trigger="0" )
+    self.assertFalse( sd_ready_trigger.is_equal( sd1 ) )
+    sd_target_error = simulation_objects.simulation_data( target_error="0.5" )
+    self.assertFalse( sd_target_error.is_equal( sd1 ) )
+    sd_threads = simulation_objects.simulation_data( threads="4" )
+    self.assertFalse( sd_threads.is_equal( sd1 ) )
 
   def test_get_dps(self):
     self.assertEqual(self.sd.get_dps(), None)
@@ -248,7 +274,6 @@ class TestSimulationDataMethods(unittest.TestCase):
       self.sd.set_dps( 5678.9 )
     with self.assertRaises( TypeError ):
       self.sd.set_dps( "5678", external="Hallo" )
-
     self.sd = None
     self.sd = simulation_objects.simulation_data()
     with self.assertRaises( TypeError ):
@@ -301,15 +326,136 @@ class TestSimulationDataMethods(unittest.TestCase):
     self.assertEqual( type( self.sd.so_simulation_start_time ), datetime.datetime )
     self.assertTrue( self.sd.set_simulation_start_time() )
 
-  # Does fail in travis. Currently intended as local test. Would need a working simc environement to actually run a test.
-  @unittest.skipUnless(os.path.isfile("./SimulationCraft/engine/simc"), "SimulationCraft wasn't found. This test is written for Travis.")
   def test_simulate(self):
-    self.sd.executionable = "./SimulationCraft/engine/simc"
+    # travis-ci test
+    # bloodytools/
+    #   ./
+    #   bloodytools/
+    #     simulation_objects/
+    #   SimulationCraft/
+    #     engine/
+    if os.path.isfile("./SimulationCraft/engine/simc"):
+      self.sd.executionable = "./SimulationCraft/engine/simc"
+      self.sd.simc_arguments = [ "./SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc" ]
+
+    # local dev test
+    # SimulationCraft/
+    # bloodytools/
+    #   ./
+    #   bloodytools/
+    #     simulation_objects/
+    elif os.path.isfile("../SimulationCraft/simc.exe"):
+      self.sd.executionable = "../SimulationCraft/simc.exe"
+      self.sd.simc_arguments = [ "../SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc" ]
+
+    # use standard values
+    # SimulationCraft/
+    #   bloodytools/
+    #     ./
+    #     bloodytools/
+    #       bloodytools/
+    #         simulation_objects/
+    else:
+      pass
     self.sd.target_error = "1.0"
-    self.sd.simc_arguments = [ "./SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc" ]
     self.assertEqual( type( self.sd.simulate() ), int )
     self.assertTrue( self.sd.get_dps() > 0 )
+    self.assertEqual( type( self.sd.so_simulation_end_time ), datetime.datetime )
 
+  def test_simulate_fail(self):
+    self.sd.executionable = "Not_a_correct_value"
+    with self.assertRaises( FileNotFoundError ):
+      self.sd.simulate()
+
+##
+## @brief      Test handling of init values
+##
+class TestSimulationGroupDataInit(unittest.TestCase):
+  def setUp(self):
+    self.sd1 = simulation_objects.simulation_data()
+    self.sd2 = simulation_objects.simulation_data()
+
+  def tearDown(self):
+    self.sd1 = None
+    self.sd2 = None
+
+  def test_empty(self):
+    with self.assertRaises(TypeError):
+      test = simulation_objects.simulation_group()
+
+  def test_correct_list_input(self):
+    test = simulation_objects.simulation_group( [ self.sd1, self.sd2 ] )
+    self.assertEqual( test.profiles[0], self.sd1 )
+    self.assertEqual( test.profiles[1], self.sd2 )
+
+  def test_correct_single_input(self):
+    test = simulation_objects.simulation_group( self.sd1 )
+    self.assertEqual( test.profiles[0], self.sd1 )
+
+  def test_wrong_list_input(self):
+    tmp = simulation_objects.simulation_data( iterations="5000" )
+    with self.assertRaises(simulation_objects.InputError):
+      test = simulation_objects.simulation_group( [ self.sd1, tmp ] )
+    with self.assertRaises(TypeError):
+      test = simulation_objects.simulation_group( [ "why", "would", "anyone", "do", "this" ] )
+
+  def test_wrong_input_type(self):
+    with self.assertRaises(TypeError):
+      test = simulation_objects.simulation_group( ( self.sd1, self.sd2 ) )
+
+
+##
+## @brief      Test methods of simulation_group
+##
+class TestSimulationGroupMethods(unittest.TestCase):
+  def setUp(self):
+    self.sd1 = simulation_objects.simulation_data( target_error="1.0" )
+    self.sd2 = simulation_objects.simulation_data( target_error=1.0 )
+    self.sg = simulation_objects.simulation_group( [ self.sd1, self.sd2 ] )
+
+  def test_selfcheck(self):
+    self.assertTrue( self.sg.selfcheck() )
+    self.sg.profiles[1].calculate_scale_factors = "1"
+    self.assertFalse( self.sg.selfcheck() )
+
+  def test_add(self):
+    start = len( self.sg.profiles )
+    new_data = simulation_objects.simulation_data( target_error=1.0)
+    self.assertTrue( self.sg.add( new_data ) )
+    self.assertEqual( len( self.sg.profiles ), start + 1 )
+    with self.assertRaises(TypeError):
+      self.sg.add( "Bananana" )
+
+  def test_simulate(self):
+    self.sd1.executionable = "Not_a_correct_value"
+    sole_sg1 = simulation_objects.simulation_group( self.sd1 )
+    with self.assertRaises( FileNotFoundError ):
+      sole_sg1.simulate()
+
+    # travis-ci test
+    # bloodytools/
+    #   ./
+    #   bloodytools/
+    #     simulation_objects/
+    #   SimulationCraft/
+    #     engine/
+    if os.path.isfile("./SimulationCraft/engine/simc"):
+      self.sd2.executionable = "./SimulationCraft/engine/simc"
+      self.sd2.simc_arguments = [ "./SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc" ]
+
+    # local dev test
+    # SimulationCraft/
+    # bloodytools/
+    #   ./
+    #   bloodytools/
+    #     simulation_objects/
+    elif os.path.isfile("../SimulationCraft/simc.exe"):
+      self.sd2.executionable = "../SimulationCraft/simc.exe"
+      self.sd2.simc_arguments = [ "../SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc" ]
+    sole_sg2 = simulation_objects.simulation_group( self.sd2 )
+    self.assertTrue( sole_sg2.simulate() )
+    self.sg.profiles = None
+    self.assertFalse( self.sg.simulate() )
 
 if __name__ == '__main__':
   unittest.main()

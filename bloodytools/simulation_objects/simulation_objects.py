@@ -41,6 +41,8 @@ class SimulationError( Error ):
 class simulation_data():
   """
   Manages all META-information for a simulation and the result.
+
+  TODO: add max_time, vary_combat_length
   """
   def __init__( self,
     calculate_scale_factors="0",
@@ -218,7 +220,7 @@ class simulation_data():
         return False
       return True
     except Exception as e:
-      False
+      return False
 
 
   def get_dps( self ):
@@ -323,12 +325,8 @@ class simulation_data():
     @return     True, if set.
     """
     if not self.so_simulation_end_time:
-      try:
-        self.so_simulation_end_time = datetime.datetime.utcnow()
-      except Exception as e:
-        raise e
-      else:
-        return True
+      self.so_simulation_end_time = datetime.datetime.utcnow()
+      return True
     else:
       raise AlreadySetError( "Simulation end time was already set. Setting it twice is not allowed." )
 
@@ -342,12 +340,8 @@ class simulation_data():
 
     @return     True, if set.
     """
-    try:
-      self.so_simulation_start_time = datetime.datetime.utcnow()
-    except Exception as e:
-      raise e
-    else:
-      return True
+    self.so_simulation_start_time = datetime.datetime.utcnow()
+    return True
 
 
   def simulate( self ):
@@ -384,13 +378,16 @@ class simulation_data():
 
       while not hasattr(self, "success") and fail_counter < 5:
 
-        simulation_output = subprocess.run(
-          argument,
-          stdout=subprocess.PIPE,
-          stderr=subprocess.STDOUT,
-          universal_newlines=True,
-          startupinfo=startupinfo
-        )
+        try:
+          simulation_output = subprocess.run(
+            argument,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
+            startupinfo=startupinfo
+          )
+        except FileNotFoundError as e:
+          raise e
 
         if simulation_output.returncode != 0:
           fail_counter += 1
@@ -401,12 +398,15 @@ class simulation_data():
 
       while not hasattr(self, "success") and fail_counter < 5:
 
-        simulation_output = subprocess.run(
-          argument,
-          stdout=subprocess.PIPE,
-          stderr=subprocess.STDOUT,
-          universal_newlines=True
-        )
+        try:
+          simulation_output = subprocess.run(
+            argument,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True
+          )
+        except FileNotFoundError as e:
+          raise e
 
         if simulation_output.returncode != 0:
           fail_counter += 1
@@ -448,18 +448,24 @@ class simulation_group():
               the simulation_data.
   """
   def __init__( self, simulation_instance, name="" ):
-    super( simulation_group, self ).__init__()
-    if type( simulation_instance ) == list:
-      self.profiles = simulation_instance
-    elif type( simulation_instance ) == simulation_instance:
-      self.profiles = [ simulation_instance ]
-    else:
-      raise TypeError( "Simulation_instance has wrong type '{}' (needed list or single simulation_data).".format(type(simulation_instance)) )
-    # optional name of the simulation_group
     self.name = name
 
-    if not selfcheck():
-      raise InputError( "simulation_instance base data wasn't coherent." )
+    if type( simulation_instance ) == list:
+      correct_type = True
+      for data in simulation_instance:
+        if type(data) != simulation_data:
+          correct_type = False
+      if correct_type:
+        self.profiles = simulation_instance
+      else:
+        raise TypeError( "At least one item of simulation_instance list had a wrong type. Expected simulation_data." )
+    elif type( simulation_instance ) == simulation_data:
+      self.profiles = [ simulation_instance ]
+    else:
+      raise TypeError( "Simulation_instance has wrong type '{}'. Expected list or single simulation_data.".format(type(simulation_instance)) )
+
+    if not self.selfcheck():
+      raise InputError( "At least one item of simulation_instance had data that didn't match the others." )
 
 
   def selfcheck( self ):
@@ -488,16 +494,26 @@ class simulation_group():
 
     @return     True on success.
     """
-    if length( self.profiles ) == 1:
-      # if only one profiles is in the group this profile is simulated normally
-      self.profiles[ 0 ].simulate()
+    if self.profiles:
+      if len( self.profiles ) == 1:
+        # if only one profiles is in the group this profile is simulated normally
+        try:
+          self.profiles[ 0 ].simulate()
+        except Exception as e:
+          raise e
+      elif len( self.profiles ) >= 2:
+        # profile set creation based on profiles content
+        # create file with profile set content
+        # start simulation with profilesets
+        # grab data
+        # push data into simulation_data.set_dps(dps)
+        pass
+      else:
+        return False
     else:
-      # profile set creation based on profiles content
-      # create file with profile set content
-      # start simulation with profilesets
-      # grab data
-      # push data into simulation_data.set_dps(dps)
-      pass
+      return False
+
+    return True
 
 
 
