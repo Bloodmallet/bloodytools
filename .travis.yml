@@ -14,8 +14,11 @@ branches:
     - dev
 
 install:
-  - git clone https://github.com/simulationcraft/simc.git Bloodmallet/SimulationCraft
+  - git clone https://github.com/simulationcraft/simc.git SimulationCraft
   - ls
+  - python --version
+  - python3 --version
+  - apt-get install python3-venv
   - python3 -m venv env
   - ./env/Scripts/activate
   - pip install -r ./requirements.txt
