@@ -305,6 +305,7 @@ class TestSimulationDataMethods(unittest.TestCase):
   #@unittest.skipUnless(os.path.isfile("..\..\SimulationCraft\engine\simc"), "SimulationCraft wasn't found. This test is written for Travis.")
   def test_simulate(self):
     print(os.listdir())
+    print(os.listdir("SimulationCraft/engine"))
     self.sd.executionable = "..\..\SimulationCraft\engine\simc"
     self.sd.target_error = "1.0"
     self.sd.simc_arguments = [ "..\..\SimulationCraft\profiles\Tier21\T21_Shaman_Elemental.simc" ]
