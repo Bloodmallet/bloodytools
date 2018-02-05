@@ -14,15 +14,15 @@ branches:
     - dev
 
 install:
-  - git clone https://github.com/simulationcraft/simc.git SimulationCraft
   - ls
   - python --version
   - python3 --version
-  - apt-get install python3-venv
-  - python3 -m venv env
-  - ./env/Scripts/activate
-  - pip install -r ./requirements.txt
-  - pip install -r ./requirements-test.txt
+  - pip3 install -r ./requirements.txt
+  - pip3 install -r ./requirements-test.txt
+  - git clone https://github.com/simulationcraft/simc.git SimulationCraft
+  - cd SimulationCraft
+  - ./configure && make
+  - cd ..
 
 script:
   # Test simulation_objects and collect coverage information at the same time.
