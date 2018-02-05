@@ -22,6 +22,7 @@ before_install:
   - source ~/virtualenv/python3.6/bin/activate
 
 install:
+  - python --version
   # Installing project requirements and test requirements.
   - pip3 install --user -r ./requirements.txt
   - pip3 install --user -r ./requirements-test.txt
