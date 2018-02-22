@@ -4,6 +4,9 @@ Bloody( tools )
 
 > Automation tool for several different aspects of all dps and some tank specs in World of Warcraft using SimulationCraft. Ingame customization and number tuning make decision making without external help a bloody hell.
 
+## In developement note
+This tool is still in developement and can't be used to generate data yet. If you want to contribute or have suggestions to automate data and representation generation, contact me.
+
 ## Requirements
 You need the latest [SimulationCraft](http://downloads.simulationcraft.org/?C=M;O=D) version ([GitHub Repository](https://github.com/simulationcraft/simc)), [Python 3.5](https://www.python.org/downloads/) or newer and the module [simc_support](https://github.com/Bloodmallet/simc_support), which is handled in the requirements.txt.
 
@@ -28,3 +31,9 @@ $ <env_name>\Scripts\active
 
 ## Development
 If you see a lack of features somewhere or ways to improve the quality of the code, please contact me or create an [issue](https://github.com/Bloodmallet/bloodytools/issues).
+
+## Contact
+Meet me in [Discord](https://discord.gg/tFR2uvK). There is a channel #bloodytools. My username is Bloodmallet(EU)#8246.
+
+## Support
+If you want to support the developement: [![PayPal link](https://img.shields.io/badge/PayPal-donate-blue.svg)](https://www.paypal.me/bloodmallet)
