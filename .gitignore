@@ -8,3 +8,6 @@
 
 # local editor
 /.vscode
+
+# local type checks
+/.mypy_cache

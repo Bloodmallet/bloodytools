@@ -12,31 +12,22 @@ import simulation_objects
 logger = logging.getLogger(__name__)
 
 
-##
-## @brief      Simple tests for the handling of init values for objects of the
-##             simulation_data class.
-##
 class TestSimulationDataInit(unittest.TestCase):
+  """Simple tests for the handling of init values for objects of the
+      simulation_data class.
+  """
 
-  ##
-  ## @brief      Cleans up after each test.
-  ##
-  ## @param      self  The object
-  ##
-  ## @return     Nothing
-  ##
   def tearDown(self):
+    """Cleans up after each test.
+    """
+
     self.sd = None
 
-  ##
-  ## @brief      Test all available and left empty input values for their
-  ##             correct default values.
-  ##
-  ## @param      self  The object
-  ##
-  ## @return     { description_of_the_return_value }
-  ##
   def test_empty(self):
+    """Test all available and left empty input values for their correct default
+        values.
+    """
+
     self.sd = simulation_objects.simulation_data()
     self.assertEqual(self.sd.calculate_scale_factors, "0")
     self.assertEqual(self.sd.default_actions, "1")
@@ -59,14 +50,10 @@ class TestSimulationDataInit(unittest.TestCase):
     self.assertEqual(self.sd.so_simulation_end_time, None)
     self.assertEqual(self.sd.so_simulation_start_time, None)
 
-  ##
-  ## @brief      Test input checks of calculate_scale_factors.
-  ##
-  ## @param      self  The object
-  ##
-  ## @return     { description_of_the_return_value }
-  ##
   def test_calculate_scale_factors(self):
+    """Test input checks of calculate_scale_factors.
+    """
+
     self.sd = simulation_objects.simulation_data(calculate_scale_factors="1")
     self.assertEqual(self.sd.calculate_scale_factors, "1")
     self.assertNotEqual(self.sd.calculate_scale_factors, "0")
