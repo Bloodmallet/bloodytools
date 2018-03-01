@@ -13,8 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class TestSimulationDataInit(unittest.TestCase):
-  """Simple tests for the handling of init values for objects of the
-      simulation_data class.
+  """Simple tests for the handling of init values for objects of the simulation_data class.
   """
 
   def tearDown(self):
@@ -24,8 +23,7 @@ class TestSimulationDataInit(unittest.TestCase):
     self.sd = None
 
   def test_empty(self):
-    """Test all available and left empty input values for their correct default
-        values.
+    """Test all available and left empty input values for their correct default values.
     """
 
     self.sd = simulation_objects.simulation_data()
@@ -139,7 +137,7 @@ class TestSimulationDataInit(unittest.TestCase):
   def test_name(self):
     self.sd = simulation_objects.simulation_data(name="")
     self.assertNotEqual(self.sd.name, "")
-    self.assertEqual(type(self.sd.name), uuid.UUID)
+    self.assertEqual(type(self.sd.name), str)
     self.sd = None
     self.sd = simulation_objects.simulation_data(name="Borke")
     self.assertEqual(self.sd.name, "Borke")
@@ -266,7 +264,7 @@ class TestSimulationDataMethods(unittest.TestCase):
     self.assertTrue(self.sd.get_dps(), 12345)
 
   def test_set_dps(self):
-    self.assertTrue(self.sd.set_dps("123"))
+    self.assertEqual(self.sd.set_dps("123"), None)
     self.assertEqual(self.sd.dps, 123)
     with self.assertRaises(simulation_objects.AlreadySetError):
       self.sd.set_dps(5678.9)
@@ -290,23 +288,25 @@ class TestSimulationDataMethods(unittest.TestCase):
     self.assertEqual(self.sd.get_avg(sd_empty), None)
 
   def test_get_simulation_duration(self):
-    self.assertEqual(self.sd.get_simulation_duration(), None)
-    self.sd.so_simulation_start_time = datetime.datetime.utcnow()
+    with self.assertRaises(simulation_objects.NotStartedYetError):
+      self.assertEqual(self.sd.get_simulation_duration(), None)
+    self.sd.set_simulation_start_time()
     time.sleep(0.005)
-    self.assertEqual(self.sd.get_simulation_duration(), None)
-    self.sd.so_simulation_end_time = datetime.datetime.utcnow()
+    with self.assertRaises(simulation_objects.StillInProgressError):
+      self.assertEqual(self.sd.get_simulation_duration(), None)
+    self.sd.set_simulation_end_time()
     self.assertNotEqual(self.sd.get_simulation_duration(), None)
 
   def test_set_full_report(self):
     with self.assertRaises(TypeError):
       self.sd.set_full_report(1234)
     report = str(uuid.uuid4())
-    self.assertTrue(self.sd.set_full_report(report))
+    self.assertEqual(self.sd.set_full_report(report), None)
     self.assertEqual(self.sd.full_report, report)
 
   def test_set_simulation_end_time(self):
     before = datetime.datetime.utcnow()
-    self.assertTrue(self.sd.set_simulation_end_time())
+    self.assertEqual(self.sd.set_simulation_end_time(), None)
     after = datetime.datetime.utcnow()
     self.assertTrue(self.sd.so_simulation_end_time >= before)
     self.assertTrue(self.sd.so_simulation_end_time <= after)
@@ -317,12 +317,12 @@ class TestSimulationDataMethods(unittest.TestCase):
   def test_set_simulation_start_time(self):
     self.assertEqual(self.sd.so_simulation_start_time, None)
     before = datetime.datetime.utcnow()
-    self.assertTrue(self.sd.set_simulation_start_time())
+    self.assertEqual(self.sd.set_simulation_start_time(), None)
     after = datetime.datetime.utcnow()
     self.assertTrue(self.sd.so_simulation_start_time >= before)
     self.assertTrue(self.sd.so_simulation_start_time <= after)
     self.assertEqual(type(self.sd.so_simulation_start_time), datetime.datetime)
-    self.assertTrue(self.sd.set_simulation_start_time())
+    self.assertEqual(self.sd.set_simulation_start_time(), None)
 
   def test_simulate(self):
     # travis-ci test
@@ -398,7 +398,7 @@ class TestSimulationGroupDataInit(unittest.TestCase):
 
   def test_wrong_list_input(self):
     tmp = simulation_objects.simulation_data(iterations="5000")
-    with self.assertRaises(simulation_objects.InputError):
+    with self.assertRaises(ValueError):
       simulation_objects.simulation_group([self.sd1, tmp])
     with self.assertRaises(TypeError):
       simulation_objects.simulation_group([

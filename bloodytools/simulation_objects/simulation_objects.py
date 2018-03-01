@@ -188,15 +188,15 @@ class simulation_data():
     # creation time of the simulation object
     self.so_creation_time = datetime.datetime.utcnow()
     # simulation dps result
-    self.dps: int
+    self.dps: int = None
     # flag to know whether data was generated with external simulation function
     self.external_simulation = False
     # simulation full report (command line print out)
-    self.full_report: str
+    self.full_report: str = None
     # simulation end time
-    self.so_simulation_end_time: datetime.datetime
+    self.so_simulation_end_time: datetime.datetime = None
     # simulation start time
-    self.so_simulation_start_time: datetime.datetime
+    self.so_simulation_start_time: datetime.datetime = None
 
   def is_equal(self, simulation_instance: 'simulation_data') -> bool:
     """Determines if the current and given simulation_data share the
