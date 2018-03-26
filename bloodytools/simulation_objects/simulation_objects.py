@@ -4,6 +4,8 @@
 import datetime
 # wow game data and simc input checks
 from simc_support import simc_checks as simc_checks
+# required for file existance check
+import os
 # sys operations and data
 import sys
 from typing import Union, List
@@ -70,7 +72,7 @@ class simulation_data():
     calculate_scale_factors: str = "0",
     default_actions: str = "1",
     default_skill: str = "1.0",
-    executionable: str = None,
+    executable: str = None,
     fight_style: str = "patchwerk",
     fixed_time: str = "1",
     html: str = "",
@@ -105,16 +107,20 @@ class simulation_data():
       self.default_skill = "1.0"
     # describes the location and type of the simc executable
     # if no value was set, determine a standard value
-    if executionable == None:
+    if executable == None:
       if sys.platform == 'win32':
-        logger.debug("Setting Windows default value for executionable.")
-        self.executionable = "../simc.exe"
+        logger.info(
+          "Setting Windows default value for executable. This might not work for your system."
+        )
+        self.executable = "../simc.exe"
       else:
-        logger.debug("Setting Linux default value for executionable.")
-        self.executionable = "../simc"
+        logger.info(
+          "Setting Linux default value for executable. This might not work for your system."
+        )
+        self.executable = "../simc"
     else:
       try:
-        self.executionable = str(executionable)
+        self.executable = str(executable)
       except Exception as e:
         logger.error("{}".format(e))
         raise e
@@ -202,7 +208,7 @@ class simulation_data():
     """Determines if the current and given simulation_data share the
       same base. The following attributes are considered base:
       calculate_scale_factors, default_actions, default_skill,
-      executionable, fight_style, fixed_time, html, iterations, log,
+      executable, fight_style, fixed_time, html, iterations, log,
       optimize_expressions, ptr, ready_trigger, target_error, threads
 
     Arguments:
@@ -219,7 +225,7 @@ class simulation_data():
         return False
       if self.default_skill != simulation_instance.default_skill:
         return False
-      if self.executionable != simulation_instance.executionable:
+      if self.executable != simulation_instance.executable:
         return False
       if self.fight_style != simulation_instance.fight_style:
         return False
@@ -370,7 +376,7 @@ class simulation_data():
     Returns:
       int -- DPS of the simulation
     """
-    argument = [self.executionable]
+    argument = [self.executable]
     argument.append("iterations=" + self.iterations)
     argument.append("target_error=" + self.target_error)
     argument.append("fight_style=" + self.fight_style)
@@ -381,10 +387,11 @@ class simulation_data():
     argument.append("default_skill=" + self.default_skill)
     argument.append("ptr=" + self.ptr)
     argument.append("threads=" + self.threads)
-    #argument.append( "ready_trigger="+ self.ready_trigger )
 
     for simc_argument in self.simc_arguments:
       argument.append(simc_argument)
+
+    argument.append("ready_trigger=" + self.ready_trigger)
 
     fail_counter = 0
     # should prevent additional empty windows popping up...on win32 systems without breaking different OS
@@ -464,11 +471,20 @@ class simulation_group():
   def __init__(
     self,
     simulation_instance: Union[simulation_data, List[simulation_data]],
-    name: str = ""
+    name: str = "",
+    threads: str = "",
+    profileset_work_threads: str = "",
+    executable: str = ""
   ) -> None:
     self.name = name
+    self.filename: str = ""
+    self.threads = threads
+    # simulationcrafts own multithreading
+    self.profileset_work_threads = profileset_work_threads
+    self.executable = executable
     self.profiles: List[simulation_data]
 
+    # check input types
     if type(simulation_instance) == list:
       correct_type = True
       for data in simulation_instance:  # type: ignore
@@ -488,10 +504,9 @@ class simulation_group():
         format(type(simulation_instance))
       )
 
+    # check input values
     if not self.selfcheck():
-      raise ValueError(
-        "At least one item of simulation_instance had data that didn't match the others."
-      )
+      raise ValueError("Selfcheck of the simulation_group failed.")
 
   def selfcheck(self) -> bool:
     """Compares the base content of all profiles. All profiles need to
@@ -507,6 +522,7 @@ class simulation_group():
       if not self.profiles[i].is_equal(self.profiles[i + 1]):
         return False
       i += 1
+
     return True
 
   def simulate(self) -> bool:
@@ -521,7 +537,6 @@ class simulation_group():
     Returns:
       bool -- True if simulations ended successfully.
     """
-
     if self.profiles:
       if len(self.profiles) == 1:
         # if only one profiles is in the group this profile is simulated normally
@@ -529,13 +544,160 @@ class simulation_group():
           self.profiles[0].simulate()
         except Exception as e:
           raise e
+
       elif len(self.profiles) >= 2:
-        # profile set creation based on profiles content
-        # create file with profile set content
-        # start simulation with profilesets
-        # grab data
-        # push data into simulation_data.set_dps(dps)
-        raise NotImplementedError
+
+        # check for a path to executable
+        if not self.executable:
+          raise ValueError(
+            "No path_to_executable was set. Simulation can't start."
+          )
+
+        # write data to file, create file name
+        if self.filename:
+          raise AlreadySetError(
+            "Filename '{}' was already set for the simulation_group. You probably tried to simulate the same group twice.".
+            format(self.filename)
+          )
+        else:
+          self.filename = str(uuid.uuid4()) + ".simc"
+
+          # if somehow the random naming function created the same name twice
+          if os.path.isfile(self.filename):
+            logger.info(
+              "Somehow the random filename generator generated a name ('{}') that is already on use.".
+              format(self.filename)
+            )
+            self.filename = str(uuid.uuid4()) + ".simc"
+          # write arguments to file
+          with open(self.filename, "w") as f:
+            # write the equal values to file
+            f.write(
+              "calculate_scale_factors={}\n".format(
+                self.profiles[0].calculate_scale_factors
+              )
+            )
+            f.write(
+              "default_actions={}\n".format(self.profiles[0].default_actions)
+            )
+            f.write(
+              "default_skill={}\n".format(self.profiles[0].default_skill)
+            )
+            f.write("fight_style={}\n".format(self.profiles[0].fight_style))
+            f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
+            f.write("html={}\n".format(self.profiles[0].html))
+            f.write("iterations={}\n".format(self.profiles[0].iterations))
+            f.write("log={}\n".format(self.profiles[0].log))
+            f.write(
+              "optimize_expressions={}\n".format(
+                self.profiles[0].optimize_expressions
+              )
+            )
+            f.write("ptr={}\n".format(self.profiles[0].ptr))
+            f.write("target_error={}\n".format(self.profiles[0].target_error))
+            f.write("threads={}\n".format(self.threads))
+            f.write(
+              "profileset_work_threads={}\n".format(
+                self.profileset_work_threads
+              )
+            )
+
+            # write all specific arguments to file
+            for profile in self.profiles:
+              # first used profile needs to be written as normal profile instead of profileset
+              if profile == self.profiles[0]:
+                for argument in profile.simc_arguments:
+                  f.write("{}\n".format(argument))
+                f.write("name={}\n\n# Profileset start\n".format(profile.name))
+                # or else in wrong scope
+                f.write(
+                  "ready_trigger={}\n".format(self.profiles[0].ready_trigger)
+                )
+
+              else:
+                for special_argument in profile.simc_arguments:
+                  f.write(
+                    "profileset.\"{profile_name}\"+={argument}\n".format(
+                      profile_name=profile.name, argument=special_argument
+                    )
+                  )
+
+          # counter of failed simulation attempts
+          fail_counter = 0
+          # should prevent additional empty windows popping up...on win32 systems without breaking different OS
+          if sys.platform == 'win32':
+            # call simulationcraft in the background. Save output for processing
+            startupinfo = subprocess.STARTUPINFO()  # type: ignore
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW  # type: ignore
+
+            while not hasattr(self, "success") and fail_counter < 5:
+
+              try:
+                simulation_output = subprocess.run(
+                  [self.executable, self.filename],
+                  stdout=subprocess.PIPE,
+                  stderr=subprocess.STDOUT,
+                  universal_newlines=True,
+                  startupinfo=startupinfo
+                )
+              except FileNotFoundError as e:
+                raise e
+
+              if simulation_output.returncode != 0:
+                fail_counter += 1
+              else:
+                self.success = True
+
+          else:
+
+            while not hasattr(self, "success") and fail_counter < 5:
+
+              try:
+                simulation_output = subprocess.run(
+                  [self.executable, self.filename],
+                  stdout=subprocess.PIPE,
+                  stderr=subprocess.STDOUT,
+                  universal_newlines=True
+                )
+              except FileNotFoundError as e:
+                raise e
+
+              if simulation_output.returncode != 0:
+                fail_counter += 1
+              else:
+                self.success = True
+
+          if fail_counter >= 5:
+            logger.error("ERROR: An Error occured during simulation.")
+            logger.error("args: " + str(simulation_output.args))
+            logger.error("stdout: " + str(simulation_output.stdout))
+            logger.error(
+              "name=value error? Check your input! Maybe your links to already existing profiles are wrong. They need to be relative links from bloodytools to your SimulationCraft directory."
+            )
+            self.error = simulation_output.stdout
+            raise SimulationError(self.error)
+
+          # get dps of the first profile
+          is_actor = True
+          profileset_results = False
+          for line in simulation_output.stdout.splitlines():
+            # needs this check to prevent grabbing the boss dps
+            if "DPS:" in line and is_actor:
+              self.profiles[0].set_dps(line.split()[1], external=False)
+              is_actor = False
+
+            if "Profilesets (median Damage per Second):" in line:
+              profileset_results = True
+
+            # get dps values of the profileset-simulations
+            if profileset_results:
+              for profile in self.profiles:
+                if profile.name in line:
+                  profile.set_dps(line.split()[0], external=False)
+
+          # remove profilesets file
+          os.remove(self.filename)
+
       else:
         raise NotSetYetError(
           "No profiles were added to this simulation_group yet. Nothing can be simulated."

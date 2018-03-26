@@ -231,8 +231,8 @@ class TestSimulationDataMethods(unittest.TestCase):
     self.assertFalse(sd_default_actions.is_equal(sd1))
     sd_default_skill = simulation_objects.simulation_data(default_skill="0.5")
     self.assertFalse(sd_default_skill.is_equal(sd1))
-    sd_executionable = simulation_objects.simulation_data(executionable="1")
-    self.assertFalse(sd_executionable.is_equal(sd1))
+    sd_executable = simulation_objects.simulation_data(executable="1")
+    self.assertFalse(sd_executable.is_equal(sd1))
     sd_fight_style = simulation_objects.simulation_data(
       fight_style="helterskelter"
     )
@@ -333,7 +333,7 @@ class TestSimulationDataMethods(unittest.TestCase):
     #   SimulationCraft/
     #     engine/
     if os.path.isfile("./SimulationCraft/engine/simc"):
-      self.sd.executionable = "./SimulationCraft/engine/simc"
+      self.sd.executable = "./SimulationCraft/engine/simc"
       self.sd.simc_arguments = [
         "./SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
       ]
@@ -345,7 +345,7 @@ class TestSimulationDataMethods(unittest.TestCase):
     #   bloodytools/
     #     simulation_objects/
     elif os.path.isfile("../SimulationCraft/simc.exe"):
-      self.sd.executionable = "../SimulationCraft/simc.exe"
+      self.sd.executable = "../SimulationCraft/simc.exe"
       self.sd.simc_arguments = [
         "../SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
       ]
@@ -365,7 +365,7 @@ class TestSimulationDataMethods(unittest.TestCase):
     self.assertEqual(type(self.sd.so_simulation_end_time), datetime.datetime)
 
   def test_simulate_fail(self):
-    self.sd.executionable = "Not_a_correct_value"
+    self.sd.executable = "Not_a_correct_value"
     with self.assertRaises(FileNotFoundError):
       self.sd.simulate()
 
@@ -416,8 +416,12 @@ class TestSimulationGroupDataInit(unittest.TestCase):
 class TestSimulationGroupMethods(unittest.TestCase):
 
   def setUp(self):
-    self.sd1 = simulation_objects.simulation_data(target_error="1.0")
-    self.sd2 = simulation_objects.simulation_data(target_error=1.0)
+    self.sd1 = simulation_objects.simulation_data(
+      target_error="1.0", simc_arguments=["talents=2222222"]
+    )
+    self.sd2 = simulation_objects.simulation_data(
+      target_error=1.0, simc_arguments=["talents=1111111"]
+    )
     self.sg = simulation_objects.simulation_group([self.sd1, self.sd2])
 
   def test_selfcheck(self):
@@ -433,8 +437,8 @@ class TestSimulationGroupMethods(unittest.TestCase):
     with self.assertRaises(TypeError):
       self.sg.add("Bananana")
 
-  def test_simulate(self):
-    self.sd1.executionable = "Not_a_correct_value"
+  def test_simulate_single_data(self):
+    self.sd1.executable = "Not_a_correct_value"
     sole_sg1 = simulation_objects.simulation_group(self.sd1)
     with self.assertRaises(FileNotFoundError):
       sole_sg1.simulate()
@@ -445,12 +449,11 @@ class TestSimulationGroupMethods(unittest.TestCase):
     #   bloodytools/
     #     simulation_objects/
     #   SimulationCraft/
-    #     engine/
-    if os.path.isfile("./SimulationCraft/engine/simc"):
-      self.sd2.executionable = "./SimulationCraft/engine/simc"
-      self.sd2.simc_arguments = [
-        "./SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
-      ]
+    if os.path.isfile("./SimulationCraft/simc"):
+      self.sd2.executable = "./SimulationCraft/simc"
+      self.sd2.simc_arguments.insert(
+        0, "./SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
+      )
 
     # local dev test
     # SimulationCraft/
@@ -459,12 +462,49 @@ class TestSimulationGroupMethods(unittest.TestCase):
     #   bloodytools/
     #     simulation_objects/
     elif os.path.isfile("../SimulationCraft/simc.exe"):
-      self.sd2.executionable = "../SimulationCraft/simc.exe"
-      self.sd2.simc_arguments = [
-        "../SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
-      ]
+      self.sd2.executable = "../SimulationCraft/simc.exe"
+      self.sd2.simc_arguments.insert(
+        0, "../SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
+      )
     sole_sg2 = simulation_objects.simulation_group(self.sd2)
     self.assertTrue(sole_sg2.simulate())
+    self.sg.profiles = None
+    self.assertFalse(self.sg.simulate())
+
+  def test_simulate_profilesets_wrong_path(self):
+    self.sg.executable = "Not_a_correct_value"
+    with self.assertRaises(FileNotFoundError):
+      self.sg.simulate()
+    os.remove(self.sg.filename)
+
+  def test_simulate_profilesets_correct_path(self):
+    # travis-ci test
+    # bloodytools/
+    #   ./
+    #   bloodytools/
+    #     simulation_objects/
+    #   SimulationCraft/
+    if os.path.isfile("./SimulationCraft/simc"):
+      self.sg.executable = "./SimulationCraft/simc"
+      self.sg.profiles[0].simc_arguments.insert(
+        0, "./SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
+      )
+
+    # local dev test
+    # SimulationCraft/
+    # bloodytools/
+    #   ./
+    #   bloodytools/
+    #     simulation_objects/
+    elif os.path.isfile("../SimulationCraft/simc.exe"):
+      self.sg.executable = "../SimulationCraft/simc.exe"
+      self.sg.profiles[0].simc_arguments.insert(
+        0, "../SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
+      )
+    self.sg.profiles[1].simc_arguments = ["talents=3333333"]
+    self.assertTrue(self.sg.simulate())
+
+  def test_simulate_profilesets_no_profiles(self):
     self.sg.profiles = None
     self.assertFalse(self.sg.simulate())
 
