@@ -28,8 +28,10 @@ install:
   - cd SimulationCraft/engine
   # Build SimulationCraft executable
   - make optimized
+  - cp simc ..
+  - cd ..
   - chmod +x simc
-  - cd ../..
+  - cd ..
 
 script:
   # Test simulation_objects and collect coverage information at the same time
