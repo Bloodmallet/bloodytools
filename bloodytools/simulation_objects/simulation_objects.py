@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 # date data
 import datetime
@@ -13,8 +14,6 @@ import uuid
 import logging
 
 import subprocess
-
-logger = logging.getLogger(__name__)
 
 
 class Error(Exception):
@@ -84,10 +83,14 @@ class simulation_data():
     ready_trigger: str = "1",
     simc_arguments: list = [],
     target_error: str = "0.1",
-    threads: str = ""
+    threads: str = "",
+    logger: logging.Logger = None
   ) -> None:
 
     super(simulation_data, self).__init__()
+
+    self.logger = logger or logging.getLogger(__name__)
+    self.logger.debug("simulation_data initiated.")
 
     # simc setting to calculate scale factors (stat weights)
     if calculate_scale_factors == "0" or calculate_scale_factors == "1":
@@ -103,18 +106,18 @@ class simulation_data():
     try:
       self.default_skill = str(float(default_skill))
     except Exception as e:
-      logger.error("{} -- Using default value instead.".format(e))
+      self.logger.error("{} -- Using default value instead.".format(e))
       self.default_skill = "1.0"
     # describes the location and type of the simc executable
     # if no value was set, determine a standard value
     if executable == None:
       if sys.platform == 'win32':
-        logger.info(
+        self.logger.info(
           "Setting Windows default value for executable. This might not work for your system."
         )
         self.executable = "../simc.exe"
       else:
-        logger.info(
+        self.logger.info(
           "Setting Linux default value for executable. This might not work for your system."
         )
         self.executable = "../simc"
@@ -122,13 +125,15 @@ class simulation_data():
       try:
         self.executable = str(executable)
       except Exception as e:
-        logger.error("{}".format(e))
+        self.logger.error("{}".format(e))
         raise e
     # simc setting to determine the fight style
     if fight_style == "custom" or simc_checks.is_fight_style(fight_style):
       self.fight_style = fight_style
     else:
-      logger.warning("{} -- Using default value instead.".format(fight_style))
+      self.logger.warning(
+        "{} -- Using default value instead.".format(fight_style)
+      )
       self.fight_style = "patchwerk"
     # simc setting to enable/diable the fixed fight length
     if fixed_time == "0" or fixed_time == "1":
@@ -284,7 +289,9 @@ class simulation_data():
     # raise AlreadySetError if one tries to overwrite previously set data
     if self.dps:
       raise AlreadySetError(
-        "A value for dps was already set to {}.".format(self.get_dps())
+        "Profile '{}' already had its dps value set to {}.".format(
+          self.name, self.get_dps()
+        )
       )
 
     try:
@@ -293,6 +300,9 @@ class simulation_data():
       self.dps = int(float(dps))
     except Exception as e:
       raise e
+    self.logger.debug(
+      "Set DPS of profile '{}' to {}.".format(self.name, self.get_dps())
+    )
 
   def get_avg(self, simulation_instance: 'simulation_data') -> int:
     """Get the average between to the parent and given simulation_instance.
@@ -435,9 +445,9 @@ class simulation_data():
           self.success = True
 
     if fail_counter >= 5:
-      logger.error("ERROR: An Error occured during simulation.")
-      logger.error("args: " + str(simulation_output.args))
-      logger.error("stdout: " + str(simulation_output.stdout))
+      self.logger.error("ERROR: An Error occured during simulation.")
+      self.logger.error("args: " + str(simulation_output.args))
+      self.logger.error("stdout: " + str(simulation_output.stdout))
       self.error = simulation_output.stdout
       raise SimulationError(self.error)
 
@@ -467,12 +477,16 @@ class simulation_group():
 
   def __init__(
     self,
-    simulation_instance: Union[simulation_data, List[simulation_data]],
+    simulation_instance: Union[simulation_data, List[simulation_data]] = None,
     name: str = "",
     threads: str = "",
     profileset_work_threads: str = "",
-    executable: str = ""
+    executable: str = "",
+    logger: logging.Logger = None
   ) -> None:
+    self.logger = logger or logging.getLogger(__name__)
+    self.logger.debug("simulation_group initiated.")
+
     self.name = name
     self.filename: str = ""
     self.threads = threads
@@ -484,7 +498,9 @@ class simulation_group():
     self.sg_simulation_end_time: datetime.datetime = None
 
     # check input types
-    if type(simulation_instance) == list:
+    if not simulation_instance:
+      self.profiles = []
+    elif type(simulation_instance) == list:
       correct_type = True
       for data in simulation_instance:  # type: ignore
         if type(data) != simulation_data:
@@ -547,8 +563,6 @@ class simulation_group():
 
     Raises:
       e -- Raised if simulation of a single profile failed.
-      NotImplementedError -- Multi-profile simulation via simulationcraft
-                             profilesets is not yet implemented.
       NotSetYetError -- No data available to simulate.
 
     Returns:
@@ -584,7 +598,7 @@ class simulation_group():
 
           # if somehow the random naming function created the same name twice
           if os.path.isfile(self.filename):
-            logger.info(
+            self.logger.info(
               "Somehow the random filename generator generated a name ('{}') that is already on use.".
               format(self.filename)
             )
@@ -688,18 +702,21 @@ class simulation_group():
                 self.success = True
 
           if fail_counter >= 5:
-            logger.error("ERROR: An Error occured during simulation.")
-            logger.error("args: " + str(simulation_output.args))
-            logger.error("stdout: " + str(simulation_output.stdout))
-            logger.error(
+            self.logger.error("ERROR: An Error occured during simulation.")
+            self.logger.error("args: " + str(simulation_output.args))
+            self.logger.error("stdout: " + str(simulation_output.stdout))
+            self.logger.error(
               "name=value error? Check your input! Maybe your links to already existing profiles are wrong. They need to be relative links from bloodytools to your SimulationCraft directory."
             )
             self.error = simulation_output.stdout
             raise SimulationError(self.error)
 
+          self.logger.debug(simulation_output.stdout)
+
           # get dps of the first profile
           is_actor = True
           profileset_results = False
+
           for line in simulation_output.stdout.splitlines():
             # needs this check to prevent grabbing the boss dps
             if "DPS:" in line and is_actor:
@@ -714,6 +731,10 @@ class simulation_group():
               for profile in self.profiles:
                 if profile.name in line:
                   profile.set_dps(line.split()[0], external=False)
+
+            # prevents false positive from Waiting -data
+            if "" == line and profileset_results:
+              profileset_results = False
 
           # remove profilesets file
           os.remove(self.filename)
