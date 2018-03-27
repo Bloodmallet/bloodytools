@@ -294,9 +294,6 @@ class simulation_data():
     except Exception as e:
       raise e
 
-    if self.so_simulation_end_time != None:
-      self.so_simulation_end_time = datetime.datetime.utcnow()
-
   def get_avg(self, simulation_instance: 'simulation_data') -> int:
     """Get the average between to the parent and given simulation_instance.
 
@@ -483,6 +480,8 @@ class simulation_group():
     self.profileset_work_threads = profileset_work_threads
     self.executable = executable
     self.profiles: List[simulation_data]
+    self.sg_simulation_start_time: datetime.datetime = None
+    self.sg_simulation_end_time: datetime.datetime = None
 
     # check input types
     if type(simulation_instance) == list:
@@ -525,6 +524,24 @@ class simulation_group():
 
     return True
 
+  def set_simulation_end_time(self) -> None:
+    """Set sg_simulation_end_time.
+
+    Raises:
+      AlreadySetError -- Raised if the simulation end time was already set.
+    """
+    if not self.sg_simulation_end_time:
+      self.sg_simulation_end_time = datetime.datetime.utcnow()
+    else:
+      raise AlreadySetError(
+        "Simulation end time was already set. Setting it twice is not allowed."
+      )
+
+  def set_simulation_start_time(self) -> None:
+    """Set sg_simulation_start_time. Can be done multiple times.
+    """
+    self.sg_simulation_start_time = datetime.datetime.utcnow()
+
   def simulate(self) -> bool:
     """Triggers the simulation of all profiles.
 
@@ -538,6 +555,9 @@ class simulation_group():
       bool -- True if simulations ended successfully.
     """
     if self.profiles:
+
+      self.set_simulation_start_time()
+
       if len(self.profiles) == 1:
         # if only one profiles is in the group this profile is simulated normally
         try:
@@ -702,6 +722,9 @@ class simulation_group():
         raise NotSetYetError(
           "No profiles were added to this simulation_group yet. Nothing can be simulated."
         )
+
+      self.set_simulation_end_time()
+
     else:
       return False
 
