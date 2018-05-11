@@ -27,7 +27,7 @@ class TestSimulationDataInit(unittest.TestCase):
     """Test all available and left empty input values for their correct default values.
     """
 
-    self.sd = simulation_objects.simulation_data()
+    self.sd = simulation_objects.Simulation_Data()
     self.assertEqual(self.sd.calculate_scale_factors, "0")
     self.assertEqual(self.sd.default_actions, "1")
     self.assertEqual(self.sd.default_skill, "1.0")
@@ -53,7 +53,7 @@ class TestSimulationDataInit(unittest.TestCase):
     """Test input checks of calculate_scale_factors.
     """
 
-    self.sd = simulation_objects.simulation_data(calculate_scale_factors="1")
+    self.sd = simulation_objects.Simulation_Data(calculate_scale_factors="1")
     self.assertEqual(self.sd.calculate_scale_factors, "1")
     self.assertNotEqual(self.sd.calculate_scale_factors, "0")
     self.assertNotEqual(self.sd.calculate_scale_factors, str)
@@ -69,7 +69,7 @@ class TestSimulationDataInit(unittest.TestCase):
   ## @return     { description_of_the_return_value }
   ##
   def test_default_actions(self):
-    self.sd = simulation_objects.simulation_data(default_actions="1")
+    self.sd = simulation_objects.Simulation_Data(default_actions="1")
     self.assertEqual(self.sd.default_actions, "1")
     self.assertNotEqual(self.sd.default_actions, "0")
     self.assertNotEqual(self.sd.default_actions, str)
@@ -78,7 +78,7 @@ class TestSimulationDataInit(unittest.TestCase):
     self.assertNotEqual(self.sd.default_actions, int)
 
   def test_fight_style(self):
-    self.sd = simulation_objects.simulation_data(fight_style="helterskelter")
+    self.sd = simulation_objects.Simulation_Data(fight_style="helterskelter")
     self.assertEqual(self.sd.fight_style, "helterskelter")
     self.assertNotEqual(self.sd.fight_style, "0")
     self.assertNotEqual(self.sd.fight_style, str)
@@ -87,11 +87,11 @@ class TestSimulationDataInit(unittest.TestCase):
     self.assertNotEqual(self.sd.fight_style, int)
     # simc_checks needs improvements to catch this
     #self.sd = None
-    #self.sd = simulation_objects.simulation_data( fight_style=1234 )
+    #self.sd = simulation_objects.Simulation_Data( fight_style=1234 )
     #self.assertEqual( self.sd.fight_style, "patchwerk" )
 
   def test_fixed_time(self):
-    self.sd = simulation_objects.simulation_data(fixed_time="1")
+    self.sd = simulation_objects.Simulation_Data(fixed_time="1")
     self.assertEqual(self.sd.fixed_time, "1")
     self.assertNotEqual(self.sd.fixed_time, "0")
     self.assertNotEqual(self.sd.fixed_time, str)
@@ -100,7 +100,7 @@ class TestSimulationDataInit(unittest.TestCase):
     self.assertNotEqual(self.sd.fixed_time, int)
 
   def test_html(self):
-    self.sd = simulation_objects.simulation_data(html="testiger.html")
+    self.sd = simulation_objects.Simulation_Data(html="testiger.html")
     self.assertEqual(self.sd.html, "testiger.html")
     self.assertNotEqual(self.sd.html, "")
     self.assertNotEqual(self.sd.html, str)
@@ -109,7 +109,7 @@ class TestSimulationDataInit(unittest.TestCase):
     self.assertNotEqual(self.sd.html, int)
 
   def test_iterations(self):
-    self.sd = simulation_objects.simulation_data(iterations="15000")
+    self.sd = simulation_objects.Simulation_Data(iterations="15000")
     self.assertEqual(self.sd.iterations, "15000")
     self.assertNotEqual(self.sd.iterations, "")
     self.assertNotEqual(self.sd.iterations, str)
@@ -117,14 +117,14 @@ class TestSimulationDataInit(unittest.TestCase):
     self.assertNotEqual(self.sd.iterations, dict)
     self.assertNotEqual(self.sd.iterations, int)
     self.sd = None
-    self.sd = simulation_objects.simulation_data(iterations=15000)
+    self.sd = simulation_objects.Simulation_Data(iterations=15000)
     self.assertEqual(self.sd.iterations, "15000")
     self.sd = None
-    self.sd = simulation_objects.simulation_data(iterations=15000.75)
+    self.sd = simulation_objects.Simulation_Data(iterations=15000.75)
     self.assertEqual(self.sd.iterations, "15000")
 
   def test_log(self):
-    self.sd = simulation_objects.simulation_data(log="1")
+    self.sd = simulation_objects.Simulation_Data(log="1")
     self.assertEqual(self.sd.log, "1")
     self.assertNotEqual(self.sd.log, "")
     self.assertNotEqual(self.sd.log, str)
@@ -132,19 +132,19 @@ class TestSimulationDataInit(unittest.TestCase):
     self.assertNotEqual(self.sd.log, dict)
     self.assertNotEqual(self.sd.log, int)
     self.sd = None
-    self.sd = simulation_objects.simulation_data(iterations=15000)
+    self.sd = simulation_objects.Simulation_Data(iterations=15000)
     self.assertEqual(self.sd.log, "0")
 
   def test_name(self):
-    self.sd = simulation_objects.simulation_data(name="")
+    self.sd = simulation_objects.Simulation_Data(name="")
     self.assertNotEqual(self.sd.name, "")
     self.assertEqual(type(self.sd.name), str)
     self.sd = None
-    self.sd = simulation_objects.simulation_data(name="Borke")
+    self.sd = simulation_objects.Simulation_Data(name="Borke")
     self.assertEqual(self.sd.name, "Borke")
 
   def test_optimize_expressions(self):
-    self.sd = simulation_objects.simulation_data(optimize_expressions="1")
+    self.sd = simulation_objects.Simulation_Data(optimize_expressions="1")
     self.assertEqual(self.sd.optimize_expressions, "1")
     self.assertNotEqual(self.sd.optimize_expressions, "0")
     self.assertNotEqual(self.sd.optimize_expressions, str)
@@ -152,11 +152,11 @@ class TestSimulationDataInit(unittest.TestCase):
     self.assertNotEqual(self.sd.optimize_expressions, dict)
     self.assertNotEqual(self.sd.optimize_expressions, int)
     self.sd = None
-    self.sd = simulation_objects.simulation_data(optimize_expressions=["1"])
+    self.sd = simulation_objects.Simulation_Data(optimize_expressions=["1"])
     self.assertEqual(self.sd.optimize_expressions, "1")
 
   def test_ptr(self):
-    self.sd = simulation_objects.simulation_data(ptr="1")
+    self.sd = simulation_objects.Simulation_Data(ptr="1")
     self.assertEqual(self.sd.ptr, "1")
     self.assertNotEqual(self.sd.ptr, "0")
     self.assertNotEqual(self.sd.ptr, str)
@@ -164,11 +164,11 @@ class TestSimulationDataInit(unittest.TestCase):
     self.assertNotEqual(self.sd.ptr, dict)
     self.assertNotEqual(self.sd.ptr, int)
     self.sd = None
-    self.sd = simulation_objects.simulation_data(ptr=["1"])
+    self.sd = simulation_objects.Simulation_Data(ptr=["1"])
     self.assertEqual(self.sd.ptr, "0")
 
   def test_ready_trigger(self):
-    self.sd = simulation_objects.simulation_data(ready_trigger="1")
+    self.sd = simulation_objects.Simulation_Data(ready_trigger="1")
     self.assertEqual(self.sd.ready_trigger, "1")
     self.assertNotEqual(self.sd.ready_trigger, "0")
     self.assertNotEqual(self.sd.ready_trigger, str)
@@ -176,31 +176,31 @@ class TestSimulationDataInit(unittest.TestCase):
     self.assertNotEqual(self.sd.ready_trigger, dict)
     self.assertNotEqual(self.sd.ready_trigger, int)
     self.sd = None
-    self.sd = simulation_objects.simulation_data(ready_trigger=["1"])
+    self.sd = simulation_objects.Simulation_Data(ready_trigger=["1"])
     self.assertEqual(self.sd.ready_trigger, "1")
 
   def test_simc_arguments(self):
-    self.sd = simulation_objects.simulation_data(simc_arguments="1")
+    self.sd = simulation_objects.Simulation_Data(simc_arguments="1")
     self.assertNotEqual(self.sd.simc_arguments, "1")
     self.assertEqual(self.sd.simc_arguments, ["1"])
     self.sd = None
-    self.sd = simulation_objects.simulation_data(simc_arguments=["a", "b"])
+    self.sd = simulation_objects.Simulation_Data(simc_arguments=["a", "b"])
     self.assertEqual(self.sd.simc_arguments, ["a", "b"])
 
   def test_target_error(self):
-    self.sd = simulation_objects.simulation_data(target_error="0.5")
+    self.sd = simulation_objects.Simulation_Data(target_error="0.5")
     self.assertEqual(self.sd.target_error, "0.5")
     self.assertNotEqual(self.sd.target_error, ["1"])
     self.sd = None
-    self.sd = simulation_objects.simulation_data(target_error=["a", "b"])
+    self.sd = simulation_objects.Simulation_Data(target_error=["a", "b"])
     self.assertEqual(self.sd.target_error, "0.1")
 
   def test_threads(self):
-    self.sd = simulation_objects.simulation_data(threads="1.5")
+    self.sd = simulation_objects.Simulation_Data(threads="1.5")
     self.assertEqual(self.sd.threads, "1")
     self.assertNotEqual(self.sd.threads, "1.5")
     self.sd = None
-    self.sd = simulation_objects.simulation_data(threads=["a", "b"])
+    self.sd = simulation_objects.Simulation_Data(threads=["a", "b"])
     self.assertEqual(self.sd.threads, "")
 
 
@@ -210,53 +210,53 @@ class TestSimulationDataInit(unittest.TestCase):
 class TestSimulationDataMethods(unittest.TestCase):
 
   def setUp(self):
-    self.sd = simulation_objects.simulation_data()
+    self.sd = simulation_objects.Simulation_Data()
 
   def tearDown(self):
     self.sd = None
 
   def test_is_equal(self):
     sd1 = self.sd
-    sd2 = simulation_objects.simulation_data()
+    sd2 = simulation_objects.Simulation_Data()
     self.assertTrue(sd1.is_equal(sd2))
     self.assertTrue(sd2.is_equal(sd1))
     self.assertTrue(sd1.is_equal(sd1))
     self.assertFalse(sd1.is_equal("Döner"))
-    sd_calculate_scale_factors = simulation_objects.simulation_data(
+    sd_calculate_scale_factors = simulation_objects.Simulation_Data(
       calculate_scale_factors="1"
     )
     self.assertFalse(sd_calculate_scale_factors.is_equal(sd1))
-    sd_default_actions = simulation_objects.simulation_data(
+    sd_default_actions = simulation_objects.Simulation_Data(
       default_actions="0"
     )
     self.assertFalse(sd_default_actions.is_equal(sd1))
-    sd_default_skill = simulation_objects.simulation_data(default_skill="0.5")
+    sd_default_skill = simulation_objects.Simulation_Data(default_skill="0.5")
     self.assertFalse(sd_default_skill.is_equal(sd1))
-    sd_executable = simulation_objects.simulation_data(executable="1")
+    sd_executable = simulation_objects.Simulation_Data(executable="1")
     self.assertFalse(sd_executable.is_equal(sd1))
-    sd_fight_style = simulation_objects.simulation_data(
+    sd_fight_style = simulation_objects.Simulation_Data(
       fight_style="helterskelter"
     )
     self.assertFalse(sd_fight_style.is_equal(sd1))
-    sd_fixed_time = simulation_objects.simulation_data(fixed_time="0")
+    sd_fixed_time = simulation_objects.Simulation_Data(fixed_time="0")
     self.assertFalse(sd_fixed_time.is_equal(sd1))
-    sd_html = simulation_objects.simulation_data(html="test.html")
+    sd_html = simulation_objects.Simulation_Data(html="test.html")
     self.assertFalse(sd_html.is_equal(sd1))
-    sd_iterations = simulation_objects.simulation_data(iterations="124153")
+    sd_iterations = simulation_objects.Simulation_Data(iterations="124153")
     self.assertFalse(sd_iterations.is_equal(sd1))
-    sd_log = simulation_objects.simulation_data(log="1")
+    sd_log = simulation_objects.Simulation_Data(log="1")
     self.assertFalse(sd_log.is_equal(sd1))
-    sd_optimize_expressions = simulation_objects.simulation_data(
+    sd_optimize_expressions = simulation_objects.Simulation_Data(
       optimize_expressions="0"
     )
     self.assertFalse(sd_optimize_expressions.is_equal(sd1))
-    sd_ptr = simulation_objects.simulation_data(ptr="1")
+    sd_ptr = simulation_objects.Simulation_Data(ptr="1")
     self.assertFalse(sd_ptr.is_equal(sd1))
-    sd_ready_trigger = simulation_objects.simulation_data(ready_trigger="0")
+    sd_ready_trigger = simulation_objects.Simulation_Data(ready_trigger="0")
     self.assertFalse(sd_ready_trigger.is_equal(sd1))
-    sd_target_error = simulation_objects.simulation_data(target_error="0.5")
+    sd_target_error = simulation_objects.Simulation_Data(target_error="0.5")
     self.assertFalse(sd_target_error.is_equal(sd1))
-    sd_threads = simulation_objects.simulation_data(threads="4")
+    sd_threads = simulation_objects.Simulation_Data(threads="4")
     self.assertFalse(sd_threads.is_equal(sd1))
 
   def test_get_dps(self):
@@ -272,7 +272,7 @@ class TestSimulationDataMethods(unittest.TestCase):
     with self.assertRaises(TypeError):
       self.sd.set_dps("5678", external="Hallo")
     self.sd = None
-    self.sd = simulation_objects.simulation_data()
+    self.sd = simulation_objects.Simulation_Data()
     with self.assertRaises(TypeError):
       self.sd.set_dps("Bonjour", external="Bonsoir")
     self.assertEqual(self.sd.get_dps(), None)
@@ -281,11 +281,11 @@ class TestSimulationDataMethods(unittest.TestCase):
     self.assertEqual(self.sd.get_dps(), None)
 
   def test_get_avg(self):
-    sd = simulation_objects.simulation_data()
+    sd = simulation_objects.Simulation_Data()
     sd.set_dps(100)
     self.sd.set_dps(50)
     self.assertEqual(sd.get_avg(self.sd), 75)
-    sd_empty = simulation_objects.simulation_data()
+    sd_empty = simulation_objects.Simulation_Data()
     self.assertEqual(self.sd.get_avg(sd_empty), None)
 
   def test_get_simulation_duration(self):
@@ -377,38 +377,40 @@ class TestSimulationDataMethods(unittest.TestCase):
 class TestSimulationGroupDataInit(unittest.TestCase):
 
   def setUp(self):
-    self.sd1 = simulation_objects.simulation_data()
-    self.sd2 = simulation_objects.simulation_data()
+    self.sd1 = simulation_objects.Simulation_Data()
+    self.sd2 = simulation_objects.Simulation_Data()
 
   def tearDown(self):
     self.sd1 = None
     self.sd2 = None
 
   def test_empty(self):
-    with self.assertRaises(TypeError):
-      simulation_objects.simulation_group()
+    self.assertEqual(
+      type(simulation_objects.Simulation_Group()),
+      simulation_objects.simulation_group
+    )
 
   def test_correct_list_input(self):
-    test = simulation_objects.simulation_group([self.sd1, self.sd2])
+    test = simulation_objects.Simulation_Group([self.sd1, self.sd2])
     self.assertEqual(test.profiles[0], self.sd1)
     self.assertEqual(test.profiles[1], self.sd2)
 
   def test_correct_single_input(self):
-    test = simulation_objects.simulation_group(self.sd1)
+    test = simulation_objects.Simulation_Group(self.sd1)
     self.assertEqual(test.profiles[0], self.sd1)
 
   def test_wrong_list_input(self):
-    tmp = simulation_objects.simulation_data(iterations="5000")
+    tmp = simulation_objects.Simulation_Data(iterations="5000")
     with self.assertRaises(ValueError):
-      simulation_objects.simulation_group([self.sd1, tmp])
+      simulation_objects.Simulation_Group([self.sd1, tmp])
     with self.assertRaises(TypeError):
-      simulation_objects.simulation_group([
+      simulation_objects.Simulation_Group([
         "why", "would", "anyone", "do", "this"
       ])
 
   def test_wrong_input_type(self):
     with self.assertRaises(TypeError):
-      simulation_objects.simulation_group((self.sd1, self.sd2))
+      simulation_objects.Simulation_Group((self.sd1, self.sd2))
 
 
 ##
@@ -417,13 +419,13 @@ class TestSimulationGroupDataInit(unittest.TestCase):
 class TestSimulationGroupMethods(unittest.TestCase):
 
   def setUp(self):
-    self.sd1 = simulation_objects.simulation_data(
+    self.sd1 = simulation_objects.Simulation_Data(
       target_error="1.0", simc_arguments=["talents=2222222"]
     )
-    self.sd2 = simulation_objects.simulation_data(
+    self.sd2 = simulation_objects.Simulation_Data(
       target_error=1.0, simc_arguments=["talents=1111111"]
     )
-    self.sg = simulation_objects.simulation_group([self.sd1, self.sd2])
+    self.sg = simulation_objects.Simulation_Group([self.sd1, self.sd2])
 
   def test_selfcheck(self):
     self.assertTrue(self.sg.selfcheck())
@@ -432,7 +434,7 @@ class TestSimulationGroupMethods(unittest.TestCase):
 
   def test_add(self):
     start = len(self.sg.profiles)
-    new_data = simulation_objects.simulation_data(target_error=1.0)
+    new_data = simulation_objects.Simulation_Data(target_error=1.0)
     self.assertTrue(self.sg.add(new_data))
     self.assertEqual(len(self.sg.profiles), start + 1)
     with self.assertRaises(TypeError):
@@ -440,7 +442,7 @@ class TestSimulationGroupMethods(unittest.TestCase):
 
   def test_simulate_single_data(self):
     self.sd1.executable = "Not_a_correct_value"
-    sole_sg1 = simulation_objects.simulation_group(self.sd1)
+    sole_sg1 = simulation_objects.Simulation_Group(self.sd1)
     with self.assertRaises(FileNotFoundError):
       sole_sg1.simulate()
 
@@ -467,7 +469,7 @@ class TestSimulationGroupMethods(unittest.TestCase):
       self.sd2.simc_arguments.insert(
         0, "../SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
       )
-    sole_sg2 = simulation_objects.simulation_group(self.sd2)
+    sole_sg2 = simulation_objects.Simulation_Group(self.sd2)
     self.assertTrue(sole_sg2.simulate())
     self.sg.profiles = None
     self.assertFalse(self.sg.simulate())

@@ -59,7 +59,7 @@ class SimulationError(Error):
   pass
 
 
-class simulation_data():
+class Simulation_Data():
   """Manages all META-information for a single simulation and the result.
 
   TODO: add max_time, vary_combat_length
@@ -87,7 +87,7 @@ class simulation_data():
     logger: logging.Logger = None
   ) -> None:
 
-    super(simulation_data, self).__init__()
+    super(Simulation_Data, self).__init__()
 
     self.logger = logger or logging.getLogger(__name__)
     self.logger.debug("simulation_data initiated.")
@@ -112,12 +112,12 @@ class simulation_data():
     # if no value was set, determine a standard value
     if executable == None:
       if sys.platform == 'win32':
-        self.logger.info(
+        self.logger.debug(
           "Setting Windows default value for executable. This might not work for your system."
         )
         self.executable = "../simc.exe"
       else:
-        self.logger.info(
+        self.logger.debug(
           "Setting Linux default value for executable. This might not work for your system."
         )
         self.executable = "../simc"
@@ -165,8 +165,8 @@ class simulation_data():
     else:
       self.optimize_expressions = "1"
     # simc setting to enable/disable ptr data
-    if ptr == "0" or ptr == "1":
-      self.ptr = ptr
+    if str(ptr) == "0" or str(ptr) == "1":
+      self.ptr = str(ptr)
     else:
       self.ptr = "0"
     # simc setting to enable/disable ready_trigger
@@ -471,13 +471,13 @@ class simulation_data():
     return self.get_dps()
 
 
-class simulation_group():
+class Simulation_Group():
   """simulator_group holds one or multiple simulation_data as profiles and can simulate them either serialized or parallel. Parallel uses SimulationCrafts own profilesets feature. Dps values are saved in the simulation_data.
   """
 
   def __init__(
     self,
-    simulation_instance: Union[simulation_data, List[simulation_data]] = None,
+    simulation_instance: Union[Simulation_Data, List[Simulation_Data]] = None,
     name: str = "",
     threads: str = "",
     profileset_work_threads: str = "",
@@ -493,7 +493,7 @@ class simulation_group():
     # simulationcrafts own multithreading
     self.profileset_work_threads = profileset_work_threads
     self.executable = executable
-    self.profiles: List[simulation_data]
+    self.profiles: List[Simulation_Data]
     self.sg_simulation_start_time: datetime.datetime = None
     self.sg_simulation_end_time: datetime.datetime = None
 
@@ -503,7 +503,7 @@ class simulation_group():
     elif type(simulation_instance) == list:
       correct_type = True
       for data in simulation_instance:  # type: ignore
-        if type(data) != simulation_data:
+        if type(data) != Simulation_Data:
           correct_type = False
       if correct_type:
         self.profiles = simulation_instance  # type: ignore
@@ -511,7 +511,7 @@ class simulation_group():
         raise TypeError(
           "At least one item of simulation_instance list had a wrong type. Expected simulation_data."
         )
-    elif type(simulation_instance) == simulation_data:
+    elif type(simulation_instance) == Simulation_Data:
       self.profiles = [simulation_instance]  # type: ignore
     else:
       raise TypeError(
@@ -642,7 +642,9 @@ class simulation_group():
               if profile == self.profiles[0]:
                 for argument in profile.simc_arguments:
                   f.write("{}\n".format(argument))
-                f.write("name={}\n\n# Profileset start\n".format(profile.name))
+                f.write(
+                  "name=\"{}\"\n\n# Profileset start\n".format(profile.name)
+                )
                 # or else in wrong scope
                 f.write(
                   "ready_trigger={}\n".format(self.profiles[0].ready_trigger)
@@ -719,8 +721,9 @@ class simulation_group():
 
           for line in simulation_output.stdout.splitlines():
             # needs this check to prevent grabbing the boss dps
-            if "DPS:" in line and is_actor:
-              self.profiles[0].set_dps(line.split()[1], external=False)
+            if self.profiles[0].name in line and is_actor:
+              self.logger.debug(line)
+              self.profiles[0].set_dps(line.split()[0], external=False)
               is_actor = False
 
             if "Profilesets (median Damage per Second):" in line:
@@ -729,7 +732,8 @@ class simulation_group():
             # get dps values of the profileset-simulations
             if profileset_results:
               for profile in self.profiles:
-                if profile.name in line:
+                # need this space to catch the difference of multiple profiles like 'tauren' and 'highmountain_tauren'
+                if " " + profile.name in line:
                   profile.set_dps(line.split()[0], external=False)
 
             # prevents false positive from Waiting -data
@@ -751,7 +755,7 @@ class simulation_group():
 
     return True
 
-  def add(self, simulation_instance: simulation_data) -> bool:
+  def add(self, simulation_instance: Simulation_Data) -> bool:
     """Add another simulation_instance object to the group.
 
     Arguments:
@@ -772,7 +776,7 @@ class simulation_group():
 
     @return     True, if adding data was successfull. Exception otherwise.
     """
-    if type(simulation_instance) == simulation_data:
+    if type(simulation_instance) == Simulation_Data:
       try:
         self.profiles.append(simulation_instance)
       except Exception as e:
@@ -784,3 +788,18 @@ class simulation_group():
         "Simulation_instance has wrong type '{}' (needed simulation_data).".
         format(type(simulation_instance))
       )
+
+  def get_dps_of(self, profile_name: str) -> int:
+    """Returns DPS of the wanted/named profile.
+
+    Arguments:
+      profile_name {str} -- Name of the profile. e.g. 'baseline'
+
+    Returns:
+      int -- dps
+    """
+
+    for profile in self.profiles:
+      if profile.name == profile_name:
+        return profile.get_dps()
+    return None
