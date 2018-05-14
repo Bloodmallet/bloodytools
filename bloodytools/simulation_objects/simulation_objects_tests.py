@@ -387,7 +387,7 @@ class TestSimulationGroupDataInit(unittest.TestCase):
   def test_empty(self):
     self.assertEqual(
       type(simulation_objects.Simulation_Group()),
-      simulation_objects.simulation_group
+      simulation_objects.Simulation_Group
     )
 
   def test_correct_list_input(self):
