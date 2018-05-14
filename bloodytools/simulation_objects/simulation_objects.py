@@ -703,6 +703,11 @@ class Simulation_Group():
               else:
                 self.success = True
 
+          # remove profilesets file
+          os.remove(self.filename)
+          self.filename = None
+
+          # handle broken simulations
           if fail_counter >= 5:
             self.logger.error("ERROR: An Error occured during simulation.")
             self.logger.error("args: " + str(simulation_output.args))
@@ -739,9 +744,6 @@ class Simulation_Group():
             # prevents false positive from Waiting -data
             if "" == line and profileset_results:
               profileset_results = False
-
-          # remove profilesets file
-          os.remove(self.filename)
 
       else:
         raise NotSetYetError(

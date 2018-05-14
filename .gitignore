@@ -11,3 +11,10 @@
 
 # local type checks
 /.mypy_cache
+
+/bloodytools/results/races
+/bloodytools/results/trinkets
+/bloodytools/results/traits
+/bloodytools/results/secondary_distributions
+*.simc
+log.txt

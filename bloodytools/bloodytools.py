@@ -43,7 +43,7 @@ def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str):
     str -- relative link to the standard simc profile
   """
 
-  logger.debug("Basic profile string creating started.")
+  logger.debug("create_basic_profile_string start")
   # create the basis profile string
   basis_profile_string: str = settings.executable.split("simc")[0]
   basis_profile_string += "profiles/"
@@ -60,7 +60,7 @@ def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str):
   logger.debug(
     "Created basis_profile_string '{}'.".format(basis_profile_string)
   )
-
+  logger.debug("create_basic_profile_string ended")
   return basis_profile_string
 
 
@@ -90,7 +90,7 @@ def create_base_json_dict(
     dict -- [description]
   """
 
-  logger.debug("create_base_json_dict start.")
+  logger.debug("create_base_json_dict start")
 
   timestamp = pretty_timestamp()
 
@@ -137,9 +137,24 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
     None --
   """
 
-  logger.debug("Race simulations start.")
+  logger.debug("race_simulations start")
   for fight_style in settings.fight_styles:
     for wow_class, wow_spec in specs:
+
+      # check whether the baseline profile does exist
+      try:
+        with open(
+          create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
+        ) as f:
+          pass
+      except Exception as e:
+        logger.error(
+          "Opening baseline profile {} {} failed. This spec won't be in the result. {}".
+          format(wow_class, wow_spec, e)
+        )
+        # end this try early, no profile, no calculations
+        continue
+
       races = wow_lib.get_races_for_class(wow_class)
       simulation_group = simulation_objects.Simulation_Group(
         name="race_simulations",
@@ -178,9 +193,22 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             race, simulation_data.name
           )
         ))
-      logger.debug("Start race simulation.")
-      simulation_group.simulate()
-      logger.debug("Finished race simulation.")
+
+      logger.debug(
+        "Start race simulation for {} {}.".format(wow_class, wow_spec)
+      )
+      try:
+        simulation_group.simulate()
+      except Exception as e:
+        logger.error(
+          "Race simulation for {} {} failed. {}".format(
+            wow_class, wow_spec, e
+          )
+        )
+        continue
+      else:
+        logger.debug("Finished race simulation.")
+
       for profile in simulation_group.profiles:
         logger.debug(
           "Profile '{}' DPS: {}".format(profile.name, profile.get_dps())
@@ -206,15 +234,15 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
 
       # write json to file
       with open(
-        "results/races/races_{}_{}_{}.json".format(
-          wow_class, wow_spec, fight_style
+        "results/races/{}_{}_{}.json".format(
+          wow_class.lower(), wow_spec.lower(), fight_style.lower()
         ), "w"
       ) as f:
         logger.debug("Print race json.")
         f.write(json.dumps(wanted_data, sort_keys=True, indent=4))
         logger.debug("Printed race json.")
 
-  logger.debug("Race simulations ended.")
+  logger.debug("race_simulations ended")
 
 
 def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
@@ -230,10 +258,24 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
     None -- [description]
   """
 
-  logger.debug("trinket_simulations start.")
+  logger.debug("trinket_simulations start")
   for fight_style in settings.fight_styles:
     simulation_results = {}
     for wow_class, wow_spec in specs:
+
+      # check whether the baseline profile does exist
+      try:
+        with open(
+          create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
+        ) as f:
+          pass
+      except Exception as e:
+        logger.error(
+          "Opening baseline profile {} {} failed. This spec won't be in the result. {}".
+          format(wow_class, wow_spec, e)
+        )
+        # end this try early, no profile, no calculations
+        continue
 
       if not wow_class in simulation_results:
         simulation_results[wow_class] = {}
@@ -287,9 +329,20 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
             simulation_group.add(simulation_data)
 
       # create and simulate baseline profile
-      logger.debug("Start trinket simulation.")
-      simulation_group.simulate()
-      logger.debug("Finished trinket simulation.")
+      logger.debug(
+        "Start trinket simulation for {} {}.".format(wow_class, wow_spec)
+      )
+      try:
+        simulation_group.simulate()
+      except Exception as e:
+        logger.error(
+          "Trinket simulation for {} {} failed. {}".format(
+            wow_class, wow_spec, e
+          )
+        )
+        continue
+      else:
+        logger.debug("Finished trinket simulation.")
 
       for profile in simulation_group.profiles:
         logger.info(
@@ -351,8 +404,8 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
 
       # write json to file
       with open(
-        "results/trinkets/trinkets_{}_{}_{}.json".format(
-          wow_class, wow_spec, fight_style
+        "results/trinkets/{}_{}_{}.json".format(
+          wow_class.lower(), wow_spec.lower(), fight_style.lower()
         ), "w"
       ) as f:
         logger.debug("Print trinket json.")
@@ -451,14 +504,16 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
         f.write("}\n")
         logger.debug("Printed trinket lua.")
 
-  logger.debug("Trinket simulations ended.")
+  logger.debug("trinket_simulations ended")
 
 
-def find_secondary_distributions(
+def secondary_distribution_simulations(
   wow_class: str,
   wow_spec: str,
   talent_combinations: List[str],
 ) -> List[simulation_objects.Simulation_Group]:
+
+  logger.debug("secondary_distribution_simulations start")
 
   distribution_multipliers = []
   step_size = 10
@@ -467,18 +522,27 @@ def find_secondary_distributions(
   secondary_amount = 0
 
   # get secondary sum from profile
-  with open(
-    create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
-  ) as f:
-    for line in f:
-      if "gear_crit_rating=" in line:
-        secondary_amount += int(line.split("=")[1])
-      elif "gear_haste_rating=" in line:
-        secondary_amount += int(line.split("=")[1])
-      elif "gear_mastery_rating=" in line:
-        secondary_amount += int(line.split("=")[1])
-      elif "gear_versatility_rating=" in line:
-        secondary_amount += int(line.split("=")[1])
+  try:
+    with open(
+      create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
+    ) as f:
+      for line in f:
+        if "gear_crit_rating=" in line:
+          secondary_amount += int(line.split("=")[1])
+        elif "gear_haste_rating=" in line:
+          secondary_amount += int(line.split("=")[1])
+        elif "gear_mastery_rating=" in line:
+          secondary_amount += int(line.split("=")[1])
+        elif "gear_versatility_rating=" in line:
+          secondary_amount += int(line.split("=")[1])
+  except Exception as e:
+    logger.error(
+      "Scanning baseline profile {} {} failed. This spec won't be in the result. {}".
+      format(wow_class, wow_spec, e)
+    )
+    # end this try early, no profile, no calculations
+    return
+
   logger.debug("secondary_amount found: {}".format(secondary_amount))
 
   # generate all valied secondary distributions
@@ -501,6 +565,7 @@ def find_secondary_distributions(
       "secondary_distributions", wow_class, wow_spec, fight_style
     )
     result_dict["sorted_data_keys"] = {}
+    result_dict["secondary_sum"] = secondary_amount
     for talent_combination in talent_combinations:
       simulation_group = simulation_objects.Simulation_Group(
         name=talent_combination,
@@ -570,15 +635,30 @@ def find_secondary_distributions(
             )
           )
 
-      logger.info("Start secondary distribution simulation.")
-      simulation_group.simulate()
-      logger.info("Finished secondary distribution simulation.")
+      logger.info(
+        "Start secondary distribution simulation for {} {} {}.".format(
+          wow_class, wow_spec, talent_combination
+        )
+      )
+
+      try:
+        simulation_group.simulate()
+      except Exception as e:
+        logger.error(
+          "Secondary distribution simulation for {} {} {} failed. {}".format(
+            wow_class, wow_spec, talent_combination, e
+          )
+        )
+        continue
+      else:
+        logger.info("Finished secondary distribution simulation.")
 
       if settings.debug:
         logger.debug("Talent combination: " + talent_combination)
         for profile in simulation_group.profiles:
           logger.debug("{}   {}".format(profile.name, profile.get_dps()))
 
+      # create sorted list and add data to the result_dict
       stat_dps_list = []
       result_dict["data"][talent_combination] = {}
 
@@ -587,6 +667,7 @@ def find_secondary_distributions(
         result_dict["data"][talent_combination][profile.name
                                                ] = profile.get_dps()
 
+      # sort list
       stat_dps_list = sorted(
         stat_dps_list, key=lambda item: item[1], reverse=True
       )
@@ -594,6 +675,8 @@ def find_secondary_distributions(
         "Sorted secondary distribution list for {}:".
         format(talent_combination)
       )
+
+      # debug print results
       logger.debug("c  h  m  v    dps")
       for item in stat_dps_list:
         logger.debug(
@@ -605,6 +688,7 @@ def find_secondary_distributions(
       for item in stat_dps_list:
         result_dict["sorted_data_keys"][talent_combination].append(item[0])
 
+    # print file
     logger.debug(result_dict)
     with open(
       "results/secondary_distributions/{}_{}_{}.json".format(
@@ -614,24 +698,36 @@ def find_secondary_distributions(
       logger.debug("Print secondary distribution json.")
       f.write(json.dumps(result_dict, sort_keys=True, indent=4))
       logger.debug("Printed secondary distribution json.")
+  logger.debug("secondary_distribution_simulations ended")
 
 
 def main():
-  logger.debug("main started")
-  # trigger race simulations for elemental shamans
-  #race_simulations([("shaman", "elemental")])
-  # trigger trinket simulations for elemental shamans
-  # trinket_simulations([
-  #   #("rogue", "assassination"),
-  #   #("rogue", "outlaw"),
-  #   ("shaman", "elemental")
-  # ])
+  logger.debug("main start")
 
-  find_secondary_distributions("shaman", "elemental", ["1111111"])
+  # TODO: some interface and parameters instead of editing settings.py all the time
+  # need params especially for
+  #  - executable = "../../SimulationCraft_BfA/simc.exe"
+  #  - threads = "8"
+  #  - profileset_work_threads = "2"
+
+  to_be_simmed_classes_specs = wow_lib.get_classes_specs()
+
+  # trigger race simulations
+  #race_simulations(to_be_simmed_classes_specs)
+  # trigger trinket simulations
+  #trinket_simulations(to_be_simmed_classes_specs)
+
+  # trigger secondary distributions of all dps talent combinations
+  for wow_class, wow_spec in to_be_simmed_classes_specs:
+    secondary_distribution_simulations(
+      wow_class, wow_spec,
+      wow_lib.get_talent_combinations(wow_class, wow_spec)
+    )
+
   logger.debug("main ended")
 
 
 if __name__ == '__main__':
-  logger.debug("__main__ started")
+  logger.debug("__main__ start")
   main()
   logger.debug("__main__ ended")
