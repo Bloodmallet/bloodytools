@@ -1,5 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""Welcome to bloodytools - a SimulationCraft automator
+
+  Generate your data more easily without having to create each and every needed profile to do so by hand:
+    - races
+    - trinkets
+    - (NYI) azerite traits
+    - secondary distributions
+
+  Output is usually saved as .json. But you can add different ways to output the data yourself.
+
+  Contact:  https://discord.gg/tFR2uvK Bloodmallet(EU)#8246
+  Github:   https://github.com/Bloodmallet/bloodytools
+  Support the developement:
+            https://www.patreon.com/bloodmallet
+            https://www.paypal.me/bloodmallet
+"""
 
 from typing import List, Tuple
 
@@ -414,7 +430,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
 
     # LUA data exporter
     if fight_style.lower() == "patchwerk":
-      human_readable = True
+      human_readable = False
       item_dict = {
       }  # intended structure: itemID -> class -> spec -> itemlevel
 
@@ -510,7 +526,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
 def secondary_distribution_simulations(
   wow_class: str,
   wow_spec: str,
-  talent_combinations: List[str],
+  talent_combinations: List[str] = [False],
 ) -> List[simulation_objects.Simulation_Group]:
 
   logger.debug("secondary_distribution_simulations start")
@@ -591,7 +607,6 @@ def secondary_distribution_simulations(
                 create_basic_profile_string(
                   wow_class, wow_spec, settings.tier
                 ),
-                "talents={}".format(talent_combination),
                 "gear_crit_rating={}".format(
                   secondary_amount * (distribution_multiplier[0] / 100)
                 ),
@@ -607,6 +622,11 @@ def secondary_distribution_simulations(
               ]
             )
           )
+          # add the talent combination to the profileset, if one was provided
+          if talent_combination:
+            simulation_group.profiles[-1].simc_arguments.append(
+              "talents={}".format(talent_combination)
+            )
         else:
           simulation_group.add(
             simulation_objects.Simulation_Data(
@@ -710,19 +730,37 @@ def main():
   #  - threads = "8"
   #  - profileset_work_threads = "2"
 
-  to_be_simmed_classes_specs = wow_lib.get_classes_specs()
+  # empty class-spec list? great, we'll run all classes-specs
+  if not settings.wow_class_spec_list:
+    settings.wow_class_spec_list = wow_lib.get_classes_specs()
 
   # trigger race simulations
-  #race_simulations(to_be_simmed_classes_specs)
-  # trigger trinket simulations
-  #trinket_simulations(to_be_simmed_classes_specs)
+  if settings.enable_race_simulations:
+    race_simulations(settings.wow_class_spec_list)
 
-  # trigger secondary distributions of all dps talent combinations
-  for wow_class, wow_spec in to_be_simmed_classes_specs:
-    secondary_distribution_simulations(
-      wow_class, wow_spec,
-      wow_lib.get_talent_combinations(wow_class, wow_spec)
-    )
+  # trigger trinket simulations
+  if settings.enable_trinket_simulations:
+    trinket_simulations(settings.wow_class_spec_list)
+
+  # trigger secondary distributions
+  if settings.enable_secondary_distributions_simulations:
+    for wow_class, wow_spec in settings.wow_class_spec_list:
+      # if multiple talent combintions shall be simed
+      if settings.talent_permutations:
+        # if no talent list is provided, simulate all
+        if not (wow_class, wow_spec) in settings.talent_list:
+          secondary_distribution_simulations(
+            wow_class, wow_spec,
+            wow_lib.get_talent_combinations(wow_class, wow_spec)
+          )
+        else:
+          # if talent list is provided, sim that
+          secondary_distribution_simulations(
+            wow_class, wow_spec, settings.talent_list[(wow_class, wow_spec)]
+          )
+      else:
+        # sim only the base profile
+        secondary_distribution_simulations(wow_class, wow_spec)
 
   logger.debug("main ended")
 
