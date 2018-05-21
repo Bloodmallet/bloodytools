@@ -34,7 +34,7 @@ $ <env_name>\Scripts\active
  - Check python version again: `python --version`
  - `python -m pip install --upgrade pip` to update the installer of extra tools
  - `pip install -r requirements.txt`
-Congratulations, you're ready for `Getting started`.
+Congratulations, you're ready to execute the command of `Getting started` in your already open Commandline/Powershell/Terminal.
 
 ## Getting started
 Edit settings.py to your liking using a text editor like Notepad++. Start python environement. Start bloodytools.
