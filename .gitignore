@@ -18,3 +18,4 @@
 /bloodytools/results/secondary_distributions
 *.simc
 log.txt
+apikey.py

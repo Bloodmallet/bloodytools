@@ -24,7 +24,11 @@ import json
 import logging
 import settings
 import simulation_objects.simulation_objects as simulation_objects
+import time
 from simc_support import wow_lib
+
+if settings.use_own_threading:
+  import threading
 
 # activate logging to file and console
 logger = logging.getLogger(__name__)
@@ -214,7 +218,10 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
         "Start race simulation for {} {}.".format(wow_class, wow_spec)
       )
       try:
-        simulation_group.simulate()
+        if settings.use_raidbots and settings.apikey:
+          simulation_group.simulate_with_raidbots(settings.apikey)
+        else:
+          simulation_group.simulate()
       except Exception as e:
         logger.error(
           "Race simulation for {} {} failed. {}".format(
@@ -349,7 +356,10 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
         "Start trinket simulation for {} {}.".format(wow_class, wow_spec)
       )
       try:
-        simulation_group.simulate()
+        if settings.use_raidbots and settings.apikey:
+          simulation_group.simulate_with_raidbots(settings.apikey)
+        else:
+          simulation_group.simulate()
       except Exception as e:
         logger.error(
           "Trinket simulation for {} {} failed. {}".format(
@@ -734,13 +744,34 @@ def main():
   if not settings.wow_class_spec_list:
     settings.wow_class_spec_list = wow_lib.get_classes_specs()
 
+  # list of all active threads. when empty, terminate tool
+  thread_list = []
+
   # trigger race simulations
   if settings.enable_race_simulations:
-    race_simulations(settings.wow_class_spec_list)
+    if settings.use_own_threading:
+      race_thread = threading.Thread(
+        name="Race Thread",
+        target=race_simulations,
+        args=(settings.wow_class_spec_list, )
+      )
+      thread_list.append(race_thread)
+      race_thread.start()
+    else:
+      race_simulations(settings.wow_class_spec_list)
 
   # trigger trinket simulations
   if settings.enable_trinket_simulations:
-    trinket_simulations(settings.wow_class_spec_list)
+    if settings.use_own_threading:
+      trinket_thread = threading.Thread(
+        name="Trinket Thread",
+        target=trinket_simulations,
+        args=(settings.wow_class_spec_list, )
+      )
+      thread_list.append(trinket_thread)
+      trinket_thread.start()
+    else:
+      trinket_simulations(settings.wow_class_spec_list)
 
   # trigger secondary distributions
   if settings.enable_secondary_distributions_simulations:
@@ -749,18 +780,54 @@ def main():
       if settings.talent_permutations:
         # if no talent list is provided, simulate all
         if not (wow_class, wow_spec) in settings.talent_list:
-          secondary_distribution_simulations(
-            wow_class, wow_spec,
-            wow_lib.get_talent_combinations(wow_class, wow_spec)
-          )
+          if settings.use_own_threading:
+            secondary_distribution_thread = threading.Thread(
+              name="Secondary Distribution Thread All Talents {} {}".format(
+                wow_class, wow_spec
+              ),
+              target=secondary_distribution_simulations,
+              args=(
+                wow_class, wow_spec,
+                wow_lib.get_talent_combinations(wow_class, wow_spec)
+              )
+            )
+            thread_list.append(secondary_distribution_thread)
+            secondary_distribution_thread.start()
+          else:
+            secondary_distribution_simulations(
+              wow_class, wow_spec,
+              wow_lib.get_talent_combinations(wow_class, wow_spec)
+            )
         else:
           # if talent list is provided, sim that
-          secondary_distribution_simulations(
-            wow_class, wow_spec, settings.talent_list[(wow_class, wow_spec)]
-          )
+          if settings.use_own_threading:
+            secondary_distribution_thread = threading.Thread(
+              name="Secondary Distribution Thread Provided Talents {} {}".
+              format(wow_class, wow_spec),
+              target=secondary_distribution_simulations,
+              args=(
+                wow_class, wow_spec,
+                settings.talent_list[(wow_class, wow_spec)]
+              )
+            )
+            thread_list.append(secondary_distribution_thread)
+            secondary_distribution_thread.start()
+          else:
+            secondary_distribution_simulations(
+              wow_class, wow_spec, settings.talent_list[(wow_class, wow_spec)]
+            )
       else:
         # sim only the base profile
         secondary_distribution_simulations(wow_class, wow_spec)
+
+  while thread_list:
+    time.sleep(1)
+    for thread in thread_list:
+      if thread.is_alive():
+        logger.info("{} is still in progress.".format(thread.getName()))
+      else:
+        logger.info("{} finished.".format(thread.getName()))
+        thread_list.remove(thread)
 
   logger.debug("main ended")
 

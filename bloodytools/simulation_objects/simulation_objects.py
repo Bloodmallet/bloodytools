@@ -757,6 +757,417 @@ class Simulation_Group():
 
     return True
 
+  def simulate_with_raidbots(self, apikey) -> bool:
+    """Triggers the simulation of all profiles using Raidbots.com API.
+
+    Raises:
+      e -- Raised if simulation of a single profile failed.
+      NotSetYetError -- No data available to simulate.
+
+    Returns:
+      bool -- True if simulations ended successfully.
+    """
+    if self.profiles:
+
+      self.set_simulation_start_time()
+
+      if len(self.profiles) == 1:
+        # if only one profiles is in the group this profile is simulated normally
+        try:
+          self.profiles[0].simulate()
+        except Exception as e:
+          raise e
+
+      elif len(self.profiles) >= 2:
+
+        # write data to file, create file name
+        if self.filename:
+          raise AlreadySetError(
+            "Filename '{}' was already set for the simulation_group. You probably tried to simulate the same group twice.".
+            format(self.filename)
+          )
+        else:
+          self.filename = str(uuid.uuid4()) + ".simc"
+
+          # if somehow the random naming function created the same name twice
+          if os.path.isfile(self.filename):
+            self.logger.info(
+              "Somehow the random filename generator generated a name ('{}') that is already on use.".
+              format(self.filename)
+            )
+            self.filename = str(uuid.uuid4()) + ".simc"
+          # write arguments to file
+          with open(self.filename, "w") as f:
+            # write the equal values to file
+            f.write(
+              "default_actions={}\n".format(self.profiles[0].default_actions)
+            )
+            f.write(
+              "default_skill={}\n".format(self.profiles[0].default_skill)
+            )
+            f.write("fight_style={}\n".format(self.profiles[0].fight_style))
+            f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
+            f.write("iterations={}\n".format(self.profiles[0].iterations))
+            f.write(
+              "optimize_expressions={}\n".format(
+                self.profiles[0].optimize_expressions
+              )
+            )
+            f.write("ptr={}\n".format(self.profiles[0].ptr))
+            f.write("target_error={}\n".format(self.profiles[0].target_error))
+
+            # write all specific arguments to file
+            for profile in self.profiles:
+              # first used profile needs to be written as normal profile instead of profileset
+              if profile == self.profiles[0]:
+                for argument in profile.simc_arguments:
+                  # first profile has the dynamic link to the base profile as the first argument
+                  if argument == profile.simc_arguments[0]:
+                    with open(argument, 'r') as basic_profile:
+                      for line in basic_profile:
+                        f.write(line)  # TODO: might need a line break
+                  else:
+                    f.write("{}\n".format(argument))
+                f.write(
+                  "name=\"{}\"\n\n# Profileset start\n".format(profile.name)
+                )
+                # or else in wrong scope
+                f.write(
+                  "ready_trigger={}\n".format(self.profiles[0].ready_trigger)
+                )
+
+              else:
+                for special_argument in profile.simc_arguments:
+                  f.write(
+                    "profileset.\"{profile_name}\"+={argument}\n".format(
+                      profile_name=profile.name, argument=special_argument
+                    )
+                  )
+
+          # need raidbots logic
+
+          # create advanced input string
+          raidbots_advancedInput = ""
+          with open(self.filename, 'r') as f:
+            for line in f:
+              raidbots_advancedInput += line
+
+          raidbots_body = {
+            "type": "advanced",
+            "apiKey": apikey,
+            "advancedInput": raidbots_advancedInput,
+            "simcVersion": "bfa-dev",
+            "reportName": "Bloodmallet's shitty tool",
+          }
+
+          self.logger.debug(
+            "Raidbots communication body created: {}".format(raidbots_body)
+          )
+
+          from urllib import request, error
+          import json
+
+          data = json.dumps(raidbots_body).encode('utf8')
+          headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Bloodmallet\'s shitty tool'
+          }
+          req = request.Request(
+            "https://www.raidbots.com/sim", data=data, headers=headers
+          )
+
+          try:
+            response = request.urlopen(req)
+          except error.URLError as e:
+            self.logger.error(
+              "Sending the task {} to Raidbots failed.".format(self.name)
+            )
+            self.logger.error(e.reason)
+            self.logger.error(e.read())
+            raise SimulationError(
+              "Communication with Raidbots failed. {}".format(e.reason)
+            )
+          else:
+            try:
+              raidbots_response = json.loads(response.read())
+            except Exception as e:
+              self.logger.error(e)
+              raise e
+            else:
+              self.logger.debug(
+                "Raidbots responded: {}".format(raidbots_response)
+              )
+
+          raidbots_sim_id = raidbots_response["simId"]
+
+          # check for when the simulation is done
+          self.logger.info(
+            "Simulation of {} is underway. Please wait".format(self.name)
+          )
+
+          try:
+            progress = json.loads(
+              request.urlopen(
+                "https://www.raidbots.com/api/job/{}".format(raidbots_sim_id)
+              ).read()
+            )
+          except:
+            self.logger.error(
+              "Fetching the progress of the simulation of {} failed.".format(
+                self.name
+              )
+            )
+            progress = {"job": {"state": ""}}
+          else:
+            self.logger.info(
+              "Simulation {} is at {}. This value might behave unpredictable.".
+              format(self.name, progress["job"]["progress"])
+            )
+
+          import time
+          while not progress["job"]["state"] == "complete" and not progress[
+            "job"
+          ]["state"] == "failed":
+            time.sleep(6.5)
+            try:
+              progress = json.loads(
+                request.urlopen(
+                  request.Request(
+                    "https://www.raidbots.com/api/job/{}".
+                    format(raidbots_sim_id),
+                    headers=headers
+                  )
+                ).read()
+              )
+            except Exception as e:
+              self.logger.error(e)
+            else:
+              progress = json.loads(
+                request.urlopen(
+                  request.Request(
+                    "https://www.raidbots.com/api/job/{}".
+                    format(raidbots_sim_id),
+                    headers=headers
+                  )
+                ).read()
+              )
+            self.logger.info(
+              "Simulation {} is at {}. This value might behave unpredictable.".
+              format(self.name, progress["job"]["progress"])
+            )
+            self.logger.debug(progress)
+          self.logger.info(
+            "Simulation {} is done. Fetching data. This might take some seconds.".
+            format(self.name)
+          )
+
+          # simulation is done, get data
+          fetch_data_start_time = datetime.datetime.utcnow(
+          ) + datetime.timedelta(0, 30)
+          fetch_data_timeout = False
+          try:
+            raidbots_data = json.loads(
+              request.urlopen(
+                request.Request(
+                  "https://www.raidbots.com/reports/{}/data.json".
+                  format(raidbots_sim_id),
+                  headers=headers
+                )
+              ).read()
+            )
+          except Exception as e:
+            self.logger.error(
+              "Fetching data for {} from raidbots failed. {}".format(
+                self.name, e
+              )
+            )
+            fetched = False
+            while not fetched and not fetch_data_timeout:
+              time.sleep(4)
+              try:
+                raidbots_data = json.loads(
+                  request.urlopen(
+                    request.Request(
+                      "https://www.raidbots.com/reports/{}/data.json".
+                      format(raidbots_sim_id),
+                      headers=headers
+                    )
+                  ).read()
+                )
+              except Exception as e:
+                self.logger.error(
+                  "Fetching data for {} from raidbots failed. {}".format(
+                    self.name, e
+                  )
+                )
+                if datetime.datetime.utcnow() > fetch_data_start_time:
+                  fetch_data_timeout = True
+              else:
+                fetched = True
+          else:
+            self.logger.info(
+              "Fetching data for {} succeeded. {}".format(
+                self.name, raidbots_data
+              )
+            )
+
+          # if simulation failed or data.json couldn't be fetched
+          if progress["job"]["state"] == "failed" or fetch_data_timeout:
+
+            fetch_input_start_time = datetime.datetime.utcnow(
+            ) + datetime.timedelta(0, 30)
+            fetch_input_timeout = False
+
+            # simulation failed, get input
+            try:
+              raidbots_input = json.loads(
+                request.urlopen(
+                  request.Request(
+                    "https://www.raidbots.com/reports/{}/input.txt".
+                    format(raidbots_sim_id),
+                    headers=headers
+                  )
+                ).read()
+              )
+            except Exception as e:
+              self.logger.error(
+                "Fetching input data for {} from raidbots failed. {}".format(
+                  self.name, e
+                )
+              )
+              fetched = False
+              while not fetched and not fetch_input_timeout:
+                try:
+                  raidbots_input = json.loads(
+                    request.urlopen(
+                      request.Request(
+                        "https://www.raidbots.com/reports/{}/input.txt".
+                        format(raidbots_sim_id),
+                        headers=headers
+                      )
+                    ).read()
+                  )
+                except Exception as e:
+                  self.logger.error(
+                    "Fetching input data for {} from raidbots failed. {}".
+                    format(self.name, e)
+                  )
+                  if datetime.datetime.utcnow() > fetch_input_start_time:
+                    fetch_input_timeout = True
+                else:
+                  fetched = True
+            else:
+              self.logger.info(
+                "Fetching input data for {} succeeded. {}".format(
+                  self.name, raidbots_input
+                )
+              )
+
+            fetch_output_start_time = datetime.datetime.utcnow(
+            ) + datetime.timedelta(0, 30)
+            fetch_output_timeout = False
+
+            # simulation failed, get input
+            try:
+              raidbots_output = json.loads(
+                request.urlopen(
+                  request.Request(
+                    "https://www.raidbots.com/reports/{}/output.txt".
+                    format(raidbots_sim_id),
+                    headers=headers
+                  )
+                ).read()
+              )
+            except Exception as e:
+              self.logger.error(
+                "Fetching output data for {} from raidbots failed. {}".format(
+                  self.name, e
+                )
+              )
+              fetched = False
+              while not fetched and not fetch_output_timeout:
+                try:
+                  raidbots_output = json.loads(
+                    request.urlopen(
+                      request.Request(
+                        "https://www.raidbots.com/reports/{}/output.txt".
+                        format(raidbots_sim_id),
+                        headers=headers
+                      )
+                    ).read()
+                  )
+                except Exception as e:
+                  self.logger.error(
+                    "Fetching output data for {} from raidbots failed. {}".
+                    format(self.name, e)
+                  )
+                  if datetime.datetime.utcnow() > fetch_output_start_time:
+                    fetch_output_timeout = True
+                else:
+                  fetched = True
+            else:
+              self.logger.info(
+                "Fetching output data for {} succeeded. {}".format(
+                  self.name, raidbots_output
+                )
+              )
+
+            with open("error_{}.txt".format(raidbots_sim_id), 'w') as f:
+              f.write("############## INPUT ##############\n")
+              f.write(json.dumps(raidbots_input))
+              f.write("\n\n############## OUTPUT ##############\n")
+              f.write(json.dumps(raidbots_output))
+
+              try:
+                f.write(
+                  "\n\n############## DATA ##############\n{}".format(
+                    json.dumps(raidbots_data)
+                  )
+                )
+              except Exception:
+                f.write(
+                  "\n\n############## DATA ##############\nNo data available.\n"
+                )
+
+            raise SimulationError(
+              "Simulating with Raidbots failed. Please check out error_{}.txt file.".
+              format(raidbots_sim_id)
+            )
+
+          input("Enter something to delete the created file.")
+          # remove profilesets file
+          os.remove(self.filename)
+          self.filename = None
+
+          self.logger.debug("Congratulations, you got a data file!")
+          self.logger.debug(
+            json.dumps(raidbots_data, sort_keys=True, indent=4)
+          )
+
+          # set basic profile dps
+          self.logger.debug("Setting dps for baseprofile.")
+          self.set_dps_of(
+            raidbots_data["sim"]["players"][0]["name"],
+            raidbots_data["sim"]["players"][0]["collected_data"]["dps"]["mean"]
+          )
+          self.logger.debug("Set dps for baseprofile.")
+
+          for profile in raidbots_data["sim"]["profilesets"]["results"]:
+            self.logger.debug("Setting dps for {}".format(profile["name"]))
+            self.set_dps_of(profile["name"], profile["mean"])
+
+      else:
+        raise NotSetYetError(
+          "No profiles were added to this simulation_group yet. Nothing can be simulated."
+        )
+
+      self.set_simulation_end_time()
+
+    else:
+      return False
+
+    return True
+
   def add(self, simulation_instance: Simulation_Data) -> bool:
     """Add another simulation_instance object to the group.
 
@@ -805,3 +1216,16 @@ class Simulation_Group():
       if profile.name == profile_name:
         return profile.get_dps()
     return None
+
+  def set_dps_of(self, profile_name: str, dps: Union[int, float, str]) -> bool:
+    try:
+      for profile in self.profiles:
+        if profile.name == profile_name:
+          profile.set_dps(dps, external=False)
+    except Exception as e:
+      self.logger.error(
+        "Setting dps for profile {} failed. {}".format(profile_name, e)
+      )
+      return False
+    else:
+      return True
