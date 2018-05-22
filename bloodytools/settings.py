@@ -17,16 +17,16 @@ wow_class_spec_list = [("shaman", "elemental")]
 ##
 # SimulationCraft
 executable = "../../SimulationCraft_BfA/simc.exe"
-iterations = "50000"
+iterations = "75000"
 profileset_work_threads = "2"
 ptr = "0"
-simc_hash = "129d90531685e1e9388127317cabc57b0e5668d2"
-target_error = "0.1"
+simc_hash = "dec9b12600b28a81a11eef118b677116b9af4955"
+target_error = "0.4"
 threads = "8"
 
 ##
 # Race simulations
-enable_race_simulations = True
+enable_race_simulations = False
 
 ##
 # Trinket simulations
@@ -48,7 +48,7 @@ talent_permutations = True  # set to False, to sim only the base profile talent 
 
 ##
 # Developement setting - you usually don't need to touch these
-debug = True
+debug = False
 use_own_threading = False
 use_raidbots = False
 try:

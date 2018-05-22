@@ -19,6 +19,7 @@
 
 from typing import List, Tuple
 
+import argparse
 import datetime
 import json
 import logging
@@ -32,7 +33,10 @@ if settings.use_own_threading:
 
 # activate logging to file and console
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
+if hasattr(settings, "debug"):
+  if settings.debug:
+    logger.setLevel(logging.DEBUG)
 # file logger
 fh = logging.FileHandler("log.txt", "w")
 fh.setLevel(logging.ERROR)
@@ -294,7 +298,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
           pass
       except Exception as e:
         logger.error(
-          "Opening baseline profile {} {} failed. This spec won't be in the result. {}".
+          "Opening baseline profile for {} {} failed. This spec won't be in the result. {}".
           format(wow_class, wow_spec, e)
         )
         # end this try early, no profile, no calculations
@@ -371,7 +375,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
         logger.debug("Finished trinket simulation.")
 
       for profile in simulation_group.profiles:
-        logger.info(
+        logger.debug(
           "{} {} DPS, baseline +{}".format(
             profile.name, profile.get_dps(),
             profile.get_dps() - simulation_group.get_dps_of(
@@ -740,8 +744,103 @@ def main():
   #  - threads = "8"
   #  - profileset_work_threads = "2"
 
-  # empty class-spec list? great, we'll run all classes-specs
-  if not settings.wow_class_spec_list:
+  parser = argparse.ArgumentParser(
+    description="Simulate different aspects of World of Warcraft data."
+  )
+  parser.add_argument(
+    "-a",
+    "--all",
+    dest="sim_all",
+    action="store_const",
+    const=True,
+    default=False,
+    help=
+    "Simulate races, trinkets, secondary distributions, and azerite traits (NYI) for all specs and all talent combinations."
+  )
+  parser.add_argument(
+    "--executable",
+    metavar="PATH",
+    type=str,
+    help="Relative path to SimulationCrafts executable. Default: '{}'".format(
+      settings.executable
+    )
+  )
+  parser.add_argument(
+    "--profileset_work_threads",
+    metavar="NUMBER",
+    type=str,
+    help=
+    "Number of threads used per profileset by SimulationCraft. Default: '{}'".
+    format(settings.profileset_work_threads)
+  )
+  parser.add_argument(
+    "--threads",
+    metavar="NUMBER",
+    type=str,
+    help="Number of threads used by SimulationCraft. Default: '{}'".format(
+      settings.threads
+    )
+  )
+  parser.add_argument(
+    "--target_error",
+    metavar="NUMBER",
+    type=str,
+    help="Accuracy used by SimulationCraft. Default: '{}'".format(
+      settings.target_error
+    )
+  )
+  parser.add_argument(
+    "--debug",
+    action="store_const",
+    const=True,
+    default=False,
+    help="Enables debug modus. Default: '{}'".format(settings.debug)
+  )
+  args = parser.parse_args()
+
+  # activate debug mode as early as possible
+  if args.debug:
+    settings.debug = args.debug
+    logger.setLevel(logging.DEBUG)
+    fh.setLevel(logging.DEBUG)
+    logger.debug("Set debug mode to {}".format(settings.debug))
+
+  # if argument specified to simulate all, override settings
+  if args.sim_all:
+    settings.enable_race_simulations = True
+    settings.enable_secondary_distributions_simulations = True
+    settings.enable_trinket_simulations = True
+    # set talent_list to empty to ensure all talent combinations are run
+    settings.talent_list = {}
+    logger.debug(
+      "Set enable_race_simulations, enable_secondary_distributions_simulations, and enable_trinket_simulations to True."
+    )
+
+  # set new executable path if provided
+  if args.executable:
+    settings.executable = args.executable
+    logger.debug("Set executable to {}".format(settings.executable))
+
+  # set new threads if provided
+  if args.threads:
+    settings.threads = args.threads
+    logger.debug("Set threads to {}".format(settings.threads))
+
+  # set new profileset_work_threads if provided
+  if args.profileset_work_threads:
+    settings.profileset_work_threads = args.profileset_work_threads
+    logger.debug(
+      "Set profileset_work_threads to {}".format(
+        settings.profileset_work_threads
+      )
+    )
+
+  if args.target_error:
+    settings.target_error = args.target_error
+    logger.debug("Set target_error to {}".format(settings.target_error))
+
+  # empty class-spec list or argument was provided to run all? great, we'll run all classes-specs
+  if not settings.wow_class_spec_list or args.sim_all:
     settings.wow_class_spec_list = wow_lib.get_classes_specs()
 
   # list of all active threads. when empty, terminate tool
@@ -824,7 +923,7 @@ def main():
     time.sleep(1)
     for thread in thread_list:
       if thread.is_alive():
-        logger.info("{} is still in progress.".format(thread.getName()))
+        logger.debug("{} is still in progress.".format(thread.getName()))
       else:
         logger.info("{} finished.".format(thread.getName()))
         thread_list.remove(thread)
