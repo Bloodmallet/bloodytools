@@ -1,0 +1,21 @@
+# locald ev env
+/env
+
+*.pyc
+
+# local coverage results
+.coverage
+
+# local editor
+/.vscode
+
+# local type checks
+/.mypy_cache
+
+/bloodytools/results/races
+/bloodytools/results/trinkets
+/bloodytools/results/traits
+/bloodytools/results/secondary_distributions
+*.simc
+log.txt
+apikey.py
