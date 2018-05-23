@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Welcome to bloodytools - a SimulationCraft automator
+"""Welcome to bloodytools - a SimulationCraft automator/wrapper
 
   Generate your data more easily without having to create each and every needed profile to do so by hand:
     - races
@@ -15,6 +15,8 @@
   Support the developement:
             https://www.patreon.com/bloodmallet
             https://www.paypal.me/bloodmallet
+
+  May 2018
 """
 
 from typing import List, Tuple
@@ -737,13 +739,9 @@ def secondary_distribution_simulations(
 
 def main():
   logger.debug("main start")
+  logger.info("Bloodytools at your service.")
 
-  # TODO: some interface and parameters instead of editing settings.py all the time
-  # need params especially for
-  #  - executable = "../../SimulationCraft_BfA/simc.exe"
-  #  - threads = "8"
-  #  - profileset_work_threads = "2"
-
+  # interface parameters
   parser = argparse.ArgumentParser(
     description="Simulate different aspects of World of Warcraft data."
   )
@@ -839,6 +837,8 @@ def main():
     settings.target_error = args.target_error
     logger.debug("Set target_error to {}".format(settings.target_error))
 
+  bloodytools_start_time = datetime.datetime.utcnow()
+
   # empty class-spec list or argument was provided to run all? great, we'll run all classes-specs
   if not settings.wow_class_spec_list or args.sim_all:
     settings.wow_class_spec_list = wow_lib.get_classes_specs()
@@ -848,6 +848,9 @@ def main():
 
   # trigger race simulations
   if settings.enable_race_simulations:
+    if not settings.use_own_threading:
+      logger.info("Starting Race simulations.")
+
     if settings.use_own_threading:
       race_thread = threading.Thread(
         name="Race Thread",
@@ -859,8 +862,14 @@ def main():
     else:
       race_simulations(settings.wow_class_spec_list)
 
+    if not settings.use_own_threading:
+      logger.info("Race simulations finished.")
+
   # trigger trinket simulations
   if settings.enable_trinket_simulations:
+    if not settings.use_own_threading:
+      logger.info("Starting Trinket simulations.")
+
     if settings.use_own_threading:
       trinket_thread = threading.Thread(
         name="Trinket Thread",
@@ -872,8 +881,14 @@ def main():
     else:
       trinket_simulations(settings.wow_class_spec_list)
 
+    if not settings.use_own_threading:
+      logger.info("Trinket simulations finished.")
+
   # trigger secondary distributions
   if settings.enable_secondary_distributions_simulations:
+    if not settings.use_own_threading:
+      logger.info("Starting Secondary Distribution simulations.")
+
     for wow_class, wow_spec in settings.wow_class_spec_list:
       # if multiple talent combintions shall be simed
       if settings.talent_permutations:
@@ -919,6 +934,9 @@ def main():
         # sim only the base profile
         secondary_distribution_simulations(wow_class, wow_spec)
 
+    if not settings.use_own_threading:
+      logger.info("Secondary Distribution simulations finished.")
+
   while thread_list:
     time.sleep(1)
     for thread in thread_list:
@@ -928,6 +946,10 @@ def main():
         logger.info("{} finished.".format(thread.getName()))
         thread_list.remove(thread)
 
+  logger.info(
+    "Bloodytools took {} to finish.".
+    format(datetime.datetime.utcnow() - bloodytools_start_time)
+  )
   logger.debug("main ended")
 
 
