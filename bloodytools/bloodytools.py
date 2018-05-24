@@ -434,6 +434,9 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
       ):
         json_export["simulated_itemlevels"].append(itemlevel)
 
+      # change order from ascending to descending to keep the order of previous versions
+      json_export["simulated_itemlevels"].sort(reverse=True)
+
       # write json to file
       with open(
         "results/trinkets/{}_{}_{}.json".format(
