@@ -259,6 +259,19 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
           )
         )
 
+      # create ordered race name list
+      tmp_list = []
+      for race in wanted_data["data"]:
+        tmp_list.append((race, wanted_data["data"][race]))
+      logger.debug("tmp_list: {}".format(tmp_list))
+
+      tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
+      logger.debug("Sorted tmp_list: {}".format(tmp_list))
+
+      wanted_data["sorted_data_keys"] = []
+      for race, _ in tmp_list:
+        wanted_data["sorted_data_keys"].append(race)
+
       logger.debug("Final json: {}".format(wanted_data))
 
       # write json to file
@@ -428,14 +441,14 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
         json_export["sorted_data_keys"].append(trinket)
 
       # add itemlevel list
-      json_export["simulated_itemlevels"] = []
+      json_export["simulated_steps"] = []
       for itemlevel in range(
         settings.min_ilevel, settings.max_ilevel, settings.ilevel_step
       ):
-        json_export["simulated_itemlevels"].append(itemlevel)
+        json_export["simulated_steps"].append(itemlevel)
 
       # change order from ascending to descending to keep the order of previous versions
-      json_export["simulated_itemlevels"].sort(reverse=True)
+      json_export["simulated_steps"].sort(reverse=True)
 
       # write json to file
       with open(
@@ -466,7 +479,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
           for profile in simulation_results[wow_class][wow_spec].profiles:
             if profile.name != "baseline {}".format(settings.min_ilevel):
               name = profile.name[:profile.name.rfind(" ")]
-              ilevel = profile.name[profile.name.rfind(" ") + 1:]
+              ilevel = int(profile.name[profile.name.rfind(" ") + 1:])
 
               item_id = name if human_readable else wow_lib.get_trinket_id(
                 name
@@ -489,8 +502,56 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
 
       logger.debug("item_dict: {}".format(item_dict))
 
-      # TODO enhance item_dict with missing itemlevels
-      #for itemlevel in range(settings.min_ilevel, settings.max_ilevel, 5):
+      # enhance item_dict with missing itemlevels
+      if settings.ilevel_step != 5:
+        for item in item_dict:
+          for wow_class in item_dict[item]:
+            for wow_spec in item_dict[item][wow_class]:
+
+              trinket = item_dict[item][wow_class][wow_spec]
+
+              # get average dps increase
+              dps_sum = 0
+              lower_dps = 0
+              itemlevels_counted = 0
+              for itemlevel in range(
+                settings.min_ilevel, settings.max_ilevel, 5
+              ):
+                if itemlevel in trinket:
+                  if lower_dps:
+                    dps_sum += trinket[itemlevel] - lower_dps
+                    itemlevels_counted += 1
+                  lower_dps = trinket[itemlevel]
+
+              average_increase = int(
+                dps_sum / itemlevels_counted / (settings.ilevel_step / 5)
+              )
+
+              logger.debug(
+                "Item {} has {} counted ilevel differences. Average dps increase is {}".
+                format(item, itemlevels_counted, average_increase)
+              )
+
+              try:
+                trinket_data = wow_lib.get_trinket(item_id=item)
+              except Exception:
+                # failes due to the human readability check
+                trinket_data = wow_lib.get_trinket(name=item)
+
+              for itemlevel in range(
+                settings.min_ilevel, settings.max_ilevel, 5
+              ):
+                # if itemlevel is valid for that item
+                if itemlevel >= trinket_data.min_itemlevel and itemlevel <= trinket_data.max_itemlevel:
+                  #if itemlevel is missing, we add it
+                  if not itemlevel in trinket:
+                    # is able to catch up to +15 ilevel steps
+                    try:
+                      trinket[itemlevel
+                              ] = trinket[itemlevel - 5] + average_increase
+                    except Exception:
+                      trinket[itemlevel
+                              ] = trinket[itemlevel + 5] - average_increase
 
       with open("results/trinkets/ItemDPS.lua", "w") as f:
         logger.debug("Print trinket lua.")
@@ -507,7 +568,6 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
               f.write("{}[{}] = {{\n".format(" " * 12, wow_spec))
 
               for itemlevel in item_dict[trinket][wow_class][wow_spec]:
-                # TODO might need a transformer for the itemlevel here
                 f.write(
                   "{}[{}] = {}".format(
                     " " * 16, itemlevel,
