@@ -12,7 +12,7 @@
 
   Contact:  https://discord.gg/tFR2uvK Bloodmallet(EU)#8246
   Github:   https://github.com/Bloodmallet/bloodytools
-  Support the developement:
+  Support the development:
             https://www.patreon.com/bloodmallet
             https://www.paypal.me/bloodmallet
 
@@ -41,7 +41,7 @@ if hasattr(settings, "debug"):
     logger.setLevel(logging.DEBUG)
 # file logger
 fh = logging.FileHandler("log.txt", "w")
-fh.setLevel(logging.ERROR)
+fh.setLevel(logging.INFO)
 if hasattr(settings, "debug"):
   if settings.debug:
     fh.setLevel(logging.DEBUG)
@@ -774,15 +774,31 @@ def secondary_distribution_simulations(
         "Sorted secondary distribution list for {}:".
         format(talent_combination)
       )
+      with open('results/secondary_distributions/{}_{}_{}.txt'.format(
+        wow_class.lower(), wow_spec.lower(), fight_style.lower()
+      ), 'a') as f:
+        f.write("Sorted secondary distribution list for {}:\n".
+        format(talent_combination))
 
       # debug print results
       logger.debug("c  h  m  v    dps")
+      with open('results/secondary_distributions/{}_{}_{}.txt'.format(
+        wow_class.lower(), wow_spec.lower(), fight_style.lower()
+      ), 'a') as f:
+        f.write("  c  h  m  v    dps")
       for item in stat_dps_list:
         logger.debug(
           "{}   {}  {}%".format(
             item[0], item[1], round(item[1] * 100 / stat_dps_list[0][1], 2)
           )
         )
+        with open('results/secondary_distributions/{}_{}_{}.txt'.format(
+          wow_class.lower(), wow_spec.lower(), fight_style.lower()
+        ), 'a') as f:
+          f.write("  {}   {}  {}%\n".format(
+            item[0], item[1], round(item[1] * 100 / stat_dps_list[0][1], 2)
+          ))
+
       result_dict["sorted_data_keys"][talent_combination] = []
       for item in stat_dps_list:
         result_dict["sorted_data_keys"][talent_combination].append(item[0])
