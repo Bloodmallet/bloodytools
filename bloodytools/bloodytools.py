@@ -770,34 +770,37 @@ def secondary_distribution_simulations(
       stat_dps_list = sorted(
         stat_dps_list, key=lambda item: item[1], reverse=True
       )
-      logger.debug(
-        "Sorted secondary distribution list for {}:".
-        format(talent_combination)
-      )
-      with open('results/secondary_distributions/{}_{}_{}.txt'.format(
-        wow_class.lower(), wow_spec.lower(), fight_style.lower()
-      ), 'a') as f:
-        f.write("Sorted secondary distribution list for {}:\n".
-        format(talent_combination))
 
-      # debug print results
+      # add debug information which is coincidentally the same as settings.write_humanreadable_secondary_distribution_file
+      logger.debug(
+        "Secondary distribution list for {} (max:{}):".
+        format(talent_combination, stat_dps_list[0][1])
+      )
+      if settings.write_humanreadable_secondary_distribution_file:
+        with open('results/secondary_distributions/{}_{}_{}.txt'.format(
+          wow_class.lower(), wow_spec.lower(), fight_style.lower()
+        ), 'a') as f:
+          f.write("Sorted secondary distribution list for {} (max:{}):\n".
+          format(talent_combination, stat_dps_list[0][1]))
       logger.debug("c  h  m  v    dps")
-      with open('results/secondary_distributions/{}_{}_{}.txt'.format(
-        wow_class.lower(), wow_spec.lower(), fight_style.lower()
-      ), 'a') as f:
-        f.write("  c  h  m  v    dps")
+      if settings.write_humanreadable_secondary_distribution_file:
+        with open('results/secondary_distributions/{}_{}_{}.txt'.format(
+          wow_class.lower(), wow_spec.lower(), fight_style.lower()
+        ), 'a') as f:
+          f.write("  c  h  m  v    dps\n")
       for item in stat_dps_list:
         logger.debug(
           "{}   {}  {}%".format(
             item[0], item[1], round(item[1] * 100 / stat_dps_list[0][1], 2)
           )
         )
-        with open('results/secondary_distributions/{}_{}_{}.txt'.format(
-          wow_class.lower(), wow_spec.lower(), fight_style.lower()
-        ), 'a') as f:
-          f.write("  {}   {}  {}%\n".format(
-            item[0], item[1], round(item[1] * 100 / stat_dps_list[0][1], 2)
-          ))
+        if settings.write_humanreadable_secondary_distribution_file:
+          with open('results/secondary_distributions/{}_{}_{}.txt'.format(
+            wow_class.lower(), wow_spec.lower(), fight_style.lower()
+          ), 'a') as f:
+            f.write("  {}   {}  {}%\n".format(
+              item[0], item[1], round(item[1] * 100 / stat_dps_list[0][1], 2)
+            ))
 
       result_dict["sorted_data_keys"][talent_combination] = []
       for item in stat_dps_list:
