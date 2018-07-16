@@ -703,10 +703,6 @@ class Simulation_Group():
               else:
                 self.success = True
 
-          # remove profilesets file
-          os.remove(self.filename)
-          self.filename = None
-
           # handle broken simulations
           if fail_counter >= 5:
             self.logger.error("ERROR: An Error occured during simulation.")
@@ -716,7 +712,20 @@ class Simulation_Group():
               "name=value error? Check your input! Maybe your links to already existing profiles are wrong. They need to be relative links from bloodytools to your SimulationCraft directory."
             )
             self.error = simulation_output.stdout
+
+            # add error to remaining profile
+            with open(self.filename, 'a') as f:
+              f.write("########################################")
+              f.write("# FAILED PROFILE!\n")
+              f.write("# SimulationCraft Output:")
+              f.write(self.error)
+
             raise SimulationError(self.error)
+
+          else:
+            # remove profilesets file
+            os.remove(self.filename)
+            self.filename = None
 
           self.logger.debug(simulation_output.stdout)
 
