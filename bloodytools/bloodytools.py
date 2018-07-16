@@ -353,7 +353,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
 
         # for each available itemlevel of the trinket
         for itemlevel in range(
-          settings.min_ilevel, settings.max_ilevel, settings.ilevel_step
+          settings.min_ilevel, settings.max_ilevel + 1, settings.ilevel_step
         ):
 
           if itemlevel >= trinket[2] and itemlevel <= trinket[3]:
@@ -420,7 +420,8 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
       json_export["item_ids"] = {}
       for trinket in json_export["data"]:
         if trinket != "baseline":
-          json_export["item_ids"][trinket] = wow_lib.get_trinket_id(trinket)
+          # FIXME: delete wow_class and wow_spec from function for bfa
+          json_export["item_ids"][trinket] = wow_lib.get_trinket_id(trinket, wow_class, wow_spec)
 
       logger.debug("Enriched json export: {}".format(json_export))
 
@@ -443,7 +444,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
       # add itemlevel list
       json_export["simulated_steps"] = []
       for itemlevel in range(
-        settings.min_ilevel, settings.max_ilevel, settings.ilevel_step
+        settings.min_ilevel, settings.max_ilevel + 1, settings.ilevel_step
       ):
         json_export["simulated_steps"].append(itemlevel)
 
@@ -461,7 +462,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
         logger.debug("Printed trinket json.")
 
     # LUA data exporter
-    if fight_style.lower() == "patchwerk":
+    if fight_style.lower() == "patchwerk" and settings.lua_trinket_export:
       human_readable = False
       item_dict = {
       }  # intended structure: itemID -> class -> spec -> itemlevel
@@ -687,16 +688,24 @@ def secondary_distribution_simulations(
                   wow_class, wow_spec, settings.tier
                 ),
                 "gear_crit_rating={}".format(
-                  secondary_amount * (distribution_multiplier[0] / 100)
+                  int(
+                    secondary_amount * (distribution_multiplier[0] / 100)
+                  )
                 ),
                 "gear_haste_rating={}".format(
-                  secondary_amount * (distribution_multiplier[1] / 100)
+                  int(
+                    secondary_amount * (distribution_multiplier[1] / 100)
+                  )
                 ),
                 "gear_mastery_rating={}".format(
-                  secondary_amount * (distribution_multiplier[2] / 100)
+                  int(
+                    secondary_amount * (distribution_multiplier[2] / 100)
+                  )
                 ),
                 "gear_versatility_rating={}".format(
-                  secondary_amount * (distribution_multiplier[3] / 100)
+                  int(
+                    secondary_amount * (distribution_multiplier[3] / 100)
+                  )
                 ),
               ]
             )
@@ -719,16 +728,24 @@ def secondary_distribution_simulations(
               logger=logger,
               simc_arguments=[
                 "gear_crit_rating={}".format(
-                  secondary_amount * (distribution_multiplier[0] / 100)
+                  int(
+                    secondary_amount * (distribution_multiplier[0] / 100)
+                  )
                 ),
                 "gear_haste_rating={}".format(
-                  secondary_amount * (distribution_multiplier[1] / 100)
+                  int(
+                    secondary_amount * (distribution_multiplier[1] / 100)
+                  )
                 ),
                 "gear_mastery_rating={}".format(
-                  secondary_amount * (distribution_multiplier[2] / 100)
+                  int(
+                    secondary_amount * (distribution_multiplier[2] / 100)
+                  )
                 ),
                 "gear_versatility_rating={}".format(
-                  secondary_amount * (distribution_multiplier[3] / 100)
+                  int(
+                    secondary_amount * (distribution_multiplier[3] / 100)
+                  )
                 ),
               ]
             )
