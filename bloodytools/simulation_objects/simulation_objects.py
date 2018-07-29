@@ -627,7 +627,8 @@ class Simulation_Group():
                 self.profiles[0].optimize_expressions
               )
             )
-            f.write("ptr={}\n".format(self.profiles[0].ptr))
+            if int(self.profiles[0].ptr) == 1:
+              f.write("ptr={}\n".format(self.profiles[0].ptr))
             f.write("target_error={}\n".format(self.profiles[0].target_error))
             f.write("threads={}\n".format(self.threads))
             f.write(
@@ -730,15 +731,18 @@ class Simulation_Group():
           self.logger.debug(simulation_output.stdout)
 
           # get dps of the first profile
-          is_actor = True
+          baseline_result = False
           profileset_results = False
 
           for line in simulation_output.stdout.splitlines():
+            # allow baseline dmg grab only in the dps listing, not from warnings
+            if "DPS Ranking:" in line:
+              baseline_result = True
             # needs this check to prevent grabbing the boss dps
-            if self.profiles[0].name in line and is_actor:
+            if self.profiles[0].name in line and baseline_result:
               self.logger.debug(line)
               self.profiles[0].set_dps(line.split()[0], external=False)
-              is_actor = False
+              baseline_result = False
 
             if "Profilesets (median Damage per Second):" in line:
               profileset_results = True
