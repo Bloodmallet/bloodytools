@@ -302,6 +302,7 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
 
       tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
       logger.debug("Sorted tmp_list: {}".format(tmp_list))
+      logger.info(f"Race {tmp_list[0][0]} won with {tmp_list[0][1]} dps.")
 
       wanted_data["sorted_data_keys"] = []
       for race, _ in tmp_list:
@@ -481,6 +482,8 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
 
       tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
       logger.debug("Sorted tmp_list: {}".format(tmp_list))
+
+      logger.info(f"Trinket {tmp_list[0][0]} won with {tmp_list[0][1]} dps.")
 
       json_export["sorted_data_keys"] = []
       for trinket, _ in tmp_list:
@@ -819,6 +822,7 @@ def secondary_distribution_simulations(
       stat_dps_list = sorted(
         stat_dps_list, key=lambda item: item[1], reverse=True
       )
+      logger.info(f"Stat distribution {stat_dps_list[0][0]} of talent combination {talent_combination} won with {stat_dps_list[0][1]} dps.")
 
       # add debug information which is coincidentally the same as settings.write_humanreadable_secondary_distribution_file
       logger.debug(
@@ -1066,6 +1070,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       # sort
       tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
       logger.debug("Sorted tmp_list: {}".format(tmp_list))
+      logger.info(f"Solo Azerite Trait {tmp_list[0][0]} won with {tmp_list[0][1]} dps.")
 
       wanted_data["sorted_data_keys"] = []
       for azerite_trait, _ in tmp_list:
@@ -1087,6 +1092,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       # sort
       tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
       logger.debug("Sorted tmp_list: {}".format(tmp_list))
+      logger.info(f"Tripple stacked Azerite Trait {tmp_list[0][0]} won with {tmp_list[0][1]} dps.")
 
       wanted_data["sorted_data_keys_2"] = []
       for azerite_trait, _ in tmp_list:
