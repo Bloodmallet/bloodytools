@@ -710,6 +710,7 @@ def secondary_distribution_simulations(
     )
     result_dict["sorted_data_keys"] = {}
     result_dict["secondary_sum"] = secondary_amount
+
     for talent_combination in talent_combinations:
       simulation_group = simulation_objects.Simulation_Group(
         name=talent_combination,
@@ -718,6 +719,7 @@ def secondary_distribution_simulations(
         executable=settings.executable,
         logger=logger
       )
+
       for distribution_multiplier in distribution_multipliers:
         # if it is the first one
         if distribution_multiplier == distribution_multipliers[0]:
@@ -922,7 +924,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       )
 
       reset_string = "disable_azerite=items"
-
+      # TODO: reset item in slot "head" to the lowest to be simmed itemlevel and adjust that item to the trait itemlevel in all sims too!
       simulation_data = simulation_objects.Simulation_Data(
         name="baseline 1_{}".format(settings.azerite_trait_ilevels[-1]),
         fight_style=fight_style,
@@ -1409,48 +1411,63 @@ def main():
       logger.info("Starting Secondary Distribution simulations.")
 
     for wow_class, wow_spec in settings.wow_class_spec_list:
-      # if multiple talent combintions shall be simed
-      if settings.talent_permutations:
-        # if no talent list is provided, simulate all
-        if not (wow_class, wow_spec) in settings.talent_list:
-          if settings.use_own_threading:
-            secondary_distribution_thread = threading.Thread(
-              name="Secondary Distribution Thread All Talents {} {}".format(
-                wow_class, wow_spec
-              ),
-              target=secondary_distribution_simulations,
-              args=(
-                wow_class, wow_spec,
-                wow_lib.get_talent_combinations(wow_class, wow_spec)
-              )
-            )
-            thread_list.append(secondary_distribution_thread)
-            secondary_distribution_thread.start()
-          else:
-            secondary_distribution_simulations(
+
+      if not settings.talent_permutations:
+        # get talent string from profile to sim
+        try:
+          with open(create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r') as f:
+            for line in f:
+              if "talents=" in line:
+                talent_combination = line.split("talents=")[1].split()[0]
+        except Exception:
+          logger.warning(f"Base profile for {wow_spec} {wow_class} not found. No secondary distribution will be calculated for this spec.")
+          continue
+
+        try:
+          settings.talent_list[(wow_class, wow_spec)] = [
+            talent_combination
+          ]
+        except Exception:
+          logger.warning(f"No talent combination was found in base profile of {wow_spec} {wow_class}. Secondary Distribution won't be calculated for this spec.")
+          continue
+
+      # if no talent list is provided, simulate all
+      if not (wow_class, wow_spec) in settings.talent_list:
+        if settings.use_own_threading:
+          secondary_distribution_thread = threading.Thread(
+            name="Secondary Distribution Thread All Talents {} {}".format(
+              wow_class, wow_spec
+            ),
+            target=secondary_distribution_simulations,
+            args=(
               wow_class, wow_spec,
               wow_lib.get_talent_combinations(wow_class, wow_spec)
             )
+          )
+          thread_list.append(secondary_distribution_thread)
+          secondary_distribution_thread.start()
         else:
-          # if talent list is provided, sim that
-          if settings.use_own_threading:
-            secondary_distribution_thread = threading.Thread(
-              name="Secondary Distribution Thread Provided Talents {} {}".
-              format(wow_class, wow_spec),
-              target=secondary_distribution_simulations,
-              args=(
-                wow_class, wow_spec, settings.talent_list[(wow_class, wow_spec)]
-              )
-            )
-            thread_list.append(secondary_distribution_thread)
-            secondary_distribution_thread.start()
-          else:
-            secondary_distribution_simulations(
+          secondary_distribution_simulations(
+            wow_class, wow_spec,
+            wow_lib.get_talent_combinations(wow_class, wow_spec)
+          )
+      else:
+        # if talent list is provided, sim that
+        if settings.use_own_threading:
+          secondary_distribution_thread = threading.Thread(
+            name="Secondary Distribution Thread Provided Talents {} {}".
+            format(wow_class, wow_spec),
+            target=secondary_distribution_simulations,
+            args=(
               wow_class, wow_spec, settings.talent_list[(wow_class, wow_spec)]
             )
-      else:
-        # sim only the base profile
-        secondary_distribution_simulations(wow_class, wow_spec)
+          )
+          thread_list.append(secondary_distribution_thread)
+          secondary_distribution_thread.start()
+        else:
+          secondary_distribution_simulations(
+            wow_class, wow_spec, settings.talent_list[(wow_class, wow_spec)]
+          )
 
     if not settings.use_own_threading:
       logger.info("Secondary Distribution simulations finished.")

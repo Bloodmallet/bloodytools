@@ -49,4 +49,4 @@ If you see a lack of features somewhere or ways to improve the quality of the co
 Meet me in [Discord](https://discord.gg/tFR2uvK). There is a channel #bloodmallet. My username is Bloodmallet(EU)#8246.
 
 ## Support the creator
-If you want to support the developement: [![PayPal link](https://img.shields.io/badge/PayPal-donate-blue.svg)](https://www.paypal.me/bloodmallet) [![Patreon link](https://img.shields.io/badge/Patreon-pledge-blue.svg)](https://www.patreon.com/bloodmallet)
+If you want to support the development: [![PayPal link](https://img.shields.io/badge/PayPal-donate-blue.svg)](https://www.paypal.me/bloodmallet) [![Patreon link](https://img.shields.io/badge/Patreon-pledge-blue.svg)](https://www.patreon.com/bloodmallet)

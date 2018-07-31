@@ -896,7 +896,7 @@ class Simulation_Group():
               "Sending the task {} to Raidbots failed.".format(self.name)
             )
             self.logger.error(e.reason)
-            self.logger.error(e.read())
+            self.logger.error(response.read())
             raise SimulationError(
               "Communication with Raidbots failed. {}".format(e.reason)
             )
