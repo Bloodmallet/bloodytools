@@ -42,19 +42,25 @@ if hasattr(settings, "debug"):
     logger.setLevel(logging.DEBUG)
 # file logger
 fh = logging.FileHandler("log.txt", "w")
-fh.setLevel(logging.INFO)
-if hasattr(settings, "debug"):
-  if settings.debug:
-    fh.setLevel(logging.DEBUG)
+fh.setLevel(logging.DEBUG)
+# if hasattr(settings, "debug"):
+#   if settings.debug:
+#     fh.setLevel(logging.DEBUG)
 log_formatter = logging.Formatter(
   "%(asctime)s - %(filename)s / %(funcName)s - %(levelname)s - %(message)s"
+)
+live_formatter = logging.Formatter(
+  "%(asctime)s - %(levelname)s - %(message)s"
 )
 fh.setFormatter(log_formatter)
 logger.addHandler(fh)
 # console logger
 ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-ch.setFormatter(log_formatter)
+ch.setLevel(logging.INFO)
+if hasattr(settings, "debug"):
+  if settings.debug:
+    ch.setLevel(logging.DEBUG)
+ch.setFormatter(live_formatter)
 logger.addHandler(ch)
 
 
