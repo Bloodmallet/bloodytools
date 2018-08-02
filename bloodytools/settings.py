@@ -5,11 +5,6 @@
 
 ##
 # General setttings
-fight_styles = [
-  "patchwerk",
-  "hecticaddcleave"
-  #"beastlord"
-]
 tier = "21"  # number or PR (PreRaid)
 wow_class_spec_list = []  # leave empty to simulate all
 # wow_class_spec_list = [("shaman", "elemental"), ("mage", "frost")] # example for a specific list
@@ -49,20 +44,28 @@ wow_class_spec_list = [
 ##
 # SimulationCraft
 executable = "../../SimulationCraft_BfA/simc.exe"
+fight_styles = [
+  # "patchwerk",
+  "hecticaddcleave"
+  #"beastlord"
+]
 iterations = "250000"
 profileset_work_threads = "2"
 ptr = "0"
-simc_hash = "ae005ee6c7554f56dc7deeb227a5f68de612e148"
-target_error = "0.2"
+simc_hash = "992db1b5638e5d2b14b9f17d6d3b0308a0cf9af4"
+target_error = {
+  "patchwerk": "0.2",
+  "hecticaddcleave": "0.4"
+}
 threads = "8"
 
 ###############################################################################
 # Race simulations
-enable_race_simulations = True
+enable_race_simulations = False
 
 ###############################################################################
 # Trinket simulations
-enable_trinket_simulations = True
+enable_trinket_simulations = False
 ilevel_step = 10  # ilevel_step is used to determine the size of each itemlevel step taken to max_ilevel
 max_ilevel = 280  # max_itemlevel determines the upper border of steps taken
 min_ilevel = 210  # min_ilevel is used to determine the first simulated itemlevel
@@ -70,7 +73,7 @@ min_ilevel = 210  # min_ilevel is used to determine the first simulated itemleve
 
 ###############################################################################
 # Secondary distributions
-enable_secondary_distributions_simulations = True
+enable_secondary_distributions_simulations = False
 secondary_distributions_step_size = 10
 talent_list = {
 }  # if no list is provided for a class-spec, all dps talent combinations will be run. If you want to only sim the base profiles, set 'talent_permutations' to False
@@ -79,7 +82,7 @@ talent_list = {
 #     "2302023",
 #   ],
 # }  # example for a talent list for Elemental Shamans
-talent_permutations = True  # set to False, to sim only the base profile talent combinations
+talent_permutations = False  # set to False, to sim only the base profile talent combinations
 
 
 ###############################################################################

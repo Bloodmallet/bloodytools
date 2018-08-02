@@ -151,7 +151,7 @@ def create_base_json_dict(
         "tier": settings.tier,
         "fight_style": fight_style,
         "iterations": settings.iterations,
-        "target_error": settings.target_error,
+        "target_error": settings.target_error[fight_style],
         "ptr": settings.ptr,
         "simc_hash": settings.simc_hash,
         "class": wow_class,
@@ -234,7 +234,7 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             name=race,
             fight_style=fight_style,
             simc_arguments=[basic_profile_string, "race={}".format(race)],
-            target_error=settings.target_error,
+            target_error=settings.target_error[fight_style],
             executable=settings.executable,
             logger=logger
           )
@@ -243,7 +243,7 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             name=race,
             fight_style=fight_style,
             simc_arguments=["race={}".format(race)],
-            target_error=settings.target_error,
+            target_error=settings.target_error[fight_style],
             executable=settings.executable,
             logger=logger
           )
@@ -387,7 +387,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
             name="baseline {}".format(settings.min_ilevel),
             fight_style=fight_style,
             iterations=settings.iterations,
-            target_error=settings.target_error,
+            target_error=settings.target_error[fight_style],
             simc_arguments=[
               create_basic_profile_string(wow_class, wow_spec, settings.tier),
               "trinket1=", "trinket2=" + second_trinket
@@ -408,7 +408,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
               name="{} {}".format(trinket[0], itemlevel),
               fight_style=fight_style,
               iterations=settings.iterations,
-              target_error=settings.target_error,
+              target_error=settings.target_error[fight_style],
               simc_arguments=[
                 "trinket1=,id={},ilevel={}".format(trinket[1], itemlevel)
               ],
@@ -736,7 +736,7 @@ def secondary_distribution_simulations(
                 distribution_multiplier[2], distribution_multiplier[3]
               ),
               fight_style=fight_style,
-              target_error=settings.target_error,
+              target_error=settings.target_error[fight_style],
               iterations=settings.iterations,
               logger=logger,
               simc_arguments=[
@@ -770,7 +770,7 @@ def secondary_distribution_simulations(
                 distribution_multiplier[2], distribution_multiplier[3]
               ),
               fight_style=fight_style,
-              target_error=settings.target_error,
+              target_error=settings.target_error[fight_style],
               iterations=settings.iterations,
               logger=logger,
               simc_arguments=[
@@ -897,17 +897,30 @@ def secondary_distribution_simulations(
 
 
 def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
+  """Simulate all azerite traits with an adjusted head itemlevel. Create json with trait values and with all known azerite items and their sumed up trait dps values.
+
+  Arguments:
+    specs {List[Tuple[str, str]]} -- all wow_specs you want to be simulated
+
+  Returns:
+    None -- Files will be created in /results/azerite_traits/
+  """
 
   logger.debug("azerite_trait_simulations start")
   for fight_style in settings.fight_styles:
     for wow_class, wow_spec in specs:
 
+
+      basic_profile_string = create_basic_profile_string(
+        wow_class, wow_spec, settings.tier
+      )
+
       # check whether the baseline profile does exist
       try:
-        with open(
-          create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
-        ) as f:
-          pass
+        with open(basic_profile_string, 'r') as f:
+          for line in f:
+            if "head=" in line:
+              item_head = line[:-1]
       except Exception as e:
         logger.error(
           "Opening baseline profile {} {} failed. This spec won't be in the result. {}".
@@ -925,21 +938,30 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         logger=logger
       )
 
-      basic_profile_string = create_basic_profile_string(
-        wow_class, wow_spec, settings.tier
-      )
-
       reset_string = "disable_azerite=items"
-      # TODO: reset item in slot "head" to the lowest to be simmed itemlevel and adjust that item to the trait itemlevel in all sims too!
+
+      # need this special handling of the first profile or else the other baseline profiles won't simulate correctly
       simulation_data = simulation_objects.Simulation_Data(
-        name="baseline 1_{}".format(settings.azerite_trait_ilevels[-1]),
+        name="baseline 1_{}".format(settings.azerite_trait_ilevels[0]),
         fight_style=fight_style,
-        simc_arguments=[basic_profile_string, reset_string],
-        target_error=settings.target_error,
+        simc_arguments=[basic_profile_string, reset_string, item_head + f",ilevel={settings.azerite_trait_ilevels[0]}"],
+        target_error=settings.target_error[fight_style],
         executable=settings.executable,
         logger=logger
       )
       simulation_group.add(simulation_data)
+
+      for itemlevel in settings.azerite_trait_ilevels:
+        if itemlevel != settings.azerite_trait_ilevels[0]:
+          simulation_data = simulation_objects.Simulation_Data(
+            name="baseline 1_{}".format(itemlevel),
+            fight_style=fight_style,
+            simc_arguments=[item_head + f",ilevel={itemlevel}"],
+            target_error=settings.target_error[fight_style],
+            executable=settings.executable,
+            logger=logger
+          )
+          simulation_group.add(simulation_data)
 
       azerite_trait_name_spell_id_dict = {}
 
@@ -962,8 +984,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           simulation_data = simulation_objects.Simulation_Data(
             name='{} 1_{}'.format(azerite_trait.split(" (")[0], itemlevel),
             fight_style=fight_style,
-            simc_arguments=[trait_input],
-            target_error=settings.target_error,
+            simc_arguments=[trait_input, item_head + f",ilevel={itemlevel}"],
+            target_error=settings.target_error[fight_style],
             executable=settings.executable,
             logger=logger
           )
@@ -975,6 +997,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             )
           )
 
+          # add stacked traits profiles to simulationgroup at max itemlevel
           if itemlevel == settings.azerite_trait_ilevels[-1]:
             logger.debug("Adding stacked azerite traits to highest itemlevel.")
             doublicate_text = "/" + trait_input.split("=")[1]
@@ -982,8 +1005,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             simulation_data = simulation_objects.Simulation_Data(
               name='{} 2_{}'.format(azerite_trait.split(" (")[0], itemlevel),
               fight_style=fight_style,
-              simc_arguments=[trait_input + doublicate_text],
-              target_error=settings.target_error,
+              simc_arguments=[trait_input + doublicate_text, item_head + f",ilevel={itemlevel}"],
+              target_error=settings.target_error[fight_style],
               executable=settings.executable,
               logger=logger
             )
@@ -993,8 +1016,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             simulation_data = simulation_objects.Simulation_Data(
               name='{} 3_{}'.format(azerite_trait.split(" (")[0], itemlevel),
               fight_style=fight_style,
-              simc_arguments=[trait_input + doublicate_text + doublicate_text],
-              target_error=settings.target_error,
+              simc_arguments=[trait_input + doublicate_text + doublicate_text, item_head + f",ilevel={itemlevel}"],
+              target_error=settings.target_error[fight_style],
               executable=settings.executable,
               logger=logger
             )
@@ -1052,10 +1075,11 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
         wanted_data["data"][azerite_trait_name][azerite_trait_ilevel] = profile.get_dps()
 
-        if azerite_trait_name == "baseline":
-          wanted_data["data"][
-            azerite_trait_name
-          ]["1_" + settings.azerite_trait_ilevels[0]] = profile.get_dps()
+        # TODO : Does this break? I don#t think special handling of baseline is required anymore
+        # if azerite_trait_name == "baseline":
+        #   wanted_data["data"][
+        #     azerite_trait_name
+        #   ]["1_" + settings.azerite_trait_ilevels[0]] = profile.get_dps()
 
         logger.debug(
           "Added '{}' with {} dps to json.".format(
@@ -1080,11 +1104,12 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       logger.debug("Sorted tmp_list: {}".format(tmp_list))
       logger.info(f"Solo Azerite Trait {tmp_list[0][0]} won with {tmp_list[0][1]} dps.")
 
+      # sorted list of all traits (one trait at max itemlevel each)
       wanted_data["sorted_data_keys"] = []
       for azerite_trait, _ in tmp_list:
         wanted_data["sorted_data_keys"].append(azerite_trait)
 
-      # create secondary azerite name list
+      # create secondary azerite name list (tripple azerite trait at max itemlevel each)
       tmp_list = []
       for trait in wanted_data["data"]:
         if not "baseline" in trait:
@@ -1106,10 +1131,12 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       for azerite_trait, _ in tmp_list:
         wanted_data["sorted_data_keys_2"].append(azerite_trait)
 
+      # spell id dict to allow link creation
       wanted_data["spell_ids"] = azerite_trait_name_spell_id_dict
 
       logger.debug("Final json: {}".format(wanted_data))
 
+      # create directory if it doesn't exist
       if not os.path.isdir("results/azerite_traits/"):
         os.makedirs("results/azerite_traits/")
 
@@ -1123,7 +1150,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         f.write(json.dumps(wanted_data, sort_keys=True, indent=4))
         logger.debug("Printed azerite_traits json.")
 
-      # item export start
+      ##
+      # item export start (Azerite Items)
       azerite_items = wow_lib.get_azerite_items(wow_class, wow_spec)
 
       # create an export for each slot
@@ -1139,7 +1167,11 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         # add baseline dps
         slot_export["data"]["baseline"] = {}
 
-        baseline_dps = slot_export["data"]["baseline"]["1_" + settings.azerite_trait_ilevels[0]] = wanted_data["data"]["baseline"]["1_" + settings.azerite_trait_ilevels[0]]
+        for itemlevel in settings.azerite_trait_ilevels:
+          slot_export["data"]["baseline"]["1_" + itemlevel] = wanted_data["data"]["baseline"]["1_" + itemlevel]
+
+        # create shorthand for later use
+        baseline_dps = slot_export["data"]["baseline"]
 
         # create dict of which azerite traits were used on whcih item
         slot_export["used_azerite_traits_per_item"] = {}
@@ -1151,11 +1183,16 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         unsorted_item_dps_list = []
         for item in azerite_items[slot]:
 
+          # skip item if necessary fields are missing
+          if not "name" in item and not "azeriteTraits" in item:
+            continue
+
           if item["name"] in slot_export["data"]:
             continue
 
           # create trait lists for each tier [(trait_name, dps)]
           trait_dict = {2: [], 3: []}
+          # collect trait data like spellid and power id to allow construction of links in page
           trait_data = {}
           for trait in item["azeriteTraits"]:
 
@@ -1174,6 +1211,10 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             if not trait["tier"] in trait_dict:
               continue
 
+            # skip trait if no name is provided (trait is probably not yet implemented in wow anyway)
+            if not "name" in trait:
+              continue
+
             # if trait was not simmed previously, throw a warning and exclude trait
             if not trait["name"] in wanted_data["data"] and not trait["name"] in trait_exclusions:
               logger.warning(f"Trait <{trait['name']}> wasn't found in already simed data and exluded data. Item <{item['name']}> will be evaluated without that trait.")
@@ -1182,22 +1223,22 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             # name is used to determine values, trait name is used to determine the name of the trait
             name = trait_name = trait["name"]
 
-            trait_data[trait_name] = {
-              "id": trait["powerId"],
-              "spell_id": trait["spellId"]
-            }
-
             # update name if we're dealing with an excluded trait
             if trait_name in trait_exclusions:
               name = trait_exclusions[trait_name]
 
+            trait_data[name] = {
+              "id": trait["powerId"],
+              "spell_id": trait["spellId"]
+            }
+
             # if trait is a dps trait we simmed
             if name in wanted_data["data"]:
-              # append tuple of name and dps
+              # append tuple of name and max itemlevel dps
               trait_dict[trait["tier"]].append(
                 (
-                  trait_name, wanted_data["data"][name]
-                  ["1_" + settings.azerite_trait_ilevels[-1]] - baseline_dps
+                  name, wanted_data["data"][name]
+                  ["1_" + settings.azerite_trait_ilevels[-1]] - baseline_dps["1_" + settings.azerite_trait_ilevels[-1]]
                 )
               )
 
@@ -1218,12 +1259,12 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           # add values to the armor for all itemlevels
           for itemlevel in settings.azerite_trait_ilevels:
 
-            slot_export["data"][item["name"]]["1_" + itemlevel] = baseline_dps
+            slot_export["data"][item["name"]]["1_" + itemlevel] = baseline_dps["1_" + itemlevel]
 
             # sum up dps values of best dps traits
             for tier in trait_dict:
               if trait_dict[tier]:
-                slot_export["data"][item["name"]]["1_" + itemlevel] += wanted_data["data"][trait_dict[tier][0][0]]["1_" + itemlevel] - baseline_dps
+                slot_export["data"][item["name"]]["1_" + itemlevel] += wanted_data["data"][trait_dict[tier][0][0]]["1_" + itemlevel] - baseline_dps["1_" + itemlevel]
 
           # add (item_name, item_dps) to unsorted_item_dps_list
           unsorted_item_dps_list.append(
@@ -1306,14 +1347,6 @@ def main():
     )
   )
   parser.add_argument(
-    "--target_error",
-    metavar="NUMBER",
-    type=str,
-    help="Accuracy used by SimulationCraft. Default: '{}'".format(
-      settings.target_error
-    )
-  )
-  parser.add_argument(
     "--debug",
     action="store_const",
     const=True,
@@ -1359,10 +1392,6 @@ def main():
         settings.profileset_work_threads
       )
     )
-
-  if args.target_error:
-    settings.target_error = args.target_error
-    logger.debug("Set target_error to {}".format(settings.target_error))
 
   bloodytools_start_time = datetime.datetime.utcnow()
 
