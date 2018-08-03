@@ -90,7 +90,7 @@ class Simulation_Data():
     super(Simulation_Data, self).__init__()
 
     self.logger = logger or logging.getLogger(__name__)
-    self.logger.debug("simulation_data initiated.")
+    # self.logger.debug("simulation_data initiated.")
 
     # simc setting to calculate scale factors (stat weights)
     if calculate_scale_factors == "0" or calculate_scale_factors == "1":

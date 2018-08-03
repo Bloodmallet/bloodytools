@@ -9,43 +9,43 @@ tier = "21"  # number or PR (PreRaid)
 wow_class_spec_list = []  # leave empty to simulate all
 # wow_class_spec_list = [("shaman", "elemental"), ("mage", "frost")] # example for a specific list
 wow_class_spec_list = [
-  ("death_knight", "blood"),
-  ("death_knight", "frost"),
-  ("death_knight", "unholy"),
-  ("demon_hunter", "havoc"),
-  ("demon_hunter", "vengeance"),
-  ("druid", "balance"),
-  ("druid", "feral"),
-  ("druid", "guardian"),
-  ("hunter", "beast_mastery"),
-  ("hunter", "marksmanship"),
-  ("hunter", "survival"),
-  ("mage", "arcane"),
-  ("mage", "fire"),
-  ("mage", "frost"),
-  ("monk", "brewmaster"),
-  ("monk", "windwalker"),
-  ("paladin", "protection"),
-  ("paladin", "retribution"),
-  ("priest", "shadow"),
-  ("rogue", "assassination"),
-  ("rogue", "outlaw"),
-  ("rogue", "subtlety"),
+  # ("death_knight", "blood"),
+  # ("death_knight", "frost"),
+  # ("death_knight", "unholy"),
+  # ("demon_hunter", "havoc"),
+  # ("demon_hunter", "vengeance"),
+  # ("druid", "balance"),
+  # ("druid", "feral"),
+  # ("druid", "guardian"),
+  # ("hunter", "beast_mastery"),
+  # ("hunter", "marksmanship"),
+  # ("hunter", "survival"),
+  # ("mage", "arcane"),
+  # ("mage", "fire"),
+  # ("mage", "frost"),
+  # ("monk", "brewmaster"),
+  # ("monk", "windwalker"),
+  # ("paladin", "protection"),
+  # ("paladin", "retribution"),
+  # ("priest", "shadow"),
+  # ("rogue", "assassination"),
+  # ("rogue", "outlaw"),
+  # ("rogue", "subtlety"),
   ("shaman", "elemental"),
-  ("shaman", "enhancement"),
-  ("warlock", "affliction"),
-  ("warlock", "demonology"),
-  ("warlock", "destruction"),
-  ("warrior", "arms"),
-  ("warrior", "fury"),
-  ("warrior", "protection"),
+  # ("shaman", "enhancement"),
+  # ("warlock", "affliction"),
+  # ("warlock", "demonology"),
+  # ("warlock", "destruction"),
+  # ("warrior", "arms"),
+  # ("warrior", "fury"),
+  # ("warrior", "protection"),
 ]
 
 ##
 # SimulationCraft
 executable = "../../SimulationCraft_BfA/simc.exe"
 fight_styles = [
-  # "patchwerk",
+  "patchwerk",
   "hecticaddcleave"
   #"beastlord"
 ]
@@ -55,7 +55,8 @@ ptr = "0"
 simc_hash = "992db1b5638e5d2b14b9f17d6d3b0308a0cf9af4"
 target_error = {
   "patchwerk": "0.2",
-  "hecticaddcleave": "0.4"
+  "hecticaddcleave": "0.4",
+  "beastlord": "0.4"
 }
 threads = "8"
 
@@ -87,7 +88,7 @@ talent_permutations = False  # set to False, to sim only the base profile talent
 
 ###############################################################################
 # Azerite traits
-enable_azerite_trait_simulations = True
+enable_azerite_trait_simulations = False
 azerite_trait_ilevels = [ # determines the itemlevel used to sim the traits
   "340",
   "355",
@@ -95,6 +96,12 @@ azerite_trait_ilevels = [ # determines the itemlevel used to sim the traits
   "385"
 ] # ascending order required
 
+
+###############################################################################
+# Gear path
+enable_gear_path = True
+step_size = 50
+start_value = 50
 
 ###############################################################################
 # Development setting - you usually don't want to touch these

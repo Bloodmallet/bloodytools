@@ -1303,6 +1303,150 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
   logger.debug("azerite_trait_simulations ended")
 
+def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
+
+  for fight_style in settings.fight_styles:
+    gear_path = []
+    for spec in specs:
+      wow_class, wow_spec = spec
+
+      # initial profiles and data
+      secondary_sum = 0
+      base_profile_string = create_basic_profile_string(wow_class, wow_spec, settings.tier)
+
+      try:
+        with open(base_profile_string, 'r') as f:
+          for line in f:
+            if "gear_crit_rating" in line:
+              secondary_sum += int(line.split("=")[-1])
+            if "gear_haste_rating" in line:
+              secondary_sum += int(line.split("=")[-1])
+            if "gear_mastery_rating" in line:
+              secondary_sum += int(line.split("=")[-1])
+            if "gear_versatility_rating" in line:
+              secondary_sum += int(line.split("=")[-1])
+      except Exception:
+        logger.warning(f"Profile for {wow_spec} {wow_class} couldn't be found. Will be left out in Gear Path simulations.")
+        continue
+
+      crit_rating = haste_rating = mastery_rating = vers_rating = settings.start_value
+
+      while crit_rating + haste_rating + mastery_rating + vers_rating < secondary_sum:
+
+        simulation_group = simulation_objects.Simulation_Group(
+          name=f"{fight_style} {wow_spec} {wow_class}",
+          executable=settings.executable,
+          threads=settings.threads,
+          profileset_work_threads=settings.profileset_work_threads,
+          logger=logger
+        )
+
+        crit_profile = simulation_objects.Simulation_Data(
+          name="crit_profile",
+          executable=settings.executable,
+          fight_style=fight_style,
+          target_error=settings.target_error[fight_style],
+          logger=logger,
+          simc_arguments=[
+            base_profile_string,
+            "gear_crit_rating={}".format(crit_rating + settings.step_size),
+            "gear_haste_rating={}".format(haste_rating),
+            "gear_mastery_rating={}".format(mastery_rating),
+            "gear_versatility_rating={}".format(vers_rating)
+          ]
+        )
+        simulation_group.add(crit_profile)
+
+        haste_profile = simulation_objects.Simulation_Data(
+          name="haste_profile",
+          executable=settings.executable,
+          fight_style=fight_style,
+          target_error=settings.target_error[fight_style],
+          logger=logger,
+          simc_arguments=[
+            "gear_crit_rating={}".format(crit_rating),
+            "gear_haste_rating={}".format(haste_rating + settings.step_size),
+            "gear_mastery_rating={}".format(mastery_rating),
+            "gear_versatility_rating={}".format(vers_rating)
+          ]
+        )
+        simulation_group.add(haste_profile)
+
+        mastery_profile = simulation_objects.Simulation_Data(
+          name="mastery_profile",
+          executable=settings.executable,
+          fight_style=fight_style,
+          target_error=settings.target_error[fight_style],
+          logger=logger,
+          simc_arguments=[
+            "gear_crit_rating={}".format(crit_rating),
+            "gear_haste_rating={}".format(haste_rating),
+            "gear_mastery_rating={}".format(mastery_rating + settings.step_size),
+            "gear_versatility_rating={}".format(vers_rating)
+          ]
+        )
+        simulation_group.add(mastery_profile)
+
+        vers_profile = simulation_objects.Simulation_Data(
+          name="vers_profile",
+          executable=settings.executable,
+          fight_style=fight_style,
+          target_error=settings.target_error[fight_style],
+          logger=logger,
+          simc_arguments=[
+            "gear_crit_rating={}".format(crit_rating),
+            "gear_haste_rating={}".format(haste_rating),
+            "gear_mastery_rating={}".format(mastery_rating),
+            "gear_versatility_rating={}".format(vers_rating + settings.step_size)
+          ]
+        )
+        simulation_group.add(vers_profile)
+
+        simulation_group.simulate()
+
+        # ugly
+        winner_dps = 0
+        if crit_profile.get_dps() >= haste_profile.get_dps() and crit_profile.get_dps() >= mastery_profile.get_dps() and crit_profile.get_dps() >= vers_profile.get_dps():
+
+          crit_rating += settings.step_size
+          winner_dps = crit_profile.get_dps()
+          logger.info(f"Crit - {crit_rating}/{haste_rating}/{mastery_rating}/{vers_rating}: {winner_dps}")
+
+        elif haste_profile.get_dps() >= crit_profile.get_dps() and haste_profile.get_dps() >= mastery_profile.get_dps() and haste_profile.get_dps() >= vers_profile.get_dps():
+
+          haste_rating += settings.step_size
+          winner_dps = haste_profile.get_dps()
+          logger.info(f"Haste - {crit_rating}/{haste_rating}/{mastery_rating}/{vers_rating}: {winner_dps}")
+
+        elif mastery_profile.get_dps() >= haste_profile.get_dps() and mastery_profile.get_dps() >= crit_profile.get_dps() and mastery_profile.get_dps() >= vers_profile.get_dps():
+
+          mastery_rating += settings.step_size
+          winner_dps = mastery_profile.get_dps()
+          logger.info(f"Mastery - {crit_rating}/{haste_rating}/{mastery_rating}/{vers_rating}: {winner_dps}")
+
+        elif vers_profile.get_dps() >= haste_profile.get_dps() and vers_profile.get_dps() >= mastery_profile.get_dps() and vers_profile.get_dps() >= crit_profile.get_dps():
+
+          vers_rating += settings.step_size
+          winner_dps = vers_profile.get_dps()
+          logger.info(f"Vers - {crit_rating}/{haste_rating}/{mastery_rating}/{vers_rating}: {winner_dps}")
+
+        gear_path.append({
+          f"{crit_rating}_{haste_rating}_{mastery_rating}_{vers_rating}": winner_dps
+        })
+
+      logger.info(gear_path)
+
+      result = create_base_json_dict("Gear Path", wow_class, wow_spec, fight_style)
+
+      result['data'] = gear_path
+
+      if not os.path.isdir('results/gear_path/'):
+        os.makedirs('results/gear_path/')
+
+      with open(f'results/gear_path/{wow_class}_{wow_spec}_{fight_style}.json', 'w') as f:
+        json.dump(result, f, indent=4, sort_keys=True)
+
+
 
 def main():
   logger.debug("main start")
@@ -1525,6 +1669,25 @@ def main():
 
     if not settings.use_own_threading:
       logger.info("Azerite Trait simulations finished.")
+
+  # trigger gear path simulations
+  if settings.enable_gear_path:
+    if not settings.use_own_threading:
+      logger.info("Gear Path simulations start.")
+
+    if settings.use_own_threading:
+      gearing_path_thread = threading.Thread(
+        name="Gear Path Thread",
+        target=gear_path_simulations,
+        args=(settings.wow_class_spec_list,)
+      )
+      thread_list.append(gearing_path_thread)
+      gearing_path_thread.start()
+    else:
+      gear_path_simulations(settings.wow_class_spec_list)
+
+    if not settings.use_own_threading:
+      logger.info("Gear Path simulations end.")
 
   while thread_list:
     time.sleep(1)
