@@ -934,7 +934,7 @@ class Simulation_Group():
             "Simulation of {} is underway. Please wait".format(self.name)
           )
 
-          try:
+          try: # simulation progress
             progress = json.loads(
               request.urlopen(
                 "https://www.raidbots.com/api/job/{}".format(raidbots_sim_id)
@@ -1050,6 +1050,67 @@ class Simulation_Group():
                 self.name, raidbots_data
               )
             )
+
+          # if too many profilesets were simulated, get the full json
+          if "hasFullJson" in raidbots_data['simbot']:
+            if raidbots_data['simbot']['hasFullJson']:
+
+              # simulation is done, get data
+              fetch_data_start_time = datetime.datetime.utcnow(
+              ) + datetime.timedelta(0, 40)
+              fetch_data_timeout = False
+              try:
+                raidbots_data = json.loads(
+                  request.urlopen(
+                    request.Request(
+                      "https://www.raidbots.com/reports/{}/data.full.json".
+                      format(raidbots_sim_id),
+                      headers=headers
+                    )
+                  ).read()
+                )
+              except Exception as e:
+                self.logger.error(
+                  "Fetching data for {} from raidbots failed. Retrying. {}".format(
+                    self.name, e
+                  )
+                )
+                fetched = False
+                backoff = 0
+                while not fetched and not fetch_data_timeout:
+                  try:
+                    raidbots_data = json.loads(
+                      request.urlopen(
+                        request.Request(
+                          "https://www.raidbots.com/reports/{}/data.full.json".
+                          format(raidbots_sim_id),
+                          headers=headers
+                        )
+                      ).read()
+                    )
+                  except Exception as e:
+                    self.logger.debug(
+                      "Fetching data for {} from raidbots failed. Retrying. {}".format(
+                        self.name, e
+                      )
+                    )
+
+                    if datetime.datetime.utcnow() > fetch_data_start_time:
+                      fetch_data_timeout = True
+                    else:
+                      # backoff between tries
+                      time.sleep(2**backoff)
+                      backoff += 1
+
+                  else:
+                    fetched = True
+              else:
+                self.logger.info(
+                  "Fetching data for {} succeeded. {}".format(
+                    self.name, raidbots_data
+                  )
+                )
+
 
           # if simulation failed or data.json couldn't be fetched
           if progress["job"]["state"] == "failed" or fetch_data_timeout:
