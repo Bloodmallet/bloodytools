@@ -949,14 +949,19 @@ class Simulation_Group():
             progress = {"job": {"state": ""}}
           else:
             self.logger.info(
-              "Simulation {} is at {}. This value might behave unpredictable.".
+              "Simulation {} is at {}%. This value might behave unpredictable.".
               format(self.name, progress["job"]["progress"])
             )
 
           backoff = 0 # not a proper back off in this case, due to the progress of a simulation not being properly monitorable with exponential backoff
           while not progress["job"]["state"] == "complete" and not progress[
             "job"
-          ]["state"] == "failed" and 10 * backoff < 1800:
+          ]["state"] == "failed" and 5 * backoff < 1800:
+
+            # backoff
+            time.sleep(5)
+            backoff += 1
+
             try:
               progress = json.loads(
                 request.urlopen(
@@ -981,14 +986,10 @@ class Simulation_Group():
               )
 
             self.logger.info(
-              "Simulation {} is at {}. This value might behave unpredictable.".
+              "Simulation {} is at {}%. This value might behave unpredictable.".
               format(self.name, progress["job"]["progress"])
             )
             self.logger.debug(progress)
-
-            # backoff
-            time.sleep(10 * backoff)
-            backoff += 1
 
           self.logger.info(
             "Simulation {} is done. Fetching data. This might take some seconds.".
@@ -1046,6 +1047,9 @@ class Simulation_Group():
                 fetched = True
           else:
             self.logger.info(
+              "Fetching data for {} succeeded.".format(self.name)
+            )
+            self.logger.debug(
               "Fetching data for {} succeeded. {}".format(
                 self.name, raidbots_data
               )
@@ -1070,7 +1074,7 @@ class Simulation_Group():
                   ).read()
                 )
               except Exception as e:
-                self.logger.error(
+                self.logger.info(
                   "Fetching data for {} from raidbots failed. Retrying. {}".format(
                     self.name, e
                   )
@@ -1089,7 +1093,7 @@ class Simulation_Group():
                       ).read()
                     )
                   except Exception as e:
-                    self.logger.debug(
+                    self.logger.info(
                       "Fetching data for {} from raidbots failed. Retrying. {}".format(
                         self.name, e
                       )
@@ -1131,7 +1135,7 @@ class Simulation_Group():
                 ).read()
               )
             except Exception as e:
-              self.logger.error(
+              self.logger.info(
                 "Fetching input data for {} from raidbots failed. Retrying. {}".format(
                   self.name, e
                 )
@@ -1151,7 +1155,7 @@ class Simulation_Group():
                     ).read()
                   )
                 except Exception as e:
-                  self.logger.error(
+                  self.logger.info(
                     "Fetching input data for {} from raidbots failed. Retrying. {}".
                     format(self.name, e)
                   )
@@ -1186,7 +1190,7 @@ class Simulation_Group():
                 ).read()
               )
             except Exception as e:
-              self.logger.error(
+              self.logger.info(
                 "Fetching output data for {} from raidbots failed. Retrying. {}".format(
                   self.name, e
                 )
@@ -1205,7 +1209,7 @@ class Simulation_Group():
                     ).read()
                   )
                 except Exception as e:
-                  self.logger.error(
+                  self.logger.info(
                     "Fetching output data for {} from raidbots failed. Retrying. {}".
                     format(self.name, e)
                   )
