@@ -390,7 +390,8 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
             target_error=settings.target_error[fight_style],
             simc_arguments=[
               create_basic_profile_string(wow_class, wow_spec, settings.tier),
-              "trinket1=", "trinket2=" + second_trinket
+              "trinket1=",
+              "trinket2=" + second_trinket + ",ilevel=" + str(settings.min_ilevel)
             ],
             executable=settings.executable,
             logger=logger
@@ -425,7 +426,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
       )
       try:
         if settings.use_raidbots and settings.apikey:
-          simulation_group.simulate_with_raidbots(settings.apikey)
+          settings.simc_hash = simulation_group.simulate_with_raidbots(settings.apikey)
         else:
           simulation_group.simulate()
       except Exception as e:
@@ -472,10 +473,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
       json_export["item_ids"] = {}
       for trinket in json_export["data"]:
         if trinket != "baseline":
-          # FIXME: delete wow_class and wow_spec from function for bfa
-          json_export["item_ids"][trinket] = wow_lib.get_trinket_id(
-            trinket, wow_class, wow_spec
-          )
+          json_export["item_ids"][trinket] = wow_lib.get_trinket_id(trinket)
 
       logger.debug("Enriched json export: {}".format(json_export))
 
