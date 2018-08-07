@@ -263,7 +263,7 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
       )
       try:
         if settings.use_raidbots and settings.apikey:
-          simulation_group.simulate_with_raidbots(settings.apikey)
+          settings.simc_hash = simulation_group.simulate_with_raidbots(settings.apikey)
         else:
           simulation_group.simulate()
       except Exception as e:
@@ -563,18 +563,24 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
 
               trinket = item_dict[item][wow_class][wow_spec]
 
+              # skip creating additions to the lua file if increase cant be calculated
+              if len(trinket) < 2:
+                continue
+
               # get average dps increase
               dps_sum = 0
               lower_dps = 0
               itemlevels_counted = 0
               for itemlevel in range(
-                settings.min_ilevel, settings.max_ilevel, 5
+                settings.min_ilevel, settings.max_ilevel + 1, 5
               ):
                 if itemlevel in trinket:
                   if lower_dps:
                     dps_sum += trinket[itemlevel] - lower_dps
                     itemlevels_counted += 1
                   lower_dps = trinket[itemlevel]
+
+              logger.debug(f"Item: {item}, dps_sum: {dps_sum}, itemlevels_counted: {itemlevels_counted}, settings.ilevel_step: {settings.ilevel_step}")
 
               average_increase = int(
                 dps_sum / itemlevels_counted / (settings.ilevel_step / 5)
@@ -796,7 +802,10 @@ def secondary_distribution_simulations(
       )
 
       try:
-        simulation_group.simulate()
+        if settings.use_raidbots:
+          settings.simc_hash = simulation_group.simulate_with_raidbots(settings.apikey)
+        else:
+          simulation_group.simulate()
       except Exception as e:
         logger.error(
           "Secondary distribution simulation for {} {} {} failed. {}".format(
@@ -1029,7 +1038,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       )
       try:
         if settings.use_raidbots and settings.apikey:
-          simulation_group.simulate_with_raidbots(settings.apikey)
+          settings.simc_hash = simulation_group.simulate_with_raidbots(settings.apikey)
         else:
           simulation_group.simulate()
       except Exception as e:
