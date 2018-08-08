@@ -821,7 +821,7 @@ class Simulation_Group():
             )
             f.write("fight_style={}\n".format(self.profiles[0].fight_style))
             f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
-            f.write("iterations=10\n")
+            f.write("iterations={}\n".format(self.profiles[0].iterations))
             f.write(
               "optimize_expressions={}\n".format(
                 self.profiles[0].optimize_expressions
@@ -859,9 +859,7 @@ class Simulation_Group():
                     )
                   )
                 # add iterations hack
-                f.write("profileset.\"{profile_name}\"+=iterations={iterations}\n".format(profile_name=profile.name, iterations=self.profiles[0].iterations))
-
-          # need raidbots logic
+                # f.write("profileset.\"{profile_name}\"+=iterations={iterations}\n".format(profile_name=profile.name, iterations=self.profiles[0].iterations))
 
           # create advanced input string
           raidbots_advancedInput = ""
@@ -900,7 +898,7 @@ class Simulation_Group():
             response = request.urlopen(req)
           except error.HTTPError as e:
             self.logger.error(
-              "Sending the task {} to Raidbots failed ({}, {}). Retrying in 1".format(self.name, e.code, e.reason)
+              "Sending the task {} to Raidbots failed ({}, {}, {}). Retrying in 1".format(self.name, e.code, e.reason, e.read())
             )
 
             backoff = 0
