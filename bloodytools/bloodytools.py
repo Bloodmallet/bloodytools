@@ -236,6 +236,7 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             simc_arguments=[basic_profile_string, "race={}".format(race)],
             target_error=settings.target_error[fight_style],
             executable=settings.executable,
+            iterations=settings.iterations,
             logger=logger
           )
         else:
@@ -245,6 +246,7 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             simc_arguments=["race={}".format(race)],
             target_error=settings.target_error[fight_style],
             executable=settings.executable,
+            iterations=settings.iterations,
             logger=logger
           )
         simulation_group.add(simulation_data)
@@ -954,6 +956,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         simc_arguments=[basic_profile_string, reset_string, item_head + f",ilevel={settings.azerite_trait_ilevels[0]}"],
         target_error=settings.target_error[fight_style],
         executable=settings.executable,
+        iterations=settings.iterations,
         logger=logger
       )
       simulation_group.add(simulation_data)
@@ -966,6 +969,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             simc_arguments=[item_head + f",ilevel={itemlevel}"],
             target_error=settings.target_error[fight_style],
             executable=settings.executable,
+            iterations=settings.iterations,
             logger=logger
           )
           simulation_group.add(simulation_data)
