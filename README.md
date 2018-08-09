@@ -4,11 +4,11 @@ Bloody( tools )
 
 > Automation tool for several different aspects of all dps and some tank specs in World of Warcraft using SimulationCraft. Ingame customization and number tuning make decision making without external help a bloody hell.
 
-## In developement note
-This tool is still in developement but can be used to generate some data. If you want to contribute or have suggestions to automate data and representation generation, contact me.
-
 ## Requirements
-You need the latest [SimulationCraft](http://downloads.simulationcraft.org/?C=M;O=D) version ([GitHub Repository](https://github.com/simulationcraft/simc)), [Python 3.6](https://www.python.org/downloads/) or newer and the module [simc_support](https://github.com/Bloodmallet/simc_support), which is handled in the requirements.txt.
+You need
+- [SimulationCraft](http://downloads.simulationcraft.org/?C=M;O=D) ([GitHub Repository](https://github.com/simulationcraft/simc)),
+- [Python 3.6](https://www.python.org/downloads/) or newer,
+- [simc_support](https://github.com/Bloodmallet/simc_support) (which is handled in the requirements.txt).
 
 ## Download
 Download or clone this repository into the SimulationCraft directory. `simulationcraft\bloodytools`
@@ -28,8 +28,8 @@ $ <env_name>\Scripts\active
  - `python --version` should return the python 3.6 version number you installed, if it doesn't, try `python3 --version`. Use whatever (python/python3) returned the correct version in the next step
  - [Create a virtual 3.6 environment](https://docs.python.org/3/library/venv.html) inside `bloodytools` directory (you might need to start the commandline on windows as administrator to do so), `python3 -m venv env`
  - Start the virtual env you just created
- - [Windows] `env/Scripts/activate`
- - [Linux] `source env/bin/activate`
+   - [Windows] `env/Scripts/activate`
+   - [Linux] `source env/bin/activate`
  - "(env)" should appear in front of your line
  - Check python version again: `python --version`
  - `python -m pip install --upgrade pip` to update the installer of extra tools
@@ -39,6 +39,8 @@ Congratulations, you're ready to execute the command of `Getting started` in you
 ## Getting started
 Edit settings.py to your liking using a text editor like Notepad++. Start python environement. Start bloodytools.
 ```sh
+$ <env_name>/Scripts/activate
+$ cd bloodytools/bloodytools/
 (<env_name>)$ python bloodytools.py
 ```
 
