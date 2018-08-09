@@ -43,7 +43,7 @@ wow_class_spec_list = [
 
 ##
 # SimulationCraft
-executable = "../../SimulationCraft_BfA/simc.exe"
+executable = "../../SimulationCraft/simc.exe"
 fight_styles = [
   "patchwerk",
   "hecticaddcleave"
