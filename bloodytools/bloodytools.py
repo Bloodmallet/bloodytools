@@ -1607,7 +1607,7 @@ def main():
         try:
           with open(create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r') as f:
             for line in f:
-              if "talents=" in line:
+              if "talents=" in line[0:8]:
                 talent_combination = line.split("talents=")[1].split()[0]
         except Exception:
           logger.warning(f"Base profile for {wow_spec} {wow_class} not found. No secondary distribution will be calculated for this spec.")
