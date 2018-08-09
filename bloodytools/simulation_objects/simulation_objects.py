@@ -392,11 +392,13 @@ class Simulation_Data():
     argument.append("default_actions=" + self.default_actions)
     argument.append("log=" + self.log)
     argument.append("default_skill=" + self.default_skill)
-    argument.append("ptr=" + self.ptr)
+    if self.ptr == "1":
+      argument.append("ptr=" + self.ptr)
     argument.append("threads=" + self.threads)
 
     for simc_argument in self.simc_arguments:
       argument.append(simc_argument)
+    argument.append("name=" + self.name)
 
     argument.append("ready_trigger=" + self.ready_trigger)
 
@@ -454,15 +456,18 @@ class Simulation_Data():
     # save output
     self.set_full_report(simulation_output.stdout)
 
-    is_actor = True
-    run_dps = "DPS: 0.0"
+    is_actor = False
+    run_dps: str
     for line in simulation_output.stdout.splitlines():
       # needs this check to prevent grabbing the boss dps
-      if "DPS:" in line and is_actor:
+      if "DPS Ranking:" in line:
+        is_actor = True
+
+      if is_actor and self.name in line:
         run_dps = line
         is_actor = False
 
-    dps_value = run_dps.split()[1]
+    dps_value = run_dps.split()[0]
 
     # save dps value
     self.set_dps(dps_value, external=False)
