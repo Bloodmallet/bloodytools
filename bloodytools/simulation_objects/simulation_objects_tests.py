@@ -336,7 +336,7 @@ class TestSimulationDataMethods(unittest.TestCase):
     if os.path.isfile("./SimulationCraft/engine/simc"):
       self.sd.executable = "./SimulationCraft/engine/simc"
       self.sd.simc_arguments = [
-        "./SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
+        "./SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"
       ]
 
     # local dev test
@@ -348,7 +348,7 @@ class TestSimulationDataMethods(unittest.TestCase):
     elif os.path.isfile("../SimulationCraft/simc.exe"):
       self.sd.executable = "../SimulationCraft/simc.exe"
       self.sd.simc_arguments = [
-        "../SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
+        "../SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"
       ]
 
     # use standard values
@@ -455,7 +455,7 @@ class TestSimulationGroupMethods(unittest.TestCase):
     if os.path.isfile("./SimulationCraft/simc"):
       self.sd2.executable = "./SimulationCraft/simc"
       self.sd2.simc_arguments.insert(
-        0, "./SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
+        0, "./SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"
       )
 
     # local dev test
@@ -467,7 +467,7 @@ class TestSimulationGroupMethods(unittest.TestCase):
     elif os.path.isfile("../SimulationCraft/simc.exe"):
       self.sd2.executable = "../SimulationCraft/simc.exe"
       self.sd2.simc_arguments.insert(
-        0, "../SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
+        0, "../SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"
       )
     sole_sg2 = simulation_objects.Simulation_Group(self.sd2)
     self.assertTrue(sole_sg2.simulate())
@@ -490,7 +490,7 @@ class TestSimulationGroupMethods(unittest.TestCase):
     if os.path.isfile("./SimulationCraft/simc"):
       self.sg.executable = "./SimulationCraft/simc"
       self.sg.profiles[0].simc_arguments.insert(
-        0, "./SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
+        0, "./SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"
       )
 
     # local dev test
@@ -502,7 +502,7 @@ class TestSimulationGroupMethods(unittest.TestCase):
     elif os.path.isfile("../SimulationCraft/simc.exe"):
       self.sg.executable = "../SimulationCraft/simc.exe"
       self.sg.profiles[0].simc_arguments.insert(
-        0, "../SimulationCraft/profiles/Tier21/T21_Shaman_Elemental.simc"
+        0, "../SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"
       )
     self.sg.profiles[1].simc_arguments = ["talents=3333333"]
     self.assertTrue(self.sg.simulate())
