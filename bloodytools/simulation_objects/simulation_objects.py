@@ -90,7 +90,7 @@ class Simulation_Data():
     super(Simulation_Data, self).__init__()
 
     self.logger = logger or logging.getLogger(__name__)
-    self.logger.debug("simulation_data initiated.")
+    # self.logger.debug("simulation_data initiated.")
 
     # simc setting to calculate scale factors (stat weights)
     if calculate_scale_factors == "0" or calculate_scale_factors == "1":
@@ -392,11 +392,13 @@ class Simulation_Data():
     argument.append("default_actions=" + self.default_actions)
     argument.append("log=" + self.log)
     argument.append("default_skill=" + self.default_skill)
-    argument.append("ptr=" + self.ptr)
+    if self.ptr == "1":
+      argument.append("ptr=" + self.ptr)
     argument.append("threads=" + self.threads)
 
     for simc_argument in self.simc_arguments:
       argument.append(simc_argument)
+    argument.append("name=" + self.name)
 
     argument.append("ready_trigger=" + self.ready_trigger)
 
@@ -454,15 +456,18 @@ class Simulation_Data():
     # save output
     self.set_full_report(simulation_output.stdout)
 
-    is_actor = True
-    run_dps = "DPS: 0.0"
+    is_actor = False
+    run_dps: str
     for line in simulation_output.stdout.splitlines():
       # needs this check to prevent grabbing the boss dps
-      if "DPS:" in line and is_actor:
+      if "DPS Ranking:" in line:
+        is_actor = True
+
+      if is_actor and self.name in line:
         run_dps = line
         is_actor = False
 
-    dps_value = run_dps.split()[1]
+    dps_value = run_dps.split()[0]
 
     # save dps value
     self.set_dps(dps_value, external=False)
@@ -627,7 +632,8 @@ class Simulation_Group():
                 self.profiles[0].optimize_expressions
               )
             )
-            f.write("ptr={}\n".format(self.profiles[0].ptr))
+            if int(self.profiles[0].ptr) == 1:
+              f.write("ptr={}\n".format(self.profiles[0].ptr))
             f.write("target_error={}\n".format(self.profiles[0].target_error))
             f.write("threads={}\n".format(self.threads))
             f.write(
@@ -703,10 +709,6 @@ class Simulation_Group():
               else:
                 self.success = True
 
-          # remove profilesets file
-          os.remove(self.filename)
-          self.filename = None
-
           # handle broken simulations
           if fail_counter >= 5:
             self.logger.error("ERROR: An Error occured during simulation.")
@@ -716,20 +718,36 @@ class Simulation_Group():
               "name=value error? Check your input! Maybe your links to already existing profiles are wrong. They need to be relative links from bloodytools to your SimulationCraft directory."
             )
             self.error = simulation_output.stdout
+
+            # add error to remaining profile
+            with open(self.filename, 'a') as f:
+              f.write("########################################")
+              f.write("# FAILED PROFILE!\n")
+              f.write("# SimulationCraft Output:")
+              f.write(self.error)
+
             raise SimulationError(self.error)
+
+          else:
+            # remove profilesets file
+            os.remove(self.filename)
+            self.filename = None
 
           self.logger.debug(simulation_output.stdout)
 
           # get dps of the first profile
-          is_actor = True
+          baseline_result = False
           profileset_results = False
 
           for line in simulation_output.stdout.splitlines():
+            # allow baseline dmg grab only in the dps listing, not from warnings
+            if "DPS Ranking:" in line:
+              baseline_result = True
             # needs this check to prevent grabbing the boss dps
-            if self.profiles[0].name in line and is_actor:
+            if self.profiles[0].name in line and baseline_result:
               self.logger.debug(line)
               self.profiles[0].set_dps(line.split()[0], external=False)
-              is_actor = False
+              baseline_result = False
 
             if "Profilesets (median Damage per Second):" in line:
               profileset_results = True
@@ -767,6 +785,7 @@ class Simulation_Group():
     Returns:
       bool -- True if simulations ended successfully.
     """
+    simc_hash = False
     if self.profiles:
 
       self.set_simulation_start_time()
@@ -813,7 +832,8 @@ class Simulation_Group():
                 self.profiles[0].optimize_expressions
               )
             )
-            f.write("ptr={}\n".format(self.profiles[0].ptr))
+            if int(self.profiles[0].ptr) == 1:
+              f.write("ptr={}\n".format(self.profiles[0].ptr))
             f.write("target_error={}\n".format(self.profiles[0].target_error))
 
             # write all specific arguments to file
@@ -843,8 +863,8 @@ class Simulation_Group():
                       profile_name=profile.name, argument=special_argument
                     )
                   )
-
-          # need raidbots logic
+                # add iterations hack
+                # f.write("profileset.\"{profile_name}\"+=iterations={iterations}\n".format(profile_name=profile.name, iterations=self.profiles[0].iterations))
 
           # create advanced input string
           raidbots_advancedInput = ""
@@ -856,8 +876,9 @@ class Simulation_Group():
             "type": "advanced",
             "apiKey": apikey,
             "advancedInput": raidbots_advancedInput,
-            "simcVersion": "bfa-dev",
+            "simcVersion": "nightly",
             "reportName": "Bloodmallet's shitty tool",
+            "iterations": 100000
           }
 
           self.logger.debug(
@@ -876,27 +897,38 @@ class Simulation_Group():
             "https://www.raidbots.com/sim", data=data, headers=headers
           )
 
+          import time
+
           try:
             response = request.urlopen(req)
-          except error.URLError as e:
+          except error.HTTPError as e:
             self.logger.error(
-              "Sending the task {} to Raidbots failed.".format(self.name)
+              "Sending the task {} to Raidbots failed ({}, {}, {}). Retrying in 1".format(self.name, e.code, e.reason, e.read())
             )
-            self.logger.error(e.reason)
-            self.logger.error(e.read())
-            raise SimulationError(
-              "Communication with Raidbots failed. {}".format(e.reason)
-            )
+
+            backoff = 0
+            while backoff < 4:
+              time.sleep(2 ** backoff)
+              backoff += 1
+              try:
+                response = request.urlopen(req)
+              except error.URLError as e:
+                self.logger.error(
+                  "Sending the task {} to Raidbots failed ({}, {}). Retry in {}".format(self.name, e.code, e.reason, 2 ** backoff)
+                )
+
+            if 2**backoff >= 60:
+              raise SimulationError("Communication with Raidbots failed. Sent data was not accepted.")
+
+          try:
+            raidbots_response = json.loads(response.read())
+          except Exception as e:
+            self.logger.error(e)
+            raise e
           else:
-            try:
-              raidbots_response = json.loads(response.read())
-            except Exception as e:
-              self.logger.error(e)
-              raise e
-            else:
-              self.logger.debug(
-                "Raidbots responded: {}".format(raidbots_response)
-              )
+            self.logger.debug(
+              "Raidbots responded: {}".format(raidbots_response)
+            )
 
           raidbots_sim_id = raidbots_response["simId"]
 
@@ -905,7 +937,7 @@ class Simulation_Group():
             "Simulation of {} is underway. Please wait".format(self.name)
           )
 
-          try:
+          try: # simulation progress
             progress = json.loads(
               request.urlopen(
                 "https://www.raidbots.com/api/job/{}".format(raidbots_sim_id)
@@ -920,15 +952,19 @@ class Simulation_Group():
             progress = {"job": {"state": ""}}
           else:
             self.logger.info(
-              "Simulation {} is at {}. This value might behave unpredictable.".
+              "Simulation {} is at {}%. This value might behave unpredictable.".
               format(self.name, progress["job"]["progress"])
             )
 
-          import time
+          backoff = 0 # not a proper back off in this case, due to the progress of a simulation not being properly monitorable with exponential backoff
           while not progress["job"]["state"] == "complete" and not progress[
             "job"
-          ]["state"] == "failed":
-            time.sleep(6.5)
+          ]["state"] == "failed" and 5 * backoff < 1800:
+
+            # backoff
+            time.sleep(5)
+            backoff += 1
+
             try:
               progress = json.loads(
                 request.urlopen(
@@ -940,7 +976,7 @@ class Simulation_Group():
                 ).read()
               )
             except Exception as e:
-              self.logger.error(e)
+              self.logger.debug(e)
             else:
               progress = json.loads(
                 request.urlopen(
@@ -951,11 +987,13 @@ class Simulation_Group():
                   )
                 ).read()
               )
+
             self.logger.info(
-              "Simulation {} is at {}. This value might behave unpredictable.".
+              "Simulation {} is at {}%. This value might behave unpredictable.".
               format(self.name, progress["job"]["progress"])
             )
             self.logger.debug(progress)
+
           self.logger.info(
             "Simulation {} is done. Fetching data. This might take some seconds.".
             format(self.name)
@@ -963,7 +1001,7 @@ class Simulation_Group():
 
           # simulation is done, get data
           fetch_data_start_time = datetime.datetime.utcnow(
-          ) + datetime.timedelta(0, 30)
+          ) + datetime.timedelta(0, 40)
           fetch_data_timeout = False
           try:
             raidbots_data = json.loads(
@@ -977,13 +1015,13 @@ class Simulation_Group():
             )
           except Exception as e:
             self.logger.error(
-              "Fetching data for {} from raidbots failed. {}".format(
+              "Fetching data for {} from raidbots failed. Retrying. {}".format(
                 self.name, e
               )
             )
             fetched = False
+            backoff = 0
             while not fetched and not fetch_data_timeout:
-              time.sleep(4)
               try:
                 raidbots_data = json.loads(
                   request.urlopen(
@@ -995,27 +1033,97 @@ class Simulation_Group():
                   ).read()
                 )
               except Exception as e:
-                self.logger.error(
-                  "Fetching data for {} from raidbots failed. {}".format(
+                self.logger.debug(
+                  "Fetching data for {} from raidbots failed. Retrying. {}".format(
                     self.name, e
                   )
                 )
+
                 if datetime.datetime.utcnow() > fetch_data_start_time:
                   fetch_data_timeout = True
+                else:
+                  # backoff between tries
+                  time.sleep(2**backoff)
+                  backoff += 1
+
               else:
                 fetched = True
           else:
             self.logger.info(
+              "Fetching data for {} succeeded.".format(self.name)
+            )
+            self.logger.debug(
               "Fetching data for {} succeeded. {}".format(
                 self.name, raidbots_data
               )
             )
 
+          # if too many profilesets were simulated, get the full json
+          if "hasFullJson" in raidbots_data['simbot']:
+            if raidbots_data['simbot']['hasFullJson']:
+
+              # simulation is done, get data
+              fetch_data_start_time = datetime.datetime.utcnow(
+              ) + datetime.timedelta(0, 40)
+              fetch_data_timeout = False
+              try:
+                raidbots_data = json.loads(
+                  request.urlopen(
+                    request.Request(
+                      "https://www.raidbots.com/reports/{}/data.full.json".
+                      format(raidbots_sim_id),
+                      headers=headers
+                    )
+                  ).read()
+                )
+              except Exception as e:
+                self.logger.info(
+                  "Fetching data for {} from raidbots failed. Retrying. {}".format(
+                    self.name, e
+                  )
+                )
+                fetched = False
+                backoff = 0
+                while not fetched and not fetch_data_timeout:
+                  try:
+                    raidbots_data = json.loads(
+                      request.urlopen(
+                        request.Request(
+                          "https://www.raidbots.com/reports/{}/data.full.json".
+                          format(raidbots_sim_id),
+                          headers=headers
+                        )
+                      ).read()
+                    )
+                  except Exception as e:
+                    self.logger.info(
+                      "Fetching data for {} from raidbots failed. Retrying. {}".format(
+                        self.name, e
+                      )
+                    )
+
+                    if datetime.datetime.utcnow() > fetch_data_start_time:
+                      fetch_data_timeout = True
+                    else:
+                      # backoff between tries
+                      time.sleep(2**backoff)
+                      backoff += 1
+
+                  else:
+                    fetched = True
+              else:
+                self.logger.info(
+                  "Fetching data for {} succeeded. {}".format(
+                    self.name, raidbots_data
+                  )
+                )
+
+
           # if simulation failed or data.json couldn't be fetched
           if progress["job"]["state"] == "failed" or fetch_data_timeout:
 
             fetch_input_start_time = datetime.datetime.utcnow(
-            ) + datetime.timedelta(0, 30)
+            ) + datetime.timedelta(0, 40)
             fetch_input_timeout = False
 
             # simulation failed, get input
@@ -1030,12 +1138,14 @@ class Simulation_Group():
                 ).read()
               )
             except Exception as e:
-              self.logger.error(
-                "Fetching input data for {} from raidbots failed. {}".format(
+              self.logger.info(
+                "Fetching input data for {} from raidbots failed. Retrying. {}".format(
                   self.name, e
                 )
               )
+
               fetched = False
+              backoff = 0
               while not fetched and not fetch_input_timeout:
                 try:
                   raidbots_input = json.loads(
@@ -1048,12 +1158,16 @@ class Simulation_Group():
                     ).read()
                   )
                 except Exception as e:
-                  self.logger.error(
-                    "Fetching input data for {} from raidbots failed. {}".
+                  self.logger.info(
+                    "Fetching input data for {} from raidbots failed. Retrying. {}".
                     format(self.name, e)
                   )
                   if datetime.datetime.utcnow() > fetch_input_start_time:
                     fetch_input_timeout = True
+                  else:
+                    # backoff between tries
+                    time.sleep(2**backoff)
+                    backoff += 1
                 else:
                   fetched = True
             else:
@@ -1064,7 +1178,7 @@ class Simulation_Group():
               )
 
             fetch_output_start_time = datetime.datetime.utcnow(
-            ) + datetime.timedelta(0, 30)
+            ) + datetime.timedelta(0, 40)
             fetch_output_timeout = False
 
             # simulation failed, get input
@@ -1079,12 +1193,13 @@ class Simulation_Group():
                 ).read()
               )
             except Exception as e:
-              self.logger.error(
-                "Fetching output data for {} from raidbots failed. {}".format(
+              self.logger.info(
+                "Fetching output data for {} from raidbots failed. Retrying. {}".format(
                   self.name, e
                 )
               )
               fetched = False
+              backoff = 0
               while not fetched and not fetch_output_timeout:
                 try:
                   raidbots_output = json.loads(
@@ -1097,12 +1212,17 @@ class Simulation_Group():
                     ).read()
                   )
                 except Exception as e:
-                  self.logger.error(
-                    "Fetching output data for {} from raidbots failed. {}".
+                  self.logger.info(
+                    "Fetching output data for {} from raidbots failed. Retrying. {}".
                     format(self.name, e)
                   )
                   if datetime.datetime.utcnow() > fetch_output_start_time:
                     fetch_output_timeout = True
+                  else:
+                    # backoff between tries
+                    time.sleep(2**backoff)
+                    backoff += 1
+
                 else:
                   fetched = True
             else:
@@ -1134,7 +1254,7 @@ class Simulation_Group():
               format(raidbots_sim_id)
             )
 
-          input("Enter something to delete the created file.")
+          #input("Enter something to delete the created file.")
           # remove profilesets file
           os.remove(self.filename)
           self.filename = None
@@ -1143,6 +1263,8 @@ class Simulation_Group():
           self.logger.debug(
             json.dumps(raidbots_data, sort_keys=True, indent=4)
           )
+
+          simc_hash = raidbots_data['git_revision']
 
           # set basic profile dps
           self.logger.debug("Setting dps for baseprofile.")
@@ -1166,7 +1288,7 @@ class Simulation_Group():
     else:
       return False
 
-    return True
+    return simc_hash
 
   def add(self, simulation_instance: Simulation_Data) -> bool:
     """Add another simulation_instance object to the group.
