@@ -228,7 +228,7 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
           )
 
           simulation_data = simulation_objects.Simulation_Data(
-            name=race,
+            name=race.title().replace("_", " "),
             fight_style=fight_style,
             simc_arguments=[basic_profile_string, "race={}".format(race)],
             target_error=settings.target_error[fight_style],
@@ -238,7 +238,7 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
           )
         else:
           simulation_data = simulation_objects.Simulation_Data(
-            name=race,
+            name=race.title().replace("_", " "),
             fight_style=fight_style,
             simc_arguments=["race={}".format(race)],
             target_error=settings.target_error[fight_style],
