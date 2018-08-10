@@ -36,10 +36,7 @@ if settings.use_own_threading:
 
 # activate logging to file and console
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-if hasattr(settings, "debug"):
-  if settings.debug:
-    logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)
 # file logger
 fh = logging.FileHandler("log.txt", "w")
 fh.setLevel(logging.DEBUG)
