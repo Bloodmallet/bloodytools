@@ -907,17 +907,19 @@ class Simulation_Group():
             )
 
             backoff = 0
-            while backoff < 4:
+            while backoff < 7:
               time.sleep(2 ** backoff)
               backoff += 1
               try:
                 response = request.urlopen(req, timeout=30)
-              except error.URLError as e:
+              except error.HTTPError as e:
                 self.logger.error(
                   "Sending the task {} to Raidbots failed ({}, {}). Retry in {}".format(self.name, e.code, e.reason, 2 ** backoff)
                 )
+              else:
+                break
 
-            if 2**backoff >= 60:
+            if backoff >= 7:
               raise SimulationError("Communication with Raidbots failed. Sent data was not accepted.")
 
           try:
