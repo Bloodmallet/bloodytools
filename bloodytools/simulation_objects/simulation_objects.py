@@ -900,7 +900,7 @@ class Simulation_Group():
           import time
 
           try:
-            response = request.urlopen(req)
+            response = request.urlopen(req, timeout=30)
           except error.HTTPError as e:
             self.logger.error(
               "Sending the task {} to Raidbots failed ({}, {}, {}). Retrying in 1".format(self.name, e.code, e.reason, e.read())
@@ -911,7 +911,7 @@ class Simulation_Group():
               time.sleep(2 ** backoff)
               backoff += 1
               try:
-                response = request.urlopen(req)
+                response = request.urlopen(req, timeout=30)
               except error.URLError as e:
                 self.logger.error(
                   "Sending the task {} to Raidbots failed ({}, {}). Retry in {}".format(self.name, e.code, e.reason, 2 ** backoff)
@@ -932,7 +932,7 @@ class Simulation_Group():
 
           raidbots_sim_id = raidbots_response["simId"]
 
-          # check for when the simulation is done
+          # monitor simulation progress
           self.logger.info(
             "Simulation of {} is underway. Please wait".format(self.name)
           )
@@ -940,7 +940,7 @@ class Simulation_Group():
           try: # simulation progress
             progress = json.loads(
               request.urlopen(
-                "https://www.raidbots.com/api/job/{}".format(raidbots_sim_id)
+                "https://www.raidbots.com/api/job/{}".format(raidbots_sim_id), timeout=30
               ).read()
             )
           except:
@@ -972,7 +972,7 @@ class Simulation_Group():
                     "https://www.raidbots.com/api/job/{}".
                     format(raidbots_sim_id),
                     headers=headers
-                  )
+                  ), timeout=30
                 ).read()
               )
             except Exception as e:
@@ -984,7 +984,7 @@ class Simulation_Group():
                     "https://www.raidbots.com/api/job/{}".
                     format(raidbots_sim_id),
                     headers=headers
-                  )
+                  ), timeout=30
                 ).read()
               )
 
@@ -1010,7 +1010,7 @@ class Simulation_Group():
                   "https://www.raidbots.com/reports/{}/data.json".
                   format(raidbots_sim_id),
                   headers=headers
-                )
+                ), timeout=30
               ).read()
             )
           except Exception as e:
@@ -1029,7 +1029,7 @@ class Simulation_Group():
                       "https://www.raidbots.com/reports/{}/data.json".
                       format(raidbots_sim_id),
                       headers=headers
-                    )
+                    ), timeout=30
                   ).read()
                 )
               except Exception as e:
@@ -1073,7 +1073,7 @@ class Simulation_Group():
                       "https://www.raidbots.com/reports/{}/data.full.json".
                       format(raidbots_sim_id),
                       headers=headers
-                    )
+                    ), timeout=30
                   ).read()
                 )
               except Exception as e:
@@ -1092,7 +1092,7 @@ class Simulation_Group():
                           "https://www.raidbots.com/reports/{}/data.full.json".
                           format(raidbots_sim_id),
                           headers=headers
-                        )
+                        ), timeout=30
                       ).read()
                     )
                   except Exception as e:
@@ -1134,7 +1134,7 @@ class Simulation_Group():
                     "https://www.raidbots.com/reports/{}/input.txt".
                     format(raidbots_sim_id),
                     headers=headers
-                  )
+                  ), timeout=30
                 ).read()
               )
             except Exception as e:
@@ -1154,7 +1154,7 @@ class Simulation_Group():
                         "https://www.raidbots.com/reports/{}/input.txt".
                         format(raidbots_sim_id),
                         headers=headers
-                      )
+                      ), timeout=30
                     ).read()
                   )
                 except Exception as e:
@@ -1189,7 +1189,7 @@ class Simulation_Group():
                     "https://www.raidbots.com/reports/{}/output.txt".
                     format(raidbots_sim_id),
                     headers=headers
-                  )
+                  ), timeout=30
                 ).read()
               )
             except Exception as e:
@@ -1208,7 +1208,7 @@ class Simulation_Group():
                         "https://www.raidbots.com/reports/{}/output.txt".
                         format(raidbots_sim_id),
                         headers=headers
-                      )
+                      ), timeout=30
                     ).read()
                   )
                 except Exception as e:
