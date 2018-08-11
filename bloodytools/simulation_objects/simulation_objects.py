@@ -944,10 +944,11 @@ class Simulation_Group():
           )
 
           try: # simulation progress
-            progress = json.loads(
-              request.urlopen(
-                "https://www.raidbots.com/api/job/{}".format(raidbots_sim_id), timeout=30
-              ).read()
+            response = request.urlopen(
+              request.Request(
+                "https://www.raidbots.com/api/job/{}".format(raidbots_sim_id), headers=headers
+              ),
+              timeout=30
             )
           except:
             self.logger.error(
@@ -957,6 +958,7 @@ class Simulation_Group():
             )
             progress = {"job": {"state": ""}}
           else:
+            progress = json.loads(response.read())
             self.logger.info(
               "Simulation {} is at {}%. This value might behave unpredictable.".
               format(self.name, progress["job"]["progress"])
@@ -972,27 +974,18 @@ class Simulation_Group():
             backoff += 1
 
             try:
-              progress = json.loads(
-                request.urlopen(
-                  request.Request(
-                    "https://www.raidbots.com/api/job/{}".
-                    format(raidbots_sim_id),
-                    headers=headers
-                  ), timeout=30
-                ).read()
+              response = request.urlopen(
+                request.Request(
+                  "https://www.raidbots.com/api/job/{}".
+                  format(raidbots_sim_id),
+                  headers=headers
+                ), timeout=30
               )
             except Exception as e:
               self.logger.debug(e)
+              continue
             else:
-              progress = json.loads(
-                request.urlopen(
-                  request.Request(
-                    "https://www.raidbots.com/api/job/{}".
-                    format(raidbots_sim_id),
-                    headers=headers
-                  ), timeout=30
-                ).read()
-              )
+              progress = json.loads(response.read())
 
             self.logger.info(
               "Simulation {} is at {}%. This value might behave unpredictable.".
