@@ -751,17 +751,21 @@ class Simulation_Group():
 
             if "Profilesets (median Damage per Second):" in line:
               profileset_results = True
-
-            # get dps values of the profileset-simulations
-            if profileset_results:
-              for profile in self.profiles:
-                # need this space to catch the difference of multiple profiles like 'tauren' and 'highmountain_tauren'
-                if " " + profile.name in line:
-                  profile.set_dps(line.split()[0], external=False)
+              continue
 
             # prevents false positive from Waiting -data
             if "" == line and profileset_results:
               profileset_results = False
+              continue
+
+            # get dps values of the profileset-simulations
+            if profileset_results:
+              for profile in self.profiles:
+                self.logger.debug(line)
+                # need this space to catch the difference of multiple profiles like 'tauren' and 'highmountain_tauren', "Tauren" and "Highmountain Tauren"
+                if line.split(" : ")[1] == profile.name:
+                  profile.set_dps(line.split()[0], external=False)
+
 
       else:
         raise NotSetYetError(

@@ -130,10 +130,10 @@ def create_base_json_dict(
     "timestamp":
       timestamp,
     "title":
-      "{data_type} | {wow_class} {wow_spec} | {fight_style}".format(
+      "{data_type} | {wow_spec} {wow_class} | {fight_style}".format(
         data_type=data_type.title(),
-        wow_class=wow_class.title(),
-        wow_spec=wow_spec.title(),
+        wow_class=wow_class.title().replace("_", " "),
+        wow_spec=wow_spec.title().replace("_", " "),
         fight_style=fight_style.title()
       ),
     "subtitle":
