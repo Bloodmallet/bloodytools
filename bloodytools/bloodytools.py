@@ -201,7 +201,7 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
         ) as f:
           pass
       except Exception as e:
-        logger.error(
+        logger.warning(
           "Opening baseline profile {} {} failed. This spec won't be in the result. {}".
           format(wow_class, wow_spec, e)
         )
@@ -356,7 +356,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
         ) as f:
           pass
       except Exception as e:
-        logger.error(
+        logger.warning(
           "Opening baseline profile for {} {} failed. This spec won't be in the result. {}".
           format(wow_class, wow_spec, e)
         )
@@ -689,7 +689,7 @@ def secondary_distribution_simulations(
         elif "gear_versatility_rating=" in line:
           secondary_amount += int(line.split("=")[1])
   except Exception as e:
-    logger.error(
+    logger.warning(
       "Scanning baseline profile {} {} failed. This spec won't be in the result. {}".
       format(wow_class, wow_spec, e)
     )
@@ -844,6 +844,15 @@ def secondary_distribution_simulations(
           talent_combination, stat_dps_list[0][1]
         )
       )
+
+      # create directory if it doesn't exist
+      if not os.path.isdir("results/"):
+        os.makedirs("results/")
+
+      # create directory if it doesn't exist
+      if not os.path.isdir("results/secondary_distributions/"):
+        os.makedirs("results/secondary_distributions/")
+
       if settings.write_humanreadable_secondary_distribution_file:
         with open(
           'results/secondary_distributions/{}_{}_{}.txt'.format(
@@ -928,7 +937,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             if "head=" in line:
               item_head = line[:-1]
       except Exception as e:
-        logger.error(
+        logger.warning(
           "Opening baseline profile {} {} failed. This spec won't be in the result. {}".
           format(wow_class, wow_spec, e)
         )
