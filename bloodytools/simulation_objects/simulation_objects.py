@@ -956,21 +956,19 @@ class Simulation_Group():
                 self.name
               )
             )
-            progress = {"job": {"state": ""}}
+            progress = {"job": {"state": ""}, "retriesRemaining": 8}
           else:
             progress = json.loads(response.read())
             self.logger.info(
-              "Simulation {} is at {}%. This value might behave unpredictable.".
+              "{} progress: {}%".
               format(self.name, progress["job"]["progress"])
             )
 
           backoff = 0 # not a proper back off in this case, due to the progress of a simulation not being properly monitorable with exponential backoff
-          while not progress["job"]["state"] == "complete" and not progress[
-            "job"
-          ]["state"] == "failed" and 5 * backoff < 1800:
+          while not progress["job"]["state"] == "complete" and 10 * backoff < 3600:
 
             # backoff
-            time.sleep(5)
+            time.sleep(10)
             backoff += 1
 
             try:
@@ -988,13 +986,19 @@ class Simulation_Group():
               progress = json.loads(response.read())
 
             self.logger.info(
-              "Simulation {} is at {}%. This value might behave unpredictable.".
+              "{} progress {}%".
               format(self.name, progress["job"]["progress"])
             )
             self.logger.debug(progress)
 
+            if progress["job"]["state"] == "failed" and int(progress["retriesRemaining"]) <= 0:
+              break
+
+          if progress["job"]["state"] == "failed" and int(progress["retriesRemaining"]) <= 0:
+            raise SimulationError("Simulation failed. No Retries possible.")
+
           self.logger.info(
-            "Simulation {} is done. Fetching data. This might take some seconds.".
+            "Simulating {} is done. Fetching data.".
             format(self.name)
           )
 
