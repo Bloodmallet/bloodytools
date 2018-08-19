@@ -5,8 +5,9 @@
   Generate your data more easily without having to create each and every needed profile to do so by hand:
     - races
     - trinkets
-    - (NYI) azerite traits
+    - azerite traits
     - secondary distributions
+    - gear path
 
   Output is usually saved as .json. But you can add different ways to output the data yourself.
 
@@ -665,6 +666,19 @@ def secondary_distribution_simulations(
   wow_spec: str,
   talent_combinations: List[str] = [False],
 ) -> List[simulation_objects.Simulation_Group]:
+  """Simulates several secondary distributions for the baseline profile.
+
+  Arguments:
+    wow_class {str} -- [description]
+    wow_spec {str} -- [description]
+
+  Keyword Arguments:
+    talent_combinations {List[str]} -- [description] (default: {[False]})
+
+  Returns:
+    List[simulation_objects.Simulation_Group] -- [description]
+  """
+
 
   logger.debug("secondary_distribution_simulations start")
 
@@ -998,10 +1012,17 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             tokenize_str(azerite_trait), itemlevel
           )
 
+          # create the new head input
+          head_input = item_head
+          if azerite_trait == "Azerite Empowered":
+            head_input += f",ilevel={int(itemlevel) + 5}"
+          else:
+            head_input += f",ilevel={itemlevel}"
+
           simulation_data = simulation_objects.Simulation_Data(
             name='{} 1_{}'.format(azerite_trait.split(" (")[0], itemlevel),
             fight_style=fight_style,
-            simc_arguments=[trait_input, item_head + f",ilevel={itemlevel}"],
+            simc_arguments=[trait_input, head_input],
             target_error=settings.target_error[fight_style],
             executable=settings.executable,
             logger=logger
@@ -1016,24 +1037,39 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
           # add stacked traits profiles to simulationgroup at max itemlevel
           if itemlevel == settings.azerite_trait_ilevels[-1]:
+
+            # create the new head input
+            head_input = item_head
+            if azerite_trait == "Azerite Empowered":
+              head_input += f",ilevel={int(itemlevel) + 10}"
+            else:
+              head_input += f",ilevel={itemlevel}"
+
             logger.debug("Adding stacked azerite traits to highest itemlevel.")
             doublicate_text = "/" + trait_input.split("=")[1]
             simulation_data = None
             simulation_data = simulation_objects.Simulation_Data(
               name='{} 2_{}'.format(azerite_trait.split(" (")[0], itemlevel),
               fight_style=fight_style,
-              simc_arguments=[trait_input + doublicate_text, item_head + f",ilevel={itemlevel}"],
+              simc_arguments=[trait_input + doublicate_text, head_input],
               target_error=settings.target_error[fight_style],
               executable=settings.executable,
               logger=logger
             )
             simulation_group.add(simulation_data)
 
+            # create the new head input
+            head_input = item_head
+            if azerite_trait == "Azerite Empowered":
+              head_input += f",ilevel={int(itemlevel) + 15}"
+            else:
+              head_input += f",ilevel={itemlevel}"
+
             simulation_data = None
             simulation_data = simulation_objects.Simulation_Data(
               name='{} 3_{}'.format(azerite_trait.split(" (")[0], itemlevel),
               fight_style=fight_style,
-              simc_arguments=[trait_input + doublicate_text + doublicate_text, item_head + f",ilevel={itemlevel}"],
+              simc_arguments=[trait_input + doublicate_text + doublicate_text, head_input],
               target_error=settings.target_error[fight_style],
               executable=settings.executable,
               logger=logger
@@ -1213,17 +1249,6 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           trait_data = {}
           for trait in item["azeriteTraits"]:
 
-            # keys in this dict are intentionally left out as those are just alliance counterparts to horde pvp traits, get values from their horde counterparts
-            # this list needs to match with the faq.html page on bloodmallet.com
-            trait_exclusions = {
-              "Anduin's Dedication": "Sylvanas' Resolve",
-              "Battlefield Precision": "Battlefield Focus",
-              "Stand As One": "Collective Will",
-              "Stronger Together": "Combined Might",
-              "Last Gift": "Retaliatory Fury",
-              "Liberator's Might": "Glory in Battle"
-            }
-
             # if trait tier is appropriate
             if not trait["tier"] in trait_dict:
               continue
@@ -1233,16 +1258,11 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               continue
 
             # if trait was not simmed previously, throw a warning and exclude trait
-            if not trait["name"] in wanted_data["data"] and not trait["name"] in trait_exclusions:
+            if not trait["name"] in wanted_data["data"]:
               logger.warning(f"Trait <{trait['name']}> wasn't found in already simed data and exluded data. Item <{item['name']}> will be evaluated without that trait.")
               continue
 
-            # name is used to determine values, trait name is used to determine the name of the trait
-            name = trait_name = trait["name"]
-
-            # update name if we're dealing with an excluded trait
-            if trait_name in trait_exclusions:
-              name = trait_exclusions[trait_name]
+            name = trait["name"]
 
             trait_data[name] = {
               "id": trait["powerId"],
@@ -1319,6 +1339,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           logger.debug(f"Printed azerite_traits {slot} json.")
 
   logger.debug("azerite_trait_simulations ended")
+
 
 def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
 
@@ -1462,7 +1483,6 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
 
       with open(f'results/gear_path/{wow_class}_{wow_spec}_{fight_style}.json', 'w') as f:
         json.dump(result, f, indent=4, sort_keys=True)
-
 
 
 def main():
