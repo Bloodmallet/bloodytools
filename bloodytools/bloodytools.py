@@ -1007,6 +1007,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                                             ] = azerite_trait_spell_id
 
           simulation_data = None
+
           # azerite_override=
           trait_input = "azerite_override={}:{}".format(
             tokenize_str(azerite_trait), itemlevel
@@ -1027,6 +1028,15 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             executable=settings.executable,
             logger=logger
           )
+
+          additional_input = {
+            "Battlefield Precision": "bfa.battlefield_debuff_stacks=20",
+            "Battlefield Focus": "bfa.battlefield_debuff_stacks=20"
+          }
+
+          if azerite_trait in additional_input:
+            simulation_data.simc_arguments.append(additional_input[azerite_trait])
+
           simulation_group.add(simulation_data)
           logger.debug(
             (
