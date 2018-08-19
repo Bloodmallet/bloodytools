@@ -814,7 +814,7 @@ class Simulation_Group():
 
           # if somehow the random naming function created the same name twice
           if os.path.isfile(self.filename):
-            self.logger.info(
+            self.logger.debug(
               "Somehow the random filename generator generated a name ('{}') that is already on use.".
               format(self.filename)
             )
@@ -906,7 +906,7 @@ class Simulation_Group():
           try:
             response = request.urlopen(req, timeout=30)
           except error.HTTPError as e:
-            self.logger.error(
+            self.logger.warning(
               "Sending the task {} to Raidbots failed ({}, {}, {}). Retrying in 1".format(self.name, e.code, e.reason, e.read())
             )
 
@@ -917,7 +917,7 @@ class Simulation_Group():
               try:
                 response = request.urlopen(req, timeout=30)
               except error.HTTPError as e:
-                self.logger.error(
+                self.logger.warning(
                   "Sending the task {} to Raidbots failed ({}, {}). Retry in {}".format(self.name, e.code, e.reason, 2 ** backoff)
                 )
               else:
@@ -951,7 +951,7 @@ class Simulation_Group():
               timeout=30
             )
           except:
-            self.logger.error(
+            self.logger.warning(
               "Fetching the progress of the simulation of {} failed.".format(
                 self.name
               )
@@ -1017,7 +1017,7 @@ class Simulation_Group():
               ).read()
             )
           except Exception as e:
-            self.logger.error(
+            self.logger.warning(
               "Fetching data for {} from raidbots failed. Retrying. {}".format(
                 self.name, e
               )
@@ -1100,8 +1100,11 @@ class Simulation_Group():
                     )
                   except Exception as e:
                     self.logger.info(
-                      "Fetching data for {} from raidbots failed. Retrying. {}".format(
-                        self.name, e
+                      "Fetching data for {} succeeded.".format(self.name)
+                    )
+                    self.logger.debug(
+                      "Fetching data for {} succeeded. {}".format(
+                        self.name, raidbots_data
                       )
                     )
 
@@ -1116,11 +1119,13 @@ class Simulation_Group():
                     fetched = True
               else:
                 self.logger.info(
-                  "Fetching data for {} succeeded. {}".format(
+                  "Fetching full data for {} succeeded.".format(self.name)
+                )
+                self.logger.debug(
+                  "Fetching full data for {} succeeded. {}".format(
                     self.name, raidbots_data
                   )
                 )
-
 
           # if simulation failed or data.json couldn't be fetched
           if progress["job"]["state"] == "failed" or fetch_data_timeout:
@@ -1175,8 +1180,11 @@ class Simulation_Group():
                   fetched = True
             else:
               self.logger.info(
+                "Fetching input data for {} succeeded.".format(self.name)
+              )
+              self.logger.debug(
                 "Fetching input data for {} succeeded. {}".format(
-                  self.name, raidbots_input
+                  self.name, raidbots_data
                 )
               )
 
@@ -1230,6 +1238,11 @@ class Simulation_Group():
                   fetched = True
             else:
               self.logger.info(
+                "Fetching output data for {} succeeded.".format(
+                  self.name
+                )
+              )
+              self.logger.debug(
                 "Fetching output data for {} succeeded. {}".format(
                   self.name, raidbots_output
                 )
