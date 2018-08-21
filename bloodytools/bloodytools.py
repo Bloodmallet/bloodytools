@@ -1066,6 +1066,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               executable=settings.executable,
               logger=logger
             )
+            if azerite_trait in additional_input:
+              simulation_data.simc_arguments.append(additional_input[azerite_trait])
             simulation_group.add(simulation_data)
 
             # create the new head input
@@ -1084,6 +1086,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               executable=settings.executable,
               logger=logger
             )
+            if azerite_trait in additional_input:
+              simulation_data.simc_arguments.append(additional_input[azerite_trait])
             simulation_group.add(simulation_data)
 
       logger.info(
@@ -1167,7 +1171,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       logger.debug("Sorted tmp_list: {}".format(tmp_list))
       logger.info(f"Solo Azerite Trait {tmp_list[0][0]} won with {tmp_list[0][1]} dps.")
 
-      # sorted list of all traits (one trait at max itemlevel each)
+      # sorted ilevel trait list (one trait at max itemlevel each)
       wanted_data["sorted_data_keys"] = []
       for azerite_trait, _ in tmp_list:
         wanted_data["sorted_data_keys"].append(azerite_trait)
@@ -1190,9 +1194,92 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       logger.debug("Sorted tmp_list: {}".format(tmp_list))
       logger.info(f"Tripple stacked Azerite Trait {tmp_list[0][0]} won with {tmp_list[0][1]} dps.")
 
+      # sorted stacked trait list
       wanted_data["sorted_data_keys_2"] = []
       for azerite_trait, _ in tmp_list:
         wanted_data["sorted_data_keys_2"].append(azerite_trait)
+
+      # create sorted tier 1 ilevel list
+      # create sorted tier 2 ilevel list
+      tmp_tier1_ilvl = []
+      tmp_tier2_ilvl = []
+      # create sorted tier 1 stacked list
+      # create sorted tier 2 stacked list
+      tmp_tier1_stacked = []
+      tmp_tier2_stacked = []
+
+      for trait in wanted_data["data"]:
+        if not "baseline" in trait:
+
+          # check for tier 2, to allow azerite empowered in tier 1 data
+          if wow_lib.get_azerite_tier(wow_class, wow_spec, trait) == 2:
+            tmp_tier2_ilvl.append(
+              (
+                trait,
+                wanted_data["data"][trait]["1_"
+                                          + settings.azerite_trait_ilevels[-1]]
+              )
+            )
+            tmp_tier2_stacked.append(
+              (
+                trait,
+                wanted_data["data"][trait]["3_"
+                                          + settings.azerite_trait_ilevels[-1]]
+              )
+            )
+
+          else:
+            tmp_tier1_ilvl.append(
+              (
+                trait,
+                wanted_data["data"][trait]["1_"
+                                          + settings.azerite_trait_ilevels[-1]]
+              )
+            )
+            tmp_tier1_stacked.append(
+              (
+                trait,
+                wanted_data["data"][trait]["3_"
+                                          + settings.azerite_trait_ilevels[-1]]
+              )
+            )
+      logger.debug("tmp_tier1: {}".format(tmp_tier1_ilvl))
+      logger.debug("tmp_tier2: {}".format(tmp_tier2_ilvl))
+      # sort
+      tmp_tier1_ilvl = sorted(tmp_tier1_ilvl, key=lambda item: item[1], reverse=True)
+      tmp_tier2_ilvl = sorted(tmp_tier2_ilvl, key=lambda item: item[1], reverse=True)
+      logger.debug("Sorted tmp_tier1: {}".format(tmp_tier1_ilvl))
+      logger.info(f"Tier 1 Trait {tmp_tier1_ilvl[0][0]} won with {tmp_tier1_ilvl[0][1]} dps in ilevel category.")
+      logger.debug("Sorted tmp_tier2: {}".format(tmp_tier2_ilvl))
+      logger.info(f"Tier 2 Trait {tmp_tier2_ilvl[0][0]} won with {tmp_tier2_ilvl[0][1]} dps in ilevel category.")
+
+      # sorted ilevel trait list
+      wanted_data["sorted_azerite_tier_1_itemlevel"] = []
+      for azerite_trait, _ in tmp_tier1_ilvl:
+        wanted_data["sorted_azerite_tier_1_itemlevel"].append(azerite_trait)
+      # sorted ilevel trait list
+      wanted_data["sorted_azerite_tier_2_itemlevel"] = []
+      for azerite_trait, _ in tmp_tier2_ilvl:
+        wanted_data["sorted_azerite_tier_2_itemlevel"].append(azerite_trait)
+
+      logger.debug("tmp_tier1: {}".format(tmp_tier1_stacked))
+      logger.debug("tmp_tier2: {}".format(tmp_tier2_stacked))
+      # sort
+      tmp_tier1_stacked = sorted(tmp_tier1_stacked, key=lambda item: item[1], reverse=True)
+      tmp_tier2_stacked = sorted(tmp_tier2_stacked, key=lambda item: item[1], reverse=True)
+      logger.debug("Sorted tmp_tier1: {}".format(tmp_tier1_stacked))
+      logger.info(f"Tier 1 Trait {tmp_tier1_stacked[0][0]} won with {tmp_tier1_stacked[0][1]} dps in stacked trait category.")
+      logger.debug("Sorted tmp_tier2: {}".format(tmp_tier2_stacked))
+      logger.info(f"Tier 2 Trait {tmp_tier2_stacked[0][0]} won with {tmp_tier2_stacked[0][1]} dps in stacked trait category.")
+
+      # sorted ilevel trait list
+      wanted_data["sorted_azerite_tier_1_trait_stacking"] = []
+      for azerite_trait, _ in tmp_tier1_stacked:
+        wanted_data["sorted_azerite_tier_1_trait_stacking"].append(azerite_trait)
+      # sorted ilevel trait list
+      wanted_data["sorted_azerite_tier_2_trait_stacking"] = []
+      for azerite_trait, _ in tmp_tier2_stacked:
+        wanted_data["sorted_azerite_tier_2_trait_stacking"].append(azerite_trait)
 
       # spell id dict to allow link creation
       wanted_data["spell_ids"] = azerite_trait_name_spell_id_dict
