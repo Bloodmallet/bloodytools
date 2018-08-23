@@ -1030,8 +1030,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           )
 
           additional_input = {
-            "Battlefield Precision": "bfa.battlefield_debuff_stacks=20",
-            "Battlefield Focus": "bfa.battlefield_debuff_stacks=20"
+            # "": ""
           }
 
           if azerite_trait in additional_input:
