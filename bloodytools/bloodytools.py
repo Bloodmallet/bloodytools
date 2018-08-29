@@ -39,7 +39,7 @@ if settings.use_own_threading:
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 # file logger
-fh = logging.FileHandler("log.txt", "w")
+fh = logging.FileHandler("log.txt", "w", encoding="utf-8")
 fh.setLevel(logging.DEBUG)
 # if hasattr(settings, "debug"):
 #   if settings.debug:
@@ -459,6 +459,8 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
         "trinkets", wow_class, wow_spec, fight_style
       )
 
+      data_list_trinkets = wow_lib.get_trinket_list()
+
       for profile in simulation_group.profiles:
 
         name = profile.name[:profile.name.rfind(" ")]
@@ -468,6 +470,16 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
           json_export["data"][name] = {}
 
         json_export["data"][name][ilevel] = profile.get_dps()
+
+        # add translation to export
+        if not "languages" in json_export:
+          json_export["languages"] = {}
+        if not name in json_export["languages"] and not "baseline" in name:
+          try:
+            json_export["languages"][name] = wow_lib.get_item_translation(item_name=name, item_list=data_list_trinkets)
+          except Exception as e:
+            logger.debug("No translation found for {}.".format(name))
+            logger.warning(e)
 
       # create item_id table
       json_export["item_ids"] = {}
@@ -510,10 +522,10 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
       with open(
         "results/trinkets/{}_{}_{}.json".format(
           wow_class.lower(), wow_spec.lower(), fight_style.lower()
-        ), "w"
+        ), "w", encoding="utf-8"
       ) as f:
         logger.debug("Print trinket json.")
-        f.write(json.dumps(json_export, sort_keys=True, indent=4))
+        f.write(json.dumps(json_export, sort_keys=True, indent=4, ensure_ascii=False))
         logger.debug("Printed trinket json.")
 
     # LUA data exporter
@@ -1242,6 +1254,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                                           + settings.azerite_trait_ilevels[-1]]
               )
             )
+
       logger.debug("tmp_tier1: {}".format(tmp_tier1_ilvl))
       logger.debug("tmp_tier2: {}".format(tmp_tier2_ilvl))
       # sort
@@ -1293,10 +1306,10 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       with open(
         "results/azerite_traits/{}_{}_{}.json".format(
           wow_class.lower(), wow_spec.lower(), fight_style.lower()
-        ), "w"
+        ), "w", encoding="utf-8"
       ) as f:
         logger.debug("Print azerite_traits json.")
-        f.write(json.dumps(wanted_data, sort_keys=True, indent=4))
+        f.write(json.dumps(wanted_data, sort_keys=True, indent=4, ensure_ascii=False))
         logger.debug("Printed azerite_traits json.")
 
       ##
@@ -1338,6 +1351,12 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
           if item["name"] in slot_export["data"]:
             continue
+
+          # add translation to export
+          if not "languages" in slot_export:
+            slot_export["languages"] = {}
+          if not item["name"] in slot_export["languages"]:
+            slot_export["languages"][item["name"]] = item["names"]
 
           # create trait lists for each tier [(trait_name, dps)]
           trait_dict = {2: [], 3: []}
@@ -1428,10 +1447,10 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         with open(
           "results/azerite_traits/{}_{}_{}_{}.json".format(
             wow_class.lower(), wow_spec.lower(), slot.lower(), fight_style.lower()
-          ), "w"
+          ), "w", encoding="utf-8"
         ) as f:
           logger.debug(f"Print azerite_traits {slot} json.")
-          f.write(json.dumps(slot_export, sort_keys=True, indent=4))
+          f.write(json.dumps(slot_export, sort_keys=True, indent=4, ensure_ascii=False))
           logger.debug(f"Printed azerite_traits {slot} json.")
 
   logger.debug("azerite_trait_simulations ended")
