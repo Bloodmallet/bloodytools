@@ -156,6 +156,7 @@ def create_base_json_dict(
         "spec": wow_spec
       },
     "data": {},
+    "languages": {}
   }
 
 
@@ -299,6 +300,8 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             profile.name, profile.get_dps()
           )
         )
+        # add race translations to the final json
+        wanted_data["languages"][profile.name] = wow_lib.get_race_translation(profile.name)
 
       # create ordered race name list
       tmp_list = []
@@ -323,10 +326,10 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
       with open(
         "results/races/{}_{}_{}.json".format(
           wow_class.lower(), wow_spec.lower(), fight_style.lower()
-        ), "w"
+        ), "w", encoding="utf-8"
       ) as f:
         logger.debug("Print race json.")
-        f.write(json.dumps(wanted_data, sort_keys=True, indent=4))
+        f.write(json.dumps(wanted_data, sort_keys=True, indent=4, ensure_ascii=False))
         logger.debug("Printed race json.")
 
   logger.debug("race_simulations ended")
@@ -459,8 +462,6 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
         "trinkets", wow_class, wow_spec, fight_style
       )
 
-      data_list_trinkets = wow_lib.get_trinket_list()
-
       for profile in simulation_group.profiles:
 
         name = profile.name[:profile.name.rfind(" ")]
@@ -472,11 +473,9 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
         json_export["data"][name][ilevel] = profile.get_dps()
 
         # add translation to export
-        if not "languages" in json_export:
-          json_export["languages"] = {}
         if not name in json_export["languages"] and not "baseline" in name:
           try:
-            json_export["languages"][name] = wow_lib.get_item_translation(item_name=name, item_list=data_list_trinkets)
+            json_export["languages"][name] = wow_lib.get_trinket_translation(name)
           except Exception as e:
             logger.debug("No translation found for {}.".format(name))
             logger.warning(e)
@@ -1153,11 +1152,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
         wanted_data["data"][azerite_trait_name][azerite_trait_ilevel] = profile.get_dps()
 
-        # TODO : Does this break? I don#t think special handling of baseline is required anymore
-        # if azerite_trait_name == "baseline":
-        #   wanted_data["data"][
-        #     azerite_trait_name
-        #   ]["1_" + settings.azerite_trait_ilevels[0]] = profile.get_dps()
+        if not azerite_trait_name in wanted_data["languages"] and not "baseline" in azerite_trait_name:
+          wanted_data["languages"][azerite_trait_name] = wow_lib.get_trait_translation(azerite_trait_name)
 
         logger.debug(
           "Added '{}' with {} dps to json.".format(
@@ -1266,9 +1262,9 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       logger.info(f"Tier 2 Trait {tmp_tier2_ilvl[0][0]} won with {tmp_tier2_ilvl[0][1]} dps in ilevel category.")
 
       # sorted ilevel trait list
-      wanted_data["sorted_azerite_tier_1_itemlevel"] = []
+      wanted_data["sorted_azerite_tier_3_itemlevel"] = []
       for azerite_trait, _ in tmp_tier1_ilvl:
-        wanted_data["sorted_azerite_tier_1_itemlevel"].append(azerite_trait)
+        wanted_data["sorted_azerite_tier_3_itemlevel"].append(azerite_trait)
       # sorted ilevel trait list
       wanted_data["sorted_azerite_tier_2_itemlevel"] = []
       for azerite_trait, _ in tmp_tier2_ilvl:
@@ -1285,9 +1281,9 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       logger.info(f"Tier 2 Trait {tmp_tier2_stacked[0][0]} won with {tmp_tier2_stacked[0][1]} dps in stacked trait category.")
 
       # sorted ilevel trait list
-      wanted_data["sorted_azerite_tier_1_trait_stacking"] = []
+      wanted_data["sorted_azerite_tier_3_trait_stacking"] = []
       for azerite_trait, _ in tmp_tier1_stacked:
-        wanted_data["sorted_azerite_tier_1_trait_stacking"].append(azerite_trait)
+        wanted_data["sorted_azerite_tier_3_trait_stacking"].append(azerite_trait)
       # sorted ilevel trait list
       wanted_data["sorted_azerite_tier_2_trait_stacking"] = []
       for azerite_trait, _ in tmp_tier2_stacked:
