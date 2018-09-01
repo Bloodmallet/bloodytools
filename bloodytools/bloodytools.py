@@ -1178,7 +1178,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       logger.debug("Sorted tmp_list: {}".format(tmp_list))
       logger.info(f"Solo Azerite Trait {tmp_list[0][0]} won with {tmp_list[0][1]} dps.")
 
-      azerite_weight_string = "( AzeritePowerWeights:1:'{fight_style} {wow_spec} {wow_class}':{class_id}:{spec_id}:".format(fight_style=fight_style.title(), wow_spec=wow_spec.title(), wow_class=wow_class.title(), class_id=wow_lib.get_class_id(wow_class), spec_id=wow_lib.get_spec_id(wow_class, wow_spec))
+      azerite_weight_string = "( AzeritePowerWeights:1:\"{fight_style} {wow_spec} {wow_class}\":{class_id}:{spec_id}:".format(fight_style=fight_style.title(), wow_spec=wow_spec.title(), wow_class=wow_class.title(), class_id=wow_lib.get_class_id(wow_class), spec_id=wow_lib.get_spec_id(wow_class, wow_spec))
 
 
       # sorted ilevel trait list (one trait at max itemlevel each)
@@ -1290,6 +1290,9 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       wanted_data["sorted_azerite_tier_3_itemlevel"] = []
       for azerite_trait, _ in tmp_tier1_ilvl:
         wanted_data["sorted_azerite_tier_3_itemlevel"].append(azerite_trait)
+      wanted_data["sorted_azerite_tier_1_itemlevel"] = []
+      for azerite_trait, _ in tmp_tier1_ilvl:
+        wanted_data["sorted_azerite_tier_1_itemlevel"].append(azerite_trait)
       # sorted ilevel trait list
       wanted_data["sorted_azerite_tier_2_itemlevel"] = []
       for azerite_trait, _ in tmp_tier2_ilvl:
@@ -1309,6 +1312,9 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       wanted_data["sorted_azerite_tier_3_trait_stacking"] = []
       for azerite_trait, _ in tmp_tier1_stacked:
         wanted_data["sorted_azerite_tier_3_trait_stacking"].append(azerite_trait)
+      wanted_data["sorted_azerite_tier_1_trait_stacking"] = []
+      for azerite_trait, _ in tmp_tier1_stacked:
+        wanted_data["sorted_azerite_tier_1_trait_stacking"].append(azerite_trait)
       # sorted ilevel trait list
       wanted_data["sorted_azerite_tier_2_trait_stacking"] = []
       for azerite_trait, _ in tmp_tier2_stacked:
