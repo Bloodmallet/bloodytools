@@ -1178,10 +1178,35 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       logger.debug("Sorted tmp_list: {}".format(tmp_list))
       logger.info(f"Solo Azerite Trait {tmp_list[0][0]} won with {tmp_list[0][1]} dps.")
 
+      azerite_weight_string = "( AzeritePowerWeights:1:'{fight_style} {wow_spec} {wow_class} ilevel ':{class_id}:{spec_id}:".format(fight_style=fight_style.title(), wow_spec=wow_spec.title(), wow_class=wow_class.title(), class_id=wow_lib.get_class_id(wow_class), spec_id=wow_lib.get_spec_id(wow_class, wow_spec))
+
+
       # sorted ilevel trait list (one trait at max itemlevel each)
       wanted_data["sorted_data_keys"] = []
-      for azerite_trait, _ in tmp_list:
+      baseline_dps = None
+      for name, dps in tmp_list:
+        if "baseline" in name:
+          baseline_dps = dps
+
+      for azerite_trait, at_dps in tmp_list:
         wanted_data["sorted_data_keys"].append(azerite_trait)
+
+        power_id = ""
+        for spell_id in azerite_traits:
+          if azerite_traits[spell_id]["name"] == azerite_trait:
+            power_id = azerite_traits[spell_id]["trait_id"]
+
+        if power_id:
+          azerite_weight_string += " {}={},".format(power_id, at_dps - baseline_dps)
+
+      wanted_data["azerite_weight_{}".format(fight_style)] = azerite_weight_string[:-1] + " )"
+
+      # TODO: make this previous passage about azerite_weight_string better
+      # input from HawkCorrigan:
+      # baseline_dps_385 = wanted_data['data']['baseline']['1_385']
+      # list(map(lambda x: {(azerite_traits.get(find(lambda traitid: azerite_traits[traitid]['name'] == x, azerite_traits), {}).get('trait_id', 0)): round(max( wanted_data['data'][x].values())-baseline_dps_385, 2)}, wanted_data['data']))
+
+      logger.info(wanted_data["azerite_weight_{}".format(fight_style)])
 
       # create secondary azerite name list (tripple azerite trait at max itemlevel each)
       tmp_list = []
