@@ -5,7 +5,7 @@
 
 ##
 # General setttings
-tier = "PR"  # number or PR (PreRaid)
+tier = "22"  # number or PR (PreRaid)
 wow_class_spec_list = []  # leave empty to simulate all
 # wow_class_spec_list = [("shaman", "elemental"), ("mage", "frost")] # example for a specific list
 wow_class_spec_list = [
@@ -27,6 +27,7 @@ wow_class_spec_list = [
   ("monk", "windwalker"),
   ("paladin", "protection"),
   ("paladin", "retribution"),
+  ("priest", "holy"),
   ("priest", "shadow"),
   ("rogue", "assassination"),
   ("rogue", "outlaw"),
@@ -52,7 +53,7 @@ fight_styles = [
 iterations = "20000" # sane value, should be enough for 0.2
 profileset_work_threads = "2"
 ptr = "0"
-simc_hash = "d74cad902abf9da07f74bc874767a3a702ac4af7"
+simc_hash = "08d71dfd759edc78466edf1789212b23dd4cc8cc"
 target_error = {
   "patchwerk": "0.2",
   "hecticaddcleave": "0.2",
@@ -68,8 +69,8 @@ enable_race_simulations = True
 # Trinket simulations
 enable_trinket_simulations = True
 ilevel_step = 15  # ilevel_step is used to determine the size of each itemlevel step taken to max_ilevel
-max_ilevel = 355  # max_itemlevel determines the upper border of steps taken
-min_ilevel = 325  # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
+max_ilevel = 400  # max_itemlevel determines the upper border of steps taken
+min_ilevel = 340  # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
 # example: min 300, max 325, step 10, resulting simulated ilevels: 300, 310, 320
 
 ###############################################################################
