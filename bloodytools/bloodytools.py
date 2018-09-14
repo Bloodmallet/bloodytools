@@ -76,7 +76,12 @@ def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str):
 
   logger.debug("create_basic_profile_string start")
   # create the basis profile string
-  basis_profile_string: str = settings.executable.split("simc")[0]
+  split_path: list = settings.executable.split("simc")
+  if len(split_path) > 2:
+    # the path contains multiple "simc"
+    basis_profile_string: str = "simc".join(split_path[:-1])
+  else:
+    basis_profile_string: str = split_path[0]
   basis_profile_string += "profiles/"
   if tier == "PR":
     basis_profile_string += "PreRaids/PR_{}_{}".format(
