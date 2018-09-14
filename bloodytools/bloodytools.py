@@ -82,6 +82,11 @@ def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str):
     basis_profile_string: str = "simc".join(split_path[:-1])
   else:
     basis_profile_string: str = split_path[0]
+
+  # fix path for linux users
+  if basis_profile_string.endswith("/engine/"):
+    basis_profile_string = basis_profile_string.split("/engine/")[0] + "/"
+
   basis_profile_string += "profiles/"
   if tier == "PR":
     basis_profile_string += "PreRaids/PR_{}_{}".format(
