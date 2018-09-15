@@ -85,7 +85,11 @@ def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str):
 
   # fix path for linux users
   if basis_profile_string.endswith("/engine/"):
-    basis_profile_string = basis_profile_string.split("/engine/")[0] + "/"
+    split_path = basis_profile_string.split("/engine/")
+    if len(split_path) > 2:
+      basis_profile_string = "/engine/".join(split_path[:-1])
+    else:
+      basis_profile_string = split_path[0] + "/"
 
   basis_profile_string += "profiles/"
   if tier == "PR":
@@ -1786,7 +1790,8 @@ def main():
           with open(create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r') as f:
             for line in f:
               if "talents=" in line[0:8]:
-                talent_combination = line.split("talents=")[1].split()[0]
+                # only lines starting with talents= are looked at, only the last element of that line is used to catch armory imports just fine
+                talent_combination = line.split("talents=")[-1].split()[0]
         except Exception:
           logger.warning(f"Base profile for {wow_spec} {wow_class} not found. No secondary distribution will be calculated for this spec.")
           continue
