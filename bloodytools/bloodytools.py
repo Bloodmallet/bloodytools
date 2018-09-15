@@ -1257,8 +1257,10 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       for trait in wanted_data["data"]:
         if not "baseline" in trait:
 
+          trait_id = azerite_trait_name_spell_id_dict[trait]
+
           # check for tier 2, to allow azerite empowered in tier 1 data
-          if wow_lib.get_azerite_tier(wow_class, wow_spec, trait) == 2:
+          if wow_lib.get_azerite_tier(wow_class, wow_spec, str(trait_id)) == 2:
             tmp_tier2_ilvl.append(
               (
                 trait,
