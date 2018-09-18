@@ -954,7 +954,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
   """Simulate all azerite traits with an adjusted head itemlevel. Create json with trait values and with all known azerite items and their sumed up trait dps values.
 
   Arguments:
-    specs {List[Tuple[str, str]]} -- all wow_specs you want to be simulated
+    specs {List[Tuple[wow_class:str, wow_spec:str]]} -- all wow_specs you want to be simulated
 
   Returns:
     None -- Files will be created in /results/azerite_traits/
@@ -983,6 +983,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         # end this try early, no profile, no calculations
         continue
 
+      # create simulation GROUP
       azerite_traits = wow_lib.get_azerite_traits(wow_class, wow_spec)
       simulation_group = simulation_objects.Simulation_Group(
         name="azerite_trait_simulations",
@@ -994,6 +995,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
       reset_string = "disable_azerite=items"
 
+      # create baseline profile/-s
       # need this special handling of the first profile or else the other baseline profiles won't simulate correctly
       simulation_data = simulation_objects.Simulation_Data(
         name="baseline 1_{}".format(settings.azerite_trait_ilevels[0]),
@@ -1021,6 +1023,37 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
       azerite_trait_name_spell_id_dict = {}
 
+      trait_special_handles = {
+        "Laser Matrix": {
+          "additional_profiles": [
+            {
+              "new_name": "Laser Matrix +5",
+              "translation_addition": " +5",
+              "additional_input": ["bfa.reorigination_array_stacks=5"]
+            }, {
+              "new_name": "Laser Matrix +10",
+              "translation_addition": " +10",
+              "additional_input": ["bfa.reorigination_array_stacks=10"]
+            }
+          ],
+          "additional_input": []
+        },
+        "Archive of the Titans": {
+          "additional_profiles": [
+            {
+              "new_name": "Archive of the Titans +5",
+              "translation_addition": " +5",
+              "additional_input": ["bfa.reorigination_array_stacks=5"]
+            }, {
+              "new_name": "Archive of the Titans +10",
+              "translation_addition": " +10",
+              "additional_input": ["bfa.reorigination_array_stacks=10"]
+            }
+          ],
+          "additional_input": []
+        }
+      }
+
       for azerite_trait_spell_id in azerite_traits:
 
         for itemlevel in settings.azerite_trait_ilevels:
@@ -1035,6 +1068,12 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           if not azerite_trait in azerite_trait_name_spell_id_dict:
             azerite_trait_name_spell_id_dict[azerite_trait.split(" (")[0]
                                             ] = azerite_trait_spell_id
+
+            # add special handled (added) azerite traits with their correct baseline spellid
+            if azerite_trait in trait_special_handles:
+              logger.debug("Adding special handled entries to azerite_trait_name_spell_id_dict")
+              for entry in trait_special_handles[azerite_trait]["additional_profiles"]:
+                azerite_trait_name_spell_id_dict[entry["new_name"]] = azerite_trait_spell_id
 
           simulation_data = None
 
@@ -1059,12 +1098,9 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             logger=logger
           )
 
-          additional_input = {
-            # "": ""
-          }
-
-          if azerite_trait in additional_input:
-            simulation_data.simc_arguments.append(additional_input[azerite_trait])
+          if azerite_trait in trait_special_handles:
+            for entry in trait_special_handles[azerite_trait]["additional_input"]:
+              simulation_data.simc_arguments.append(entry)
 
           simulation_group.add(simulation_data)
           logger.debug(
@@ -1073,6 +1109,31 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               format(azerite_trait, itemlevel, simulation_data.name)
             )
           )
+
+          if azerite_trait in trait_special_handles:
+            for profile in trait_special_handles[azerite_trait]["additional_profiles"]:
+              simulation_data = simulation_objects.Simulation_Data(
+                name='{} 1_{}'.format(profile["new_name"], itemlevel),
+                fight_style=fight_style,
+                simc_arguments=[trait_input, head_input],
+                target_error=settings.target_error[fight_style],
+                executable=settings.executable,
+                logger=logger
+              )
+
+              for entry in trait_special_handles[azerite_trait]["additional_input"]:
+                simulation_data.simc_arguments.append(entry)
+
+              for input_string in profile["additional_input"]:
+
+                simulation_data.simc_arguments.append(input_string)
+                simulation_group.add(simulation_data)
+                logger.debug(
+                  (
+                    "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".
+                    format(input_string, itemlevel, simulation_data.name)
+                  )
+                )
 
           # add stacked traits profiles to simulationgroup at max itemlevel
           if itemlevel == settings.azerite_trait_ilevels[-1] or int(itemlevel) == int(azerite_traits[azerite_trait_spell_id]['max_itemlevel']):
@@ -1096,11 +1157,39 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                 executable=settings.executable,
                 logger=logger
               )
-              if azerite_trait in additional_input:
-                simulation_data.simc_arguments.append(additional_input[azerite_trait])
+
+              if azerite_trait in trait_special_handles:
+                for input_string in trait_special_handles[azerite_trait]["additional_input"]:
+                  simulation_data.simc_arguments.append(input_string)
               simulation_group.add(simulation_data)
 
-            # create the new head input
+              if azerite_trait in trait_special_handles:
+                for profile in trait_special_handles[azerite_trait]["additional_profiles"]:
+                  simulation_data = simulation_objects.Simulation_Data(
+                    name='{} 2_{}'.format(profile["new_name"], itemlevel),
+                    fight_style=fight_style,
+                    simc_arguments=[trait_input + doublicate_text, head_input],
+                    target_error=settings.target_error[fight_style],
+                    executable=settings.executable,
+                    logger=logger
+                  )
+
+                  for entry in trait_special_handles[azerite_trait]["additional_input"]:
+                    simulation_data.simc_arguments.append(entry)
+
+                  for input_string in profile["additional_input"]:
+
+                    simulation_data.simc_arguments.append(input_string)
+                    simulation_group.add(simulation_data)
+                    logger.debug(
+                      (
+                        "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".
+                        format(input_string, itemlevel, simulation_data.name)
+                      )
+                    )
+
+
+            # create the new head input for 3 stacks
             if azerite_traits[azerite_trait_spell_id]["max_stack"] >= 3:
               head_input = item_head
               if azerite_trait == "Azerite Empowered":
@@ -1117,9 +1206,36 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                 executable=settings.executable,
                 logger=logger
               )
-              if azerite_trait in additional_input:
-                simulation_data.simc_arguments.append(additional_input[azerite_trait])
+
+              if azerite_trait in trait_special_handles:
+                for input_string in trait_special_handles[azerite_trait]["additional_input"]:
+                  simulation_data.simc_arguments.append(input_string)
               simulation_group.add(simulation_data)
+
+              if azerite_trait in trait_special_handles:
+                for profile in trait_special_handles[azerite_trait]["additional_profiles"]:
+                  simulation_data = simulation_objects.Simulation_Data(
+                    name='{} 3_{}'.format(profile["new_name"], itemlevel),
+                    fight_style=fight_style,
+                    simc_arguments=[trait_input + doublicate_text + doublicate_text, head_input],
+                    target_error=settings.target_error[fight_style],
+                    executable=settings.executable,
+                    logger=logger
+                  )
+
+                  for entry in trait_special_handles[azerite_trait]["additional_input"]:
+                    simulation_data.simc_arguments.append(entry)
+
+                  for input_string in profile["additional_input"]:
+
+                    simulation_data.simc_arguments.append(input_string)
+                    simulation_group.add(simulation_data)
+                    logger.debug(
+                      (
+                        "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".
+                        format(input_string, itemlevel, simulation_data.name)
+                      )
+                    )
 
       logger.info(
         "Start {} azerite_trait simulation for {} {}. {} profiles.".format(
@@ -1175,6 +1291,13 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
         if not azerite_trait_name in wanted_data["languages"] and not "baseline" in azerite_trait_name:
           wanted_data["languages"][azerite_trait_name] = wow_lib.get_trait_translation(azerite_trait_name)
+
+          for special_handle in trait_special_handles:
+            if special_handle in azerite_trait_name:
+              for trait_profile in trait_special_handles[special_handle]["additional_profiles"]:
+                if trait_profile["new_name"] == azerite_trait_name:
+                  for language in wanted_data["languages"][azerite_trait_name]:
+                    wanted_data["languages"][azerite_trait_name][language] = wanted_data["languages"][azerite_trait_name][language] + trait_profile["translation_addition"]
 
         logger.debug(
           "Added '{}' with {} dps to json.".format(
