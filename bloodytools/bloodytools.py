@@ -1328,6 +1328,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
       azerite_weight_string = "( AzeritePowerWeights:1:\"{fight_style} {wow_spec} {wow_class}\":{class_id}:{spec_id}:".format(fight_style=fight_style.title(), wow_spec=wow_spec.title(), wow_class=wow_class.title(), class_id=wow_lib.get_class_id(wow_class), spec_id=wow_lib.get_spec_id(wow_class, wow_spec))
 
+      azerite_forge_string_itemlevel = f"AZFORGE:{wow_lib.get_class_id(wow_class)}:{wow_lib.get_spec_id(wow_class, wow_spec)}^"
+      azerite_forge_string_trait_stacking = f"AZFORGE:{wow_lib.get_class_id(wow_class)}:{wow_lib.get_spec_id(wow_class, wow_spec)}^"
 
       # sorted ilevel trait list (one trait at max itemlevel each)
       wanted_data["sorted_data_keys"] = []
@@ -1343,9 +1345,36 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         if power_id:
           azerite_weight_string += " {}={},".format(power_id, at_dps - base_dps)
 
+          max_available_itemlevel = "1_" + settings.azerite_trait_ilevels[-1]
+          if not max_available_itemlevel in wanted_data["data"][azerite_trait]:
+            max_available_itemlevel = sorted(wanted_data["data"][azerite_trait])[-1]
+
+          azerite_forge_string_trait_stacking += f"[{power_id}]"
+          for trait_count in [1, 2, 3]:
+            try:
+              azerite_forge_string_trait_stacking += f"{trait_count}:{wanted_data['data'][azerite_trait][str(trait_count) + '_' + max_available_itemlevel.split('1_')[1]] - base_dps},"
+            except Exception:
+              pass
+          azerite_forge_string_trait_stacking += "^"
+
+          min_available_itemlevel = "1_" + settings.azerite_trait_ilevels[0]
+          if not min_available_itemlevel in wanted_data["data"][azerite_trait]:
+            min_available_itemlevel = sorted(wanted_data["data"][azerite_trait])[0]
+
+          azerite_forge_string_itemlevel += f"[{power_id}]"
+          for itemlevel in wanted_data["data"][azerite_trait]:
+            if "1_" in itemlevel:
+              azerite_forge_string_itemlevel += "{}:{},".format(itemlevel.split("1_")[1], wanted_data["data"][azerite_trait][itemlevel] - wanted_data["data"]["baseline"][min_available_itemlevel])
+          azerite_forge_string_itemlevel += "^"
+
       azerite_weight_string = azerite_weight_string[:-1] + " )"
 
       wanted_data["azerite_weight_{}".format(fight_style)] = azerite_weight_string
+
+      wanted_data["azerite_forge_{}_itemlevel".format(fight_style)] = azerite_forge_string_itemlevel
+
+      wanted_data["azerite_forge_{}_trait_stacking".format(fight_style)] = azerite_forge_string_trait_stacking
+
 
       # TODO: make this previous passage about azerite_weight_string better
       # input from HawkCorrigan:
