@@ -494,6 +494,15 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
             logger.debug("No translation found for {}.".format(name))
             logger.warning(e)
 
+        if not "data_sources" in json_export:
+          json_export["data_sources"] = {}
+
+        if not name in json_export["data_sources"] and not "baseline" in name:
+          try:
+            json_export["data_sources"][name] = wow_lib.get_trinket(name=name).get_source()
+          except:
+            pass
+
       # create item_id table
       json_export["item_ids"] = {}
       for trinket in json_export["data"]:
@@ -1550,7 +1559,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         # create shorthand for later use
         baseline_dps = slot_export["data"]["baseline"]
 
-        # create dict of which azerite traits were used on whcih item
+        # create dict of which azerite traits were used on which item
         slot_export["used_azerite_traits_per_item"] = {}
 
         # add class id number
@@ -1589,7 +1598,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
             # if trait was not simmed previously, throw a warning and exclude trait
             if not trait["name"] in wanted_data["data"]:
-              logger.debug(f"Trait <{trait['name']}> wasn't found in already simed data and exluded data. Item <{item['name']}> will be evaluated without that trait as it probably would only have that trait for a different spec.")
+              logger.debug(f"Trait <{trait['name']}> wasn't found in already simed data and excluded data. Item <{item['name']}> will be evaluated without that trait as it probably would only have that trait for a different spec.")
               continue
 
             name = trait["name"]
