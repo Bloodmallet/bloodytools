@@ -761,7 +761,6 @@ class Simulation_Group():
             # get dps values of the profileset-simulations
             if profileset_results:
               for profile in self.profiles:
-                self.logger.debug(line)
                 # need this space to catch the difference of multiple profiles like 'tauren' and 'highmountain_tauren', "Tauren" and "Highmountain Tauren"
                 if line.split(" : ")[1] == profile.name:
                   profile.set_dps(line.split()[0], external=False)

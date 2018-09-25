@@ -76,7 +76,21 @@ def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str):
 
   logger.debug("create_basic_profile_string start")
   # create the basis profile string
-  basis_profile_string: str = settings.executable.split("simc")[0]
+  split_path: list = settings.executable.split("simc")
+  if len(split_path) > 2:
+    # the path contains multiple "simc"
+    basis_profile_string: str = "simc".join(split_path[:-1])
+  else:
+    basis_profile_string: str = split_path[0]
+
+  # fix path for linux users
+  if basis_profile_string.endswith("/engine/"):
+    split_path = basis_profile_string.split("/engine/")
+    if len(split_path) > 2:
+      basis_profile_string = "/engine/".join(split_path[:-1])
+    else:
+      basis_profile_string = split_path[0] + "/"
+
   basis_profile_string += "profiles/"
   if tier == "PR":
     basis_profile_string += "PreRaids/PR_{}_{}".format(
@@ -479,6 +493,15 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
           except Exception as e:
             logger.debug("No translation found for {}.".format(name))
             logger.warning(e)
+
+        if not "data_sources" in json_export:
+          json_export["data_sources"] = {}
+
+        if not name in json_export["data_sources"] and not "baseline" in name:
+          try:
+            json_export["data_sources"][name] = wow_lib.get_trinket(name=name).get_source()
+          except:
+            pass
 
       # create item_id table
       json_export["item_ids"] = {}
@@ -940,7 +963,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
   """Simulate all azerite traits with an adjusted head itemlevel. Create json with trait values and with all known azerite items and their sumed up trait dps values.
 
   Arguments:
-    specs {List[Tuple[str, str]]} -- all wow_specs you want to be simulated
+    specs {List[Tuple[wow_class:str, wow_spec:str]]} -- all wow_specs you want to be simulated
 
   Returns:
     None -- Files will be created in /results/azerite_traits/
@@ -969,6 +992,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         # end this try early, no profile, no calculations
         continue
 
+      # create simulation GROUP
       azerite_traits = wow_lib.get_azerite_traits(wow_class, wow_spec)
       simulation_group = simulation_objects.Simulation_Group(
         name="azerite_trait_simulations",
@@ -980,6 +1004,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
       reset_string = "disable_azerite=items"
 
+      # create baseline profile/-s
       # need this special handling of the first profile or else the other baseline profiles won't simulate correctly
       simulation_data = simulation_objects.Simulation_Data(
         name="baseline 1_{}".format(settings.azerite_trait_ilevels[0]),
@@ -1007,15 +1032,57 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
       azerite_trait_name_spell_id_dict = {}
 
+      trait_special_handles = {
+        "Laser Matrix": {
+          "additional_profiles": [
+            {
+              "new_name": "Laser Matrix +5",
+              "translation_addition": " +5",
+              "additional_input": ["bfa.reorigination_array_stacks=5"]
+            }, {
+              "new_name": "Laser Matrix +10",
+              "translation_addition": " +10",
+              "additional_input": ["bfa.reorigination_array_stacks=10"]
+            }
+          ],
+          "additional_input": []
+        },
+        "Archive of the Titans": {
+          "additional_profiles": [
+            {
+              "new_name": "Archive of the Titans +5",
+              "translation_addition": " +5",
+              "additional_input": ["bfa.reorigination_array_stacks=5"]
+            }, {
+              "new_name": "Archive of the Titans +10",
+              "translation_addition": " +10",
+              "additional_input": ["bfa.reorigination_array_stacks=10"]
+            }
+          ],
+          "additional_input": []
+        }
+      }
+
       for azerite_trait_spell_id in azerite_traits:
 
         for itemlevel in settings.azerite_trait_ilevels:
 
           azerite_trait = azerite_traits[azerite_trait_spell_id]['name']
 
+          if azerite_traits[azerite_trait_spell_id]['min_itemlevel'] > int(itemlevel) or (azerite_traits[azerite_trait_spell_id]['max_itemlevel'] < int(itemlevel) and azerite_traits[azerite_trait_spell_id]['max_itemlevel'] != -1):
+
+            logger.debug(f"Skipping trait <{azerite_trait}> at itemlevel {itemlevel} due to itemlevel restrictions, min: {azerite_traits[azerite_trait_spell_id]['min_itemlevel']}, max: {azerite_traits[azerite_trait_spell_id]['max_itemlevel']}")
+            continue
+
           if not azerite_trait in azerite_trait_name_spell_id_dict:
             azerite_trait_name_spell_id_dict[azerite_trait.split(" (")[0]
                                             ] = azerite_trait_spell_id
+
+            # add special handled (added) azerite traits with their correct baseline spellid
+            if azerite_trait in trait_special_handles:
+              logger.debug("Adding special handled entries to azerite_trait_name_spell_id_dict")
+              for entry in trait_special_handles[azerite_trait]["additional_profiles"]:
+                azerite_trait_name_spell_id_dict[entry["new_name"]] = azerite_trait_spell_id
 
           simulation_data = None
 
@@ -1040,12 +1107,9 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             logger=logger
           )
 
-          additional_input = {
-            # "": ""
-          }
-
-          if azerite_trait in additional_input:
-            simulation_data.simc_arguments.append(additional_input[azerite_trait])
+          if azerite_trait in trait_special_handles:
+            for entry in trait_special_handles[azerite_trait]["additional_input"]:
+              simulation_data.simc_arguments.append(entry)
 
           simulation_group.add(simulation_data)
           logger.debug(
@@ -1055,50 +1119,132 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             )
           )
 
+          if azerite_trait in trait_special_handles:
+            for profile in trait_special_handles[azerite_trait]["additional_profiles"]:
+              simulation_data = simulation_objects.Simulation_Data(
+                name='{} 1_{}'.format(profile["new_name"], itemlevel),
+                fight_style=fight_style,
+                simc_arguments=[trait_input, head_input],
+                target_error=settings.target_error[fight_style],
+                executable=settings.executable,
+                logger=logger
+              )
+
+              for entry in trait_special_handles[azerite_trait]["additional_input"]:
+                simulation_data.simc_arguments.append(entry)
+
+              for input_string in profile["additional_input"]:
+
+                simulation_data.simc_arguments.append(input_string)
+                simulation_group.add(simulation_data)
+                logger.debug(
+                  (
+                    "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".
+                    format(input_string, itemlevel, simulation_data.name)
+                  )
+                )
+
           # add stacked traits profiles to simulationgroup at max itemlevel
-          if itemlevel == settings.azerite_trait_ilevels[-1]:
+          if itemlevel == settings.azerite_trait_ilevels[-1] or int(itemlevel) == int(azerite_traits[azerite_trait_spell_id]['max_itemlevel']):
 
-            # create the new head input
-            head_input = item_head
-            if azerite_trait == "Azerite Empowered":
-              head_input += f",ilevel={int(itemlevel) + 10}"
-            else:
-              head_input += f",ilevel={itemlevel}"
+            # create the new head input for 2 stacks
+            if azerite_traits[azerite_trait_spell_id]["max_stack"] >= 2:
+              head_input = item_head
+              if azerite_trait == "Azerite Empowered":
+                head_input += f",ilevel={int(itemlevel) + 10}"
+              else:
+                head_input += f",ilevel={itemlevel}"
 
-            logger.debug("Adding stacked azerite traits to highest itemlevel.")
-            doublicate_text = "/" + trait_input.split("=")[1]
-            simulation_data = None
-            simulation_data = simulation_objects.Simulation_Data(
-              name='{} 2_{}'.format(azerite_trait.split(" (")[0], itemlevel),
-              fight_style=fight_style,
-              simc_arguments=[trait_input + doublicate_text, head_input],
-              target_error=settings.target_error[fight_style],
-              executable=settings.executable,
-              logger=logger
-            )
-            if azerite_trait in additional_input:
-              simulation_data.simc_arguments.append(additional_input[azerite_trait])
-            simulation_group.add(simulation_data)
+              logger.debug("Adding stacked azerite traits to highest itemlevel.")
+              doublicate_text = "/" + trait_input.split("=")[1]
+              simulation_data = None
+              simulation_data = simulation_objects.Simulation_Data(
+                name='{} 2_{}'.format(azerite_trait.split(" (")[0], itemlevel),
+                fight_style=fight_style,
+                simc_arguments=[trait_input + doublicate_text, head_input],
+                target_error=settings.target_error[fight_style],
+                executable=settings.executable,
+                logger=logger
+              )
 
-            # create the new head input
-            head_input = item_head
-            if azerite_trait == "Azerite Empowered":
-              head_input += f",ilevel={int(itemlevel) + 15}"
-            else:
-              head_input += f",ilevel={itemlevel}"
+              if azerite_trait in trait_special_handles:
+                for input_string in trait_special_handles[azerite_trait]["additional_input"]:
+                  simulation_data.simc_arguments.append(input_string)
+              simulation_group.add(simulation_data)
 
-            simulation_data = None
-            simulation_data = simulation_objects.Simulation_Data(
-              name='{} 3_{}'.format(azerite_trait.split(" (")[0], itemlevel),
-              fight_style=fight_style,
-              simc_arguments=[trait_input + doublicate_text + doublicate_text, head_input],
-              target_error=settings.target_error[fight_style],
-              executable=settings.executable,
-              logger=logger
-            )
-            if azerite_trait in additional_input:
-              simulation_data.simc_arguments.append(additional_input[azerite_trait])
-            simulation_group.add(simulation_data)
+              if azerite_trait in trait_special_handles:
+                for profile in trait_special_handles[azerite_trait]["additional_profiles"]:
+                  simulation_data = simulation_objects.Simulation_Data(
+                    name='{} 2_{}'.format(profile["new_name"], itemlevel),
+                    fight_style=fight_style,
+                    simc_arguments=[trait_input + doublicate_text, head_input],
+                    target_error=settings.target_error[fight_style],
+                    executable=settings.executable,
+                    logger=logger
+                  )
+
+                  for entry in trait_special_handles[azerite_trait]["additional_input"]:
+                    simulation_data.simc_arguments.append(entry)
+
+                  for input_string in profile["additional_input"]:
+
+                    simulation_data.simc_arguments.append(input_string)
+                    simulation_group.add(simulation_data)
+                    logger.debug(
+                      (
+                        "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".
+                        format(input_string, itemlevel, simulation_data.name)
+                      )
+                    )
+
+
+            # create the new head input for 3 stacks
+            if azerite_traits[azerite_trait_spell_id]["max_stack"] >= 3:
+              head_input = item_head
+              if azerite_trait == "Azerite Empowered":
+                head_input += f",ilevel={int(itemlevel) + 15}"
+              else:
+                head_input += f",ilevel={itemlevel}"
+
+              simulation_data = None
+              simulation_data = simulation_objects.Simulation_Data(
+                name='{} 3_{}'.format(azerite_trait.split(" (")[0], itemlevel),
+                fight_style=fight_style,
+                simc_arguments=[trait_input + doublicate_text + doublicate_text, head_input],
+                target_error=settings.target_error[fight_style],
+                executable=settings.executable,
+                logger=logger
+              )
+
+              if azerite_trait in trait_special_handles:
+                for input_string in trait_special_handles[azerite_trait]["additional_input"]:
+                  simulation_data.simc_arguments.append(input_string)
+              simulation_group.add(simulation_data)
+
+              if azerite_trait in trait_special_handles:
+                for profile in trait_special_handles[azerite_trait]["additional_profiles"]:
+                  simulation_data = simulation_objects.Simulation_Data(
+                    name='{} 3_{}'.format(profile["new_name"], itemlevel),
+                    fight_style=fight_style,
+                    simc_arguments=[trait_input + doublicate_text + doublicate_text, head_input],
+                    target_error=settings.target_error[fight_style],
+                    executable=settings.executable,
+                    logger=logger
+                  )
+
+                  for entry in trait_special_handles[azerite_trait]["additional_input"]:
+                    simulation_data.simc_arguments.append(entry)
+
+                  for input_string in profile["additional_input"]:
+
+                    simulation_data.simc_arguments.append(input_string)
+                    simulation_group.add(simulation_data)
+                    logger.debug(
+                      (
+                        "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".
+                        format(input_string, itemlevel, simulation_data.name)
+                      )
+                    )
 
       logger.info(
         "Start {} azerite_trait simulation for {} {}. {} profiles.".format(
@@ -1155,20 +1301,31 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         if not azerite_trait_name in wanted_data["languages"] and not "baseline" in azerite_trait_name:
           wanted_data["languages"][azerite_trait_name] = wow_lib.get_trait_translation(azerite_trait_name)
 
+          for special_handle in trait_special_handles:
+            if special_handle in azerite_trait_name:
+              for trait_profile in trait_special_handles[special_handle]["additional_profiles"]:
+                if trait_profile["new_name"] == azerite_trait_name:
+                  for language in wanted_data["languages"][azerite_trait_name]:
+                    wanted_data["languages"][azerite_trait_name][language] = wanted_data["languages"][azerite_trait_name][language] + trait_profile["translation_addition"]
+
         logger.debug(
           "Added '{}' with {} dps to json.".format(
             profile.name, profile.get_dps()
           )
         )
 
-      # create azerite name list
+      # create azerite name list based on highest simulated itemlevel of traits
       tmp_list = []
       for trait in wanted_data["data"]:
+        max_available_itemlevel = "1_" + settings.azerite_trait_ilevels[-1]
+        if not max_available_itemlevel in wanted_data["data"][trait]:
+          max_available_itemlevel = sorted(wanted_data["data"][trait])[-1]
+
         tmp_list.append(
           (
             trait,
-            wanted_data["data"][trait]["1_"
-                                       + settings.azerite_trait_ilevels[-1]]
+            wanted_data["data"][trait][max_available_itemlevel],
+            wanted_data["data"]["baseline"][max_available_itemlevel]
           )
         )
       logger.debug("tmp_list: {}".format(tmp_list))
@@ -1180,15 +1337,13 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
       azerite_weight_string = "( AzeritePowerWeights:1:\"{fight_style} {wow_spec} {wow_class}\":{class_id}:{spec_id}:".format(fight_style=fight_style.title(), wow_spec=wow_spec.title(), wow_class=wow_class.title(), class_id=wow_lib.get_class_id(wow_class), spec_id=wow_lib.get_spec_id(wow_class, wow_spec))
 
+      azerite_forge_string_itemlevel = f"AZFORGE:{wow_lib.get_class_id(wow_class)}:{wow_lib.get_spec_id(wow_class, wow_spec)}^"
+      azerite_forge_string_trait_stacking = f"AZFORGE:{wow_lib.get_class_id(wow_class)}:{wow_lib.get_spec_id(wow_class, wow_spec)}^"
 
       # sorted ilevel trait list (one trait at max itemlevel each)
       wanted_data["sorted_data_keys"] = []
-      baseline_dps = None
-      for name, dps in tmp_list:
-        if "baseline" in name:
-          baseline_dps = dps
 
-      for azerite_trait, at_dps in tmp_list:
+      for azerite_trait, at_dps, base_dps in tmp_list:
         wanted_data["sorted_data_keys"].append(azerite_trait)
 
         power_id = ""
@@ -1197,9 +1352,38 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             power_id = azerite_traits[spell_id]["trait_id"]
 
         if power_id:
-          azerite_weight_string += " {}={},".format(power_id, at_dps - baseline_dps)
+          azerite_weight_string += " {}={},".format(power_id, at_dps - base_dps)
 
-      wanted_data["azerite_weight_{}".format(fight_style)] = azerite_weight_string[:-1] + " )"
+          max_available_itemlevel = "1_" + settings.azerite_trait_ilevels[-1]
+          if not max_available_itemlevel in wanted_data["data"][azerite_trait]:
+            max_available_itemlevel = sorted(wanted_data["data"][azerite_trait])[-1]
+
+          azerite_forge_string_trait_stacking += f"[{power_id}]"
+          for trait_count in [1, 2, 3]:
+            try:
+              azerite_forge_string_trait_stacking += f"{trait_count}:{wanted_data['data'][azerite_trait][str(trait_count) + '_' + max_available_itemlevel.split('1_')[1]] - base_dps},"
+            except Exception:
+              pass
+          azerite_forge_string_trait_stacking += "^"
+
+          min_available_itemlevel = "1_" + settings.azerite_trait_ilevels[0]
+          if not min_available_itemlevel in wanted_data["data"][azerite_trait]:
+            min_available_itemlevel = sorted(wanted_data["data"][azerite_trait])[0]
+
+          azerite_forge_string_itemlevel += f"[{power_id}]"
+          for itemlevel in wanted_data["data"][azerite_trait]:
+            if "1_" in itemlevel:
+              azerite_forge_string_itemlevel += "{}:{},".format(itemlevel.split("1_")[1], wanted_data["data"][azerite_trait][itemlevel] - wanted_data["data"]["baseline"][min_available_itemlevel])
+          azerite_forge_string_itemlevel += "^"
+
+      azerite_weight_string = azerite_weight_string[:-1] + " )"
+
+      wanted_data["azerite_weight_{}".format(fight_style)] = azerite_weight_string
+
+      wanted_data["azerite_forge_{}_itemlevel".format(fight_style)] = azerite_forge_string_itemlevel
+
+      wanted_data["azerite_forge_{}_trait_stacking".format(fight_style)] = azerite_forge_string_trait_stacking
+
 
       # TODO: make this previous passage about azerite_weight_string better
       # input from HawkCorrigan:
@@ -1212,11 +1396,15 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       tmp_list = []
       for trait in wanted_data["data"]:
         if not "baseline" in trait:
+
+          max_available_itemlevel = "3_" + settings.azerite_trait_ilevels[-1]
+          if not max_available_itemlevel in wanted_data["data"][trait]:
+            max_available_itemlevel = sorted(wanted_data["data"][trait])[-1]
+
           tmp_list.append(
             (
               trait,
-              wanted_data["data"][trait]["3_"
-                                         + settings.azerite_trait_ilevels[-1]]
+              wanted_data["data"][trait][max_available_itemlevel]
             )
           )
       logger.debug("tmp_list: {}".format(tmp_list))
@@ -1243,8 +1431,10 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       for trait in wanted_data["data"]:
         if not "baseline" in trait:
 
+          trait_id = azerite_trait_name_spell_id_dict[trait]
+
           # check for tier 2, to allow azerite empowered in tier 1 data
-          if wow_lib.get_azerite_tier(wow_class, wow_spec, trait) == 2:
+          if wow_lib.get_azerite_tier(wow_class, wow_spec, str(trait_id)) == 2:
             tmp_tier2_ilvl.append(
               (
                 trait,
@@ -1261,18 +1451,25 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             )
 
           else:
+            max_available_itemlevel = "1_" + settings.azerite_trait_ilevels[-1]
+            if not max_available_itemlevel in wanted_data["data"][trait]:
+              i = len(settings.azerite_trait_ilevels) - 1
+              while i >= 0:
+                max_available_itemlevel = "1_" + settings.azerite_trait_ilevels[i]
+                if max_available_itemlevel in wanted_data["data"][trait]:
+                  i = -1
+                i -= 1
+
             tmp_tier1_ilvl.append(
               (
                 trait,
-                wanted_data["data"][trait]["1_"
-                                          + settings.azerite_trait_ilevels[-1]]
+                wanted_data["data"][trait][max_available_itemlevel]
               )
             )
             tmp_tier1_stacked.append(
               (
                 trait,
-                wanted_data["data"][trait]["3_"
-                                          + settings.azerite_trait_ilevels[-1]]
+                wanted_data["data"][trait][sorted(wanted_data["data"][trait])[-1]] - wanted_data["data"]["baseline"][sorted(wanted_data["data"][trait])[-1].replace("3_", "1_")]
               )
             )
 
@@ -1362,7 +1559,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         # create shorthand for later use
         baseline_dps = slot_export["data"]["baseline"]
 
-        # create dict of which azerite traits were used on whcih item
+        # create dict of which azerite traits were used on which item
         slot_export["used_azerite_traits_per_item"] = {}
 
         # add class id number
@@ -1401,7 +1598,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
             # if trait was not simmed previously, throw a warning and exclude trait
             if not trait["name"] in wanted_data["data"]:
-              logger.warning(f"Trait <{trait['name']}> wasn't found in already simed data and exluded data. Item <{item['name']}> will be evaluated without that trait.")
+              logger.debug(f"Trait <{trait['name']}> wasn't found in already simed data and excluded data. Item <{item['name']}> will be evaluated without that trait as it probably would only have that trait for a different spec.")
               continue
 
             name = trait["name"]
@@ -1413,18 +1610,23 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
             # if trait is a dps trait we simmed
             if name in wanted_data["data"]:
-              # append tuple of name and max itemlevel dps
+              # append tuple of name and max available itemlevel dps
+              max_available_itemlevel = "1_" + settings.azerite_trait_ilevels[-1]
+              if not max_available_itemlevel in wanted_data["data"][name]:
+                max_available_itemlevel = sorted(wanted_data["data"][name])[-1]
+
+
               trait_dict[trait["tier"]].append(
                 (
                   name, wanted_data["data"][name]
-                  ["1_" + settings.azerite_trait_ilevels[-1]] - baseline_dps["1_" + settings.azerite_trait_ilevels[-1]]
+                  [max_available_itemlevel] - baseline_dps[max_available_itemlevel]
                 )
               )
 
           # create list of traits of item
           slot_export["used_azerite_traits_per_item"][item["name"]] = []
 
-          # complete trait list with dps was created. get max values
+          # complete trait list with dps was created. add best trait names to json and sort trait_dict in place
           for tier in trait_dict:
             if trait_dict[tier]:
               trait_dict[tier] = sorted(trait_dict[tier], key=lambda item: item[1], reverse=True)
@@ -1435,21 +1637,31 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               })
 
           slot_export["data"][item["name"]] = {}
-          # add values to the armor for all itemlevels
+          # add values to the armor for all available itemlevels
           for itemlevel in settings.azerite_trait_ilevels:
 
+            # add base dps value first to be able to add the dps value of the different tiers later
             slot_export["data"][item["name"]]["1_" + itemlevel] = baseline_dps["1_" + itemlevel]
 
-            # sum up dps values of best dps traits
+            # sum up dps values of best dps traits if itemlevel was simmed
             for tier in trait_dict:
               if trait_dict[tier]:
-                slot_export["data"][item["name"]]["1_" + itemlevel] += wanted_data["data"][trait_dict[tier][0][0]]["1_" + itemlevel] - baseline_dps["1_" + itemlevel]
+                try:
+                  slot_export["data"][item["name"]]["1_" + itemlevel] += wanted_data["data"][trait_dict[tier][0][0]]["1_" + itemlevel] - baseline_dps["1_" + itemlevel]
+                except Exception:
+                  logger.debug(f"Itemlevel {itemlevel} for trait <{trait_dict[tier][0][0]}> not found. Removing the itemlevel from the item <{item['name']}> from result dict.")
+                  slot_export["data"][item["name"]].pop("1_" + itemlevel)
+                  continue
 
           # add (item_name, item_dps) to unsorted_item_dps_list
+          max_available_itemlevel = "1_" + settings.azerite_trait_ilevels[-1]
+          if not max_available_itemlevel in slot_export["data"][item["name"]]:
+            max_available_itemlevel = sorted(slot_export["data"][item["name"]])[-1]
+
           unsorted_item_dps_list.append(
             (
               item["name"],
-              slot_export["data"][item["name"]]["1_" + settings.azerite_trait_ilevels[-1]]
+              slot_export["data"][item["name"]][max_available_itemlevel]
             )
           )
 
@@ -1776,7 +1988,8 @@ def main():
           with open(create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r') as f:
             for line in f:
               if "talents=" in line[0:8]:
-                talent_combination = line.split("talents=")[1].split()[0]
+                # only lines starting with talents= are looked at, only the last element of that line is used to catch armory imports just fine
+                talent_combination = line.split("talents=")[-1].split()[0]
         except Exception:
           logger.warning(f"Base profile for {wow_spec} {wow_class} not found. No secondary distribution will be calculated for this spec.")
           continue
