@@ -92,10 +92,10 @@ special_cases = {
         "azerite_trait_simulations": {
           "Shrouded Suffocation": [
             {
-              "suffix": "S",
+              "suffix": "Sub",
               "additional_input": ["talents=2210021"],
               "link_data": {
-                "S": { "spell_id": "279703" }
+                "Sub": { "spell_id": "279703" }
               },
               "description": "Forcing the use of Subterfuge"
             }
