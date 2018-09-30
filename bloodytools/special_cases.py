@@ -86,6 +86,40 @@ special_cases = {
       }
     }
   },
+  "rogue": {
+    "assassination": {
+      "patchwerk": {
+        "azerite_trait_simulations": {
+          "Shrouded Suffocation": [
+            {
+              "suffix": "S",
+              "additional_input": ["talents=2210021"],
+              "link_data": {
+                "S": { "spell_id": "279703" }
+              },
+              "description": "Forcing the use of Subterfuge"
+            }
+          ]
+        }
+      }
+    },
+    "outlaw": {
+      "patchwerk": {
+        "azerite_trait_simulations": {
+          "Ace Up Your Sleeve": [
+            {
+              "suffix": "DS",
+              "additional_input": ["talents=2020022"],
+              "link_data": {
+                "DS": { "spell_id": "278676" }
+              },
+              "description": "Forcing the use of Deeper Stratagem"
+            }
+          ]
+        }
+      }
+    }
+  },
   "shaman": {
     "elemental": {
       "patchwerk": {
