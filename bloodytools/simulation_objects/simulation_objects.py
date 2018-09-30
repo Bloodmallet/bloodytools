@@ -475,6 +475,41 @@ class Simulation_Data():
 
     return self.get_dps()
 
+  def copy(self):
+    """Create an identical, independent copy of the current Simulation_Data. WARNING: The name is identical too! You'll need to update it manually!
+
+    Returns:
+      Simulation_Data -- Deep copy of the current Simulation_Data
+    """
+    new_sim_data = Simulation_Data(
+      calculate_scale_factors=self.calculate_scale_factors,
+      default_actions=self.default_actions,
+      default_skill=self.default_skill,
+      executable=self.executable,
+      fight_style=self.fight_style,
+      fixed_time=self.fixed_time,
+      html=self.html,
+      iterations=self.iterations,
+      log=self.log,
+      name=self.name,
+      optimize_expressions=self.optimize_expressions,
+      ptr=self.ptr,
+      ready_trigger=self.ready_trigger,
+      simc_arguments=list(self.simc_arguments),
+      target_error=self.target_error,
+      threads=self.threads,
+      logger=self.logger
+    )
+
+    new_sim_data.so_creation_time = self.so_creation_time
+    new_sim_data.dps = self.dps
+    new_sim_data.external_simulation = self.external_simulation
+    new_sim_data.full_report = self.full_report
+    new_sim_data.so_simulation_end_time = self.so_simulation_end_time
+    new_sim_data.so_simulation_start_time = self.so_simulation_start_time
+
+    return new_sim_data
+
 
 class Simulation_Group():
   """simulator_group holds one or multiple simulation_data as profiles and can simulate them either serialized or parallel. Parallel uses SimulationCrafts own profilesets feature. Dps values are saved in the simulation_data.
