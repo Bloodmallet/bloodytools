@@ -1092,6 +1092,14 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               for entry in trait_special_handles[azerite_trait]["additional_profiles"]:
                 azerite_trait_name_spell_id_dict[entry["new_name"]] = azerite_trait_spell_id
 
+            try:
+              special_case_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"][azerite_trait]
+            except Exception:
+              pass
+            else:
+              for special_case in special_case_list:
+                azerite_trait_name_spell_id_dict[azerite_trait + " +" + special_case["suffix"]] = azerite_trait_spell_id
+
           simulation_data = None
 
           # azerite_override=
