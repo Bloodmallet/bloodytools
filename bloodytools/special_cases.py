@@ -95,7 +95,7 @@ special_cases = {
               "suffix": "Sub",
               "additional_input": ["talents=2210021"],
               "link_data": {
-                "Sub": { "spell_id": "279703" }
+                "Sub": { "spell_id": "108208" }
               },
               "description": "Forcing the use of Subterfuge"
             }
@@ -111,7 +111,7 @@ special_cases = {
               "suffix": "DS",
               "additional_input": ["talents=2020022"],
               "link_data": {
-                "DS": { "spell_id": "278676" }
+                "DS": { "spell_id": "193531" }
               },
               "description": "Forcing the use of Deeper Stratagem"
             }
