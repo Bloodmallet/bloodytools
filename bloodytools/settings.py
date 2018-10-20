@@ -41,7 +41,6 @@ wow_class_spec_list = [
   ("warlock", "destruction"),
   ("warrior", "arms"),
   ("warrior", "fury"),
-  ("warrior", "protection"),
 ]
 
 ##
@@ -49,7 +48,7 @@ wow_class_spec_list = [
 executable = "../../SimulationCraft/simc.exe"
 fight_styles = [
   "patchwerk",
-  # "hecticaddcleave"
+  "hecticaddcleave"
   #"beastlord"
 ]
 iterations = "20000" # sane value, should be enough for 0.2
@@ -65,11 +64,11 @@ threads = "8"
 
 ###############################################################################
 # Race simulations
-enable_race_simulations = False
+enable_race_simulations = True
 
 ###############################################################################
 # Trinket simulations
-enable_trinket_simulations = False
+enable_trinket_simulations = True
 ilevel_step = 15  # ilevel_step is used to determine the size of each itemlevel step taken to max_ilevel
 max_ilevel = 400  # max_itemlevel determines the upper border of steps taken
 min_ilevel = 340  # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
@@ -77,7 +76,7 @@ min_ilevel = 340  # min_ilevel is used to determine the first simulated itemleve
 
 ###############################################################################
 # Secondary distributions
-enable_secondary_distributions_simulations = False
+enable_secondary_distributions_simulations = True
 secondary_distributions_step_size = 10 # in percent of full available secondary sum
 talent_list = {
 }  # if no list is provided for a class-spec, all dps talent combinations will be run. If you want to only sim the base profiles, set 'talent_permutations' to False
@@ -91,7 +90,7 @@ talent_permutations = False  # set to False, to sim only the base profile talent
 
 ###############################################################################
 # Azerite traits
-enable_azerite_trait_simulations = False
+enable_azerite_trait_simulations = True
 azerite_trait_ilevels = [ # determines the itemlevel used to sim the traits
   "340",
   "355",
@@ -109,13 +108,12 @@ start_value = 50
 
 ###############################################################################
 # Talent worth
-enable_talent_worth = True
-
+enable_talent_worth_simulations = False
 
 
 ###############################################################################
 # Development setting - you usually don't want to touch these
-debug = True
+debug = False
 use_own_threading = False
 use_raidbots = False
 write_humanreadable_secondary_distribution_file = True
