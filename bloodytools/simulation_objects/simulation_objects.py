@@ -808,6 +808,8 @@ class Simulation_Group():
 
       self.set_simulation_end_time()
 
+      self.logger.debug("Simulation time: {}.".format(self.sg_simulation_end_time - self.sg_simulation_start_time))
+
     else:
       return False
 
@@ -1334,6 +1336,8 @@ class Simulation_Group():
         )
 
       self.set_simulation_end_time()
+
+      self.logger.debug("Simulation time: {}.".format(self.sg_simulation_end_time - self.sg_simulation_start_time))
 
     else:
       return False

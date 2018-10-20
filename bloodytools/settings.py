@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """Settings for bloodytools
 
   Look for the matching paragraphs of what you want to do. Change settings responsibly. If anything breaks too hard, just reload the settings-file from the repository.
@@ -47,13 +49,13 @@ wow_class_spec_list = [
 executable = "../../SimulationCraft/simc.exe"
 fight_styles = [
   "patchwerk",
-  "hecticaddcleave"
+  # "hecticaddcleave"
   #"beastlord"
 ]
 iterations = "20000" # sane value, should be enough for 0.2
 profileset_work_threads = "2"
 ptr = "0"
-simc_hash = "08d71dfd759edc78466edf1789212b23dd4cc8cc"
+simc_hash = "8a824362971c369c78b9ce7d398d6534000dfcff"
 target_error = {
   "patchwerk": "0.2",
   "hecticaddcleave": "0.2",
@@ -63,11 +65,11 @@ threads = "8"
 
 ###############################################################################
 # Race simulations
-enable_race_simulations = True
+enable_race_simulations = False
 
 ###############################################################################
 # Trinket simulations
-enable_trinket_simulations = True
+enable_trinket_simulations = False
 ilevel_step = 15  # ilevel_step is used to determine the size of each itemlevel step taken to max_ilevel
 max_ilevel = 400  # max_itemlevel determines the upper border of steps taken
 min_ilevel = 340  # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
@@ -75,7 +77,7 @@ min_ilevel = 340  # min_ilevel is used to determine the first simulated itemleve
 
 ###############################################################################
 # Secondary distributions
-enable_secondary_distributions_simulations = True
+enable_secondary_distributions_simulations = False
 secondary_distributions_step_size = 10 # in percent of full available secondary sum
 talent_list = {
 }  # if no list is provided for a class-spec, all dps talent combinations will be run. If you want to only sim the base profiles, set 'talent_permutations' to False
@@ -89,7 +91,7 @@ talent_permutations = False  # set to False, to sim only the base profile talent
 
 ###############################################################################
 # Azerite traits
-enable_azerite_trait_simulations = True
+enable_azerite_trait_simulations = False
 azerite_trait_ilevels = [ # determines the itemlevel used to sim the traits
   "340",
   "355",
@@ -104,13 +106,20 @@ enable_gear_path = False
 step_size = 50
 start_value = 50
 
+
+###############################################################################
+# Talent worth
+enable_talent_worth = True
+
+
+
 ###############################################################################
 # Development setting - you usually don't want to touch these
-debug = False
+debug = True
 use_own_threading = False
 use_raidbots = False
-write_humanreadable_secondary_distribution_file = False
-lua_trinket_export = False
+write_humanreadable_secondary_distribution_file = True
+lua_trinket_export = True
 try:
   from apikey import apikey
 except Exception:

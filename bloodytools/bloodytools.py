@@ -130,7 +130,6 @@ def create_base_json_dict(
     wow_class {str} -- [description]
     wow_spec {str} -- [description]
     fight_style {str} -- [description]
-    simulation_group {simulation_objects.Simulation_Group} -- [description]
 
   Returns:
     dict -- [description]
@@ -1922,6 +1921,184 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
         json.dump(result, f, indent=4, sort_keys=True)
 
 
+def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
+  """Function generates all possible talent combinations for all specs. Including empty dps talent rows. This way the dps gain of each talent can be calculated.
+
+  Arguments:
+    specs {List[Tuple[str, str]]} -- wow_class, wow_spec
+
+  Returns:
+    None -- [description]
+  Creates json result files.
+  """
+
+  logger.debug("talent_worth_simulations start")
+
+  for fight_style in settings.fight_styles:
+    for wow_class, wow_spec in specs:
+      base_profile_string = create_basic_profile_string(wow_class, wow_spec, settings.tier)
+
+      simulation_group = simulation_objects.Simulation_Group(
+        name=f"{fight_style} {wow_spec} {wow_class}",
+        executable=settings.executable,
+        threads=settings.threads,
+        profileset_work_threads=settings.profileset_work_threads,
+        logger=logger
+      )
+
+      talent_blueprint = wow_lib.get_talent_blueprint(wow_class)
+
+      talent_combinations = []
+
+      # build list of all talent combinations
+      for first in range(4):
+        for second in range(4):
+          for third in range(4):
+            for forth in range(4):
+              for fifth in range(4):
+                for sixth in range(4):
+                  for seventh in range(4):
+
+                    talent_combination = "{}{}{}{}{}{}{}".format(first, second, third, forth, fifth, sixth, seventh)
+
+                    abort = False
+
+                    tmp_count = 0
+
+                    # compare all non-dps locations, use only dps talent rows
+                    location = talent_blueprint.find("0")
+                    while location > -1:
+                      if talent_combination[tmp_count + location] != "0":
+                        abort = True
+                      tmp_count += location + 1
+                      location = talent_blueprint[tmp_count:].find("0")
+
+                    # skip talent combinations with too many (more than one) not chosen dps values
+                    if talent_combination.count("0") > talent_blueprint.count("0") + 1:
+                      abort = True
+
+                    if abort:
+                      continue
+
+                    talent_combinations.append(talent_combination)
+      logger.debug("Creating talent combinations: Done. Created {}.".format(len(talent_combinations)))
+
+      base_profile = simulation_objects.Simulation_Data(
+        name="{}".format(talent_combinations[0]),
+        fight_style=fight_style,
+        simc_arguments=[base_profile_string, "talents={}".format(talent_combinations[0])],
+        target_error=settings.target_error[fight_style],
+        executable=settings.executable,
+        iterations=settings.iterations,
+        logger=logger
+      )
+      simulation_group.add(base_profile)
+
+      # add all talent combinations to the simulation_group
+      for talent_combination in talent_combinations[1:]:
+        simulation_data = simulation_objects.Simulation_Data(
+          name="{}".format(talent_combination),
+          fight_style=fight_style,
+          simc_arguments=["talents={}".format(talent_combination)],
+          target_error=settings.target_error[fight_style],
+          executable=settings.executable,
+          iterations=settings.iterations,
+          logger=logger
+        )
+        simulation_group.add(simulation_data)
+
+      # time to sim
+      if settings.use_raidbots:
+        simulation_group.simulate_with_raidbots(settings.apikey)
+      else:
+        simulation_group.simulate()
+
+      export_json = create_base_json_dict("Talent Worth", wow_class, wow_spec, fight_style)
+
+      # save all generated data in "data"
+      for profile in simulation_group.profiles:
+        export_json["data"][profile.name] = profile.get_dps()
+
+      # name scheme: ab
+      # a... talent row
+      # b... talent number
+      # 11... would be the first talent of the first row
+      export_json["calculated_talent_values"] = {}
+      for row in range(len(talent_blueprint)):
+
+        # if we're looking at a dps row, collect all necessary data for that row
+        # collect highest non talent value for the row
+        # collect
+        if talent_blueprint[row] == "1":
+          base_talent_combination = ""
+          base_dps = 0
+
+          tmp = talent_blueprint
+          tmp = tmp[:row] + "0" + tmp[row + 1:]
+          tmp = tmp.replace("1", "x")
+
+          talent_combinations = None
+          talent_combinations = wow_lib.get_talent_combinations(wow_class, wow_spec, tmp)
+
+          for talent_combination in talent_combinations:
+            if export_json["data"][talent_combination] > base_dps:
+              base_talent_combination = talent_combination
+              base_dps = export_json["data"][talent_combination]
+
+          logger.debug("calculated_talent_values: best base talent combination {} dps {}".format(base_talent_combination, base_dps))
+
+          # create lists for each fixed talent
+          for talent in range(1,4):
+            data = {
+              "base_talent_combination": base_talent_combination,
+              "minimum_talent_combination": "",
+              "maximum_talent_combination": "",
+              "median_talent_combination": ""
+            }
+
+            tmp = talent_blueprint
+            tmp = tmp.replace("1", "x")
+            tmp = "{}{}{}".format(tmp[:row], talent, tmp[row + 1:])
+
+            logger.debug("New blueprint for talent combination lookup: {}".format(tmp))
+
+            talent_combinations = None
+            talent_combinations = wow_lib.get_talent_combinations(wow_class, wow_spec, tmp)
+
+            talent_dps_collection = []
+            for talent_combination in talent_combinations:
+              talent_dps_collection.append((talent_combination, export_json["data"][talent_combination]))
+
+            talent_dps_collection = sorted(talent_dps_collection, key=lambda item: item[1], reverse=True)
+            logger.debug("Sorted talent_dps_collection: {}".format(talent_dps_collection))
+
+            data["maximum_talent_combination"] = talent_dps_collection[0][0]
+            data["minimum_talent_combination"] = talent_dps_collection[-1][0]
+            data["median_talent_combination"] = talent_dps_collection[round(len(talent_dps_collection) / 2)][0]
+
+            export_json["calculated_talent_values"]["{}{}".format(row + 1, talent)] = data
+      logger.debug(export_json["calculated_talent_values"])
+
+      # spike the export data with talent data
+      export_json["talent_data"] = wow_lib.get_talent_dict(wow_class, wow_spec)
+
+      # create directory if it doesn't exist
+      if not os.path.isdir("results/talent_worth/"):
+        os.makedirs("results/talent_worth/")
+
+      # write json to file
+      with open(
+        "results/talent_worth/{}_{}_{}.json".format(
+          wow_class.lower(), wow_spec.lower(), fight_style.lower()
+        ), "w", encoding="utf-8"
+      ) as f:
+        logger.debug("Print talent_worth json.")
+        f.write(json.dumps(export_json, sort_keys=True, indent=4, ensure_ascii=False))
+        logger.debug("Printed talent_worth json.")
+
+  logger.debug("talent_worth_simulations end")
+  pass
+
 def main():
   logger.debug("main start")
   logger.info("Bloodytools at your service.")
@@ -2163,6 +2340,28 @@ def main():
 
     if not settings.use_own_threading:
       logger.info("Gear Path simulations end.")
+
+
+  # trigger talent worth simulations
+  if settings.enable_talent_worth:
+    if not settings.use_own_threading:
+      logger.info("Talent Worth simulations start.")
+
+    if settings.use_own_threading:
+      talent_worth_thread = threading.Thread(
+        name="Talent Worth Thread",
+        target=talent_worth_simulations,
+        args=(settings.wow_class_spec_list,)
+      )
+      thread_list.append(talent_worth_thread)
+      talent_worth_thread.start()
+    else:
+      talent_worth_simulations(settings.wow_class_spec_list)
+
+    if not settings.use_own_threading:
+      logger.info("Talent Worth simulations end.")
+
+
 
   while thread_list:
     time.sleep(1)
