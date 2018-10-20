@@ -1936,6 +1936,7 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
 
   for fight_style in settings.fight_styles:
     for wow_class, wow_spec in specs:
+
       base_profile_string = create_basic_profile_string(wow_class, wow_spec, settings.tier)
 
       simulation_group = simulation_objects.Simulation_Group(
@@ -2007,6 +2008,9 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
         )
         simulation_group.add(simulation_data)
 
+
+      logger.info("Talent Worth {} {} {} {} profiles.".format(wow_spec, wow_class, fight_style, len(simulation_group.profiles)))
+
       # time to sim
       if settings.use_raidbots:
         simulation_group.simulate_with_raidbots(settings.apikey)
@@ -2019,65 +2023,29 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
       for profile in simulation_group.profiles:
         export_json["data"][profile.name] = profile.get_dps()
 
-      # name scheme: ab
-      # a... talent row
-      # b... talent number
-      # 11... would be the first talent of the first row
-      export_json["calculated_talent_values"] = {}
-      for row in range(len(talent_blueprint)):
+      tmp_1 = []
+      tmp_2 = []
 
-        # if we're looking at a dps row, collect all necessary data for that row
-        # collect highest non talent value for the row
-        # collect
-        if talent_blueprint[row] == "1":
-          base_talent_combination = ""
-          base_dps = 0
+      for talent_combination in export_json["data"]:
+        if talent_combination.count("0") == talent_blueprint.count("0"):
+          tmp_1.append((talent_combination, export_json["data"][talent_combination] ))
+        else:
+          tmp_2.append((talent_combination, export_json["data"][talent_combination] ))
 
-          tmp = talent_blueprint
-          tmp = tmp[:row] + "0" + tmp[row + 1:]
-          tmp = tmp.replace("1", "x")
+      tmp_1 = sorted(tmp_1, key=lambda item: item[1], reverse=True)
+      tmp_2 = sorted(tmp_2, key=lambda item: item[1], reverse=True)
 
-          talent_combinations = None
-          talent_combinations = wow_lib.get_talent_combinations(wow_class, wow_spec, tmp)
+      # add sorted key lists
+      # 1 all usual talent combinations
+      # 2 all talent combinations with one empty dps row
+      export_json["sorted_data_keys"] = []
+      export_json["sorted_data_keys_2"] = []
 
-          for talent_combination in talent_combinations:
-            if export_json["data"][talent_combination] > base_dps:
-              base_talent_combination = talent_combination
-              base_dps = export_json["data"][talent_combination]
+      for item in tmp_1:
+        export_json["sorted_data_keys"].append(item[0])
+      for item in tmp_2:
+        export_json["sorted_data_keys_2"].append(item[0])
 
-          logger.debug("calculated_talent_values: best base talent combination {} dps {}".format(base_talent_combination, base_dps))
-
-          # create lists for each fixed talent
-          for talent in range(1,4):
-            data = {
-              "base_talent_combination": base_talent_combination,
-              "minimum_talent_combination": "",
-              "maximum_talent_combination": "",
-              "median_talent_combination": ""
-            }
-
-            tmp = talent_blueprint
-            tmp = tmp.replace("1", "x")
-            tmp = "{}{}{}".format(tmp[:row], talent, tmp[row + 1:])
-
-            logger.debug("New blueprint for talent combination lookup: {}".format(tmp))
-
-            talent_combinations = None
-            talent_combinations = wow_lib.get_talent_combinations(wow_class, wow_spec, tmp)
-
-            talent_dps_collection = []
-            for talent_combination in talent_combinations:
-              talent_dps_collection.append((talent_combination, export_json["data"][talent_combination]))
-
-            talent_dps_collection = sorted(talent_dps_collection, key=lambda item: item[1], reverse=True)
-            logger.debug("Sorted talent_dps_collection: {}".format(talent_dps_collection))
-
-            data["maximum_talent_combination"] = talent_dps_collection[0][0]
-            data["minimum_talent_combination"] = talent_dps_collection[-1][0]
-            data["median_talent_combination"] = talent_dps_collection[round(len(talent_dps_collection) / 2)][0]
-
-            export_json["calculated_talent_values"]["{}{}".format(row + 1, talent)] = data
-      logger.debug(export_json["calculated_talent_values"])
 
       # spike the export data with talent data
       export_json["talent_data"] = wow_lib.get_talent_dict(wow_class, wow_spec)
@@ -2343,7 +2311,7 @@ def main():
 
 
   # trigger talent worth simulations
-  if settings.enable_talent_worth:
+  if settings.enable_talent_worth_simulations:
     if not settings.use_own_threading:
       logger.info("Talent Worth simulations start.")
 
