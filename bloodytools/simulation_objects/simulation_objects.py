@@ -12,6 +12,7 @@ import sys
 from typing import Union, List
 import uuid
 import logging
+import threading
 
 import subprocess
 
@@ -563,6 +564,8 @@ class Simulation_Group():
     if not self.selfcheck():
       raise ValueError("Selfcheck of the simulation_group failed.")
 
+    self.simulation_output = ""
+
   def selfcheck(self) -> bool:
     """Compares the base content of all profiles. All profiles need to
       have the same values in each standard field (__init__ of
@@ -597,6 +600,32 @@ class Simulation_Group():
     """Set sg_simulation_start_time. Can be done multiple times.
     """
     self.sg_simulation_start_time = datetime.datetime.utcnow()
+
+  def monitor_simulation(self, process) -> None:
+    """Monitors and prints the most recent output from the simc subprocess to command line. Additionally saves the line to simulation_output of the simulation_group.
+
+    Arguments:
+      process {subprocess.Popen} -- the ongoing simulation subprocess
+
+    Returns:
+      None --
+    """
+
+    for line in iter(process.stdout.readline, b''):
+      if line == "":
+        self.logger.debug("monitor_simulation")
+        break
+
+      # save line for later use
+      self.simulation_output += line
+
+      # shorten output, this console print is not intended to replace the log
+      output_length = 100
+
+      print_line = line[:-1]
+      print_line = print_line[:output_length]
+      print(" " * output_length, end="\r", flush=True)
+      print("{}".format(print_line), end='\r', flush=True) # kill line break
 
   def simulate(self) -> bool:
     """Triggers the simulation of all profiles.
@@ -710,7 +739,8 @@ class Simulation_Group():
             while not hasattr(self, "success") and fail_counter < 5:
 
               try:
-                simulation_output = subprocess.run(
+                # do stuff here
+                simulation_output = subprocess.Popen(
                   [self.executable, self.filename],
                   stdout=subprocess.PIPE,
                   stderr=subprocess.STDOUT,
@@ -719,6 +749,12 @@ class Simulation_Group():
                 )
               except FileNotFoundError as e:
                 raise e
+
+              watcher = threading.Thread(target=self.monitor_simulation, args=(simulation_output,))
+              watcher.start()
+
+              simulation_output.wait()
+              watcher.join()
 
               if simulation_output.returncode != 0:
                 fail_counter += 1
@@ -730,7 +766,7 @@ class Simulation_Group():
             while not hasattr(self, "success") and fail_counter < 5:
 
               try:
-                simulation_output = subprocess.run(
+                simulation_output = subprocess.Popen(
                   [self.executable, self.filename],
                   stdout=subprocess.PIPE,
                   stderr=subprocess.STDOUT,
@@ -738,6 +774,12 @@ class Simulation_Group():
                 )
               except FileNotFoundError as e:
                 raise e
+
+              watcher = threading.Thread(target=self.monitor_simulation, args=(simulation_output,))
+              watcher.start()
+
+              simulation_output.wait()
+              watcher.join()
 
               if simulation_output.returncode != 0:
                 fail_counter += 1
@@ -768,13 +810,13 @@ class Simulation_Group():
             os.remove(self.filename)
             self.filename = None
 
-          self.logger.debug(simulation_output.stdout)
+          self.logger.debug(self.simulation_output)
 
           # get dps of the first profile
           baseline_result = False
           profileset_results = False
 
-          for line in simulation_output.stdout.splitlines():
+          for line in self.simulation_output.splitlines():
             # allow baseline dmg grab only in the dps listing, not from warnings
             if "DPS Ranking:" in line:
               baseline_result = True
