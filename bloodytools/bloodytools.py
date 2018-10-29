@@ -1947,7 +1947,7 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
         logger=logger
       )
 
-      talent_blueprint = wow_lib.get_talent_blueprint(wow_class)
+      talent_blueprint = wow_lib.get_talent_blueprint(wow_class, wow_spec)
 
       talent_combinations = []
 
@@ -1989,6 +1989,7 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
         fight_style=fight_style,
         simc_arguments=[base_profile_string, "talents={}".format(talent_combinations[0])],
         target_error=settings.target_error[fight_style],
+        ptr=settings.ptr,
         executable=settings.executable,
         iterations=settings.iterations,
         logger=logger
@@ -2048,17 +2049,21 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
 
 
       # spike the export data with talent data
-      export_json["talent_data"] = wow_lib.get_talent_dict(wow_class, wow_spec)
+      export_json["talent_data"] = wow_lib.get_talent_dict(wow_class, wow_spec, settings.ptr == "1")
 
       # create directory if it doesn't exist
       if not os.path.isdir("results/talent_worth/"):
         os.makedirs("results/talent_worth/")
 
+      file_name = "results/talent_worth/{}_{}_{}".format(
+          wow_class.lower(), wow_spec.lower(), fight_style.lower()
+        )
+      if settings.ptr == "1":
+        file_name += "_ptr"
+
       # write json to file
       with open(
-        "results/talent_worth/{}_{}_{}.json".format(
-          wow_class.lower(), wow_spec.lower(), fight_style.lower()
-        ), "w", encoding="utf-8"
+        file_name + ".json", "w", encoding="utf-8"
       ) as f:
         logger.debug("Print talent_worth json.")
         f.write(json.dumps(export_json, sort_keys=True, indent=4, ensure_ascii=False))
