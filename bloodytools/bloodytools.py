@@ -2147,6 +2147,13 @@ def main():
     default=False,
     help="Enables debug modus. Default: '{}'".format(settings.debug)
   )
+  parser.add_argument(
+    "-ptr",
+    action="store_const",
+    const=True,
+    default=False,
+    help="Enables ptr."
+  )
   # sim only one type of data generation for one spec
   parser.add_argument(
     "-s",
@@ -2212,6 +2219,8 @@ def main():
     settings.enable_azerite_trait_simulations = True
     # set talent_list to empty to ensure all talent combinations are run
     settings.talent_list = {}
+
+    settings.wow_class_spec_list = wow_lib.get_classes_specs()
     logger.debug(
       "Set enable_race_simulations, enable_secondary_distributions_simulations, enable_trinket_simulations, and enable_azerite_trait_simulations to True."
     )
@@ -2235,12 +2244,15 @@ def main():
       )
     )
 
+  if args.ptr:
+    settings.ptr = "1"
+
   settings.simc_hash = get_simc_hash(settings.executable)
 
   bloodytools_start_time = datetime.datetime.utcnow()
 
-  # empty class-spec list or argument was provided to run all? great, we'll run all classes-specs
-  if not settings.wow_class_spec_list or args.sim_all:
+  # empty class-spec list? great, we'll run all class-spec combinations
+  if not settings.wow_class_spec_list:
     settings.wow_class_spec_list = wow_lib.get_classes_specs()
 
   # list of all active threads. when empty, terminate tool
