@@ -197,6 +197,31 @@ def tokenize_str(string: str) -> str:
   return string
 
 
+def get_simc_hash(path) -> str:
+  """Get the FETCH_HEAD simc hash.
+
+  Returns:
+    str -- [description]
+  """
+
+  if ".exe" in path:
+    new_path = path.split("simc.exe")[0]
+  else:
+    new_path = path[:-5] # cut "/simc" from unix path
+    if "engine" in new_path[-6:]:
+      new_path = new_path[:-6]
+
+  # add path to file to variable
+  new_path += ".git/FETCH_HEAD"
+
+  with open(new_path, 'r', encoding='utf-8') as f:
+    for line in f:
+      if "'bfa-dev'" in line:
+        simc_hash = line.split()[0]
+
+  return simc_hash
+
+
 def race_simulations(specs: List[Tuple[str, str]]) -> None:
   """Simulates all available races for all given specs.
 
@@ -2209,6 +2234,8 @@ def main():
         settings.profileset_work_threads
       )
     )
+
+  settings.simc_hash = get_simc_hash(settings.executable)
 
   bloodytools_start_time = datetime.datetime.utcnow()
 
