@@ -27,6 +27,7 @@ import datetime
 import json
 import logging
 import os
+import sys
 import settings # settings.py file
 from special_cases import special_cases # special_cases file, contains spec specific additional profile information for azerite traits
 import simulation_objects.simulation_objects as simulation_objects
@@ -2121,6 +2122,15 @@ def main():
     default=False,
     help="Enables debug modus. Default: '{}'".format(settings.debug)
   )
+  # sim only one type of data generation for one spec
+  parser.add_argument(
+    "-s",
+    "--single_sim",
+    dest="single_sim",
+    metavar="STRING",
+    type=str,
+    help="Activate a single simulation on the local machine. <simulation_types> are races, azerite_traits, secondary_distributions, talent_worth, and trinkets. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk"
+  )
   args = parser.parse_args()
 
   # activate debug mode as early as possible
@@ -2130,8 +2140,47 @@ def main():
     fh.setLevel(logging.DEBUG)
     logger.debug("Set debug mode to {}".format(settings.debug))
 
+  if args.single_sim:
+    logger.debug("-s / --single_sim detected")
+    try:
+      simulation_type, wow_class, wow_spec, fight_style  = args.single_sim.split(',')
+    except Exception:
+      logger.error("-s / --single_sim arg is missing parameters. Read -h.")
+      sys.exit("Input error. Bloodytools terminates.")
+
+    # single sim will always use all cores unless --threads is defined
+    settings.threads = ""
+    settings.wow_class_spec_list = [(wow_class.lower(), wow_spec.lower())]
+    settings.fight_styles = [fight_style]
+    settings.iterations = "20000"
+    # disable all simulation types
+    settings.enable_race_simulations = False
+    settings.enable_trinket_simulations = False
+    settings.enable_secondary_distributions_simulations = False
+    settings.enable_azerite_trait_simulations = False
+    settings.enable_gear_path = False
+    settings.enable_talent_worth_simulations = False
+
+    # set dev options
+    settings.debug = False
+    settings.use_own_threading = False
+    settings.use_raidbots = False
+    settings.write_humanreadable_secondary_distribution_file = False
+    settings.lua_trinket_export = False
+
+    if simulation_type == "races":
+      settings.enable_race_simulations = True
+    elif simulation_type == "trinkets":
+      settings.enable_trinket_simulations = True
+    elif simulation_type == "azerite_traits":
+      settings.enable_azerite_trait_simulations = True
+    elif simulation_type == "secondary_distributions":
+      settings.enable_secondary_distributions_simulations = True
+    elif simulation_type == "talent_worth":
+      settings.enable_talent_worth_simulations = True
+
   # if argument specified to simulate all, override settings
-  if args.sim_all:
+  elif args.sim_all:
     settings.enable_race_simulations = True
     settings.enable_secondary_distributions_simulations = True
     settings.enable_trinket_simulations = True
