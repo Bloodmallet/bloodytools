@@ -274,6 +274,8 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             fight_style=fight_style,
             simc_arguments=[basic_profile_string, "race={}".format(race)],
             target_error=settings.target_error[fight_style],
+            ptr=settings.ptr,
+            default_actions=settings.default_actions,
             executable=settings.executable,
             iterations=settings.iterations,
             logger=logger
@@ -284,6 +286,8 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             fight_style=fight_style,
             simc_arguments=["race={}".format(race)],
             target_error=settings.target_error[fight_style],
+            ptr=settings.ptr,
+            default_actions=settings.default_actions,
             executable=settings.executable,
             iterations=settings.iterations,
             logger=logger
@@ -436,6 +440,8 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
               "trinket1=",
               "trinket2=" + second_trinket + ",ilevel=" + str(settings.min_ilevel)
             ],
+            ptr=settings.ptr,
+            default_actions=settings.default_actions,
             executable=settings.executable,
             logger=logger
           )
@@ -456,6 +462,8 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
               simc_arguments=[
                 "trinket1=,id={},ilevel={}".format(trinket[1], itemlevel)
               ],
+              ptr=settings.ptr,
+              default_actions=settings.default_actions,
               executable=settings.executable,
               logger=logger
             )
@@ -831,6 +839,8 @@ def secondary_distribution_simulations(
                   int(secondary_amount * (distribution_multiplier[3] / 100))
                 ),
               ],
+              ptr=settings.ptr,
+              default_actions=settings.default_actions,
               executable=settings.executable
             )
           )
@@ -864,6 +874,8 @@ def secondary_distribution_simulations(
                   int(secondary_amount * (distribution_multiplier[3] / 100))
                 ),
               ],
+              ptr=settings.ptr,
+              default_actions=settings.default_actions,
               executable=settings.executable
             )
           )
@@ -1053,6 +1065,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             target_error=settings.target_error[fight_style],
             executable=settings.executable,
             iterations=settings.iterations,
+            default_actions=settings.default_actions,
+            ptr=settings.ptr,
             logger=logger
           )
           simulation_group.add(simulation_data)
@@ -1145,6 +1159,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             simc_arguments=[trait_input, head_input],
             target_error=settings.target_error[fight_style],
             executable=settings.executable,
+            ptr=settings.ptr,
+            default_actions=settings.default_actions,
             logger=logger
           )
 
@@ -1225,6 +1241,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                 simc_arguments=[trait_input + doublicate_text, head_input],
                 target_error=settings.target_error[fight_style],
                 executable=settings.executable,
+                ptr=settings.ptr,
+                default_actions=settings.default_actions,
                 logger=logger
               )
 
@@ -1292,6 +1310,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                 simc_arguments=[trait_input + doublicate_text + doublicate_text, head_input],
                 target_error=settings.target_error[fight_style],
                 executable=settings.executable,
+                ptr=settings.ptr,
+                default_actions=settings.default_actions,
                 logger=logger
               )
 
@@ -1853,7 +1873,9 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
             "gear_haste_rating={}".format(haste_rating),
             "gear_mastery_rating={}".format(mastery_rating),
             "gear_versatility_rating={}".format(vers_rating)
-          ]
+          ],
+          ptr=settings.ptr,
+          default_actions=settings.default_actions
         )
         simulation_group.add(crit_profile)
 
@@ -1868,7 +1890,9 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
             "gear_haste_rating={}".format(haste_rating + settings.step_size),
             "gear_mastery_rating={}".format(mastery_rating),
             "gear_versatility_rating={}".format(vers_rating)
-          ]
+          ],
+          ptr=settings.ptr,
+          default_actions=settings.default_actions
         )
         simulation_group.add(haste_profile)
 
@@ -1883,7 +1907,9 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
             "gear_haste_rating={}".format(haste_rating),
             "gear_mastery_rating={}".format(mastery_rating + settings.step_size),
             "gear_versatility_rating={}".format(vers_rating)
-          ]
+          ],
+          ptr=settings.ptr,
+          default_actions=settings.default_actions
         )
         simulation_group.add(mastery_profile)
 
@@ -1898,7 +1924,9 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
             "gear_haste_rating={}".format(haste_rating),
             "gear_mastery_rating={}".format(mastery_rating),
             "gear_versatility_rating={}".format(vers_rating + settings.step_size)
-          ]
+          ],
+          ptr=settings.ptr,
+          default_actions=settings.default_actions
         )
         simulation_group.add(vers_profile)
 
@@ -2016,6 +2044,7 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
         simc_arguments=[base_profile_string, "talents={}".format(talent_combinations[0])],
         target_error=settings.target_error[fight_style],
         ptr=settings.ptr,
+        default_actions=settings.default_actions,
         executable=settings.executable,
         iterations=settings.iterations,
         logger=logger
@@ -2029,6 +2058,8 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
           fight_style=fight_style,
           simc_arguments=["talents={}".format(talent_combination)],
           target_error=settings.target_error[fight_style],
+          ptr=settings.ptr,
+          default_actions=settings.default_actions,
           executable=settings.executable,
           iterations=settings.iterations,
           logger=logger
