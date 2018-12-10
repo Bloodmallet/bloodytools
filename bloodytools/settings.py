@@ -54,7 +54,7 @@ fight_styles = [
 iterations = "20000" # sane value, should be enough for 0.2
 profileset_work_threads = "2"
 ptr = "0"
-simc_hash = "8a824362971c369c78b9ce7d398d6534000dfcff"
+default_actions = "1"
 target_error = {
   "patchwerk": "0.2",
   "hecticaddcleave": "0.2",

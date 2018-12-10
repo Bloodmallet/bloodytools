@@ -1433,7 +1433,7 @@ class Simulation_Group():
     for profile in self.profiles:
       if profile.name == profile_name:
         return profile.get_dps()
-    return None
+    raise KeyError("Profile_name '{}' wasn't found in the simulation_group.".format(profile_name))
 
   def set_dps_of(self, profile_name: str, dps: Union[int, float, str]) -> bool:
     try:

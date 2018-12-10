@@ -494,14 +494,21 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
         )
 
       for profile in simulation_group.profiles:
-        logger.debug(
-          "{} {} DPS, baseline +{}".format(
-            profile.name, profile.get_dps(),
-            profile.get_dps() - simulation_group.get_dps_of(
-              "baseline {}".format(settings.min_ilevel)
+        try:
+          logger.debug(
+            "{} {} DPS, baseline + {}".format(
+              profile.name, profile.get_dps(),
+              profile.get_dps() - simulation_group.get_dps_of(
+                "baseline {}".format(settings.min_ilevel)
+              )
             )
           )
-        )
+        except Exception as e:
+          logger.error("Exception was thrown when trying to fetch the following data from simulation_group: profile.name, profile.get_dps(), profile.get_dps() - simulation_group.get_dps_of(\"baseline {}\".format(settings.min_ilevel))")
+          logger.debug("profile.name {}".format(profile.name))
+          logger.debug("profile.get_dps() {}".format(profile.get_dps()))
+          logger.debug("settings.min_ilevel {}".format(settings.min_ilevel))
+          logger.debug("simulation_group.get_dps_of(\"baseline {{}}\".format(settings.min_ilevel)) {}".format(simulation_group.get_dps_of("baseline {}".format(settings.min_ilevel))))
 
       simulation_results[wow_class][wow_spec] = simulation_group
 
@@ -1051,6 +1058,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         target_error=settings.target_error[fight_style],
         executable=settings.executable,
         iterations=settings.iterations,
+        ptr=settings.ptr,
+        default_actions=settings.default_actions,
         logger=logger
       )
       simulation_group.add(simulation_data)
@@ -1065,8 +1074,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             target_error=settings.target_error[fight_style],
             executable=settings.executable,
             iterations=settings.iterations,
-            default_actions=settings.default_actions,
             ptr=settings.ptr,
+            default_actions=settings.default_actions,
             logger=logger
           )
           simulation_group.add(simulation_data)
