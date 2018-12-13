@@ -127,7 +127,7 @@ special_cases = {
           "Natural Harmony": [
             {
               "suffix": "EB",
-              "additional_input": ["talents=3302022"],
+              "additional_input": ["talents=3302012"],
               "link_data": {
                 "EB": { "spell_id": "117014" }
               },
