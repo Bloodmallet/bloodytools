@@ -1717,7 +1717,20 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           if not "languages" in slot_export:
             slot_export["languages"] = {}
           if not item["name"] in slot_export["languages"]:
-            slot_export["languages"][item["name"]] = wow_lib.get_azerite_item_translation(item["name"])
+            try:
+              slot_export["languages"][item["name"]] = wow_lib.get_azerite_item_translation(item["name"])
+            except LookupError as e:
+              slot_export["languages"][item["name"]] = {
+                "de_DE": item["name"],
+                "en_US": item["name"],
+                "es_ES": item["name"],
+                "fr_FR": item["name"],
+                "it_IT": item["name"],
+                "pt_BR": item["name"],
+                "ko_KR": item["name"],
+                "cn_CN": item["name"],
+                "ru_RU": item["name"]
+              }
 
           # create trait lists for each tier [(trait_name, dps)]
           trait_dict = {2: [], 3: []}
