@@ -38,6 +38,38 @@
 # Last but not least you can create longer suffixes consisting of multiple additional spells/items by adding + into the suffix name. E.g. "hello +world". You can then use "hello" and "world" in link_data to indicate multiple changes to the profile.
 
 special_cases = {
+  "death_knight": {
+    "frost": {
+      "patchwerk": {
+        "azerite_trait_simulations": {
+          "Frozen Tempest": [
+            {
+              "suffix": "GS",
+              "additional_input": ["talents=3102013"],
+              "link_data": {
+                "GS": { "spell_id": "194912" }
+              },
+              "description": "Frozen Tempest is more powerful with Gathering Storm. Wanted by Chewsday#1234"
+            }
+          ]
+        }
+      },
+      "hecticaddcleave": {
+        "azerite_trait_simulations": {
+          "Frozen Tempest": [
+            {
+              "suffix": "GS",
+              "additional_input": ["talents=3102013"],
+              "link_data": {
+                "GS": { "spell_id": "194912" }
+              },
+              "description": "Frozen Tempest is more powerful with Gathering Storm. Wanted by Chewsday#1234"
+            }
+          ]
+        }
+      }
+    }
+  },
   "hunter": {
     "beast_mastery": {
       "patchwerk": {
