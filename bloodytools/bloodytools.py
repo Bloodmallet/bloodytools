@@ -1523,7 +1523,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       # baseline_dps_385 = wanted_data['data']['baseline']['1_385']
       # list(map(lambda x: {(azerite_traits.get(find(lambda traitid: azerite_traits[traitid]['name'] == x, azerite_traits), {}).get('trait_id', 0)): round(max( wanted_data['data'][x].values())-baseline_dps_385, 2)}, wanted_data['data']))
 
-      logger.info(wanted_data["azerite_weight_{}".format(fight_style)])
+      logger.debug(wanted_data["azerite_weight_{}".format(fight_style)])
 
       # create secondary azerite name list (tripple azerite trait at max itemlevel each)
       tmp_list = []
@@ -1571,7 +1571,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             trait_id = azerite_trait_name_spell_id_dict[trait.split("+")[0][:-1]]
 
           # check for tier 2, to allow azerite empowered in tier 1 data
-          if wow_lib.get_azerite_tier(wow_class, wow_spec, str(trait_id)) == 2:
+          if 2 in wow_lib.get_azerite_tiers(wow_class, wow_spec, str(trait_id)):
             tmp_tier2_ilvl.append(
               (
                 trait,
@@ -1587,7 +1587,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               )
             )
 
-          else:
+          elif 1 in wow_lib.get_azerite_tiers(wow_class, wow_spec, str(trait_id)) or 3 in wow_lib.get_azerite_tiers(wow_class, wow_spec, str(trait_id)) or 4 in wow_lib.get_azerite_tiers(wow_class, wow_spec, str(trait_id)):
             max_available_itemlevel = "1_" + settings.azerite_trait_ilevels[-1]
             if not max_available_itemlevel in wanted_data["data"][trait]:
               i = len(settings.azerite_trait_ilevels) - 1
@@ -1609,6 +1609,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                 wanted_data["data"][trait][sorted(wanted_data["data"][trait])[-1]] - wanted_data["data"]["baseline"][sorted(wanted_data["data"][trait])[-1].replace("3_", "1_")]
               )
             )
+          else:
+            logger.error("Somehow a valid trait is neither of tier 1, 3, or 4. Trait id: {}".format(trait_id))
 
       logger.debug("tmp_tier1: {}".format(tmp_tier1_ilvl))
       logger.debug("tmp_tier2: {}".format(tmp_tier2_ilvl))
@@ -1733,7 +1735,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               }
 
           # create trait lists for each tier [(trait_name, dps)]
-          trait_dict = {2: [], 3: []}
+          trait_dict = {2: [], 3: [], 4: []}
           # collect trait data like spellid and power id to allow construction of links in page
           trait_data = {}
           for trait in item["azeriteTraits"]:
@@ -1777,7 +1779,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           slot_export["used_azerite_traits_per_item"][item["name"]] = []
 
           # complete trait list with dps was created. add best trait names to json and sort trait_dict in place
-          for tier in trait_dict:
+          for tier in sorted(trait_dict.keys()): # due to some unknown reasons the actual order is always ascending, even though it's a dictionary
             if trait_dict[tier]:
               trait_dict[tier] = sorted(trait_dict[tier], key=lambda item: item[1], reverse=True)
               slot_export["used_azerite_traits_per_item"][item["name"]].append({
