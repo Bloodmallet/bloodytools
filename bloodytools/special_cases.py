@@ -169,5 +169,23 @@ special_cases = {
         }
       }
     }
+  },
+  "warlock": {
+    "demonology": {
+      "patchwerk": {
+        "azerite_trait_simulations": {
+          "Shadow's Bite": [
+            {
+              "suffix": "DC",
+              "additional_input": ["talents=2103033"],
+              "link_data": {
+                "DC": { "spell_id": "205145" }
+              },
+              "description": "Curiosity killed the cat"
+            }
+          ]
+        }
+      }
+    }
   }
 }
