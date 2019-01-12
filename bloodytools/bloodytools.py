@@ -214,10 +214,18 @@ def get_simc_hash(path) -> str:
   # add path to file to variable
   new_path += ".git/FETCH_HEAD"
 
-  with open(new_path, 'r', encoding='utf-8') as f:
-    for line in f:
-      if "'bfa-dev'" in line:
-        simc_hash = line.split()[0]
+  try:
+    with open(new_path, 'r', encoding='utf-8') as f:
+      for line in f:
+        if "'bfa-dev'" in line:
+          simc_hash = line.split()[0]
+  except FileNotFoundError:
+    with open('../../SimulationCraft/.git/shallow', 'r', encoding='utf-8') as f:
+      for line in f:
+        simc_hash = line
+  except Exception as e:
+    logger.error(e)
+    raise e
 
   return simc_hash
 
