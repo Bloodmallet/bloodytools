@@ -222,7 +222,7 @@ def get_simc_hash(path) -> str:
   except FileNotFoundError:
     with open('../../SimulationCraft/.git/shallow', 'r', encoding='utf-8') as f:
       for line in f:
-        simc_hash = line
+        simc_hash = line.strip()
   except Exception as e:
     logger.error(e)
     raise e
