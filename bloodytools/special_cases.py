@@ -38,81 +38,37 @@
 # Last but not least you can create longer suffixes consisting of multiple additional spells/items by adding + into the suffix name. E.g. "hello +world". You can then use "hello" and "world" in link_data to indicate multiple changes to the profile.
 
 special_cases = {
-  "death_knight": {
-    "frost": {
+  "demon_hunter": {
+    "havoc": {
       "patchwerk": {
         "azerite_trait_simulations": {
-          "Frozen Tempest": [
+          "Eyes of Rage": [
             {
-              "suffix": "GS",
-              "additional_input": ["talents=3102013"],
+              "suffix": "BF+IA+D",
+              "additional_input": ["talents=1310221"],
               "link_data": {
-                "GS": { "spell_id": "194912" }
+                "BF": { "spell_id": "203550" },
+                "IA": {"spell_id": "258920"},
+                "D": {"spell_id": "213410"}
               },
-              "description": "Frozen Tempest is more powerful with Gathering Storm. Wanted by Chewsday#1234"
+              "description": "Original: 3210222. Blind Fury instead of Felblade, Immolation Aura instead of Demon Blades, Demonic instead of Momentum. Wanted by iPilot#2019"
             }
           ]
         }
       },
       "hecticaddcleave": {
         "azerite_trait_simulations": {
-          "Frozen Tempest": [
+          "Eyes of Rage": [
             {
-              "suffix": "GS",
-              "additional_input": ["talents=3102013"],
+              "suffix": "BF+IA+D",
+              "additional_input": ["talents=1310221"],
               "link_data": {
-                "GS": { "spell_id": "194912" }
+                "BF": { "spell_id": "203550" },
+                "IA": {"spell_id": "258920"},
+                "D": {"spell_id": "213410"}
               },
-              "description": "Frozen Tempest is more powerful with Gathering Storm. Wanted by Chewsday#1234"
+              "description": "Original: 3210222. Blind Fury instead of Felblade, Immolation Aura instead of Demon Blades, Demonic instead of Momentum. Wanted by iPilot#2019"
             }
-          ]
-        }
-      }
-    }
-  },
-  "hunter": {
-    "beast_mastery": {
-      "patchwerk": {
-        "azerite_trait_simulations": {
-          "Pack Alpha": [
-            {
-              "suffix": "AC",
-              "additional_input": ["talents=2303011"],
-              "link_data": {
-                "AC": { "spell_id": "267116" }
-              },
-              "description": "Pack Alpha needs additional active pets to provide actual value. Animal Companion (talent) provides that."
-            },
-            {
-              "suffix": "DB",
-              "additional_input": ["talents=3303011"],
-              "link_data": {
-                "DB": { "spell_id": "120679" }
-              },
-              "description": "Pack Alpha needs additional active pets to provide actual value. Dire Beast (talent) provides that to some degree."
-            },
-          ]
-        }
-      },
-      "hecticaddcleave": {
-        "azerite_trait_simulations": {
-          "Pack Alpha": [
-            {
-              "suffix": "AC",
-              "additional_input": ["talents=2303011"],
-              "link_data": {
-                "AC": { "spell_id": "267116" }
-              },
-              "description": "Pack Alpha needs additional active pets to provide actual value. Animal Companion (talent) provides that."
-            },
-            {
-              "suffix": "DB",
-              "additional_input": ["talents=3303011"],
-              "link_data": {
-                "DB": { "spell_id": "120679" }
-              },
-              "description": "Pack Alpha needs additional active pets to provide actual value. Dire Beast (talent) provides that to some degree."
-            },
           ]
         }
       }
