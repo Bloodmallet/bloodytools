@@ -1093,38 +1093,25 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       # trait_special_handles are general additions for all specs and classes, based on the traits
       # current use are raid specific traits
       trait_special_handles = {
-        "Laser Matrix": {
-          "additional_profiles": [
-            {
-              "new_name": "Laser Matrix +5RA",
-              "translation_addition": " +5RA",
-              "additional_input": ["bfa.reorigination_array_stacks=5"]
-            }, {
-              "new_name": "Laser Matrix +10RA",
-              "translation_addition": " +10RA",
-              "additional_input": ["bfa.reorigination_array_stacks=10"]
-            }
-          ],
-          "additional_input": []
-        },
-        "Archive of the Titans": {
-          "additional_profiles": [
-            {
-              "new_name": "Archive of the Titans +5RA",
-              "translation_addition": " +5RA",
-              "additional_input": ["bfa.reorigination_array_stacks=5"]
-            }, {
-              "new_name": "Archive of the Titans +10RA",
-              "translation_addition": " +10RA",
-              "additional_input": ["bfa.reorigination_array_stacks=10"]
-            }
-          ],
-          "additional_input": []
-        }
+        # "Laser Matrix": {
+        #   "additional_profiles": [
+        #     {
+        #       "new_name": "Laser Matrix +5RA",
+        #       "translation_addition": " +5RA",
+        #       "additional_input": ["bfa.reorigination_array_stacks=5"]
+        #     }, {
+        #       "new_name": "Laser Matrix +10RA",
+        #       "translation_addition": " +10RA",
+        #       "additional_input": ["bfa.reorigination_array_stacks=10"]
+        #     }
+        #   ],
+        #   "additional_input": []
+        # },
       }
 
-      azerite_trait_name_spell_id_dict["5RA"] = "281237"
-      azerite_trait_name_spell_id_dict["10RA"] = "281237"
+      # add necessary spelldta manually
+      # azerite_trait_name_spell_id_dict["5RA"] = "281237"
+      # azerite_trait_name_spell_id_dict["10RA"] = "281237"
 
       for azerite_trait_spell_id in azerite_traits:
 
