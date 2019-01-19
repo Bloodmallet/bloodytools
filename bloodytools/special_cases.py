@@ -143,5 +143,37 @@ special_cases = {
         }
       }
     }
+  },
+  "warrior": {
+    "fury": {
+      "patchwerk": {
+        "azerite_trait_simulations": {
+          "Gathering Storm": [
+            {
+              "suffix": "BS",
+              "additional_input": ["talents=2332133"],
+              "link_data": {
+                "BS": { "spell_id": "46924" }
+              },
+              "description": "Archimtiros"
+            }
+          ]
+        }
+      },
+      "hecticaddcleave": {
+        "azerite_trait_simulations": {
+          "Gathering Storm": [
+            {
+              "suffix": "BS",
+              "additional_input": ["talents=2332133"],
+              "link_data": {
+                "BS": { "spell_id": "46924" }
+              },
+              "description": "Archimtiros"
+            }
+          ]
+        }
+      }
+    }
   }
 }
