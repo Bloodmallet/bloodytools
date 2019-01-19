@@ -1448,14 +1448,19 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         max_available_itemlevel = "1_" + settings.azerite_trait_ilevels[-1]
         if not max_available_itemlevel in wanted_data["data"][trait]:
           max_available_itemlevel = sorted(wanted_data["data"][trait])[-1]
+          if "1_" != max_available_itemlevel[:2]:
+            max_available_itemlevel = "1_" + max_available_itemlevel[2:]
 
-        tmp_list.append(
-          (
-            trait,
-            wanted_data["data"][trait][max_available_itemlevel],
-            wanted_data["data"]["baseline"][max_available_itemlevel]
+        try:
+          tmp_list.append(
+            (
+              trait,
+              wanted_data["data"][trait][max_available_itemlevel],
+              wanted_data["data"]["baseline"][max_available_itemlevel]
+            )
           )
-        )
+        except Exception:
+          logger.error("{}, {}, {}".format(trait, max_available_itemlevel, wanted_data["data"][trait]))
       logger.debug("tmp_list: {}".format(tmp_list))
 
       # sort
@@ -1761,7 +1766,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               max_available_itemlevel = "1_" + settings.azerite_trait_ilevels[-1]
               if not max_available_itemlevel in wanted_data["data"][name]:
                 max_available_itemlevel = sorted(wanted_data["data"][name])[-1]
-
+                if "1_" != max_available_itemlevel[:2]:
+                  max_available_itemlevel = "1_" + max_available_itemlevel[2:]
 
               trait_dict[trait["tier"]].append(
                 (
@@ -1797,7 +1803,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                   slot_export["data"][item["name"]]["1_" + itemlevel] += wanted_data["data"][trait_dict[tier][0][0]]["1_" + itemlevel] - baseline_dps["1_" + itemlevel]
                 except Exception:
                   logger.debug(f"Itemlevel {itemlevel} for trait <{trait_dict[tier][0][0]}> not found. Removing the itemlevel from the item <{item['name']}> from result dict.")
-                  slot_export["data"][item["name"]].pop("1_" + itemlevel)
+                  if "1_" + itemlevel in slot_export["data"][item["name"]]:
+                    slot_export["data"][item["name"]].pop("1_" + itemlevel)
                   continue
 
           # add (item_name, item_dps) to unsorted_item_dps_list
