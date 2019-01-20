@@ -187,5 +187,82 @@ special_cases = {
         }
       }
     }
-  }
+  },
+  {
+  "shaman": {
+    "enhancement": {
+      "patchwerk": {
+        "azerite_trait_simulations": {
+          "Primal Primer": [
+            {
+              "suffix": "HH+TM+HS+Sun+ElS",
+              "additional_input": ["talents=3201033"],
+              "link_data": {
+                "HH": { "spell_id": "201900" }
+                "TM": { "spell_id": "262395" }
+                "HS": { "spell_id": "210853" }
+                "Sun": { "spell_id": "197214" }
+                "ElS": { "spell_id": "262624" }
+              },
+              "description": "Primal Primer is more powerful with this build"
+            }
+          ]
+        }
+      },
+	  "patchwerk": {
+        "azerite_trait_simulations": {
+          "Strength of Earth": [
+            {
+              "suffix": "BF+LS+OC+Sun+ESp",
+              "additional_input": ["talents=1103032"],
+              "link_data": {
+                "BF": { "spell_id": "246035" }
+                "LS": { "spell_id": "197992" }
+                "OC": { "spell_id": "210727" }
+                "Sun": { "spell_id": "197214" }
+                "ESp": { "spell_id": "188089" }
+              },
+              "description": "Strenght of Earth is more powerful with this single target focused build"
+            }
+          ]
+        }
+      },
+	  "patchwerk": {
+        "azerite_trait_simulations": {
+          "Thunderaan's Fury": [
+            {
+              "suffix": "LiS+FFW+SA+Sun+ElS",
+              "additional_input": ["talents=1103032"],
+              "link_data": {
+                "LiS": { "spell_id": "192106" }
+                "FFW": { "spell_id": "262647" }
+                "SA": { "spell_id": "192087" }
+                "Sun": { "spell_id": "197214" }
+                "ElS": { "spell_id": "262624" }
+              },
+              "description": "Classic 8.0 build"
+            }
+          ]
+        }
+      },
+      "hecticaddcleave": {
+        "azerite_trait_simulations": {
+          "Thunderaan's Fury": [
+            {
+              "suffix": "LiS+FFW+HS+Sun+ElS",
+              "additional_input": ["talents=1103032"],
+              "link_data": {
+                "LiS": { "spell_id": "192106" }
+                "FFW": { "spell_id": "262647" }
+                "HS": { "spell_id": "210853" }
+                "Sun": { "spell_id": "197214" }
+                "ElS": { "spell_id": "262624" }
+              },
+              "description": "Classic 8.0 build"
+            }
+          ]
+        }
+      },
+    }
+  },
 }
