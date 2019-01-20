@@ -145,7 +145,7 @@ special_cases = {
           "Primal Primer": [
             {
               "suffix": "HH+TM+HS+Sun+ElS",
-              "additional_input": ["talents=3201033"],
+              "additional_input": ["talents=2302031"],
               "link_data": {
                 "HH": { "spell_id": "201900" },
                 "TM": { "spell_id": "262395" },
@@ -173,7 +173,7 @@ special_cases = {
           "Thunderaan's Fury": [
             {
               "suffix": "LiS+FFW+SA+Sun+ElS",
-              "additional_input": ["talents=1103032"],
+              "additional_input": ["talents=3201031"],
               "link_data": {
                 "LiS": { "spell_id": "192106" },
                 "FFW": { "spell_id": "262647" },
