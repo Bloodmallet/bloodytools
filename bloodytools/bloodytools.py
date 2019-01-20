@@ -141,11 +141,8 @@ def create_base_json_dict(
   timestamp = pretty_timestamp()
 
   profile = {}
-
   profile_location = create_basic_profile_string(wow_class, wow_spec, settings.tier)
-
   interesting_bits = [
-    # "talents",
     "head",
     "neck",
     "shoulder",
@@ -163,9 +160,6 @@ def create_base_json_dict(
     "main_hand",
     "off_hand"
   ]
-
-  profile = {}
-
   with open(profile_location, 'r') as f:
     for line in f:
       for bit in interesting_bits:
@@ -190,6 +184,13 @@ def create_base_json_dict(
             for element in elements:
               if (element + "=") in part:
                 profile[bit][element] = part.split("=")[1].strip()
+
+  # spike the export data with talent data
+  talent_data = wow_lib.get_talent_dict(wow_class, wow_spec, settings.ptr == "1")
+
+  # add class/ id number
+  class_id = wow_lib.get_class_id(wow_class)
+  spec_id = wow_lib.get_spec_id(wow_class, wow_spec)
 
   return {
     "data_type":
@@ -223,7 +224,10 @@ def create_base_json_dict(
       },
     "data": {},
     "languages": {},
-    "profile": profile
+    "profile": profile,
+    "talent_data": talent_data,
+    "class_id": class_id,
+    "spec_id": spec_id
   }
 
 
@@ -1753,9 +1757,6 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         # create dict of which azerite traits were used on which item
         slot_export["used_azerite_traits_per_item"] = {}
 
-        # add class id number
-        slot_export["class_id"] = wow_lib.get_class_id(wow_class)
-
         # look at each item
         unsorted_item_dps_list = []
         for item in azerite_items[slot]:
@@ -2202,10 +2203,6 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
         export_json["sorted_data_keys"].append(item[0])
       for item in tmp_2:
         export_json["sorted_data_keys_2"].append(item[0])
-
-
-      # spike the export data with talent data
-      export_json["talent_data"] = wow_lib.get_talent_dict(wow_class, wow_spec, settings.ptr == "1")
 
       # create directory if it doesn't exist
       if not os.path.isdir("results/talent_worth/"):
