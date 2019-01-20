@@ -89,6 +89,20 @@ special_cases = {
             }
           ]
         }
+      },
+      "hecticaddcleave": {
+        "azerite_trait_simulations": {
+          "Shrouded Suffocation": [
+            {
+              "suffix": "Sub",
+              "additional_input": ["talents=2210021"],
+              "link_data": {
+                "Sub": { "spell_id": "108208" }
+              },
+              "description": "Forcing the use of Subterfuge"
+            }
+          ]
+        }
       }
     },
     "outlaw": {
