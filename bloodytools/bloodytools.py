@@ -140,6 +140,57 @@ def create_base_json_dict(
 
   timestamp = pretty_timestamp()
 
+  profile = {}
+
+  profile_location = create_basic_profile_string(wow_class, wow_spec, settings.tier)
+
+  interesting_bits = [
+    # "talents",
+    "head",
+    "neck",
+    "shoulder",
+    "back",
+    "chest",
+    "wrist",
+    "hands",
+    "waist",
+    "legs",
+    "feet",
+    "finger1",
+    "finger2",
+    "trinket1",
+    "trinket2",
+    "main_hand",
+    "off_hand"
+  ]
+
+  profile = {}
+
+  with open(profile_location, 'r') as f:
+    for line in f:
+      for bit in interesting_bits:
+        if "talents=" in line:
+          profile["talents"] = line.split("talents=")[1].split()[0].strip()
+
+        if bit + "=" in line:
+
+          if not bit in profile:
+            profile[bit]= {}
+
+          elements = [
+            "id",
+            "bonus_id",
+            "azerite_powers",
+            "enchant"
+          ]
+
+          parts = line.split(",")
+
+          for part in parts:
+            for element in elements:
+              if (element + "=") in part:
+                profile[bit][element] = part.split("=")[1].strip()
+
   return {
     "data_type":
       "{}".format(data_type.lower().replace(" ", "_")),
@@ -171,7 +222,8 @@ def create_base_json_dict(
         "spec": wow_spec
       },
     "data": {},
-    "languages": {}
+    "languages": {},
+    "profile": profile
   }
 
 
@@ -1734,6 +1786,23 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                 "ru_RU": item["name"]
               }
 
+          # get maximum available itemlevel for an item from its traits
+          # (yey to not having to create lists of raid items...yet)
+
+          max_available_itemlevel = 1000
+          for trait in item['azeriteTraits']:
+
+            # skip trait if no name is provided (trait is probably not yet implemented in wow anyway)
+            if not 'name' in trait:
+              continue
+
+            trait_id = str(trait['spellId'])
+
+            trait_ilvl = wow_lib.get_azerite_trait_max_ilevel(wow_class, wow_spec, trait_id)
+
+            if trait_ilvl < max_available_itemlevel:
+              max_available_itemlevel = trait_ilvl
+
           # create trait lists for each tier [(trait_name, dps)]
           trait_dict = {2: [], 3: [], 4: []}
           # collect trait data like spellid and power id to allow construction of links in page
@@ -1763,16 +1832,16 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             # if trait is a dps trait we simmed
             if name in wanted_data["data"]:
               # append tuple of name and max available itemlevel dps
-              max_available_itemlevel = "1_" + settings.azerite_trait_ilevels[-1]
-              if not max_available_itemlevel in wanted_data["data"][name]:
-                max_available_itemlevel = sorted(wanted_data["data"][name])[-1]
-                if "1_" != max_available_itemlevel[:2]:
-                  max_available_itemlevel = "1_" + max_available_itemlevel[2:]
+              tmp_max_available_itemlevel = "1_" + str(max_available_itemlevel)
+              if not tmp_max_available_itemlevel in wanted_data["data"][name]:
+                tmp_max_available_itemlevel = sorted(wanted_data["data"][name])[-1]
+                if "1_" != tmp_max_available_itemlevel[:2]:
+                  tmp_max_available_itemlevel = "1_" + tmp_max_available_itemlevel[2:]
 
               trait_dict[trait["tier"]].append(
                 (
                   name, wanted_data["data"][name]
-                  [max_available_itemlevel] - baseline_dps[max_available_itemlevel]
+                  [tmp_max_available_itemlevel] - baseline_dps[tmp_max_available_itemlevel]
                 )
               )
 
@@ -1793,6 +1862,10 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           # add values to the armor for all available itemlevels
           for itemlevel in settings.azerite_trait_ilevels:
 
+            # skip itemlevel if item (trait) can't scale up to this itemlevel
+            if int(itemlevel) > max_available_itemlevel:
+              continue
+
             # add base dps value first to be able to add the dps value of the different tiers later
             slot_export["data"][item["name"]]["1_" + itemlevel] = baseline_dps["1_" + itemlevel]
 
@@ -1808,7 +1881,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                   continue
 
           # add (item_name, item_dps) to unsorted_item_dps_list
-          max_available_itemlevel = "1_" + settings.azerite_trait_ilevels[-1]
+          max_available_itemlevel = "1_" + str(max_available_itemlevel)
           if not max_available_itemlevel in slot_export["data"][item["name"]]:
             max_available_itemlevel = sorted(slot_export["data"][item["name"]])[-1]
 
