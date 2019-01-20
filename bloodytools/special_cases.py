@@ -183,7 +183,7 @@ special_cases = {
               },
               "description": "Classic 8.0 build"
             }
-          ],
+          ]
         }
       },
       "hecticaddcleave": {
@@ -203,8 +203,8 @@ special_cases = {
             }
           ]
         }
-      },
-    },
+      }
+    }
   },
   "warlock": {
     "demonology": {
@@ -237,8 +237,8 @@ special_cases = {
               },
               "description": "Archimtiros"
             }
-          ],
-        },
+          ]
+        }
       },
       "hecticaddcleave": {
         "azerite_trait_simulations": {
