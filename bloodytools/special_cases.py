@@ -142,21 +142,7 @@ special_cases = {
     "enhancement": {
       "patchwerk": {
         "azerite_trait_simulations": {
-          "Primal Primer": [
-            {
-              "suffix": "HH+TM+HS+Sun+ElS",
-              "additional_input": ["talents=2302031"],
-              "link_data": {
-                "HH": { "spell_id": "201900" },
-                "TM": { "spell_id": "262395" },
-                "HS": { "spell_id": "210853" },
-                "Sun": { "spell_id": "197214" },
-                "ElS": { "spell_id": "262624" }
-              },
-              "description": "Primal Primer is more powerful with this build"
-            }
-          ],
-          "Strength of Earth": [
+         "Strength of Earth": [
             {
               "suffix": "BF+LS+OC+Sun+ESp",
               "additional_input": ["talents=1103032"],
@@ -169,21 +155,7 @@ special_cases = {
               },
               "description": "Strenght of Earth is more powerful with this single target focused build"
             }
-          ],
-           "Natural Harmony": [
-            {
-              "suffix": "HH+TM+HS+Sun+ElS",
-              "additional_input": ["talents=2302031"],
-              "link_data": {
-                "HH": { "spell_id": "201900" },
-                "TM": { "spell_id": "262395" },
-                "HS": { "spell_id": "210853" },
-                "Sun": { "spell_id": "197214" },
-                "ElS": { "spell_id": "262624" }
-              },
-              "description": "Natural Harmony comparison on Freezerburn build with Hailstorm"
-            }
-          ],
+          ],           
           "Natural Harmony": [
             {
               "suffix": "HH+TM+SA+Sun+ElS",
