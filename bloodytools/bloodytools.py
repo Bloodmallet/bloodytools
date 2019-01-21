@@ -136,6 +136,11 @@ def create_base_json_dict(
     dict -- [description]
   """
 
+  # TODO: fix standard profile in different simulations.
+  # trinkets don't use baseline trinkets
+  # azerite traits don't use azerite traits
+
+
   logger.debug("create_base_json_dict start")
 
   timestamp = pretty_timestamp()
@@ -145,10 +150,10 @@ def create_base_json_dict(
   interesting_bits = [
     "head",
     "neck",
-    "shoulder",
+    "shoulders",
     "back",
     "chest",
-    "wrist",
+    "wrists",
     "hands",
     "waist",
     "legs",
@@ -182,7 +187,7 @@ def create_base_json_dict(
 
           for part in parts:
             for element in elements:
-              if (element + "=") in part:
+              if (element + "=") in part and part.startswith(element):
                 profile[bit][element] = part.split("=")[1].strip()
 
   # spike the export data with talent data
