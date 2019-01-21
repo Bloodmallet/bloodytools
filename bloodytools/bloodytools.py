@@ -136,11 +136,6 @@ def create_base_json_dict(
     dict -- [description]
   """
 
-  # TODO: fix standard profile in different simulations.
-  # trinkets don't use baseline trinkets
-  # azerite traits don't use azerite traits
-
-
   logger.debug("create_base_json_dict start")
 
   timestamp = pretty_timestamp()
@@ -585,6 +580,15 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
       json_export = create_base_json_dict(
         "trinkets", wow_class, wow_spec, fight_style
       )
+
+      # fix profile to match what was used in baseline
+      json_export['profile'].pop('trinket1')
+      json_export['profile'].pop('trinket2')
+      json_export['profile']['trinket2'] = {
+        "id": second_trinket.split(",")[1].split("=")[1],
+        "bonus_id": second_trinket.split(",")[2].split("=")[1],
+        "ilevel": str(settings.min_ilevel)
+      }
 
       for profile in simulation_group.profiles:
 
@@ -1456,6 +1460,12 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       wanted_data = create_base_json_dict(
         "Azerite Traits", wow_class, wow_spec, fight_style
       )
+
+      # fix base profile to match sim
+      wanted_data["profile"]["head"].pop("azerite_powers")
+      wanted_data["profile"]["shoulders"].pop("azerite_powers")
+      wanted_data["profile"]["chest"].pop("azerite_powers")
+
 
       logger.debug("Created base dict for json export. {}".format(wanted_data))
 
