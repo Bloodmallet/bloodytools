@@ -166,7 +166,49 @@ special_cases = {
               },
               "description": "Classic 8.0 build"
             }
-          ]
+          ],
+          "Natural Harmony": [
+            {
+              "suffix": "HH+TM+SA+Sun+ElS",
+              "additional_input": ["talents=2301031"],
+              "link_data": {
+                "HH": { "spell_id": "201900" },
+                "TM": { "spell_id": "262395" },
+                "SA": { "spell_id": "192087" },
+                "Sun": { "spell_id": "197214" },
+                "ElS": { "spell_id": "262624" }
+              },
+              "description": "Natural Harmony comparison on Freezerburn build with Searing Assault"
+            }
+          ],
+          "Natural Harmony": [
+            {
+              "suffix": "LiS+FFW+SA+Sun+Asc",
+              "additional_input": ["talents=3201033"],
+              "link_data": {
+                "LiS": { "spell_id": "192106" },
+                "FFW": { "spell_id": "262647" },
+                "SA": { "spell_id": "192087" },
+                "Sun": { "spell_id": "197214" },
+                "Asc": { "spell_id": "114051" }
+              },
+              "description": "Natural Harmony comparison on default build with Searing Assault"
+            }
+          ],
+          "Natural Harmony": [
+            {
+              "suffix": "LiS+FFW+HS+Sun+Asc",
+              "additional_input": ["talents=3202033"],
+              "link_data": {
+                "LiS": { "spell_id": "192106" },
+                "FFW": { "spell_id": "262647" },
+                "HS": { "spell_id": "210853" },
+                "Sun": { "spell_id": "197214" },
+                "Asc": { "spell_id": "114051" }
+              },
+              "description": "Natural Harmony comparison on default build with Hailstorm"
+            }
+          ],
         }
       },
       "hecticaddcleave": {
@@ -174,7 +216,7 @@ special_cases = {
           "Thunderaan's Fury": [
             {
               "suffix": "LiS+FFW+HS+Sun+ElS",
-              "additional_input": ["talents=1103032"],
+              "additional_input": ["talents=3201031"],
               "link_data": {
                 "LiS": { "spell_id": "192106" },
                 "FFW": { "spell_id": "262647" },
