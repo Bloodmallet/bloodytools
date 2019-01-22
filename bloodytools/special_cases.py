@@ -144,7 +144,7 @@ special_cases = {
         "azerite_trait_simulations": {
           "Strength of Earth": [
             {
-              "suffix": "BF+LS+OC+Sun+ESp",
+              "suffix": "BF+LS+OC+ESp",
               "additional_input": ["talents=1103032"],
               "link_data": {
                 "BF": { "spell_id": "246035" },
@@ -157,7 +157,7 @@ special_cases = {
           ],
           "Thunderaan's Fury": [
             {
-              "suffix": "LiS+FFW+SA+Sun+ElS",
+              "suffix": "LiS+FFW+SA",
               "additional_input": ["talents=3201031"],
               "link_data": {
                 "LiS": { "spell_id": "192106" },
@@ -169,27 +169,22 @@ special_cases = {
           ],
           "Natural Harmony": [
             {
-              "suffix": "HH+TM+SA+Sun+ElS",
+              "suffix": "SA",
               "additional_input": ["talents=2301031"],
               "link_data": {
-                "HH": { "spell_id": "201900" },
-                "TM": { "spell_id": "262395" },
                 "SA": { "spell_id": "192087" },
-                "Sun": { "spell_id": "197214" },
-                "ElS": { "spell_id": "262624" }
               },
               "description": "Natural Harmony comparison on Freezerburn build with Searing Assault"
             }
           ],
           "Natural Harmony": [
             {
-              "suffix": "LiS+FFW+SA+Sun+Asc",
+              "suffix": "LiS+FFW+SA+Asc",
               "additional_input": ["talents=3201033"],
               "link_data": {
                 "LiS": { "spell_id": "192106" },
                 "FFW": { "spell_id": "262647" },
                 "SA": { "spell_id": "192087" },
-                "Sun": { "spell_id": "197214" },
                 "Asc": { "spell_id": "114051" }
               },
               "description": "Natural Harmony comparison on default build with Searing Assault"
@@ -197,13 +192,11 @@ special_cases = {
           ],
           "Natural Harmony": [
             {
-              "suffix": "LiS+FFW+HS+Sun+Asc",
+              "suffix": "LiS+FFW+Asc",
               "additional_input": ["talents=3202033"],
               "link_data": {
                 "LiS": { "spell_id": "192106" },
                 "FFW": { "spell_id": "262647" },
-                "HS": { "spell_id": "210853" },
-                "Sun": { "spell_id": "197214" },
                 "Asc": { "spell_id": "114051" }
               },
               "description": "Natural Harmony comparison on default build with Hailstorm"
@@ -215,14 +208,12 @@ special_cases = {
         "azerite_trait_simulations": {
           "Thunderaan's Fury": [
             {
-              "suffix": "LiS+FFW+HS+Sun+ElS",
+              "suffix": "LiS+FFW+HS",
               "additional_input": ["talents=3201031"],
               "link_data": {
                 "LiS": { "spell_id": "192106" },
                 "FFW": { "spell_id": "262647" },
                 "HS": { "spell_id": "210853" },
-                "Sun": { "spell_id": "197214" },
-                "ElS": { "spell_id": "262624" }
               },
               "description": "Classic 8.0 build"
             }
