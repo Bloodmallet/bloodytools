@@ -27,6 +27,7 @@ import datetime
 import json
 import logging
 import os
+# import re
 import sys
 import settings # settings.py file
 from special_cases import special_cases # special_cases file, contains spec specific additional profile information for azerite traits
@@ -163,7 +164,10 @@ def create_base_json_dict(
   with open(profile_location, 'r') as f:
     for line in f:
       for bit in interesting_bits:
-        if "talents=" in line:
+
+        # TODO: Rework this section to use regex (re)
+        # /^talents=[0-3]{7}$/ https://regexr.com/
+        if "talents=" == line[:8]:
           profile["talents"] = line.split("talents=")[1].split()[0].strip()
 
         if bit + "=" in line:
