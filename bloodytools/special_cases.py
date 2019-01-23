@@ -175,9 +175,7 @@ special_cases = {
                 "SA": { "spell_id": "192087" },
               },
               "description": "Natural Harmony comparison on Freezerburn build with Searing Assault"
-            }
-          ],
-          "Natural Harmony": [
+            },
             {
               "suffix": "LiS+FFW+SA+Asc",
               "additional_input": ["talents=3201033"],
@@ -188,9 +186,7 @@ special_cases = {
                 "Asc": { "spell_id": "114051" }
               },
               "description": "Natural Harmony comparison on default build with Searing Assault"
-            }
-          ],
-          "Natural Harmony": [
+            },
             {
               "suffix": "LiS+FFW+Asc",
               "additional_input": ["talents=3202033"],
