@@ -129,7 +129,7 @@ class Simulation_Data():
         self.logger.error("{}".format(e))
         raise e
     # simc setting to determine the fight style
-    if fight_style == "custom" or simc_checks.is_fight_style(fight_style):
+    if fight_style == "custom" or simc_checks.FightStyle().is_fight_style(fight_style):
       self.fight_style = fight_style
     else:
       self.logger.warning(
