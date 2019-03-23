@@ -38,42 +38,6 @@
 # Last but not least you can create longer suffixes consisting of multiple additional spells/items by adding + into the suffix name. E.g. "hello +world". You can then use "hello" and "world" in link_data to indicate multiple changes to the profile.
 
 special_cases = {
-  "demon_hunter": {
-    "havoc": {
-      "patchwerk": {
-        "azerite_trait_simulations": {
-          "Eyes of Rage": [
-            {
-              "suffix": "BF+IA+D",
-              "additional_input": ["talents=1310221"],
-              "link_data": {
-                "BF": { "spell_id": "203550" },
-                "IA": {"spell_id": "258920"},
-                "D": {"spell_id": "213410"}
-              },
-              "description": "Original: 3210222. Blind Fury instead of Felblade, Immolation Aura instead of Demon Blades, Demonic instead of Momentum. Wanted by iPilot#2019"
-            }
-          ]
-        }
-      },
-      "hecticaddcleave": {
-        "azerite_trait_simulations": {
-          "Eyes of Rage": [
-            {
-              "suffix": "BF+IA+D",
-              "additional_input": ["talents=1310221"],
-              "link_data": {
-                "BF": { "spell_id": "203550" },
-                "IA": {"spell_id": "258920"},
-                "D": {"spell_id": "213410"}
-              },
-              "description": "Original: 3210222. Blind Fury instead of Felblade, Immolation Aura instead of Demon Blades, Demonic instead of Momentum. Wanted by iPilot#2019"
-            }
-          ]
-        }
-      }
-    }
-  },
   "rogue": {
     "assassination": {
       "patchwerk": {
@@ -123,38 +87,9 @@ special_cases = {
     }
   },
   "shaman": {
-    "elemental": {
-      "patchwerk": {
-        "azerite_trait_simulations": {
-          "Natural Harmony": [
-            {
-              "suffix": "EB",
-              "additional_input": ["talents=3302012"],
-              "link_data": {
-                "EB": { "spell_id": "117014" }
-              },
-              "description": "Natural Harmony buffs different secondary stats based on the used spell school. The standard patchwerk simulation doesn't use the Frost School. Switching to Elemental Blast (talent) forces this school."
-            }
-          ]
-        }
-      }
-    },
     "enhancement": {
       "patchwerk": {
         "azerite_trait_simulations": {
-          "Strength of Earth": [
-            {
-              "suffix": "BF+LS+OC+ESp",
-              "additional_input": ["talents=1103032"],
-              "link_data": {
-                "BF": { "spell_id": "246035" },
-                "LS": { "spell_id": "197992" },
-                "OC": { "spell_id": "210727" },
-                "ESp": { "spell_id": "188089" }
-              },
-              "description": "Strenght of Earth is more powerful with this single target focused build"
-            }
-          ],
           "Thunderaan's Fury": [
             {
               "suffix": "LiS+FFW+SA",
@@ -212,24 +147,6 @@ special_cases = {
                 "HS": { "spell_id": "210853" },
               },
               "description": "Classic 8.0 build"
-            }
-          ]
-        }
-      }
-    }
-  },
-  "warlock": {
-    "demonology": {
-      "patchwerk": {
-        "azerite_trait_simulations": {
-          "Shadow's Bite": [
-            {
-              "suffix": "DC",
-              "additional_input": ["talents=2103033"],
-              "link_data": {
-                "DC": { "spell_id": "205145" }
-              },
-              "description": "Curiosity killed the cat"
             }
           ]
         }
