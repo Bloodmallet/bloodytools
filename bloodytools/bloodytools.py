@@ -258,7 +258,7 @@ def tokenize_str(string: str) -> str:
 
 
 def get_simc_hash(path) -> str:
-  """Get the FETCH_HEAD simc hash.
+  """Get the FETCH_HEAD or shallow simc git hash.
 
   Returns:
     str -- [description]
@@ -310,12 +310,11 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
           create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
         ) as f:
           pass
-      except Exception as e:
+      except FileNotFoundError:
         logger.warning(
-          "Opening baseline profile {} {} failed. This spec won't be in the result. {}".
-          format(wow_class, wow_spec, e)
+          "{} {} profile not found. Skipping.".
+          format(wow_spec.title(), wow_class.title())
         )
-        # end this try early, no profile, no calculations
         continue
 
       races = wow_lib.get_races_for_class(wow_class)
@@ -471,12 +470,11 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
           create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
         ) as f:
           pass
-      except Exception as e:
+      except FileNotFoundError:
         logger.warning(
-          "Opening baseline profile for {} {} failed. This spec won't be in the result. {}".
-          format(wow_class, wow_spec, e)
+          "{} {} profile not found. Skipping.".
+          format(wow_spec.title(), wow_class.title())
         )
-        # end this try early, no profile, no calculations
         continue
 
       if not wow_class in simulation_results:
@@ -593,6 +591,11 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
         "bonus_id": second_trinket.split(",")[2].split("=")[1],
         "ilevel": str(settings.min_ilevel)
       }
+
+      json_export["data_active"] = {}
+      for trinket in trinket_list:
+        json_export["data_active"][trinket[0]] = trinket[5]
+
 
       for profile in simulation_group.profiles:
 
@@ -854,10 +857,10 @@ def secondary_distribution_simulations(
           secondary_amount += int(line.split("=")[1])
         elif "gear_versatility_rating=" in line:
           secondary_amount += int(line.split("=")[1])
-  except Exception as e:
+  except FileNotFoundError:
     logger.warning(
-      "Scanning baseline profile {} {} failed. This spec won't be in the result. {}".
-      format(wow_class, wow_spec, e)
+      "{} {} profile not found. Skipping.".
+      format(wow_spec.title(), wow_class.title())
     )
     # end this try early, no profile, no calculations
     return
@@ -1106,10 +1109,10 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           for line in f:
             if "head=" in line:
               item_head = line[:-1]
-      except Exception as e:
+      except FileNotFoundError:
         logger.warning(
-          "Opening baseline profile {} {} failed. This spec won't be in the result. {}".
-          format(wow_class, wow_spec, e)
+          "{} {} profile not found. Skipping.".
+          format(wow_spec.title(), wow_class.title())
         )
         # end this try early, no profile, no calculations
         continue
@@ -1946,8 +1949,21 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
 
   for fight_style in settings.fight_styles:
     gear_path = []
-    for spec in specs:
-      wow_class, wow_spec = spec
+    for wow_class, wow_spec in specs:
+
+      # check whether the baseline profile does exist
+      try:
+        with open(
+          create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
+        ) as f:
+          pass
+      except FileNotFoundError:
+        logger.warning(
+          "{} {} profile not found. Skipping.".
+          format(wow_spec.title(), wow_class.title())
+        )
+        continue
+
 
       # initial profiles and data
       secondary_sum = 0
@@ -2109,6 +2125,19 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
 
   for fight_style in settings.fight_styles:
     for wow_class, wow_spec in specs:
+
+      # check whether the baseline profile does exist
+      try:
+        with open(
+          create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
+        ) as f:
+          pass
+      except FileNotFoundError:
+        logger.warning(
+          "{} {} profile not found. Skipping.".
+          format(wow_spec.title(), wow_class.title())
+        )
+        continue
 
       base_profile_string = create_basic_profile_string(wow_class, wow_spec, settings.tier)
 
@@ -2547,7 +2576,6 @@ def main():
 
     if not settings.use_own_threading:
       logger.info("Gear Path simulations end.")
-
 
   # trigger talent worth simulations
   if settings.enable_talent_worth_simulations:
