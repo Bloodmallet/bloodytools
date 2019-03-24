@@ -48,7 +48,7 @@ fh.setLevel(logging.DEBUG)
 #   if settings.debug:
 #     fh.setLevel(logging.DEBUG)
 log_formatter = logging.Formatter(
-  "%(asctime)s - %(filename)s / %(funcName)s - %(levelname)s - %(message)s"
+  "%(asctime)s - %(filename)s / %(funcName)s / %(lineno)s - %(levelname)s - %(message)s"
 )
 live_formatter = logging.Formatter(
   "%(asctime)s - %(levelname)s - %(message)s"
@@ -359,6 +359,12 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             iterations=settings.iterations,
             logger=logger
           )
+
+          # adding argument for zandalari trolls
+          if race == 'zandalari_troll':
+            simulation_data.simc_arguments.append('zandalari_loa=kimbul')
+            simulation_data.name += ' Kimbul'
+
         simulation_group.add(simulation_data)
         logger.debug(
           (
@@ -367,6 +373,30 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             )
           )
         )
+
+        if race == 'zandalari_troll':
+          # create more loa profiles and add them
+          simulation_data = None
+          for loa in [ 'bwonsamdi', 'paku']:
+            simulation_data = simulation_objects.Simulation_Data(
+              name='{} {}'.format(race.title().replace("_", " "), loa.title()),
+              fight_style=fight_style,
+              simc_arguments=["race={}".format(race), 'zandalari_loa={}'.format(loa)],
+              target_error=settings.target_error[fight_style],
+              ptr=settings.ptr,
+              default_actions=settings.default_actions,
+              executable=settings.executable,
+              iterations=settings.iterations,
+              logger=logger
+            )
+            simulation_group.add(simulation_data)
+            logger.debug(
+              (
+                "Added race '{}' in profile '{}' to simulation_group.".format(
+                  race, simulation_data.name
+                )
+              )
+            )
 
       logger.info(
         "Start {} race simulation for {} {}.".format(
@@ -412,7 +442,21 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
           )
         )
         # add race translations to the final json
-        wanted_data["languages"][profile.name] = wow_lib.get_race_translation(profile.name)
+        translated_name = wow_lib.get_race_translation(profile.name)
+        if translated_name:
+          wanted_data["languages"][profile.name] = wow_lib.get_race_translation(profile.name)
+        else:
+          fake_translation = profile.name.title().replace("_", " ")
+          wanted_data['languages'][profile.name] = {
+            'en_US': fake_translation,
+            'it_IT': fake_translation,
+            'de_DE': fake_translation,
+            'fr_FR': fake_translation,
+            'ru_RU': fake_translation,
+            'es_ES': fake_translation,
+            'ko_KR': fake_translation,
+            'cn_CN': fake_translation
+          }
 
       # create ordered race name list
       tmp_list = []
