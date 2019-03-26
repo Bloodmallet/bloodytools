@@ -280,9 +280,16 @@ def get_simc_hash(path) -> str:
         if "'bfa-dev'" in line:
           simc_hash = line.split()[0]
   except FileNotFoundError:
-    with open('../../SimulationCraft/.git/shallow', 'r', encoding='utf-8') as f:
-      for line in f:
-        simc_hash = line.strip()
+    try:
+      with open('../../SimulationCraft/.git/shallow', 'r', encoding='utf-8') as f:
+        for line in f:
+          simc_hash = line.strip()
+    except FileNotFoundError:
+      logger.warning("Couldn't extract SimulationCraft git hash. Result files won't contain a sane hash.")
+      simc_hash = None
+    except Exception as e:
+      logger.error(e)
+      raise e
   except Exception as e:
     logger.error(e)
     raise e
