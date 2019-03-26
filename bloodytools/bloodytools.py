@@ -196,6 +196,13 @@ def create_base_json_dict(
   class_id = wow_lib.get_class_id(wow_class)
   spec_id = wow_lib.get_spec_id(wow_class, wow_spec)
 
+  subtitle = "UTC {timestamp}".format(timestamp=timestamp)
+  if settings.simc_hash:
+    subtitle += " | SimC build: <a href=\"https://github.com/simulationcraft/simc/commit/{simc_hash}\" target=\"blank\">{simc_hash_short}</a>".format(
+      simc_hash=settings.simc_hash,
+      simc_hash_short=settings.simc_hash[0:7]
+    )
+
   return {
     "data_type":
       "{}".format(data_type.lower().replace(" ", "_")),
@@ -208,13 +215,7 @@ def create_base_json_dict(
         wow_spec=wow_spec.title().replace("_", " "),
         fight_style=fight_style.title()
       ),
-    "subtitle":
-      "UTC {timestamp} | SimC build: <a href=\"https://github.com/simulationcraft/simc/commit/{simc_hash}\" target=\"blank\">{simc_hash_short}</a>"
-      .format(
-        timestamp=timestamp,
-        simc_hash=settings.simc_hash,
-        simc_hash_short=settings.simc_hash[0:7]
-      ),
+    "subtitle": subtitle,
     "simc_settings":
       {
         "tier": settings.tier,
@@ -2473,7 +2474,12 @@ def main():
   if args.ptr:
     settings.ptr = "1"
 
-  settings.simc_hash = get_simc_hash(settings.executable)
+  # only
+  new_hash = get_simc_hash(settings.executable)
+  if new_hash:
+    settings.simc_hash = new_hash
+  if not hasattr(settings, 'simc_hash'):
+    settings.simc_hash = None
 
   bloodytools_start_time = datetime.datetime.utcnow()
 
