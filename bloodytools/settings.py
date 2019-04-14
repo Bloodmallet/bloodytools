@@ -7,7 +7,7 @@
 
 ##
 # General setttings
-tier = "22"  # number or PR (PreRaid)
+tier = "23"  # number or PR (PreRaid)
 wow_class_spec_list = []  # leave empty to simulate all
 # wow_class_spec_list = [("shaman", "elemental"), ("mage", "frost")] # example for a specific list
 wow_class_spec_list = [
@@ -29,6 +29,7 @@ wow_class_spec_list = [
   ("monk", "windwalker"),
   ("paladin", "protection"),
   ("paladin", "retribution"),
+  ("priest", "discipline"),
   ("priest", "holy"),
   ("priest", "shadow"),
   ("rogue", "assassination"),
@@ -41,6 +42,7 @@ wow_class_spec_list = [
   ("warlock", "destruction"),
   ("warrior", "arms"),
   ("warrior", "fury"),
+  ("warrior", "protection"),
 ]
 
 ##
@@ -58,21 +60,24 @@ default_actions = "1"
 target_error = {
   "patchwerk": "0.2",
   "hecticaddcleave": "0.2",
-  "beastlord": "0.4"
+  "beastlord": "0.2"
 }
 threads = "8"
+
 
 ###############################################################################
 # Race simulations
 enable_race_simulations = True
 
+
 ###############################################################################
 # Trinket simulations
 enable_trinket_simulations = True
 ilevel_step = 15  # ilevel_step is used to determine the size of each itemlevel step taken to max_ilevel
-max_ilevel = 400  # max_itemlevel determines the upper border of steps taken
-min_ilevel = 340  # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
+max_ilevel = 415  # max_itemlevel determines the upper border of steps taken
+min_ilevel = 370  # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
 # example: min 300, max 325, step 10, resulting simulated ilevels: 300, 310, 320
+
 
 ###############################################################################
 # Secondary distributions
@@ -92,10 +97,10 @@ talent_permutations = False  # set to False, to sim only the base profile talent
 # Azerite traits
 enable_azerite_trait_simulations = True
 azerite_trait_ilevels = [ # determines the itemlevel used to sim the traits
-  "340",
-  "355",
   "370",
-  "385"
+  "385",
+  "400",
+  "415"
 ] # ascending order required
 
 
@@ -116,9 +121,11 @@ enable_talent_worth_simulations = False
 debug = False
 use_own_threading = False
 use_raidbots = False
-write_humanreadable_secondary_distribution_file = True
+write_humanreadable_secondary_distribution_file = False
 lua_trinket_export = True
 try:
   from apikey import apikey
 except Exception:
+  if use_raidbots:
+    exit("Error: apikey required! Add your apikey to apikey.py")
   pass
