@@ -64,6 +64,9 @@ target_error = {
 }
 threads = "8"
 
+use_custom_profile = False # custom profile overrides standard profile, standard profile is still used as baseline
+# use_custom_fight_style = False # NYI
+
 
 ###############################################################################
 # Race simulations

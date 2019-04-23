@@ -82,6 +82,7 @@ class Simulation_Data():
     optimize_expressions: str = "1",
     ptr: str = "0",
     ready_trigger: str = "1",
+    profile: dict = {},
     simc_arguments: list = [],
     target_error: str = "0.1",
     threads: str = "",
@@ -181,6 +182,27 @@ class Simulation_Data():
       self.simc_arguments = simc_arguments
     else:
       self.simc_arguments = [simc_arguments]
+    # craft simc input for a proper profile
+    if profile:
+      if not profile.get('character', None) or not profile.get('items', None):
+        raise ValueError('When providing a profile it must have \'character\' and \'items\' keys.')
+
+      character = []
+      for name in profile['character']:
+        if name != 'class':
+          character.append("{}={}".format(name, profile['character'][name]))
+        else:
+          character.append("{}=baseline".format(profile['character'][name]))
+
+      items = []
+      for slot in profile['items']:
+        string = "{}=,".format(slot)
+        string += ",".join("{}={}".format(key, value) for key, value in profile['items'][slot].items())
+        items.append(string)
+
+      # prepend created character profile input
+      self.simc_arguments = character + items + self.simc_arguments
+
     # simc setting to determine the target_error
     try:
       self.target_error = str(float(target_error))
@@ -923,13 +945,7 @@ class Simulation_Group():
               # first used profile needs to be written as normal profile instead of profileset
               if profile == self.profiles[0]:
                 for argument in profile.simc_arguments:
-                  # first profile has the dynamic link to the base profile as the first argument
-                  if argument == profile.simc_arguments[0]:
-                    with open(argument, 'r') as basic_profile:
-                      for line in basic_profile:
-                        f.write(line)  # TODO: might need a line break
-                  else:
-                    f.write("{}\n".format(argument))
+                  f.write("{}\n".format(argument))
                 f.write(
                   "name=\"{}\"\n\n# Profileset start\n".format(profile.name)
                 )

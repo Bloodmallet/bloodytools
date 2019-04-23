@@ -21,6 +21,9 @@
 """
 
 from typing import List, Tuple
+from simc_support import wow_lib
+from simulation_objects import simulation_objects
+from special_cases import special_cases # special_cases file, contains spec specific additional profile information for azerite traits
 
 import argparse
 import datetime
@@ -30,10 +33,8 @@ import os
 # import re
 import sys
 import settings # settings.py file
-from special_cases import special_cases # special_cases file, contains spec specific additional profile information for azerite traits
-import simulation_objects.simulation_objects as simulation_objects
 import time
-from simc_support import wow_lib
+import re
 
 if settings.use_own_threading:
   import threading
@@ -122,6 +123,110 @@ def pretty_timestamp() -> str:
   return datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M")
 
 
+def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
+  """Extract all character specific data from a given file.
+
+  Arguments:
+      path {str} -- path to file, relative or absolute
+      profile {dict} -- profile input that should be updated
+
+  Returns:
+      dict -- all known character data
+  """
+
+  if not profile:
+    profile = {}
+
+  if not 'character' in profile:
+    profile['character'] = {}
+
+  profile['character']['class'] = wow_class
+
+  item_slots = [
+    "head",
+    "neck",
+    "shoulders",
+    "back",
+    "chest",
+    "wrists",
+    "hands",
+    "waist",
+    "legs",
+    "feet",
+    "finger1",
+    "finger2",
+    "trinket1",
+    "trinket2",
+    "main_hand",
+    "off_hand",
+  ]
+  pattern_slots = {}
+  for element in item_slots:
+    pattern_slots[element] = re.compile('^{}=([a-z0-9_=,/]*)$'.format(element))
+
+  item_elements = [
+    "id",
+    "bonus_id",
+    "azerite_powers",
+    "enchant"
+  ]
+  pattern_element = {}
+  # don't recompile this for each slot
+  for element in item_elements:
+    pattern_element[element] = re.compile(',{}=([a-z0-9_/]*)'.format(element))
+
+  character_specifics = [
+    'level',
+    'race',
+    'role',
+    'position',
+    'talents',
+    'spec',
+  ]
+  pattern_specifics = {}
+  for element in character_specifics:
+    pattern_specifics[element] = re.compile('^{}=([a-z0-9_]*)$'.format(element))
+
+  with open(path, 'r') as f:
+    for line in f:
+      for specific in character_specifics:
+
+        matches = pattern_specifics[specific].search(line)
+        if matches:
+          profile['character'][specific] = matches.group(1)
+          # TODO: remove after some time (webfront-end needs to be updated)
+          profile[specific] = matches.group(1)
+
+      for slot in item_slots:
+
+        if not 'items' in profile:
+          profile['items'] = {}
+
+        matches = pattern_slots[slot].search(line)
+        # slot line found
+        if matches:
+          new_line = matches.group(1)
+          if not slot in profile:
+            profile['items'][slot] = {}
+
+          # allow pre-prepared profiles to get emptied if input wants to overwrite with empty
+          # 'head=' as a head example for an empty overwrite
+          if not new_line:
+            profile['items'].pop(slot, None)
+
+          # check for all elements
+          for element in item_elements:
+            new_matches = pattern_element[element].search(new_line)
+            if new_matches:
+              profile['items'][slot][element] = new_matches.group(1)
+              # TODO: remove after some time (webfront-end needs to be updated)
+              if not slot in profile:
+                profile[slot] = {}
+              profile[slot][element] = new_matches.group(1)
+
+  return profile
+
+
 def create_base_json_dict(
   data_type: str, wow_class: str, wow_spec: str, fight_style: str
 ):
@@ -141,53 +246,12 @@ def create_base_json_dict(
 
   timestamp = pretty_timestamp()
 
-  profile = {}
   profile_location = create_basic_profile_string(wow_class, wow_spec, settings.tier)
-  interesting_bits = [
-    "head",
-    "neck",
-    "shoulders",
-    "back",
-    "chest",
-    "wrists",
-    "hands",
-    "waist",
-    "legs",
-    "feet",
-    "finger1",
-    "finger2",
-    "trinket1",
-    "trinket2",
-    "main_hand",
-    "off_hand"
-  ]
-  with open(profile_location, 'r') as f:
-    for line in f:
-      for bit in interesting_bits:
 
-        # TODO: Rework this section to use regex (re)
-        # /^talents=[0-3]{7}$/ https://regexr.com/
-        if "talents=" == line[:8]:
-          profile["talents"] = line.split("talents=")[1].split()[0].strip()
+  profile = extract_profile(profile_location, wow_class)
 
-        if bit + "=" in line:
-
-          if not bit in profile:
-            profile[bit]= {}
-
-          elements = [
-            "id",
-            "bonus_id",
-            "azerite_powers",
-            "enchant"
-          ]
-
-          parts = line.split(",")
-
-          for part in parts:
-            for element in elements:
-              if (element + "=") in part and part.startswith(element):
-                profile[bit][element] = part.split("=")[1].strip()
+  if settings.use_custom_profile:
+    profile = extract_profile('custom_profile.txt', wow_class, profile)
 
   # spike the export data with talent data
   talent_data = wow_lib.get_talent_dict(wow_class, wow_spec, settings.ptr == "1")
@@ -224,7 +288,9 @@ def create_base_json_dict(
         "target_error": settings.target_error[fight_style],
         "ptr": settings.ptr,
         "simc_hash": settings.simc_hash,
+        # deprecated
         "class": wow_class,
+        # deprecated
         "spec": wow_spec
       },
     "data": {},
@@ -320,10 +386,15 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
           pass
       except FileNotFoundError:
         logger.warning(
-          "{} {} profile not found. Skipping.".
+          "{} {} base profile not found. Skipping.".
           format(wow_spec.title(), wow_class.title())
         )
         continue
+
+      # prepare result json
+      wanted_data = create_base_json_dict(
+        "Races", wow_class, wow_spec, fight_style
+      )
 
       races = wow_lib.get_races_for_class(wow_class)
       simulation_group = simulation_objects.Simulation_Group(
@@ -340,14 +411,11 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
 
         if race == races[0]:
 
-          basic_profile_string = create_basic_profile_string(
-            wow_class, wow_spec, settings.tier
-          )
-
           simulation_data = simulation_objects.Simulation_Data(
             name=race.title().replace("_", " "),
             fight_style=fight_style,
-            simc_arguments=[basic_profile_string, "race={}".format(race)],
+            profile=wanted_data['profile'],
+            simc_arguments=["race={}".format(race)],
             target_error=settings.target_error[fight_style],
             ptr=settings.ptr,
             default_actions=settings.default_actions,
@@ -433,11 +501,6 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
         logger.debug(
           "Profile '{}' DPS: {}".format(profile.name, profile.get_dps())
         )
-
-      # save data to json
-      wanted_data = create_base_json_dict(
-        "Races", wow_class, wow_spec, fight_style
-      )
 
       logger.debug("Created base dict for json export. {}".format(wanted_data))
 
@@ -529,13 +592,35 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
         )
         continue
 
-      if not wow_class in simulation_results:
-        simulation_results[wow_class] = {}
+      # json exporter
+      json_export = create_base_json_dict(
+        "trinkets", wow_class, wow_spec, fight_style
+      )
 
       # get main-trinkets
       trinket_list = wow_lib.get_trinkets_for_spec(wow_class, wow_spec)
       # get secondary-trinket (standard stat stick)
       second_trinket = wow_lib.get_second_trinket_for_spec(wow_class, wow_spec)
+
+      # fix profile for this type of simulations
+      json_export['profile']['items'].pop('trinket1')
+      json_export['profile']['items'].pop('trinket2')
+      json_export['profile']['items']['trinket2'] = {
+        "id": second_trinket.split(",")[1].split("=")[1],
+        "bonus_id": second_trinket.split(",")[2].split("=")[1],
+        "ilevel": str(settings.min_ilevel)
+      }
+      # TODO: remove after some time and after frontend is updated
+      json_export['profile'].pop('trinket1')
+      json_export['profile'].pop('trinket2')
+      json_export['profile']['trinket2'] = {
+        "id": second_trinket.split(",")[1].split("=")[1],
+        "bonus_id": second_trinket.split(",")[2].split("=")[1],
+        "ilevel": str(settings.min_ilevel)
+      }
+
+      if not wow_class in simulation_results:
+        simulation_results[wow_class] = {}
 
       simulation_group = simulation_objects.Simulation_Group(
         name="{} {}".format(wow_class.title(), wow_spec.title()),
@@ -553,10 +638,9 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
             fight_style=fight_style,
             iterations=settings.iterations,
             target_error=settings.target_error[fight_style],
+            profile=json_export['profile'],
             simc_arguments=[
-              create_basic_profile_string(wow_class, wow_spec, settings.tier),
               "trinket1=",
-              "trinket2=" + second_trinket + ",ilevel=" + str(settings.min_ilevel)
             ],
             ptr=settings.ptr,
             default_actions=settings.default_actions,
@@ -629,20 +713,6 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
           logger.debug("simulation_group.get_dps_of(\"baseline {{}}\".format(settings.min_ilevel)) {}".format(simulation_group.get_dps_of("baseline {}".format(settings.min_ilevel))))
 
       simulation_results[wow_class][wow_spec] = simulation_group
-
-      # json exporter
-      json_export = create_base_json_dict(
-        "trinkets", wow_class, wow_spec, fight_style
-      )
-
-      # fix profile to match what was used in baseline
-      json_export['profile'].pop('trinket1')
-      json_export['profile'].pop('trinket2')
-      json_export['profile']['trinket2'] = {
-        "id": second_trinket.split(",")[1].split("=")[1],
-        "bonus_id": second_trinket.split(",")[2].split("=")[1],
-        "ilevel": str(settings.min_ilevel)
-      }
 
       json_export["data_active"] = {}
       for trinket in trinket_list:
@@ -891,8 +961,8 @@ def secondary_distribution_simulations(
 
   distribution_multipliers = []
   step_size = settings.secondary_distributions_step_size
-  lower_border = 10
-  upper_border = 70
+  lower_border = 10 # percent
+  upper_border = 70 # percent
   secondary_amount = 0
 
   # get secondary sum from profile
@@ -916,6 +986,16 @@ def secondary_distribution_simulations(
     )
     # end this try early, no profile, no calculations
     return
+
+  if settings.use_custom_profile:
+    try:
+      with open('custom_profile.txt', 'r') as f:
+        for line in f:
+          if 'secondary_sum=' in line:
+            secondary_amount = int(line.split('=')[1])
+    except FileNotFoundError:
+      logger.warning('Custom character file not found. Can\'t simulate this profile')
+      return
 
   logger.debug("secondary_amount found: {}".format(secondary_amount))
 
@@ -963,8 +1043,8 @@ def secondary_distribution_simulations(
               target_error=settings.target_error[fight_style],
               iterations=settings.iterations,
               logger=logger,
+              profile=result_dict['profile'],
               simc_arguments=[
-                create_basic_profile_string(wow_class, wow_spec, settings.tier),
                 "gear_crit_rating={}".format(
                   int(secondary_amount * (distribution_multiplier[0] / 100))
                 ),
@@ -1169,6 +1249,25 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         # end this try early, no profile, no calculations
         continue
 
+      if settings.use_custom_profile:
+        try:
+          with open('custom_profile.txt', 'r') as f:
+            for line in f:
+              if "head=" in line:
+                item_head = line[:-1]
+        except FileNotFoundError:
+          logger.warning(
+            "{} {} profile not found. Skipping.".
+            format(wow_spec.title(), wow_class.title())
+          )
+          # end this try early, no profile, no calculations
+          continue
+
+      # save data to json
+      wanted_data = create_base_json_dict(
+        "Azerite Traits", wow_class, wow_spec, fight_style
+      )
+
       # create simulation GROUP
       azerite_traits = wow_lib.get_azerite_traits(wow_class, wow_spec)
       simulation_group = simulation_objects.Simulation_Group(
@@ -1186,7 +1285,11 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       simulation_data = simulation_objects.Simulation_Data(
         name="baseline 1_{}".format(settings.azerite_trait_ilevels[0]),
         fight_style=fight_style,
-        simc_arguments=[basic_profile_string, reset_string, item_head + f",ilevel={settings.azerite_trait_ilevels[0]}"],
+        profile=wanted_data['profile'],
+        simc_arguments=[
+          reset_string,
+          item_head + f",ilevel={settings.azerite_trait_ilevels[0]}",
+        ],
         target_error=settings.target_error[fight_style],
         executable=settings.executable,
         iterations=settings.iterations,
@@ -1514,11 +1617,6 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         logger.debug(
           "Profile '{}' DPS: {}".format(profile.name, profile.get_dps())
         )
-
-      # save data to json
-      wanted_data = create_base_json_dict(
-        "Azerite Traits", wow_class, wow_spec, fight_style
-      )
 
       # fix base profile to match sim
       wanted_data["profile"]["head"].pop("azerite_powers")
@@ -2325,6 +2423,7 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
   logger.debug("talent_worth_simulations end")
   pass
 
+
 def main():
   logger.debug("main start")
   logger.info("Bloodytools at your service.")
@@ -2390,19 +2489,27 @@ def main():
     type=str,
     help="Activate a single simulation on the local machine. <simulation_types> are races, azerite_traits, secondary_distributions, talent_worth, and trinkets. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk"
   )
+  parser.add_argument(
+    "--use_custom_profile",
+    action="store_const",
+    const=True,
+    default=False,
+    help="Enables usage of 'custom_profile.txt' in addition to the base profile. Default: '{}'".format(settings.debug)
+  )
+
   args = parser.parse_args()
 
   # activate debug mode as early as possible
   if args.debug:
     settings.debug = args.debug
     logger.setLevel(logging.DEBUG)
-    fh.setLevel(logging.DEBUG)
+    ch.setLevel(logging.DEBUG)
     logger.debug("Set debug mode to {}".format(settings.debug))
 
   if args.single_sim:
     logger.debug("-s / --single_sim detected")
     try:
-      simulation_type, wow_class, wow_spec, fight_style  = args.single_sim.split(',')
+      simulation_type, wow_class, wow_spec, fight_style = args.single_sim.split(',')
     except Exception:
       logger.error("-s / --single_sim arg is missing parameters. Read -h.")
       sys.exit("Input error. Bloodytools terminates.")
@@ -2473,6 +2580,9 @@ def main():
 
   if args.ptr:
     settings.ptr = "1"
+
+  if args.use_custom_profile:
+    settings.use_custom_profile = args.use_custom_profile
 
   # only
   new_hash = get_simc_hash(settings.executable)
