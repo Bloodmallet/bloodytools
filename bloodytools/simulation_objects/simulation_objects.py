@@ -192,7 +192,7 @@ class Simulation_Data():
         if name != 'class':
           character.append("{}={}".format(name, profile['character'][name]))
         else:
-          character.append("{}=baseline".format(profile['character'][name]))
+          character.append("{}=baseline".format(profile['character'][name].replace("_", "")))
 
       items = []
       for slot in profile['items']:
@@ -1374,7 +1374,11 @@ class Simulation_Group():
             json.dumps(raidbots_data, sort_keys=True, indent=4)
           )
 
-          simc_hash = raidbots_data['git_revision']
+          try:
+            simc_hash = raidbots_data['git_revision']
+          except Exception:
+            self.logger.error("'git_revision' not found in raidbots answer.")
+            simc_hash = False
 
           # set basic profile dps
           self.logger.debug("Setting dps for baseprofile.")
