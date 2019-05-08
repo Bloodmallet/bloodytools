@@ -37,6 +37,7 @@ wow_class_spec_list = [
   ("rogue", "subtlety"),
   ("shaman", "elemental"),
   ("shaman", "enhancement"),
+  ("shaman", "restoration"),
   ("warlock", "affliction"),
   ("warlock", "demonology"),
   ("warlock", "destruction"),
