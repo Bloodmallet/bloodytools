@@ -632,21 +632,19 @@ class Simulation_Group():
     Returns:
       None --
     """
+    self.simulation_output = ''
 
-    for line in iter(process.stdout.readline, b''):
-      if line == "":
-        self.logger.debug("monitor_simulation")
-        break
-
-      # save line for later use
-      self.simulation_output += line
-
+    for line in iter(process.stdout.readline, ''):
       # shorten output, this console print is not intended to replace the log
       output_length = 100
 
-      print_line = line[:-1]
+      print_line = line.strip()
       print_line = print_line[:output_length]
+      # save line for later use
+      self.simulation_output += print_line + '\n'
+      # remove previously printed line
       print(" " * output_length, end="\r", flush=True)
+      # write current output
       print("{}".format(print_line), end='\r', flush=True) # kill line break
 
   def simulate(self) -> bool:
@@ -810,13 +808,13 @@ class Simulation_Group():
 
           # handle broken simulations
           if fail_counter >= 5:
-            self.logger.error("ERROR: An Error occured during simulation.")
-            self.logger.error("args: " + str(simulation_output.args))
-            self.logger.error("stdout: " + str(simulation_output.stdout))
-            self.logger.error(
-              "name=value error? Check your input! Maybe your links to already existing profiles are wrong. They need to be relative links from bloodytools to your SimulationCraft directory."
+            self.logger.debug("ERROR: An Error occured during simulation.")
+            self.logger.debug("args: " + str(simulation_output.args))
+            self.logger.debug("stdout: " + str(self.simulation_output))
+            self.logger.debug(
+              "'name=value error's can occur when relative paths are wrong. They need to be relative paths from <bloodytools> to your SimulationCraft directory."
             )
-            self.error = simulation_output.stdout
+            self.error = self.simulation_output
 
             # add error to remaining profile
             with open(self.filename, 'a') as f:

@@ -38,6 +38,26 @@
 # Last but not least you can create longer suffixes consisting of multiple additional spells/items by adding + into the suffix name. E.g. "hello +world". You can then use "hello" and "world" in link_data to indicate multiple changes to the profile.
 
 special_cases = {
+  # "druid": {
+  #   "balance": {
+  #     "patchwerk": {
+  #       "azerite_trait_simulations": {
+  #         "*": [
+  #           {
+  #             "suffix": "AP",
+  #             "additional_input": ["azerite_override=arcanic_pulsar:<itemlevel>"],
+  #             "link_data": {
+  #               "AP": { "spell_id": "287773" }
+  #             },
+  #             "description": "All Balance azerite profiles use Arcanic Pulsar because it changes their order quite significantly.",
+  #             "base_trait": "Arcanic Pulsar",
+  #             "base_trait_id": "200"
+  #           }
+  #         ]
+  #       }
+  #     },
+  #   },
+  # },
   "rogue": {
     "assassination": {
       "patchwerk": {
