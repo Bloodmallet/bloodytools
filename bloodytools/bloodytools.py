@@ -1994,6 +1994,14 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           "Azerite Items " + slot.title(), wow_class, wow_spec, fight_style
         )
 
+        # fix base profile to match sim
+        slot_export["profile"]["head"].pop("azerite_powers")
+        slot_export["profile"]["shoulders"].pop("azerite_powers")
+        slot_export["profile"]["chest"].pop("azerite_powers")
+        slot_export['profile']['items']['head'].pop('azerite_powers')
+        slot_export['profile']['items']['shoulders'].pop('azerite_powers')
+        slot_export['profile']['items']['chest'].pop('azerite_powers')
+
         slot_export["simulated_steps"] = []
         for itemlevel in settings.azerite_trait_ilevels:
           slot_export["simulated_steps"].insert(0, "1_" + itemlevel)
@@ -2102,7 +2110,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                     ]
                   )
                 )
-                logger.info('trait_dict: {}'.format(trait_dict[trait['tier']][-1]))
+                logger.debug('trait_dict: {}'.format(trait_dict[trait['tier']][-1]))
               except KeyError:
                 # special case that uses one trait as a baseline instead of zero traits
                 # compares the second stacked trait to the baseline
@@ -2131,7 +2139,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                 "id": trait_data[trait_dict[tier][0][0]]["id"],
                 "spell_id": trait_data[trait_dict[tier][0][0]]["spell_id"]
               })
-              logger.info('adding to slot export {}'.format(slot_export["used_azerite_traits_per_item"][item["name"]][-1]))
+              logger.debug('adding to slot export {}'.format(slot_export["used_azerite_traits_per_item"][item["name"]][-1]))
 
           slot_export["data"][item["name"]] = {}
           # add values to the armor for all available itemlevels
@@ -2163,7 +2171,8 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                     continue
 
                 else:
-                  logger.info('slot export {} {} {}'.format(item["name"], "1_" + itemlevel, slot_export["data"][item["name"]]["1_" + itemlevel]))
+                  logger.debug('slot export {} {} {}'.format(item["name"], "1_" + itemlevel, slot_export["data"][item["name"]]["1_" + itemlevel]))
+                  pass
 
           # add tuple (item_name, item_dps) to unsorted_item_dps_list
           max_available_itemlevel = "1_" + str(max_available_itemlevel)
