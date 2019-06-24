@@ -24,6 +24,7 @@ from typing import List, Tuple
 from simc_support import wow_lib
 from simulation_objects import simulation_objects
 from special_cases import special_cases # special_cases file, contains spec specific additional profile information for azerite traits
+from simulation_objects import essence_simulation
 
 import argparse
 import datetime
@@ -1038,36 +1039,51 @@ def secondary_distribution_simulations(
       for distribution_multiplier in distribution_multipliers:
         # if it is the first one
         if distribution_multiplier == distribution_multipliers[0]:
-          simulation_group.add(
-            simulation_objects.Simulation_Data(
-              name="{}_{}_{}_{}".format(
-                distribution_multiplier[0], distribution_multiplier[1],
-                distribution_multiplier[2], distribution_multiplier[3]
+
+          s_o = simulation_objects.Simulation_Data(
+            name="{}_{}_{}_{}".format(
+              distribution_multiplier[0], distribution_multiplier[1],
+              distribution_multiplier[2], distribution_multiplier[3]
+            ),
+            fight_style=fight_style,
+            target_error=settings.target_error[fight_style],
+            iterations=settings.iterations,
+            logger=logger,
+            profile=result_dict['profile'],
+            simc_arguments=[
+              "gear_crit_rating={}".format(
+                int(secondary_amount * (distribution_multiplier[0] / 100))
               ),
-              fight_style=fight_style,
-              target_error=settings.target_error[fight_style],
-              iterations=settings.iterations,
-              logger=logger,
-              profile=result_dict['profile'],
-              simc_arguments=[
-                "gear_crit_rating={}".format(
-                  int(secondary_amount * (distribution_multiplier[0] / 100))
-                ),
-                "gear_haste_rating={}".format(
-                  int(secondary_amount * (distribution_multiplier[1] / 100))
-                ),
-                "gear_mastery_rating={}".format(
-                  int(secondary_amount * (distribution_multiplier[2] / 100))
-                ),
-                "gear_versatility_rating={}".format(
-                  int(secondary_amount * (distribution_multiplier[3] / 100))
-                ),
-              ],
-              ptr=settings.ptr,
-              default_actions=settings.default_actions,
-              executable=settings.executable
-            )
+              "gear_haste_rating={}".format(
+                int(secondary_amount * (distribution_multiplier[1] / 100))
+              ),
+              "gear_mastery_rating={}".format(
+                int(secondary_amount * (distribution_multiplier[2] / 100))
+              ),
+              "gear_versatility_rating={}".format(
+                int(secondary_amount * (distribution_multiplier[3] / 100))
+              ),
+            ],
+            ptr=settings.ptr,
+            default_actions=settings.default_actions,
+            executable=settings.executable
           )
+
+          custom_apl = None
+          if settings.use_custom_apl:
+            with open('custom_apl.txt') as f:
+              custom_apl = f.read()
+          if custom_apl:
+            s_o.simc_arguments.append(custom_apl)
+
+          custom_fight_style = None
+          if settings.use_custom_fight_style:
+            with open('custom_fight_style.txt') as f:
+              custom_fight_style = f.read()
+          if custom_fight_style:
+            s_o.simc_arguments.append(custom_fight_style)
+
+          simulation_group.add(s_o)
           # add the talent combination to the profileset, if one was provided
           if talent_combination:
             simulation_group.profiles[-1].simc_arguments.append(
@@ -2554,6 +2570,8 @@ def main():
   logger.debug("main start")
   logger.info("Bloodytools at your service.")
 
+  settings.logger = logger
+
   # interface parameters
   parser = argparse.ArgumentParser(
     description="Simulate different aspects of World of Warcraft data."
@@ -2654,11 +2672,8 @@ def main():
     settings.enable_talent_worth_simulations = False
 
     # set dev options
-    settings.debug = False
     settings.use_own_threading = False
     settings.use_raidbots = False
-    settings.write_humanreadable_secondary_distribution_file = False
-    settings.lua_trinket_export = False
 
     if simulation_type == "races":
       settings.enable_race_simulations = True
@@ -2670,6 +2685,8 @@ def main():
       settings.enable_secondary_distributions_simulations = True
     elif simulation_type == "talent_worth":
       settings.enable_talent_worth_simulations = True
+    elif simulation_type == "essences":
+      settings.enable_azerite_essence_simulations = True
 
   # if argument specified to simulate all, override settings
   elif args.sim_all:
@@ -2889,7 +2906,24 @@ def main():
     if not settings.use_own_threading:
       logger.info("Talent Worth simulations end.")
 
+  # trigger essence simulations
+  if settings.enable_azerite_essence_simulations:
+    if not settings.use_own_threading:
+      logger.info("Essence simulations start.")
 
+    if settings.use_own_threading:
+      essence_thread = threading.Thread(
+        name="Essence Thread",
+        target=essence_simulation.essence_simulation,
+        args=(settings,)
+      )
+      thread_list.append(essence_thread)
+      essence_thread.start()
+    else:
+      essence_simulation.essence_simulation(settings)
+
+    if not settings.use_own_threading:
+      logger.info("Essence simulations end.")
 
   while thread_list:
     time.sleep(1)
