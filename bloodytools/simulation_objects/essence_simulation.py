@@ -152,7 +152,7 @@ def essence_simulation(settings: object) -> None:
         essence_type: int = int(profile.name.split('_')[2])
 
         altered_essence_name: str = essence_name
-        if essence_type == 1:
+        if essence_type == 0:
           altered_essence_name += ' minor'
 
         # create missing subdict
@@ -174,6 +174,16 @@ def essence_simulation(settings: object) -> None:
 
         wanted_data['spell_ids'][altered_essence_name] = essences[str(essence_id)]['major']['spell_id']
 
+        # adding power ids to dict
+        power_id_name = 'power_ids'
+        if not power_id_name in wanted_data:
+          wanted_data[power_id_name] = {}
+
+        if not altered_essence_name in wanted_data[power_id_name]:
+          wanted_data[power_id_name][altered_essence_name] = {}
+
+        wanted_data[power_id_name][altered_essence_name] = wow_lib.get_essence_power_id(essence_id)
+
       # create ordered essence name list
       tmp_list = []
       essence_name: str
@@ -194,7 +204,7 @@ def essence_simulation(settings: object) -> None:
       # add simulated steps...err ranks
       wanted_data['simulated_steps'] = []
       for i in range(1,4):
-        wanted_data['simulated_steps'].append(str(i))
+        wanted_data['simulated_steps'].append(4 - i) # get the steps into the proper order...descending
 
       logger.debug("Final json: {}".format(wanted_data))
 
