@@ -44,7 +44,7 @@ def essence_simulation(settings: object) -> None:
         "Essences", wow_class, wow_spec, fight_style, settings
       )
 
-      essences = wow_lib.get_essences()
+      essences = wow_lib.get_essences(wow_class.title(), wow_spec.title())
       simulation_group = simulation_objects.Simulation_Group(
         name="essences",
         threads=settings.threads,
