@@ -100,6 +100,15 @@ def essence_simulation(settings: object) -> None:
               )
             )
 
+            # special case worldvein
+            if essence_id == "4":
+              logger.info('found special case')
+              special_case = None
+              special_case = simulation_data.copy()
+              special_case.name += "+3"
+              special_case.simc_arguments.append("bfa.worldvein_allies=3")
+              simulation_group.add(special_case)
+
       logger.info(
         "Start {} essence simulation for {} {}.".format(
           fight_style, wow_class, wow_spec
@@ -149,11 +158,17 @@ def essence_simulation(settings: object) -> None:
         essence_name: str = essences[profile.name.split('_')[0]]['name']
         essence_id: int = int(profile.name.split('_')[0])
         essence_rank: int = int(profile.name.split('_')[1])
-        essence_type: int = int(profile.name.split('_')[2])
+        essence_type: int = int(profile.name.split('_')[2].split('+')[0])
 
         altered_essence_name: str = essence_name
         if essence_type == 0:
           altered_essence_name += ' minor'
+
+        # add special cases
+        if '+' in profile.name:
+          for i, plus in enumerate(profile.name.split('+')):
+            if i > 0:
+              altered_essence_name += ' +' + plus
 
         # create missing subdict
         if not altered_essence_name in wanted_data['data']:
@@ -172,7 +187,10 @@ def essence_simulation(settings: object) -> None:
         if not altered_essence_name in wanted_data['spell_ids']:
           wanted_data['spell_ids'][altered_essence_name] = {}
 
-        wanted_data['spell_ids'][altered_essence_name] = essences[str(essence_id)]['major']['spell_id']
+        if "minor" in altered_essence_name.split():
+          wanted_data['spell_ids'][altered_essence_name] = essences[str(essence_id)]['minor']['spell_id']
+        else:
+          wanted_data['spell_ids'][altered_essence_name] = essences[str(essence_id)]['major']['spell_id']
 
         # adding power ids to dict
         power_id_name = 'power_ids'
