@@ -708,7 +708,8 @@ class Simulation_Group():
             )
             f.write("fight_style={}\n".format(self.profiles[0].fight_style))
             f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
-            f.write("html={}\n".format(self.profiles[0].html))
+            if self.profiles[0].html != "":
+              f.write("html={}\n".format(self.profiles[0].html))
             f.write("iterations={}\n".format(self.profiles[0].iterations))
             f.write("log={}\n".format(self.profiles[0].log))
             f.write(
