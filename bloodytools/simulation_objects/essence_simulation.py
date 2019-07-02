@@ -102,7 +102,6 @@ def essence_simulation(settings: object) -> None:
 
             # special case worldvein
             if essence_id == "4":
-              logger.info('found special case')
               special_case = None
               special_case = simulation_data.copy()
               special_case.name += "+3"
