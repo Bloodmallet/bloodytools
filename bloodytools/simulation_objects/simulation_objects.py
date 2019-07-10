@@ -196,9 +196,10 @@ class Simulation_Data():
 
       items = []
       for slot in profile['items']:
-        string = "{}=,".format(slot)
-        string += ",".join("{}={}".format(key, value) for key, value in profile['items'][slot].items())
-        items.append(string)
+        if profile['items'][slot]:
+          string = "{}=,".format(slot)
+          string += ",".join("{}={}".format(key, value) for key, value in profile['items'][slot].items())
+          items.append(string)
 
       # prepend created character profile input
       self.simc_arguments = character + items + self.simc_arguments
