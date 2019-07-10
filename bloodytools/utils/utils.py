@@ -112,7 +112,9 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     "id",
     "bonus_id",
     "azerite_powers",
-    "enchant"
+    "enchant",
+    "azerite_level", # neck
+    "ilevel",
   ]
   pattern_element = {}
   # don't recompile this for each slot
