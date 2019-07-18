@@ -22,9 +22,9 @@
 
 from typing import List, Tuple
 from simc_support import wow_lib
-from simulation_objects import simulation_objects
-from special_cases import special_cases # special_cases file, contains spec specific additional profile information for azerite traits
-from simulation_objects import essence_simulation
+from bloodytools.simulation_objects import simulation_objects
+from bloodytools.special_cases import special_cases # special_cases file, contains spec specific additional profile information for azerite traits
+from bloodytools.simulation_objects import essence_simulation, essence_combination_simulation
 
 import argparse
 import datetime
@@ -33,7 +33,7 @@ import logging
 import os
 # import re
 import sys
-import settings # settings.py file
+from bloodytools import settings # settings.py file
 import time
 import re
 
@@ -2144,7 +2144,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                 )
                 logger.info('trait_dict: {}'.format(trait_dict[trait['tier']][-1]))
 
-          logger.info('{}'.format(trait_dict))
+          # logger.info('{}'.format(trait_dict))
 
           # create list of traits of item
           slot_export["used_azerite_traits_per_item"][item["name"]] = []
@@ -2634,7 +2634,7 @@ def main():
     dest="single_sim",
     metavar="STRING",
     type=str,
-    help="Activate a single simulation on the local machine. <simulation_types> are races, azerite_traits, secondary_distributions, talent_worth, and trinkets. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk"
+    help="Activate a single simulation on the local machine. <simulation_types> are races, azerite_traits, secondary_distributions, talent_worth, trinkets, essences, essence_combinations. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk"
   )
   parser.add_argument(
     "--use_custom_profile",
@@ -2673,6 +2673,8 @@ def main():
     settings.enable_azerite_trait_simulations = False
     settings.enable_gear_path = False
     settings.enable_talent_worth_simulations = False
+    settings.enable_azerite_essence_simulations = False
+    settings.enable_azerite_essence_combination_simulations = False
 
     # set dev options
     settings.use_own_threading = False
@@ -2690,6 +2692,8 @@ def main():
       settings.enable_talent_worth_simulations = True
     elif simulation_type == "essences":
       settings.enable_azerite_essence_simulations = True
+    elif simulation_type == "essence_combinations":
+      settings.enable_azerite_essence_combination_simulations = True
 
   # if argument specified to simulate all, override settings
   elif args.sim_all:
@@ -2927,6 +2931,25 @@ def main():
 
     if not settings.use_own_threading:
       logger.info("Essence simulations end.")
+
+  # trigger essence simulations
+  if settings.enable_azerite_essence_combination_simulations:
+    if not settings.use_own_threading:
+      logger.info("Essence combination simulations start.")
+
+    if settings.use_own_threading:
+      essence_combination_thread = threading.Thread(
+        name="Essence Combinations Thread",
+        target=essence_combination_simulation.essence_combination_simulation,
+        args=(settings,)
+      )
+      thread_list.append(essence_combination_thread)
+      essence_combination_thread.start()
+    else:
+      essence_combination_simulation.essence_combination_simulation(settings)
+
+    if not settings.use_own_threading:
+      logger.info("Essence combination simulations end.")
 
   while thread_list:
     time.sleep(1)
