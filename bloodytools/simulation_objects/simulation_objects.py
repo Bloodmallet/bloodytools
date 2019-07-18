@@ -223,7 +223,7 @@ class Simulation_Data():
     # creation time of the simulation object
     self.so_creation_time = datetime.datetime.utcnow()
     # simulation dps result
-    self.dps: int = None
+    self.dps: int = -1
     # flag to know whether data was generated with external simulation function
     self.external_simulation = False
     # simulation full report (command line print out)
