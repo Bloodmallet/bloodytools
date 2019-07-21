@@ -5,6 +5,7 @@ from simc_support import wow_lib
 
 logger = logging.getLogger(__name__)
 
+
 def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str, settings: object):
   """Create basic profile string to get the standard profile of a spec. Use this function to get the necessary string for your first argument of a simulation_data object.
 
@@ -36,18 +37,12 @@ def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str, settin
 
   basis_profile_string += "profiles/"
   if tier == "PR":
-    basis_profile_string += "PreRaids/PR_{}_{}".format(
-      wow_class.title(), wow_spec.title()
-    )
+    basis_profile_string += "PreRaids/PR_{}_{}".format(wow_class.title(), wow_spec.title())
   else:
-    basis_profile_string += "Tier{}/T{}_{}_{}".format(
-      tier, tier, wow_class, wow_spec
-    ).title()
+    basis_profile_string += "Tier{}/T{}_{}_{}".format(tier, tier, wow_class, wow_spec).title()
   basis_profile_string += ".simc"
 
-  logger.debug(
-    "Created basis_profile_string '{}'.".format(basis_profile_string)
-  )
+  logger.debug("Created basis_profile_string '{}'.".format(basis_profile_string))
   logger.debug("create_basic_profile_string ended")
   return basis_profile_string
 
@@ -73,7 +68,9 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
       dict -- all known character data
   """
 
-  logger.warning('DEPRICATION WARNING: profile format change. Information will be stored in its own subsection. Read result file to already get the new format.')
+  logger.warning(
+    'DEPRICATION WARNING: profile format change. Information will be stored in its own subsection. Read result file to already get the new format.'
+  )
 
   if not profile:
     profile = {}
@@ -113,7 +110,7 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     "bonus_id",
     "azerite_powers",
     "enchant",
-    "azerite_level", # neck
+    "azerite_level",     # neck
     "ilevel",
   ]
   pattern_element = {}
@@ -174,9 +171,7 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
   return profile
 
 
-def create_base_json_dict(
-  data_type: str, wow_class: str, wow_spec: str, fight_style: str, settings: object
-):
+def create_base_json_dict(data_type: str, wow_class: str, wow_spec: str, fight_style: str, settings: object):
   """Creates as basic json dictionary. You'll need to add your data into 'data'. Can be extended.
 
   Arguments:
@@ -210,15 +205,12 @@ def create_base_json_dict(
   subtitle = "UTC {timestamp}".format(timestamp=timestamp)
   if settings.simc_hash:
     subtitle += " | SimC build: <a href=\"https://github.com/simulationcraft/simc/commit/{simc_hash}\" target=\"blank\">{simc_hash_short}</a>".format(
-      simc_hash=settings.simc_hash,
-      simc_hash_short=settings.simc_hash[0:7]
+      simc_hash=settings.simc_hash, simc_hash_short=settings.simc_hash[0:7]
     )
 
   return {
-    "data_type":
-      "{}".format(data_type.lower().replace(" ", "_")),
-    "timestamp":
-      timestamp,
+    "data_type": "{}".format(data_type.lower().replace(" ", "_")),
+    "timestamp": timestamp,
     "title":
       "{data_type} | {wow_spec} {wow_class} | {fight_style}".format(
         data_type=data_type.title(),
@@ -227,19 +219,18 @@ def create_base_json_dict(
         fight_style=fight_style.title()
       ),
     "subtitle": subtitle,
-    "simc_settings":
-      {
-        "tier": settings.tier,
-        "fight_style": fight_style,
-        "iterations": settings.iterations,
-        "target_error": settings.target_error[fight_style],
-        "ptr": settings.ptr,
-        "simc_hash": settings.simc_hash,
-        # deprecated
-        "class": wow_class,
-        # deprecated
-        "spec": wow_spec
-      },
+    "simc_settings": {
+      "tier": settings.tier,
+      "fight_style": fight_style,
+      "iterations": settings.iterations,
+      "target_error": settings.target_error[fight_style],
+      "ptr": settings.ptr,
+      "simc_hash": settings.simc_hash,
+     # deprecated
+      "class": wow_class,
+     # deprecated
+      "spec": wow_spec
+    },
     "data": {},
     "languages": {},
     "profile": profile,
@@ -262,11 +253,7 @@ def tokenize_str(string: str) -> str:
   string = string.lower().split(" (")[0]
   # cleanse name
   if "__" in string or " " in string or "-" in string or "'" in string or "," in string:
-    return tokenize_str(
-      string.replace("'", "").replace("-", "").replace(" ", "_").replace(
-        "__", "_"
-      ).replace(",", "")
-    )
+    return tokenize_str(string.replace("'", "").replace("-", "").replace(" ", "_").replace("__", "_").replace(",", ""))
 
   return string
 
@@ -281,7 +268,7 @@ def get_simc_hash(path) -> str:
   if ".exe" in path:
     new_path = path.split("simc.exe")[0]
   else:
-    new_path = path[:-5] # cut "/simc" from unix path
+    new_path = path[:-5]     # cut "/simc" from unix path
     if "engine" in new_path[-6:]:
       new_path = new_path[:-6]
 
@@ -309,5 +296,3 @@ def get_simc_hash(path) -> str:
     raise e
 
   return simc_hash
-
-

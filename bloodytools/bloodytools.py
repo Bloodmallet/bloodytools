@@ -23,7 +23,7 @@
 from typing import List, Tuple
 from simc_support import wow_lib
 from simulation_objects import simulation_objects
-from special_cases import special_cases # special_cases file, contains spec specific additional profile information for azerite traits
+from special_cases import special_cases     # special_cases file, contains spec specific additional profile information for azerite traits
 from simulation_objects import essence_simulation, essence_combination_simulation
 
 import argparse
@@ -33,7 +33,7 @@ import logging
 import os
 # import re
 import sys
-import settings # settings.py file
+import settings     # settings.py file
 import time
 import re
 
@@ -52,9 +52,7 @@ fh.setLevel(logging.DEBUG)
 log_formatter = logging.Formatter(
   "%(asctime)s - %(filename)s / %(funcName)s / %(lineno)s - %(levelname)s - %(message)s"
 )
-live_formatter = logging.Formatter(
-  "%(asctime)s - %(levelname)s - %(message)s"
-)
+live_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 fh.setFormatter(log_formatter)
 logger.addHandler(fh)
 # console logger
@@ -98,18 +96,12 @@ def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str):
 
   basis_profile_string += "profiles/"
   if tier == "PR":
-    basis_profile_string += "PreRaids/PR_{}_{}".format(
-      wow_class.title(), wow_spec.title()
-    )
+    basis_profile_string += "PreRaids/PR_{}_{}".format(wow_class.title(), wow_spec.title())
   else:
-    basis_profile_string += "Tier{}/T{}_{}_{}".format(
-      tier, tier, wow_class, wow_spec
-    ).title()
+    basis_profile_string += "Tier{}/T{}_{}_{}".format(tier, tier, wow_class, wow_spec).title()
   basis_profile_string += ".simc"
 
-  logger.debug(
-    "Created basis_profile_string '{}'.".format(basis_profile_string)
-  )
+  logger.debug("Created basis_profile_string '{}'.".format(basis_profile_string))
   logger.debug("create_basic_profile_string ended")
   return basis_profile_string
 
@@ -135,7 +127,9 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
       dict -- all known character data
   """
 
-  logger.warning('DEPRICATION WARNING: profile format change. Information will be stored in its own subsection. Read result file to already get the new format.')
+  logger.warning(
+    'DEPRICATION WARNING: profile format change. Information will be stored in its own subsection. Read result file to already get the new format.'
+  )
 
   if not profile:
     profile = {}
@@ -175,7 +169,7 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     "bonus_id",
     "azerite_powers",
     "enchant",
-    "azerite_level", # neck
+    "azerite_level",     # neck
     "ilevel",
   ]
   pattern_element = {}
@@ -236,9 +230,7 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
   return profile
 
 
-def create_base_json_dict(
-  data_type: str, wow_class: str, wow_spec: str, fight_style: str
-):
+def create_base_json_dict(data_type: str, wow_class: str, wow_spec: str, fight_style: str):
   """Creates as basic json dictionary. You'll need to add your data into 'data'. Can be extended.
 
   Arguments:
@@ -272,15 +264,12 @@ def create_base_json_dict(
   subtitle = "UTC {timestamp}".format(timestamp=timestamp)
   if settings.simc_hash:
     subtitle += " | SimC build: <a href=\"https://github.com/simulationcraft/simc/commit/{simc_hash}\" target=\"blank\">{simc_hash_short}</a>".format(
-      simc_hash=settings.simc_hash,
-      simc_hash_short=settings.simc_hash[0:7]
+      simc_hash=settings.simc_hash, simc_hash_short=settings.simc_hash[0:7]
     )
 
   return {
-    "data_type":
-      "{}".format(data_type.lower().replace(" ", "_")),
-    "timestamp":
-      timestamp,
+    "data_type": "{}".format(data_type.lower().replace(" ", "_")),
+    "timestamp": timestamp,
     "title":
       "{data_type} | {wow_spec} {wow_class} | {fight_style}".format(
         data_type=data_type.title(),
@@ -289,19 +278,18 @@ def create_base_json_dict(
         fight_style=fight_style.title()
       ),
     "subtitle": subtitle,
-    "simc_settings":
-      {
-        "tier": settings.tier,
-        "fight_style": fight_style,
-        "iterations": settings.iterations,
-        "target_error": settings.target_error[fight_style],
-        "ptr": settings.ptr,
-        "simc_hash": settings.simc_hash,
-        # deprecated
-        "class": wow_class,
-        # deprecated
-        "spec": wow_spec
-      },
+    "simc_settings": {
+      "tier": settings.tier,
+      "fight_style": fight_style,
+      "iterations": settings.iterations,
+      "target_error": settings.target_error[fight_style],
+      "ptr": settings.ptr,
+      "simc_hash": settings.simc_hash,
+     # deprecated
+      "class": wow_class,
+     # deprecated
+      "spec": wow_spec
+    },
     "data": {},
     "languages": {},
     "profile": profile,
@@ -324,11 +312,7 @@ def tokenize_str(string: str) -> str:
   string = string.lower().split(" (")[0]
   # cleanse name
   if "__" in string or " " in string or "-" in string or "'" in string or "," in string:
-    return tokenize_str(
-      string.replace("'", "").replace("-", "").replace(" ", "_").replace(
-        "__", "_"
-      ).replace(",", "")
-    )
+    return tokenize_str(string.replace("'", "").replace("-", "").replace(" ", "_").replace("__", "_").replace(",", ""))
 
   return string
 
@@ -343,7 +327,7 @@ def get_simc_hash(path) -> str:
   if ".exe" in path:
     new_path = path.split("simc.exe")[0]
   else:
-    new_path = path[:-5] # cut "/simc" from unix path
+    new_path = path[:-5]     # cut "/simc" from unix path
     if "engine" in new_path[-6:]:
       new_path = new_path[:-6]
 
@@ -389,21 +373,14 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
 
       # check whether the baseline profile does exist
       try:
-        with open(
-          create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
-        ) as f:
+        with open(create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r') as f:
           pass
       except FileNotFoundError:
-        logger.warning(
-          "{} {} base profile not found. Skipping.".
-          format(wow_spec.title(), wow_class.title())
-        )
+        logger.warning("{} {} base profile not found. Skipping.".format(wow_spec.title(), wow_class.title()))
         continue
 
       # prepare result json
-      wanted_data = create_base_json_dict(
-        "Races", wow_class, wow_spec, fight_style
-      )
+      wanted_data = create_base_json_dict("Races", wow_class, wow_spec, fight_style)
 
       races = wow_lib.get_races_for_class(wow_class)
       simulation_group = simulation_objects.Simulation_Group(
@@ -451,18 +428,12 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             simulation_data.name += ' Kimbul'
 
         simulation_group.add(simulation_data)
-        logger.debug(
-          (
-            "Added race '{}' in profile '{}' to simulation_group.".format(
-              race, simulation_data.name
-            )
-          )
-        )
+        logger.debug(("Added race '{}' in profile '{}' to simulation_group.".format(race, simulation_data.name)))
 
         if race == 'zandalari_troll':
           # create more loa profiles and add them
           simulation_data = None
-          for loa in [ 'bwonsamdi', 'paku']:
+          for loa in ['bwonsamdi', 'paku']:
             simulation_data = simulation_objects.Simulation_Data(
               name='{} {}'.format(race.title().replace("_", " "), loa.title()),
               fight_style=fight_style,
@@ -475,52 +446,33 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
               logger=logger
             )
             simulation_group.add(simulation_data)
-            logger.debug(
-              (
-                "Added race '{}' in profile '{}' to simulation_group.".format(
-                  race, simulation_data.name
-                )
-              )
-            )
+            logger.debug(("Added race '{}' in profile '{}' to simulation_group.".format(race, simulation_data.name)))
 
-      logger.info(
-        "Start {} race simulation for {} {}.".format(
-          fight_style, wow_class, wow_spec
-        )
-      )
+      logger.info("Start {} race simulation for {} {}.".format(fight_style, wow_class, wow_spec))
       try:
         if settings.use_raidbots and settings.apikey:
           settings.simc_hash = simulation_group.simulate_with_raidbots(settings.apikey)
         else:
           simulation_group.simulate()
       except Exception as e:
-        logger.error(
-          "{} race simulation for {} {} failed. {}".format(
-            fight_style.title(), wow_class, wow_spec, e
-          )
-        )
+        logger.error("{} race simulation for {} {} failed. {}".format(fight_style.title(), wow_class, wow_spec, e))
         continue
       else:
         logger.info(
-          "{} race simulation for {} {} ended successfully. Cleaning up.".
-          format(fight_style.title(), wow_class, wow_spec)
+          "{} race simulation for {} {} ended successfully. Cleaning up.".format(
+            fight_style.title(), wow_class, wow_spec
+          )
         )
 
       for profile in simulation_group.profiles:
-        logger.debug(
-          "Profile '{}' DPS: {}".format(profile.name, profile.get_dps())
-        )
+        logger.debug("Profile '{}' DPS: {}".format(profile.name, profile.get_dps()))
 
       logger.debug("Created base dict for json export. {}".format(wanted_data))
 
       # add dps values to json
       for profile in simulation_group.profiles:
         wanted_data["data"][profile.name] = profile.get_dps()
-        logger.debug(
-          "Added '{}' with {} dps to json.".format(
-            profile.name, profile.get_dps()
-          )
-        )
+        logger.debug("Added '{}' with {} dps to json.".format(profile.name, profile.get_dps()))
         # add race translations to the final json
         translated_name = wow_lib.get_race_translation(profile.name)
         if translated_name:
@@ -559,9 +511,9 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
 
       # write json to file
       with open(
-        "results/races/{}_{}_{}.json".format(
-          wow_class.lower(), wow_spec.lower(), fight_style.lower()
-        ), "w", encoding="utf-8"
+        "results/races/{}_{}_{}.json".format(wow_class.lower(), wow_spec.lower(), fight_style.lower()),
+        "w",
+        encoding="utf-8"
       ) as f:
         logger.debug("Print race json.")
         f.write(json.dumps(wanted_data, sort_keys=True, indent=4, ensure_ascii=False))
@@ -590,21 +542,14 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
 
       # check whether the baseline profile does exist
       try:
-        with open(
-          create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
-        ) as f:
+        with open(create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r') as f:
           pass
       except FileNotFoundError:
-        logger.warning(
-          "{} {} profile not found. Skipping.".
-          format(wow_spec.title(), wow_class.title())
-        )
+        logger.warning("{} {} profile not found. Skipping.".format(wow_spec.title(), wow_class.title()))
         continue
 
       # json exporter
-      json_export = create_base_json_dict(
-        "trinkets", wow_class, wow_spec, fight_style
-      )
+      json_export = create_base_json_dict("trinkets", wow_class, wow_spec, fight_style)
 
       # get main-trinkets
       trinket_list = wow_lib.get_trinkets_for_spec(wow_class, wow_spec)
@@ -659,9 +604,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
           simulation_group.add(simulation_data)
 
         # for each available itemlevel of the trinket
-        for itemlevel in range(
-          settings.min_ilevel, settings.max_ilevel + 1, settings.ilevel_step
-        ):
+        for itemlevel in range(settings.min_ilevel, settings.max_ilevel + 1, settings.ilevel_step):
 
           if itemlevel >= trinket[2] and itemlevel <= trinket[3]:
 
@@ -670,9 +613,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
               fight_style=fight_style,
               iterations=settings.iterations,
               target_error=settings.target_error[fight_style],
-              simc_arguments=[
-                "trinket1=,id={},ilevel={}".format(trinket[1], itemlevel)
-              ],
+              simc_arguments=["trinket1=,id={},ilevel={}".format(trinket[1], itemlevel)],
               ptr=settings.ptr,
               default_actions=settings.default_actions,
               executable=settings.executable,
@@ -681,27 +622,20 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
             simulation_group.add(simulation_data)
 
       # create and simulate baseline profile
-      logger.info(
-        "Start {} trinket simulation for {} {}.".format(
-          fight_style, wow_class, wow_spec
-        )
-      )
+      logger.info("Start {} trinket simulation for {} {}.".format(fight_style, wow_class, wow_spec))
       try:
         if settings.use_raidbots and settings.apikey:
           settings.simc_hash = simulation_group.simulate_with_raidbots(settings.apikey)
         else:
           simulation_group.simulate()
       except Exception as e:
-        logger.error(
-          "{} trinket simulation for {} {} failed. {}".format(
-            fight_style.title(), wow_class, wow_spec, e
-          )
-        )
+        logger.error("{} trinket simulation for {} {} failed. {}".format(fight_style.title(), wow_class, wow_spec, e))
         continue
       else:
         logger.info(
-          "{} trinket simulation for {} {} ended successfully. Cleaning up.".
-          format(fight_style.title(), wow_class, wow_spec)
+          "{} trinket simulation for {} {} ended successfully. Cleaning up.".format(
+            fight_style.title(), wow_class, wow_spec
+          )
         )
 
       for profile in simulation_group.profiles:
@@ -709,24 +643,27 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
           logger.debug(
             "{} {} DPS, baseline + {}".format(
               profile.name, profile.get_dps(),
-              profile.get_dps() - simulation_group.get_dps_of(
-                "baseline {}".format(settings.min_ilevel)
-              )
+              profile.get_dps() - simulation_group.get_dps_of("baseline {}".format(settings.min_ilevel))
             )
           )
         except Exception as e:
-          logger.error("Exception was thrown when trying to fetch the following data from simulation_group: profile.name, profile.get_dps(), profile.get_dps() - simulation_group.get_dps_of(\"baseline {}\".format(settings.min_ilevel))")
+          logger.error(
+            "Exception was thrown when trying to fetch the following data from simulation_group: profile.name, profile.get_dps(), profile.get_dps() - simulation_group.get_dps_of(\"baseline {}\".format(settings.min_ilevel))"
+          )
           logger.debug("profile.name {}".format(profile.name))
           logger.debug("profile.get_dps() {}".format(profile.get_dps()))
           logger.debug("settings.min_ilevel {}".format(settings.min_ilevel))
-          logger.debug("simulation_group.get_dps_of(\"baseline {{}}\".format(settings.min_ilevel)) {}".format(simulation_group.get_dps_of("baseline {}".format(settings.min_ilevel))))
+          logger.debug(
+            "simulation_group.get_dps_of(\"baseline {{}}\".format(settings.min_ilevel)) {}".format(
+              simulation_group.get_dps_of("baseline {}".format(settings.min_ilevel))
+            )
+          )
 
       simulation_results[wow_class][wow_spec] = simulation_group
 
       json_export["data_active"] = {}
       for trinket in trinket_list:
         json_export["data_active"][trinket[0]] = trinket[5]
-
 
       for profile in simulation_group.profiles:
 
@@ -781,9 +718,7 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
 
       # add itemlevel list
       json_export["simulated_steps"] = []
-      for itemlevel in range(
-        settings.min_ilevel, settings.max_ilevel + 1, settings.ilevel_step
-      ):
+      for itemlevel in range(settings.min_ilevel, settings.max_ilevel + 1, settings.ilevel_step):
         json_export["simulated_steps"].append(itemlevel)
 
       # change order from ascending to descending to keep the order of previous versions
@@ -794,9 +729,9 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
 
       # write json to file
       with open(
-        "results/trinkets/{}_{}_{}.json".format(
-          wow_class.lower(), wow_spec.lower(), fight_style.lower()
-        ), "w", encoding="utf-8"
+        "results/trinkets/{}_{}_{}.json".format(wow_class.lower(), wow_spec.lower(), fight_style.lower()),
+        "w",
+        encoding="utf-8"
       ) as f:
         logger.debug("Print trinket json.")
         f.write(json.dumps(json_export, sort_keys=True, indent=4, ensure_ascii=False))
@@ -805,17 +740,13 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
     # LUA data exporter
     if fight_style.lower() == "patchwerk" and settings.lua_trinket_export:
       human_readable = False
-      item_dict = {}  # intended structure: itemID -> class -> spec -> itemlevel
+      item_dict = {}     # intended structure: itemID -> class -> spec -> itemlevel
 
       for wow_class in simulation_results:
-        wow_class_id = wow_class if human_readable else wow_lib.get_class_id(
-          wow_class
-        )
+        wow_class_id = wow_class if human_readable else wow_lib.get_class_id(wow_class)
 
         for wow_spec in simulation_results[wow_class]:
-          wow_spec_id = wow_spec if human_readable else wow_lib.get_spec_id(
-            wow_class, wow_spec
-          )
+          wow_spec_id = wow_spec if human_readable else wow_lib.get_spec_id(wow_class, wow_spec)
 
           for profile in simulation_results[wow_class][wow_spec].profiles:
             if profile.name != "baseline {}".format(settings.min_ilevel):
@@ -833,11 +764,8 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
               if not wow_spec_id in item_dict[item_id][wow_class_id]:
                 item_dict[item_id][wow_class_id][wow_spec_id] = {}
 
-              item_dict[item_id
-                       ][wow_class_id][wow_spec_id][ilevel] = profile.get_dps(
-                       ) - simulation_results[wow_class][wow_spec].get_dps_of(
-                         "baseline {}".format(settings.min_ilevel)
-                       )
+              item_dict[item_id][wow_class_id][wow_spec_id][ilevel] = profile.get_dps(
+              ) - simulation_results[wow_class][wow_spec].get_dps_of("baseline {}".format(settings.min_ilevel))
 
       logger.debug("item_dict: {}".format(item_dict))
 
@@ -857,24 +785,25 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
               dps_sum = 0
               lower_dps = 0
               itemlevels_counted = 0
-              for itemlevel in range(
-                settings.min_ilevel, settings.max_ilevel + 1, 5
-              ):
+              for itemlevel in range(settings.min_ilevel, settings.max_ilevel + 1, 5):
                 if itemlevel in trinket:
                   if lower_dps:
                     dps_sum += trinket[itemlevel] - lower_dps
                     itemlevels_counted += 1
                   lower_dps = trinket[itemlevel]
 
-              logger.debug("Item: {}, dps_sum: {}, itemlevels_counted: {}, settings.ilevel_step: {}".format(item, dps_sum, itemlevels_counted, settings.ilevel_step))
-
-              average_increase = int(
-                dps_sum / itemlevels_counted / (settings.ilevel_step / 5)
+              logger.debug(
+                "Item: {}, dps_sum: {}, itemlevels_counted: {}, settings.ilevel_step: {}".format(
+                  item, dps_sum, itemlevels_counted, settings.ilevel_step
+                )
               )
 
+              average_increase = int(dps_sum / itemlevels_counted / (settings.ilevel_step / 5))
+
               logger.debug(
-                "Item {} has {} counted ilevel differences. Average dps increase is {}".
-                format(item, itemlevels_counted, average_increase)
+                "Item {} has {} counted ilevel differences. Average dps increase is {}".format(
+                  item, itemlevels_counted, average_increase
+                )
               )
 
               try:
@@ -883,20 +812,16 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
                 # failes due to the human readability check
                 trinket_data = wow_lib.get_trinket(name=item)
 
-              for itemlevel in range(
-                settings.min_ilevel, settings.max_ilevel, 5
-              ):
+              for itemlevel in range(settings.min_ilevel, settings.max_ilevel, 5):
                 # if itemlevel is valid for that item
                 if itemlevel >= trinket_data.min_itemlevel and itemlevel <= trinket_data.max_itemlevel:
                   #if itemlevel is missing, we add it
                   if not itemlevel in trinket:
                     # is able to catch up to +15 ilevel steps
                     try:
-                      trinket[itemlevel
-                             ] = trinket[itemlevel - 5] + average_increase
+                      trinket[itemlevel] = trinket[itemlevel - 5] + average_increase
                     except Exception:
-                      trinket[itemlevel
-                             ] = trinket[itemlevel + 5] - average_increase
+                      trinket[itemlevel] = trinket[itemlevel + 5] - average_increase
 
       with open("results/trinkets/ItemDPS.lua", "w") as f:
         logger.debug("Print trinket lua.")
@@ -913,16 +838,9 @@ def trinket_simulations(specs: List[Tuple[str, str]]) -> None:
               f.write("{}[{}] = {{\n".format(" " * 12, wow_spec))
 
               for itemlevel in item_dict[trinket][wow_class][wow_spec]:
-                f.write(
-                  "{}[{}] = {}".format(
-                    " " * 16, itemlevel,
-                    item_dict[trinket][wow_class][wow_spec][itemlevel]
-                  )
-                )
+                f.write("{}[{}] = {}".format(" " * 16, itemlevel, item_dict[trinket][wow_class][wow_spec][itemlevel]))
 
-                if itemlevel == list(
-                  item_dict[trinket][wow_class][wow_spec].keys()
-                )[-1]:
+                if itemlevel == list(item_dict[trinket][wow_class][wow_spec].keys())[-1]:
                   f.write("\n")
                 else:
                   f.write(",\n")
@@ -965,20 +883,17 @@ def secondary_distribution_simulations(
     List[simulation_objects.Simulation_Group] -- [description]
   """
 
-
   logger.debug("secondary_distribution_simulations start")
 
   distribution_multipliers = []
   step_size = settings.secondary_distributions_step_size
-  lower_border = 10 # percent
-  upper_border = 70 # percent
+  lower_border = 10     # percent
+  upper_border = 70     # percent
   secondary_amount = 0
 
   # get secondary sum from profile
   try:
-    with open(
-      create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
-    ) as f:
+    with open(create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r') as f:
       for line in f:
         if "gear_crit_rating=" in line:
           secondary_amount += int(line.split("=")[1])
@@ -989,10 +904,7 @@ def secondary_distribution_simulations(
         elif "gear_versatility_rating=" in line:
           secondary_amount += int(line.split("=")[1])
   except FileNotFoundError:
-    logger.warning(
-      "{} {} profile not found. Skipping.".
-      format(wow_spec.title(), wow_class.title())
-    )
+    logger.warning("{} {} profile not found. Skipping.".format(wow_spec.title(), wow_class.title()))
     # end this try early, no profile, no calculations
     return
 
@@ -1016,17 +928,11 @@ def secondary_distribution_simulations(
           if c + h + m + v == 100:
             distribution_multipliers.append((c, h, m, v))
 
-  logger.debug(
-    "'{}' different distributions generated.".format(
-      len(distribution_multipliers)
-    )
-  )
+  logger.debug("'{}' different distributions generated.".format(len(distribution_multipliers)))
 
   for fight_style in settings.fight_styles:
 
-    result_dict = create_base_json_dict(
-      "secondary_distributions", wow_class, wow_spec, fight_style
-    )
+    result_dict = create_base_json_dict("secondary_distributions", wow_class, wow_spec, fight_style)
     result_dict["sorted_data_keys"] = {}
     result_dict["secondary_sum"] = secondary_amount
 
@@ -1045,8 +951,8 @@ def secondary_distribution_simulations(
 
           s_o = simulation_objects.Simulation_Data(
             name="{}_{}_{}_{}".format(
-              distribution_multiplier[0], distribution_multiplier[1],
-              distribution_multiplier[2], distribution_multiplier[3]
+              distribution_multiplier[0], distribution_multiplier[1], distribution_multiplier[2],
+              distribution_multiplier[3]
             ),
             fight_style=fight_style,
             target_error=settings.target_error[fight_style],
@@ -1054,18 +960,10 @@ def secondary_distribution_simulations(
             logger=logger,
             profile=result_dict['profile'],
             simc_arguments=[
-              "gear_crit_rating={}".format(
-                int(secondary_amount * (distribution_multiplier[0] / 100))
-              ),
-              "gear_haste_rating={}".format(
-                int(secondary_amount * (distribution_multiplier[1] / 100))
-              ),
-              "gear_mastery_rating={}".format(
-                int(secondary_amount * (distribution_multiplier[2] / 100))
-              ),
-              "gear_versatility_rating={}".format(
-                int(secondary_amount * (distribution_multiplier[3] / 100))
-              ),
+              "gear_crit_rating={}".format(int(secondary_amount * (distribution_multiplier[0] / 100))),
+              "gear_haste_rating={}".format(int(secondary_amount * (distribution_multiplier[1] / 100))),
+              "gear_mastery_rating={}".format(int(secondary_amount * (distribution_multiplier[2] / 100))),
+              "gear_versatility_rating={}".format(int(secondary_amount * (distribution_multiplier[3] / 100))),
             ],
             ptr=settings.ptr,
             default_actions=settings.default_actions,
@@ -1089,33 +987,23 @@ def secondary_distribution_simulations(
           simulation_group.add(s_o)
           # add the talent combination to the profileset, if one was provided
           if talent_combination:
-            simulation_group.profiles[-1].simc_arguments.append(
-              "talents={}".format(talent_combination)
-            )
+            simulation_group.profiles[-1].simc_arguments.append("talents={}".format(talent_combination))
         else:
           simulation_group.add(
             simulation_objects.Simulation_Data(
               name="{}_{}_{}_{}".format(
-                distribution_multiplier[0], distribution_multiplier[1],
-                distribution_multiplier[2], distribution_multiplier[3]
+                distribution_multiplier[0], distribution_multiplier[1], distribution_multiplier[2],
+                distribution_multiplier[3]
               ),
               fight_style=fight_style,
               target_error=settings.target_error[fight_style],
               iterations=settings.iterations,
               logger=logger,
               simc_arguments=[
-                "gear_crit_rating={}".format(
-                  int(secondary_amount * (distribution_multiplier[0] / 100))
-                ),
-                "gear_haste_rating={}".format(
-                  int(secondary_amount * (distribution_multiplier[1] / 100))
-                ),
-                "gear_mastery_rating={}".format(
-                  int(secondary_amount * (distribution_multiplier[2] / 100))
-                ),
-                "gear_versatility_rating={}".format(
-                  int(secondary_amount * (distribution_multiplier[3] / 100))
-                ),
+                "gear_crit_rating={}".format(int(secondary_amount * (distribution_multiplier[0] / 100))),
+                "gear_haste_rating={}".format(int(secondary_amount * (distribution_multiplier[1] / 100))),
+                "gear_mastery_rating={}".format(int(secondary_amount * (distribution_multiplier[2] / 100))),
+                "gear_versatility_rating={}".format(int(secondary_amount * (distribution_multiplier[3] / 100))),
               ],
               ptr=settings.ptr,
               default_actions=settings.default_actions,
@@ -1143,8 +1031,9 @@ def secondary_distribution_simulations(
         continue
       else:
         logger.info(
-          "{} secondary distribution simulation for {} {} {} ended successfully. Cleaning up.".
-          format(fight_style.title(), wow_class, wow_spec, talent_combination)
+          "{} secondary distribution simulation for {} {} {} ended successfully. Cleaning up.".format(
+            fight_style.title(), wow_class, wow_spec, talent_combination
+          )
         )
 
       if settings.debug:
@@ -1158,21 +1047,18 @@ def secondary_distribution_simulations(
 
       for profile in simulation_group.profiles:
         stat_dps_list.append((profile.name, profile.get_dps()))
-        result_dict["data"][talent_combination][profile.name
-                                               ] = profile.get_dps()
+        result_dict["data"][talent_combination][profile.name] = profile.get_dps()
 
       # sort list
-      stat_dps_list = sorted(
-        stat_dps_list, key=lambda item: item[1], reverse=True
-      )
-      logger.info("Stat distribution {} of talent combination {} won with {} dps.".format(stat_dps_list[0][0], talent_combination, stat_dps_list[0][1]))
-
-      # add debug information which is coincidentally the same as settings.write_humanreadable_secondary_distribution_file
-      logger.debug(
-        "Secondary distribution list for {} (max:{}):".format(
-          talent_combination, stat_dps_list[0][1]
+      stat_dps_list = sorted(stat_dps_list, key=lambda item: item[1], reverse=True)
+      logger.info(
+        "Stat distribution {} of talent combination {} won with {} dps.".format(
+          stat_dps_list[0][0], talent_combination, stat_dps_list[0][1]
         )
       )
+
+      # add debug information which is coincidentally the same as settings.write_humanreadable_secondary_distribution_file
+      logger.debug("Secondary distribution list for {} (max:{}):".format(talent_combination, stat_dps_list[0][1]))
 
       # create directory if it doesn't exist
       if not os.path.isdir("results/"):
@@ -1189,9 +1075,7 @@ def secondary_distribution_simulations(
           ), 'a'
         ) as f:
           f.write(
-            "Sorted secondary distribution list for {} (max:{}):\n".format(
-              talent_combination, stat_dps_list[0][1]
-            )
+            "Sorted secondary distribution list for {} (max:{}):\n".format(talent_combination, stat_dps_list[0][1])
           )
       logger.debug("c  h  m  v    dps")
       if settings.write_humanreadable_secondary_distribution_file:
@@ -1202,22 +1086,14 @@ def secondary_distribution_simulations(
         ) as f:
           f.write("  c  h  m  v    dps\n")
       for item in stat_dps_list:
-        logger.debug(
-          "{}   {}  {}%".format(
-            item[0], item[1], round(item[1] * 100 / stat_dps_list[0][1], 2)
-          )
-        )
+        logger.debug("{}   {}  {}%".format(item[0], item[1], round(item[1] * 100 / stat_dps_list[0][1], 2)))
         if settings.write_humanreadable_secondary_distribution_file:
           with open(
             'results/secondary_distributions/{}_{}_{}.txt'.format(
               wow_class.lower(), wow_spec.lower(), fight_style.lower()
             ), 'a'
           ) as f:
-            f.write(
-              "  {}   {}  {}%\n".format(
-                item[0], item[1], round(item[1] * 100 / stat_dps_list[0][1], 2)
-              )
-            )
+            f.write("  {}   {}  {}%\n".format(item[0], item[1], round(item[1] * 100 / stat_dps_list[0][1], 2)))
 
       result_dict["sorted_data_keys"][talent_combination] = []
       for item in stat_dps_list:
@@ -1230,9 +1106,8 @@ def secondary_distribution_simulations(
       os.makedirs("results/secondary_distributions/")
 
     with open(
-      "results/secondary_distributions/{}_{}_{}.json".format(
-        wow_class.lower(), wow_spec.lower(), fight_style.lower()
-      ), 'w'
+      "results/secondary_distributions/{}_{}_{}.json".format(wow_class.lower(), wow_spec.lower(), fight_style.lower()),
+      'w'
     ) as f:
       logger.debug("Print secondary distribution json.")
       f.write(json.dumps(result_dict, sort_keys=True, indent=4))
@@ -1254,10 +1129,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
   for fight_style in settings.fight_styles:
     for wow_class, wow_spec in specs:
 
-
-      basic_profile_string = create_basic_profile_string(
-        wow_class, wow_spec, settings.tier
-      )
+      basic_profile_string = create_basic_profile_string(wow_class, wow_spec, settings.tier)
 
       # check whether the baseline profile does exist
       try:
@@ -1266,10 +1138,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             if "head=" in line:
               item_head = line[:-1]
       except FileNotFoundError:
-        logger.warning(
-          "{} {} profile not found. Skipping.".
-          format(wow_spec.title(), wow_class.title())
-        )
+        logger.warning("{} {} profile not found. Skipping.".format(wow_spec.title(), wow_class.title()))
         # end this try early, no profile, no calculations
         continue
 
@@ -1280,17 +1149,12 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               if "head=" in line:
                 item_head = line[:-1]
         except FileNotFoundError:
-          logger.warning(
-            "{} {} profile not found. Skipping.".
-            format(wow_spec.title(), wow_class.title())
-          )
+          logger.warning("{} {} profile not found. Skipping.".format(wow_spec.title(), wow_class.title()))
           # end this try early, no profile, no calculations
           continue
 
       # save data to json
-      wanted_data = create_base_json_dict(
-        "Azerite Traits", wow_class, wow_spec, fight_style
-      )
+      wanted_data = create_base_json_dict("Azerite Traits", wow_class, wow_spec, fight_style)
 
       # fix base profile to match sim
       wanted_data["profile"]["head"].pop("azerite_powers")
@@ -1386,20 +1250,20 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       # trait_special_handles are general additions for all specs and classes, based on the traits
       # current use are raid specific traits
       trait_special_handles = {
-        # "Laser Matrix": {
-        #   "additional_profiles": [
-        #     {
-        #       "new_name": "Laser Matrix +5RA",
-        #       "translation_addition": " +5RA",
-        #       "additional_input": ["bfa.reorigination_array_stacks=5"]
-        #     }, {
-        #       "new_name": "Laser Matrix +10RA",
-        #       "translation_addition": " +10RA",
-        #       "additional_input": ["bfa.reorigination_array_stacks=10"]
-        #     }
-        #   ],
-        #   "additional_input": []
-        # },
+      # "Laser Matrix": {
+      #   "additional_profiles": [
+      #     {
+      #       "new_name": "Laser Matrix +5RA",
+      #       "translation_addition": " +5RA",
+      #       "additional_input": ["bfa.reorigination_array_stacks=5"]
+      #     }, {
+      #       "new_name": "Laser Matrix +10RA",
+      #       "translation_addition": " +10RA",
+      #       "additional_input": ["bfa.reorigination_array_stacks=10"]
+      #     }
+      #   ],
+      #   "additional_input": []
+      # },
       }
 
       # add necessary spelldta manually
@@ -1413,15 +1277,22 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           azerite_trait = azerite_traits[azerite_trait_spell_id]['name']
 
           # skip itemlevel if it's not available for that trait
-          if azerite_traits[azerite_trait_spell_id]['min_itemlevel'] > int(itemlevel) or (azerite_traits[azerite_trait_spell_id]['max_itemlevel'] < int(itemlevel) and azerite_traits[azerite_trait_spell_id]['max_itemlevel'] != -1):
+          if azerite_traits[azerite_trait_spell_id]['min_itemlevel'] > int(itemlevel) or (
+            azerite_traits[azerite_trait_spell_id]['max_itemlevel'] < int(itemlevel) and
+            azerite_traits[azerite_trait_spell_id]['max_itemlevel'] != -1
+          ):
 
-            logger.debug("Skipping trait <{}> at itemlevel {} due to itemlevel restrictions, min: {}, max: {}".format(azerite_trait, itemlevel, azerite_traits[azerite_trait_spell_id]['min_itemlevel'], azerite_traits[azerite_trait_spell_id]['max_itemlevel']))
+            logger.debug(
+              "Skipping trait <{}> at itemlevel {} due to itemlevel restrictions, min: {}, max: {}".format(
+                azerite_trait, itemlevel, azerite_traits[azerite_trait_spell_id]['min_itemlevel'],
+                azerite_traits[azerite_trait_spell_id]['max_itemlevel']
+              )
+            )
             continue
 
           # add special handled (added) azerite traits with their correct baseline spellid
           if not azerite_trait in azerite_trait_name_spell_id_dict:
-            azerite_trait_name_spell_id_dict[azerite_trait.split(" (")[0]
-                                            ] = azerite_trait_spell_id
+            azerite_trait_name_spell_id_dict[azerite_trait.split(" (")[0]] = azerite_trait_spell_id
 
             if azerite_trait in trait_special_handles:
               logger.debug("Adding special handled entries to azerite_trait_name_spell_id_dict")
@@ -1429,28 +1300,29 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                 azerite_trait_name_spell_id_dict[entry["new_name"]] = azerite_trait_spell_id
 
             try:
-              special_case_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"][azerite_trait]
+              special_case_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"
+                                                                                  ][azerite_trait]
             except Exception:
               pass
             else:
               for special_case in special_case_list:
-                azerite_trait_name_spell_id_dict[azerite_trait + " +" + special_case["suffix"]] = azerite_trait_spell_id
+                azerite_trait_name_spell_id_dict[azerite_trait + " +" +
+                                                 special_case["suffix"]] = azerite_trait_spell_id
 
           simulation_data = None
 
           # azerite_override=
-          trait_input = "azerite_override={}:{}".format(
-            tokenize_str(azerite_trait), itemlevel
-          )
+          trait_input = "azerite_override={}:{}".format(tokenize_str(azerite_trait), itemlevel)
 
           try:
             if '*' in special_cases[wow_class][wow_spec][fight_style]['azerite_trait_simulations']:
               for change in special_cases[wow_class][wow_spec][fight_style]['azerite_trait_simulations']['*']:
                 for additional_input in change['additional_input']:
-                  trait_input += '/{}{}'.format(additional_input.replace('<itemlevel>', '').replace('azerite_override=', ''), itemlevel)
+                  trait_input += '/{}{}'.format(
+                    additional_input.replace('<itemlevel>', '').replace('azerite_override=', ''), itemlevel
+                  )
           except Exception:
             logger.debug('No * special case.')
-
 
           # create the new head input
           head_input = item_head
@@ -1487,12 +1359,11 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               simulation_group.add(simulation_data)
             else:
               logger.info('Not adding {} to simulation_group'.format(base_trait))
-          logger.debug(
-            (
-              "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".
-              format(azerite_trait, itemlevel, simulation_data.name)
+          logger.debug((
+            "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".format(
+              azerite_trait, itemlevel, simulation_data.name
             )
-          )
+          ))
 
           # create more profiles based on trait_special handles
           if azerite_trait in trait_special_handles:
@@ -1504,12 +1375,11 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                 simulation_data.simc_arguments.append(input_string)
 
               simulation_group.add(simulation_data)
-              logger.debug(
-                (
-                  "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".
-                  format(input_string, itemlevel, simulation_data.name)
+              logger.debug((
+                "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".format(
+                  input_string, itemlevel, simulation_data.name
                 )
-              )
+              ))
               # create copy to not accidentally manipulate the already to simulation_group added profile
               simulation_data = simulation_data.copy()
               # delete the profile specific additional input from the new copy
@@ -1519,7 +1389,11 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           try:
             special_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"][azerite_trait]
           except Exception as e:
-            logger.debug("No special case for {} of {} {} for fight_style {} was found. Error: {}".format(azerite_trait, wow_spec, wow_class, fight_style, e))
+            logger.debug(
+              "No special case for {} of {} {} for fight_style {} was found. Error: {}".format(
+                azerite_trait, wow_spec, wow_class, fight_style, e
+              )
+            )
           else:
             # create independant copy to not alter the existing profile in simulation_group
             simulation_data = simulation_data.copy()
@@ -1531,15 +1405,20 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
               # add spell ids to dict
               for new_addition in special_information["link_data"]:
-                azerite_trait_name_spell_id_dict[new_addition] = special_information["link_data"][new_addition]["spell_id"]
+                azerite_trait_name_spell_id_dict[new_addition] = special_information["link_data"][new_addition
+                                                                                                  ]["spell_id"]
 
               simulation_group.add(simulation_data)
               simulation_data = simulation_data.copy()
               # delete additional input again
-              simulation_data.simc_arguments = simulation_data.simc_arguments[:-len(special_information["additional_input"])]
+              simulation_data.simc_arguments = simulation_data.simc_arguments[:-len(
+                special_information["additional_input"]
+              )]
 
           # add stacked traits profiles to simulationgroup at max itemlevel
-          if itemlevel == settings.azerite_trait_ilevels[-1] or int(itemlevel) == int(azerite_traits[azerite_trait_spell_id]['max_itemlevel']):
+          if itemlevel == settings.azerite_trait_ilevels[-1] or int(itemlevel) == int(
+            azerite_traits[azerite_trait_spell_id]['max_itemlevel']
+          ):
 
             # create the new head input for 2 stacks
             if azerite_traits[azerite_trait_spell_id]["max_stack"] >= 2:
@@ -1572,9 +1451,14 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
               # add spec specific special_cases profiles to the simulation_group
               try:
-                special_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"][azerite_trait]
+                special_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"
+                                                                               ][azerite_trait]
               except Exception as e:
-                logger.debug("No special case for {} of {} {} for fight_style {} was found. Error: {}".format(azerite_trait, wow_spec, wow_class, fight_style, e))
+                logger.debug(
+                  "No special case for {} of {} {} for fight_style {} was found. Error: {}".format(
+                    azerite_trait, wow_spec, wow_class, fight_style, e
+                  )
+                )
               else:
                 # create independant copy to not alter the existing profile in simulation_group
                 simulation_data = simulation_data.copy()
@@ -1587,8 +1471,9 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                   simulation_group.add(simulation_data)
                   simulation_data = simulation_data.copy()
                   # delete additional input again
-                  simulation_data.simc_arguments = simulation_data.simc_arguments[:-len(special_information["additional_input"])]
-
+                  simulation_data.simc_arguments = simulation_data.simc_arguments[:-len(
+                    special_information["additional_input"]
+                  )]
 
               # add additional profiles from trait_special_handles
               if azerite_trait in trait_special_handles:
@@ -1601,12 +1486,11 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                     simulation_data.simc_arguments.append(input_string)
 
                   simulation_group.add(simulation_data)
-                  logger.debug(
-                    (
-                      "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".
-                      format(input_string, itemlevel, simulation_data.name)
+                  logger.debug((
+                    "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".format(
+                      input_string, itemlevel, simulation_data.name
                     )
-                  )
+                  ))
 
                   # reset simulation_data
                   simulation_data = simulation_data.copy()
@@ -1639,9 +1523,14 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
               # add spec specific special_cases profiles to the simulation_group
               try:
-                special_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"][azerite_trait]
+                special_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"
+                                                                               ][azerite_trait]
               except Exception as e:
-                logger.debug("No special case for {} of {} {} for fight_style {} was found. Error: {}".format(azerite_trait, wow_spec, wow_class, fight_style, e))
+                logger.debug(
+                  "No special case for {} of {} {} for fight_style {} was found. Error: {}".format(
+                    azerite_trait, wow_spec, wow_class, fight_style, e
+                  )
+                )
               else:
                 # create independant copy to not alter the existing profile in simulation_group
                 simulation_data = simulation_data.copy()
@@ -1654,7 +1543,9 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                   simulation_group.add(simulation_data)
                   simulation_data = simulation_data.copy()
                   # delete additional input again
-                  simulation_data.simc_arguments = simulation_data.simc_arguments[:-len(special_information["additional_input"])]
+                  simulation_data.simc_arguments = simulation_data.simc_arguments[:-len(
+                    special_information["additional_input"]
+                  )]
 
               if azerite_trait in trait_special_handles:
                 simulation_data = simulation_data.copy()
@@ -1666,19 +1557,17 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                     simulation_data.simc_arguments.append(input_string)
 
                   simulation_group.add(simulation_data)
-                  logger.debug(
-                    (
-                      "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".
-                      format(input_string, itemlevel, simulation_data.name)
+                  logger.debug((
+                    "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".format(
+                      input_string, itemlevel, simulation_data.name
                     )
-                  )
+                  ))
                   simulation_data = simulation_data.copy()
                   simulation_data.simc_arguments = simulation_data.simc_arguments[:-len(profile["additional_input"])]
 
       logger.info(
         "Start {} azerite_trait simulation for {} {}. {} profiles.".format(
-          fight_style, wow_class.title(), wow_spec.title(),
-          len(simulation_group.profiles)
+          fight_style, wow_class.title(), wow_spec.title(), len(simulation_group.profiles)
         )
       )
       try:
@@ -1695,14 +1584,13 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         continue
       else:
         logger.info(
-          "{} azerite_trait simulation for {} {} ended successfully. Cleaning up.".
-          format(fight_style.title(), wow_class.title(), wow_spec.title())
+          "{} azerite_trait simulation for {} {} ended successfully. Cleaning up.".format(
+            fight_style.title(), wow_class.title(), wow_spec.title()
+          )
         )
 
       for profile in simulation_group.profiles:
-        logger.debug(
-          "Profile '{}' DPS: {}".format(profile.name, profile.get_dps())
-        )
+        logger.debug("Profile '{}' DPS: {}".format(profile.name, profile.get_dps()))
 
       logger.debug("Created base dict for json export. {}".format(wanted_data))
 
@@ -1731,10 +1619,12 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               for trait_profile in trait_special_handles[special_handle]["additional_profiles"]:
                 if trait_profile["new_name"] == azerite_trait_name:
                   for language in wanted_data["languages"][azerite_trait_name]:
-                    wanted_data["languages"][azerite_trait_name][language] = wanted_data["languages"][azerite_trait_name][language] + trait_profile["translation_addition"]
+                    wanted_data["languages"][azerite_trait_name][language] = wanted_data["languages"][
+                      azerite_trait_name][language] + trait_profile["translation_addition"]
 
           try:
-            special_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"][azerite_trait_name.split("+")[0][:-1]]
+            special_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"][
+              azerite_trait_name.split("+")[0][:-1]]
           except Exception:
             pass
           else:
@@ -1742,13 +1632,10 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               for special_case in special_list:
                 if azerite_trait_name == azerite_trait_name.split("+")[0] + "+" + special_case["suffix"]:
                   for language in wanted_data["languages"][azerite_trait_name]:
-                    wanted_data["languages"][azerite_trait_name][language] = wanted_data["languages"][azerite_trait_name][language] + " +{}".format(special_case["suffix"])
+                    wanted_data["languages"][azerite_trait_name][language] = wanted_data["languages"][
+                      azerite_trait_name][language] + " +{}".format(special_case["suffix"])
 
-        logger.debug(
-          "Added '{}' with {} dps to json.".format(
-            profile.name, profile.get_dps()
-          )
-        )
+        logger.debug("Added '{}' with {} dps to json.".format(profile.name, profile.get_dps()))
 
       # fix general special case into existance
       try:
@@ -1756,7 +1643,9 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           for change in special_cases[wow_class][wow_spec][fight_style]['azerite_trait_simulations']['*']:
             for additional_input in change['additional_input']:
               for itemlevel in settings.azerite_trait_ilevels:
-                wanted_data['data'][change['base_trait']]['1_' + itemlevel] = wanted_data['data']['baseline']['1_' + itemlevel]
+                wanted_data['data'][change['base_trait']]['1_' +
+                                                          itemlevel] = wanted_data['data']['baseline']['1_' +
+                                                                                                       itemlevel]
       except Exception:
         pass
 
@@ -1770,13 +1659,10 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             max_available_itemlevel = "1_" + max_available_itemlevel[2:]
 
         try:
-          tmp_list.append(
-            (
-              trait,
-              wanted_data["data"][trait][max_available_itemlevel],
-              wanted_data["data"]["baseline"][max_available_itemlevel]
-            )
-          )
+          tmp_list.append((
+            trait, wanted_data["data"][trait][max_available_itemlevel],
+            wanted_data["data"]["baseline"][max_available_itemlevel]
+          ))
         except Exception:
           logger.error("{}, {}, {}".format(trait, max_available_itemlevel, wanted_data["data"][trait]))
       logger.debug("tmp_list: {}".format(tmp_list))
@@ -1786,10 +1672,20 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       logger.debug("Sorted tmp_list: {}".format(tmp_list))
       logger.info("Solo Azerite Trait {} won with {} dps.".format(tmp_list[0][0], tmp_list[0][1]))
 
-      azerite_weight_string = "( AzeritePowerWeights:1:\"{fight_style} {wow_spec} {wow_class}\":{class_id}:{spec_id}:".format(fight_style=fight_style.title(), wow_spec=wow_spec.title(), wow_class=wow_class.title(), class_id=wow_lib.get_class_id(wow_class), spec_id=wow_lib.get_spec_id(wow_class, wow_spec))
+      azerite_weight_string = "( AzeritePowerWeights:1:\"{fight_style} {wow_spec} {wow_class}\":{class_id}:{spec_id}:".format(
+        fight_style=fight_style.title(),
+        wow_spec=wow_spec.title(),
+        wow_class=wow_class.title(),
+        class_id=wow_lib.get_class_id(wow_class),
+        spec_id=wow_lib.get_spec_id(wow_class, wow_spec)
+      )
 
-      azerite_forge_string_itemlevel = "AZFORGE:{}:{}^".format(wow_lib.get_class_id(wow_class), wow_lib.get_spec_id(wow_class, wow_spec))
-      azerite_forge_string_trait_stacking = "AZFORGE:{}:{}^".format(wow_lib.get_class_id(wow_class), wow_lib.get_spec_id(wow_class, wow_spec))
+      azerite_forge_string_itemlevel = "AZFORGE:{}:{}^".format(
+        wow_lib.get_class_id(wow_class), wow_lib.get_spec_id(wow_class, wow_spec)
+      )
+      azerite_forge_string_trait_stacking = "AZFORGE:{}:{}^".format(
+        wow_lib.get_class_id(wow_class), wow_lib.get_spec_id(wow_class, wow_spec)
+      )
 
       # sorted ilevel trait list (one trait at max itemlevel each)
       wanted_data["sorted_data_keys"] = []
@@ -1812,7 +1708,11 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           azerite_forge_string_trait_stacking += "[{}]".format(power_id)
           for trait_count in [1, 2, 3]:
             try:
-              azerite_forge_string_trait_stacking += "{}:{},".format(trait_count, wanted_data['data'][azerite_trait][str(trait_count) + '_' + max_available_itemlevel.split('1_')[1]] - base_dps)
+              azerite_forge_string_trait_stacking += "{}:{},".format(
+                trait_count,
+                wanted_data['data'][azerite_trait][str(trait_count) + '_' + max_available_itemlevel.split('1_')[1]] -
+                base_dps
+              )
             except Exception:
               pass
           azerite_forge_string_trait_stacking += "^"
@@ -1824,7 +1724,10 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           azerite_forge_string_itemlevel += "[{}]".format(power_id)
           for itemlevel in wanted_data["data"][azerite_trait]:
             if "1_" in itemlevel:
-              azerite_forge_string_itemlevel += "{}:{},".format(itemlevel.split("1_")[1], wanted_data["data"][azerite_trait][itemlevel] - wanted_data["data"]["baseline"][min_available_itemlevel])
+              azerite_forge_string_itemlevel += "{}:{},".format(
+                itemlevel.split("1_")[1], wanted_data["data"][azerite_trait][itemlevel] -
+                wanted_data["data"]["baseline"][min_available_itemlevel]
+              )
           azerite_forge_string_itemlevel += "^"
 
       azerite_weight_string = azerite_weight_string[:-1] + " )"
@@ -1834,7 +1737,6 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       wanted_data["azerite_forge_{}_itemlevel".format(fight_style)] = azerite_forge_string_itemlevel
 
       wanted_data["azerite_forge_{}_trait_stacking".format(fight_style)] = azerite_forge_string_trait_stacking
-
 
       # TODO: make this previous passage about azerite_weight_string better
       # input from HawkCorrigan:
@@ -1852,12 +1754,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
           if not max_available_itemlevel in wanted_data["data"][trait]:
             max_available_itemlevel = sorted(wanted_data["data"][trait])[-1]
 
-          tmp_list.append(
-            (
-              trait,
-              wanted_data["data"][trait][max_available_itemlevel]
-            )
-          )
+          tmp_list.append((trait, wanted_data["data"][trait][max_available_itemlevel]))
       logger.debug("tmp_list: {}".format(tmp_list))
 
       # sort
@@ -1890,22 +1787,12 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
           # check for tier 2, to allow azerite empowered in tier 1 data
           if 2 in wow_lib.get_azerite_tiers(wow_class, wow_spec, str(trait_id)):
-            tmp_tier2_ilvl.append(
-              (
-                trait,
-                wanted_data["data"][trait]["1_"
-                                          + settings.azerite_trait_ilevels[-1]]
-              )
-            )
-            tmp_tier2_stacked.append(
-              (
-                trait,
-                wanted_data["data"][trait]["3_"
-                                          + settings.azerite_trait_ilevels[-1]]
-              )
-            )
+            tmp_tier2_ilvl.append((trait, wanted_data["data"][trait]["1_" + settings.azerite_trait_ilevels[-1]]))
+            tmp_tier2_stacked.append((trait, wanted_data["data"][trait]["3_" + settings.azerite_trait_ilevels[-1]]))
 
-          elif 1 in wow_lib.get_azerite_tiers(wow_class, wow_spec, str(trait_id)) or 3 in wow_lib.get_azerite_tiers(wow_class, wow_spec, str(trait_id)) or 4 in wow_lib.get_azerite_tiers(wow_class, wow_spec, str(trait_id)):
+          elif 1 in wow_lib.get_azerite_tiers(wow_class, wow_spec, str(trait_id)) or 3 in wow_lib.get_azerite_tiers(
+            wow_class, wow_spec, str(trait_id)
+          ) or 4 in wow_lib.get_azerite_tiers(wow_class, wow_spec, str(trait_id)):
 
             max_available_itemlevel = "1_" + settings.azerite_trait_ilevels[-1]
             if not max_available_itemlevel in wanted_data["data"][trait]:
@@ -1917,26 +1804,17 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                 i -= 1
 
             try:
-              tmp_tier1_ilvl.append(
-                (
-                  trait,
-                  wanted_data["data"][trait][max_available_itemlevel]
-                )
-              )
+              tmp_tier1_ilvl.append((trait, wanted_data["data"][trait][max_available_itemlevel]))
             except KeyError:
-              tmp_tier1_ilvl.append(
-                (
-                  trait,
-                  0,
-                )
-              )
-              logger.info('adding dps 0 for {} to tmp_tier1_ilvl list'.format(trait))
-            tmp_tier1_stacked.append(
-              (
+              tmp_tier1_ilvl.append((
                 trait,
-                wanted_data["data"][trait][sorted(wanted_data["data"][trait])[-1]] - wanted_data["data"]["baseline"][sorted(wanted_data["data"][trait])[-1].replace("3_", "1_")]
-              )
-            )
+                0,
+              ))
+              logger.info('adding dps 0 for {} to tmp_tier1_ilvl list'.format(trait))
+            tmp_tier1_stacked.append((
+              trait, wanted_data["data"][trait][sorted(wanted_data["data"][trait])[-1]] -
+              wanted_data["data"]["baseline"][sorted(wanted_data["data"][trait])[-1].replace("3_", "1_")]
+            ))
           else:
             logger.error("Somehow a valid trait is neither of tier 1, 3, or 4. Trait id: {}".format(trait_id))
 
@@ -1946,9 +1824,13 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       tmp_tier1_ilvl = sorted(tmp_tier1_ilvl, key=lambda item: item[1], reverse=True)
       tmp_tier2_ilvl = sorted(tmp_tier2_ilvl, key=lambda item: item[1], reverse=True)
       logger.debug("Sorted tmp_tier1: {}".format(tmp_tier1_ilvl))
-      logger.info("Tier 1 Trait {} won with {} dps in ilevel category.".format(tmp_tier1_ilvl[0][0], tmp_tier1_ilvl[0][1]))
+      logger.info(
+        "Tier 1 Trait {} won with {} dps in ilevel category.".format(tmp_tier1_ilvl[0][0], tmp_tier1_ilvl[0][1])
+      )
       logger.debug("Sorted tmp_tier2: {}".format(tmp_tier2_ilvl))
-      logger.info("Tier 2 Trait {} won with {} dps in ilevel category.".format(tmp_tier2_ilvl[0][0], tmp_tier2_ilvl[0][1]))
+      logger.info(
+        "Tier 2 Trait {} won with {} dps in ilevel category.".format(tmp_tier2_ilvl[0][0], tmp_tier2_ilvl[0][1])
+      )
 
       # sorted ilevel trait list
       wanted_data["sorted_azerite_tier_3_itemlevel"] = []
@@ -1968,9 +1850,17 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       tmp_tier1_stacked = sorted(tmp_tier1_stacked, key=lambda item: item[1], reverse=True)
       tmp_tier2_stacked = sorted(tmp_tier2_stacked, key=lambda item: item[1], reverse=True)
       logger.debug("Sorted tmp_tier1: {}".format(tmp_tier1_stacked))
-      logger.info("Tier 1 Trait {} won with {} dps in stacked trait category.".format(tmp_tier1_stacked[0][0], tmp_tier1_stacked[0][1]))
+      logger.info(
+        "Tier 1 Trait {} won with {} dps in stacked trait category.".format(
+          tmp_tier1_stacked[0][0], tmp_tier1_stacked[0][1]
+        )
+      )
       logger.debug("Sorted tmp_tier2: {}".format(tmp_tier2_stacked))
-      logger.info("Tier 2 Trait {} won with {} dps in stacked trait category.".format(tmp_tier2_stacked[0][0], tmp_tier2_stacked[0][1]))
+      logger.info(
+        "Tier 2 Trait {} won with {} dps in stacked trait category.".format(
+          tmp_tier2_stacked[0][0], tmp_tier2_stacked[0][1]
+        )
+      )
 
       # sorted ilevel trait list
       wanted_data["sorted_azerite_tier_3_trait_stacking"] = []
@@ -1995,9 +1885,9 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
       # write json to file
       with open(
-        "results/azerite_traits/{}_{}_{}.json".format(
-          wow_class.lower(), wow_spec.lower(), fight_style.lower()
-        ), "w", encoding="utf-8"
+        "results/azerite_traits/{}_{}_{}.json".format(wow_class.lower(), wow_spec.lower(), fight_style.lower()),
+        "w",
+        encoding="utf-8"
       ) as f:
         logger.debug("Print azerite_traits json.")
         f.write(json.dumps(wanted_data, sort_keys=True, indent=4, ensure_ascii=False))
@@ -2009,9 +1899,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
       # create an export for each slot
       for slot in azerite_items:
-        slot_export = create_base_json_dict(
-          "Azerite Items " + slot.title(), wow_class, wow_spec, fight_style
-        )
+        slot_export = create_base_json_dict("Azerite Items " + slot.title(), wow_class, wow_spec, fight_style)
 
         # fix base profile to match sim
         slot_export["profile"]["head"].pop("azerite_powers")
@@ -2100,15 +1988,15 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
             # if trait was not simmed previously, throw a warning and exclude trait
             if not trait["name"] in wanted_data["data"]:
-              logger.debug("Trait <{}> wasn't found in already simed data and excluded data. Item <{}> will be evaluated without that trait as it probably would only have that trait for a different spec.".format(trait['name'], item['name']))
+              logger.debug(
+                "Trait <{}> wasn't found in already simed data and excluded data. Item <{}> will be evaluated without that trait as it probably would only have that trait for a different spec."
+                .format(trait['name'], item['name'])
+              )
               continue
 
             name = trait["name"]
 
-            trait_data[name] = {
-              "id": trait["powerId"],
-              "spell_id": trait["spellId"]
-            }
+            trait_data[name] = {"id": trait["powerId"], "spell_id": trait["spellId"]}
 
             # if trait is a dps trait we simmed
             if name in wanted_data["data"]:
@@ -2121,27 +2009,19 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                   tmp_max_available_itemlevel = "1_" + tmp_max_available_itemlevel[2:]
 
               try:
-                trait_dict[trait["tier"]].append(
-                  (
-                    name,
-                    wanted_data["data"][name][tmp_max_available_itemlevel] - baseline_dps[
-                      tmp_max_available_itemlevel
-                    ]
-                  )
-                )
+                trait_dict[trait["tier"]].append((
+                  name,
+                  wanted_data["data"][name][tmp_max_available_itemlevel] - baseline_dps[tmp_max_available_itemlevel]
+                ))
                 logger.debug('trait_dict: {}'.format(trait_dict[trait['tier']][-1]))
               except KeyError:
                 # special case that uses one trait as a baseline instead of zero traits
                 # compares the second stacked trait to the baseline
                 logger.info('KeyError found. information: {}'.format(name))
-                trait_dict[trait["tier"]].append(
-                  (
-                    name,
-                    wanted_data["data"][name]['2_' + tmp_max_available_itemlevel[2:]] - baseline_dps[
-                      tmp_max_available_itemlevel
-                    ]
-                  )
-                )
+                trait_dict[trait["tier"]].append((
+                  name, wanted_data["data"][name]['2_' + tmp_max_available_itemlevel[2:]] -
+                  baseline_dps[tmp_max_available_itemlevel]
+                ))
                 logger.info('trait_dict: {}'.format(trait_dict[trait['tier']][-1]))
 
           # logger.info('{}'.format(trait_dict))
@@ -2158,7 +2038,9 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
                 "id": trait_data[trait_dict[tier][0][0]]["id"],
                 "spell_id": trait_data[trait_dict[tier][0][0]]["spell_id"]
               })
-              logger.debug('adding to slot export {}'.format(slot_export["used_azerite_traits_per_item"][item["name"]][-1]))
+              logger.debug(
+                'adding to slot export {}'.format(slot_export["used_azerite_traits_per_item"][item["name"]][-1])
+              )
 
           slot_export["data"][item["name"]] = {}
           # add values to the armor for all available itemlevels
@@ -2166,7 +2048,11 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
 
             # skip itemlevel if item (trait) can't scale up to this itemlevel
             if int(itemlevel) > max_available_itemlevel:
-              logger.info('skipping itemlevel for it is higher than the max available one: {} | {}'.format(itemlevel, max_available_itemlevel))
+              logger.info(
+                'skipping itemlevel for it is higher than the max available one: {} | {}'.format(
+                  itemlevel, max_available_itemlevel
+                )
+              )
               continue
 
             # add base dps value first to be able to add the dps value of the different tiers later
@@ -2176,21 +2062,34 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
             for tier in trait_dict:
               if trait_dict[tier]:
                 try:
-                  slot_export["data"][item["name"]]["1_" + itemlevel] += wanted_data["data"][trait_dict[tier][0][0]]["1_" + itemlevel] - baseline_dps["1_" + itemlevel]
+                  slot_export["data"][item["name"]]["1_" + itemlevel] += wanted_data["data"][trait_dict[tier][0][0]][
+                    "1_" + itemlevel] - baseline_dps["1_" + itemlevel]
                 except Exception:
                   try:
-                    slot_export["data"][item["name"]]["1_" + itemlevel] += wanted_data["data"][trait_dict[tier][0][0]]["2_" + itemlevel] - baseline_dps["1_" + itemlevel]
+                    slot_export["data"][item["name"]]["1_" + itemlevel] += wanted_data["data"][trait_dict[tier][0][0]][
+                      "2_" + itemlevel] - baseline_dps["1_" + itemlevel]
 
                   except Exception:
-                    logger.debug("Itemlevel {} for trait <{}> not found. Removing the itemlevel from the item <{}> from result dict.".format(itemlevel, trait_dict[tier][0][0], item['name']))
-                    logger.debug('item: {}; trait: {}'.format(slot_export["data"][item["name"]], wanted_data["data"][trait_dict[tier][0][0]]))
+                    logger.debug(
+                      "Itemlevel {} for trait <{}> not found. Removing the itemlevel from the item <{}> from result dict."
+                      .format(itemlevel, trait_dict[tier][0][0], item['name'])
+                    )
+                    logger.debug(
+                      'item: {}; trait: {}'.format(
+                        slot_export["data"][item["name"]], wanted_data["data"][trait_dict[tier][0][0]]
+                      )
+                    )
 
                     if "1_" + itemlevel in slot_export["data"][item["name"]]:
                       slot_export["data"][item["name"]].pop("1_" + itemlevel)
                     continue
 
                 else:
-                  logger.debug('slot export {} {} {}'.format(item["name"], "1_" + itemlevel, slot_export["data"][item["name"]]["1_" + itemlevel]))
+                  logger.debug(
+                    'slot export {} {} {}'.format(
+                      item["name"], "1_" + itemlevel, slot_export["data"][item["name"]]["1_" + itemlevel]
+                    )
+                  )
                   pass
 
           # add tuple (item_name, item_dps) to unsorted_item_dps_list
@@ -2200,15 +2099,14 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               try:
                 max_available_itemlevel = sorted(slot_export["data"][item["name"]])[-1]
               except IndexError as e:
-                logger.info('IndexError found. Information: {} ### {} ### {}'.format(item["name"], slot_export["data"], slot_export["data"][item["name"]]))
+                logger.info(
+                  'IndexError found. Information: {} ### {} ### {}'.format(
+                    item["name"], slot_export["data"], slot_export["data"][item["name"]]
+                  )
+                )
                 raise e
 
-            unsorted_item_dps_list.append(
-              (
-                item["name"],
-                slot_export["data"][item["name"]][max_available_itemlevel]
-              )
-            )
+            unsorted_item_dps_list.append((item["name"], slot_export["data"][item["name"]][max_available_itemlevel]))
 
             # create item_ids dict
             if not "item_ids" in slot_export:
@@ -2231,7 +2129,9 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
         with open(
           "results/azerite_traits/{}_{}_{}_{}.json".format(
             wow_class.lower(), wow_spec.lower(), slot.lower(), fight_style.lower()
-          ), "w", encoding="utf-8"
+          ),
+          "w",
+          encoding="utf-8"
         ) as f:
           logger.debug("Print azerite_traits {} json.".format(slot))
           f.write(json.dumps(slot_export, sort_keys=True, indent=4, ensure_ascii=False))
@@ -2248,17 +2148,11 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
 
       # check whether the baseline profile does exist
       try:
-        with open(
-          create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
-        ) as f:
+        with open(create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r') as f:
           pass
       except FileNotFoundError:
-        logger.warning(
-          "{} {} profile not found. Skipping.".
-          format(wow_spec.title(), wow_class.title())
-        )
+        logger.warning("{} {} profile not found. Skipping.".format(wow_spec.title(), wow_class.title()))
         continue
-
 
       # initial profiles and data
       secondary_sum = 0
@@ -2276,7 +2170,11 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
             if "gear_versatility_rating" in line:
               secondary_sum += int(line.split("=")[-1])
       except Exception:
-        logger.warning("Profile for {} {} couldn't be found. Will be left out in Gear Path simulations.".format(wow_spec, wow_class))
+        logger.warning(
+          "Profile for {} {} couldn't be found. Will be left out in Gear Path simulations.".format(
+            wow_spec, wow_class
+          )
+        )
         continue
 
       crit_rating = haste_rating = mastery_rating = vers_rating = settings.start_value
@@ -2298,10 +2196,8 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
           target_error=settings.target_error[fight_style],
           logger=logger,
           simc_arguments=[
-            base_profile_string,
-            "gear_crit_rating={}".format(crit_rating + settings.step_size),
-            "gear_haste_rating={}".format(haste_rating),
-            "gear_mastery_rating={}".format(mastery_rating),
+            base_profile_string, "gear_crit_rating={}".format(crit_rating + settings.step_size),
+            "gear_haste_rating={}".format(haste_rating), "gear_mastery_rating={}".format(mastery_rating),
             "gear_versatility_rating={}".format(vers_rating)
           ],
           ptr=settings.ptr,
@@ -2318,8 +2214,7 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
           simc_arguments=[
             "gear_crit_rating={}".format(crit_rating),
             "gear_haste_rating={}".format(haste_rating + settings.step_size),
-            "gear_mastery_rating={}".format(mastery_rating),
-            "gear_versatility_rating={}".format(vers_rating)
+            "gear_mastery_rating={}".format(mastery_rating), "gear_versatility_rating={}".format(vers_rating)
           ],
           ptr=settings.ptr,
           default_actions=settings.default_actions
@@ -2333,8 +2228,7 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
           target_error=settings.target_error[fight_style],
           logger=logger,
           simc_arguments=[
-            "gear_crit_rating={}".format(crit_rating),
-            "gear_haste_rating={}".format(haste_rating),
+            "gear_crit_rating={}".format(crit_rating), "gear_haste_rating={}".format(haste_rating),
             "gear_mastery_rating={}".format(mastery_rating + settings.step_size),
             "gear_versatility_rating={}".format(vers_rating)
           ],
@@ -2350,8 +2244,7 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
           target_error=settings.target_error[fight_style],
           logger=logger,
           simc_arguments=[
-            "gear_crit_rating={}".format(crit_rating),
-            "gear_haste_rating={}".format(haste_rating),
+            "gear_crit_rating={}".format(crit_rating), "gear_haste_rating={}".format(haste_rating),
             "gear_mastery_rating={}".format(mastery_rating),
             "gear_versatility_rating={}".format(vers_rating + settings.step_size)
           ],
@@ -2364,33 +2257,43 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
 
         # ugly
         winner_dps = 0
-        if crit_profile.get_dps() >= haste_profile.get_dps() and crit_profile.get_dps() >= mastery_profile.get_dps() and crit_profile.get_dps() >= vers_profile.get_dps():
+        if crit_profile.get_dps() >= haste_profile.get_dps() and crit_profile.get_dps() >= mastery_profile.get_dps(
+        ) and crit_profile.get_dps() >= vers_profile.get_dps():
 
           crit_rating += settings.step_size
           winner_dps = crit_profile.get_dps()
-          logger.info("Crit - {}/{}/{}/{}: {}".format(crit_rating, haste_rating, mastery_rating, vers_rating, winner_dps))
+          logger.info(
+            "Crit - {}/{}/{}/{}: {}".format(crit_rating, haste_rating, mastery_rating, vers_rating, winner_dps)
+          )
 
-        elif haste_profile.get_dps() >= crit_profile.get_dps() and haste_profile.get_dps() >= mastery_profile.get_dps() and haste_profile.get_dps() >= vers_profile.get_dps():
+        elif haste_profile.get_dps() >= crit_profile.get_dps() and haste_profile.get_dps() >= mastery_profile.get_dps(
+        ) and haste_profile.get_dps() >= vers_profile.get_dps():
 
           haste_rating += settings.step_size
           winner_dps = haste_profile.get_dps()
-          logger.info("Haste - {}/{}/{}/{}: {}".format(crit_rating, haste_rating, mastery_rating, vers_rating, winner_dps))
+          logger.info(
+            "Haste - {}/{}/{}/{}: {}".format(crit_rating, haste_rating, mastery_rating, vers_rating, winner_dps)
+          )
 
-        elif mastery_profile.get_dps() >= haste_profile.get_dps() and mastery_profile.get_dps() >= crit_profile.get_dps() and mastery_profile.get_dps() >= vers_profile.get_dps():
+        elif mastery_profile.get_dps() >= haste_profile.get_dps() and mastery_profile.get_dps(
+        ) >= crit_profile.get_dps() and mastery_profile.get_dps() >= vers_profile.get_dps():
 
           mastery_rating += settings.step_size
           winner_dps = mastery_profile.get_dps()
-          logger.info("Mastery - {}/{}/{}/{}: {}".format(crit_rating, haste_rating, mastery_rating, vers_rating, winner_dps))
+          logger.info(
+            "Mastery - {}/{}/{}/{}: {}".format(crit_rating, haste_rating, mastery_rating, vers_rating, winner_dps)
+          )
 
-        elif vers_profile.get_dps() >= haste_profile.get_dps() and vers_profile.get_dps() >= mastery_profile.get_dps() and vers_profile.get_dps() >= crit_profile.get_dps():
+        elif vers_profile.get_dps() >= haste_profile.get_dps() and vers_profile.get_dps() >= mastery_profile.get_dps(
+        ) and vers_profile.get_dps() >= crit_profile.get_dps():
 
           vers_rating += settings.step_size
           winner_dps = vers_profile.get_dps()
-          logger.info("Vers - {}/{}/{}/{}: {}".format(crit_rating, haste_rating, mastery_rating, vers_rating, winner_dps))
+          logger.info(
+            "Vers - {}/{}/{}/{}: {}".format(crit_rating, haste_rating, mastery_rating, vers_rating, winner_dps)
+          )
 
-        gear_path.append({
-          "{}_{}_{}_{}".format(crit_rating, haste_rating, mastery_rating, vers_rating): winner_dps
-        })
+        gear_path.append({"{}_{}_{}_{}".format(crit_rating, haste_rating, mastery_rating, vers_rating): winner_dps})
 
       logger.info(gear_path)
 
@@ -2423,15 +2326,10 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
 
       # check whether the baseline profile does exist
       try:
-        with open(
-          create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
-        ) as f:
+        with open(create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r') as f:
           pass
       except FileNotFoundError:
-        logger.warning(
-          "{} {} profile not found. Skipping.".
-          format(wow_spec.title(), wow_class.title())
-        )
+        logger.warning("{} {} profile not found. Skipping.".format(wow_spec.title(), wow_class.title()))
         continue
 
       base_profile_string = create_basic_profile_string(wow_class, wow_spec, settings.tier)
@@ -2509,8 +2407,9 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
         )
         simulation_group.add(simulation_data)
 
-
-      logger.info("Talent Worth {} {} {} {} profiles.".format(wow_spec, wow_class, fight_style, len(simulation_group.profiles)))
+      logger.info(
+        "Talent Worth {} {} {} {} profiles.".format(wow_spec, wow_class, fight_style, len(simulation_group.profiles))
+      )
 
       # time to sim
       if settings.use_raidbots:
@@ -2529,9 +2428,9 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
 
       for talent_combination in export_json["data"]:
         if talent_combination.count("0") == talent_blueprint.count("0"):
-          tmp_1.append((talent_combination, export_json["data"][talent_combination] ))
+          tmp_1.append((talent_combination, export_json["data"][talent_combination]))
         else:
-          tmp_2.append((talent_combination, export_json["data"][talent_combination] ))
+          tmp_2.append((talent_combination, export_json["data"][talent_combination]))
 
       tmp_1 = sorted(tmp_1, key=lambda item: item[1], reverse=True)
       tmp_2 = sorted(tmp_2, key=lambda item: item[1], reverse=True)
@@ -2551,16 +2450,12 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
       if not os.path.isdir("results/talent_worth/"):
         os.makedirs("results/talent_worth/")
 
-      file_name = "results/talent_worth/{}_{}_{}".format(
-          wow_class.lower(), wow_spec.lower(), fight_style.lower()
-        )
+      file_name = "results/talent_worth/{}_{}_{}".format(wow_class.lower(), wow_spec.lower(), fight_style.lower())
       if settings.ptr == "1":
         file_name += "_ptr"
 
       # write json to file
-      with open(
-        file_name + ".json", "w", encoding="utf-8"
-      ) as f:
+      with open(file_name + ".json", "w", encoding="utf-8") as f:
         logger.debug("Print talent_worth json.")
         f.write(json.dumps(export_json, sort_keys=True, indent=4, ensure_ascii=False))
         logger.debug("Printed talent_worth json.")
@@ -2576,9 +2471,7 @@ def main():
   settings.logger = logger
 
   # interface parameters
-  parser = argparse.ArgumentParser(
-    description="Simulate different aspects of World of Warcraft data."
-  )
+  parser = argparse.ArgumentParser(description="Simulate different aspects of World of Warcraft data.")
   parser.add_argument(
     "-a",
     "--all",
@@ -2586,32 +2479,27 @@ def main():
     action="store_const",
     const=True,
     default=False,
-    help=
-    "Simulate races, trinkets, secondary distributions, and azerite traits for all specs and all talent combinations."
+    help="Simulate races, trinkets, secondary distributions, and azerite traits for all specs and all talent combinations."
   )
   parser.add_argument(
     "--executable",
     metavar="PATH",
     type=str,
-    help="Relative path to SimulationCrafts executable. Default: '{}'".format(
-      settings.executable
-    )
+    help="Relative path to SimulationCrafts executable. Default: '{}'".format(settings.executable)
   )
   parser.add_argument(
     "--profileset_work_threads",
     metavar="NUMBER",
     type=str,
-    help=
-    "Number of threads used per profileset by SimulationCraft. Default: '{}'".
-    format(settings.profileset_work_threads)
+    help="Number of threads used per profileset by SimulationCraft. Default: '{}'".format(
+      settings.profileset_work_threads
+    )
   )
   parser.add_argument(
     "--threads",
     metavar="NUMBER",
     type=str,
-    help="Number of threads used by SimulationCraft. Default: '{}'".format(
-      settings.threads
-    )
+    help="Number of threads used by SimulationCraft. Default: '{}'".format(settings.threads)
   )
   parser.add_argument(
     "--debug",
@@ -2620,13 +2508,7 @@ def main():
     default=False,
     help="Enables debug modus. Default: '{}'".format(settings.debug)
   )
-  parser.add_argument(
-    "-ptr",
-    action="store_const",
-    const=True,
-    default=False,
-    help="Enables ptr."
-  )
+  parser.add_argument("-ptr", action="store_const", const=True, default=False, help="Enables ptr.")
   # sim only one type of data generation for one spec
   parser.add_argument(
     "-s",
@@ -2643,13 +2525,7 @@ def main():
     default=False,
     help="Enables usage of 'custom_profile.txt' in addition to the base profile. Default: '{}'".format(settings.debug)
   )
-  parser.add_argument(
-    "--raidbots",
-    action="store_const",
-    const=True,
-    default=False,
-    help="Don't try this at home"
-  )
+  parser.add_argument("--raidbots", action="store_const", const=True, default=False, help="Don't try this at home")
 
   args = parser.parse_args()
 
@@ -2729,11 +2605,7 @@ def main():
   # set new profileset_work_threads if provided
   if args.profileset_work_threads:
     settings.profileset_work_threads = args.profileset_work_threads
-    logger.debug(
-      "Set profileset_work_threads to {}".format(
-        settings.profileset_work_threads
-      )
-    )
+    logger.debug("Set profileset_work_threads to {}".format(settings.profileset_work_threads))
 
   if args.ptr:
     settings.ptr = "1"
@@ -2766,11 +2638,7 @@ def main():
       logger.info("Starting Race simulations.")
 
     if settings.use_own_threading:
-      race_thread = threading.Thread(
-        name="Race Thread",
-        target=race_simulations,
-        args=(settings.wow_class_spec_list,)
-      )
+      race_thread = threading.Thread(name="Race Thread", target=race_simulations, args=(settings.wow_class_spec_list,))
       thread_list.append(race_thread)
       race_thread.start()
     else:
@@ -2786,9 +2654,7 @@ def main():
 
     if settings.use_own_threading:
       trinket_thread = threading.Thread(
-        name="Trinket Thread",
-        target=trinket_simulations,
-        args=(settings.wow_class_spec_list,)
+        name="Trinket Thread", target=trinket_simulations, args=(settings.wow_class_spec_list,)
       )
       thread_list.append(trinket_thread)
       trinket_thread.start()
@@ -2814,54 +2680,46 @@ def main():
                 # only lines starting with talents= are looked at, only the last element of that line is used to catch armory imports just fine
                 talent_combination = line.split("talents=")[-1].split()[0]
         except Exception:
-          logger.warning("Base profile for {} {} not found. No secondary distribution will be calculated for this spec.".format(wow_spec, wow_class))
+          logger.warning(
+            "Base profile for {} {} not found. No secondary distribution will be calculated for this spec.".format(
+              wow_spec, wow_class
+            )
+          )
           continue
 
         try:
-          settings.talent_list[(wow_class, wow_spec)] = [
-            talent_combination
-          ]
+          settings.talent_list[(wow_class, wow_spec)] = [talent_combination]
         except Exception:
-          logger.warning("No talent combination was found in base profile of {} {}. Secondary Distribution won't be calculated for this spec.".format(wow_spec, wow_class))
+          logger.warning(
+            "No talent combination was found in base profile of {} {}. Secondary Distribution won't be calculated for this spec."
+            .format(wow_spec, wow_class)
+          )
           continue
 
       # if no talent list is provided, simulate all
       if not (wow_class, wow_spec) in settings.talent_list:
         if settings.use_own_threading:
           secondary_distribution_thread = threading.Thread(
-            name="Secondary Distribution Thread All Talents {} {}".format(
-              wow_class, wow_spec
-            ),
+            name="Secondary Distribution Thread All Talents {} {}".format(wow_class, wow_spec),
             target=secondary_distribution_simulations,
-            args=(
-              wow_class, wow_spec,
-              wow_lib.get_talent_combinations(wow_class, wow_spec)
-            )
+            args=(wow_class, wow_spec, wow_lib.get_talent_combinations(wow_class, wow_spec))
           )
           thread_list.append(secondary_distribution_thread)
           secondary_distribution_thread.start()
         else:
-          secondary_distribution_simulations(
-            wow_class, wow_spec,
-            wow_lib.get_talent_combinations(wow_class, wow_spec)
-          )
+          secondary_distribution_simulations(wow_class, wow_spec, wow_lib.get_talent_combinations(wow_class, wow_spec))
       else:
         # if talent list is provided, sim that
         if settings.use_own_threading:
           secondary_distribution_thread = threading.Thread(
-            name="Secondary Distribution Thread Provided Talents {} {}".
-            format(wow_class, wow_spec),
+            name="Secondary Distribution Thread Provided Talents {} {}".format(wow_class, wow_spec),
             target=secondary_distribution_simulations,
-            args=(
-              wow_class, wow_spec, settings.talent_list[(wow_class, wow_spec)]
-            )
+            args=(wow_class, wow_spec, settings.talent_list[(wow_class, wow_spec)])
           )
           thread_list.append(secondary_distribution_thread)
           secondary_distribution_thread.start()
         else:
-          secondary_distribution_simulations(
-            wow_class, wow_spec, settings.talent_list[(wow_class, wow_spec)]
-          )
+          secondary_distribution_simulations(wow_class, wow_spec, settings.talent_list[(wow_class, wow_spec)])
 
     if not settings.use_own_threading:
       logger.info("Secondary Distribution simulations finished.")
@@ -2873,9 +2731,7 @@ def main():
 
     if settings.use_own_threading:
       azerite_trait_thread = threading.Thread(
-        name="Azerite Traits Thread",
-        target=azerite_trait_simulations,
-        args=(settings.wow_class_spec_list,)
+        name="Azerite Traits Thread", target=azerite_trait_simulations, args=(settings.wow_class_spec_list,)
       )
       thread_list.append(azerite_trait_thread)
       azerite_trait_thread.start()
@@ -2892,9 +2748,7 @@ def main():
 
     if settings.use_own_threading:
       gearing_path_thread = threading.Thread(
-        name="Gear Path Thread",
-        target=gear_path_simulations,
-        args=(settings.wow_class_spec_list,)
+        name="Gear Path Thread", target=gear_path_simulations, args=(settings.wow_class_spec_list,)
       )
       thread_list.append(gearing_path_thread)
       gearing_path_thread.start()
@@ -2911,9 +2765,7 @@ def main():
 
     if settings.use_own_threading:
       talent_worth_thread = threading.Thread(
-        name="Talent Worth Thread",
-        target=talent_worth_simulations,
-        args=(settings.wow_class_spec_list,)
+        name="Talent Worth Thread", target=talent_worth_simulations, args=(settings.wow_class_spec_list,)
       )
       thread_list.append(talent_worth_thread)
       talent_worth_thread.start()
@@ -2930,9 +2782,7 @@ def main():
 
     if settings.use_own_threading:
       essence_thread = threading.Thread(
-        name="Essence Thread",
-        target=essence_simulation.essence_simulation,
-        args=(settings,)
+        name="Essence Thread", target=essence_simulation.essence_simulation, args=(settings,)
       )
       thread_list.append(essence_thread)
       essence_thread.start()
@@ -2970,10 +2820,7 @@ def main():
         logger.info("{} finished.".format(thread.getName()))
         thread_list.remove(thread)
 
-  logger.info(
-    "Bloodytools took {} to finish.".
-    format(datetime.datetime.utcnow() - bloodytools_start_time)
-  )
+  logger.info("Bloodytools took {} to finish.".format(datetime.datetime.utcnow() - bloodytools_start_time))
   logger.debug("main ended")
 
 

@@ -1,11 +1,10 @@
 from . import simulation_objects
-from utils import utils # pylint: disable=no-name-in-module
+from utils import utils     # pylint: disable=no-name-in-module
 from simc_support import wow_lib
 from typing import List, Tuple
 
 import json
 import os
-
 
 
 def essence_combination_simulation(settings: object) -> None:
@@ -28,21 +27,14 @@ def essence_combination_simulation(settings: object) -> None:
 
       # check whether the baseline profile does exist
       try:
-        with open(
-          utils.create_basic_profile_string(wow_class, wow_spec, settings.tier, settings), 'r'
-        ) as f:
+        with open(utils.create_basic_profile_string(wow_class, wow_spec, settings.tier, settings), 'r') as f:
           pass
       except FileNotFoundError:
-        logger.warning(
-          "{} {} base profile not found. Skipping.".
-          format(wow_spec.title(), wow_class.title())
-        )
+        logger.warning("{} {} base profile not found. Skipping.".format(wow_spec.title(), wow_class.title()))
         continue
 
       # prepare result json
-      wanted_data = utils.create_base_json_dict(
-        "Essence Combinations", wow_class, wow_spec, fight_style, settings
-      )
+      wanted_data = utils.create_base_json_dict("Essence Combinations", wow_class, wow_spec, fight_style, settings)
 
       essences = wow_lib.get_essences(wow_class.title(), wow_spec.title())
       simulation_group = simulation_objects.Simulation_Group(
@@ -72,7 +64,7 @@ def essence_combination_simulation(settings: object) -> None:
 
       # create profiles for all essences, all ranks, all minor/major types
       for major_essence_id in essences.keys():
-        rank: int = 3 # using rank 3 only for these combinations
+        rank: int = 3     # using rank 3 only for these combinations
         for minor_essence_id in essences.keys():
 
           # skip combinations with itself
@@ -82,39 +74,33 @@ def essence_combination_simulation(settings: object) -> None:
           simulation_data = None
 
           simulation_data = simulation_objects.Simulation_Data(
-              name='{}_{}'.format(major_essence_id, minor_essence_id),
-              fight_style=fight_style,
-              simc_arguments=["azerite_essences={}:{}:1/{}:{}:0".format(major_essence_id, rank, minor_essence_id, rank)],
-              target_error=settings.target_error[fight_style],
-              ptr=settings.ptr,
-              default_actions=settings.default_actions,
-              executable=settings.executable,
-              iterations=settings.iterations,
-              logger=logger
+            name='{}_{}'.format(major_essence_id, minor_essence_id),
+            fight_style=fight_style,
+            simc_arguments=["azerite_essences={}:{}:1/{}:{}:0".format(major_essence_id, rank, minor_essence_id, rank)],
+            target_error=settings.target_error[fight_style],
+            ptr=settings.ptr,
+            default_actions=settings.default_actions,
+            executable=settings.executable,
+            iterations=settings.iterations,
+            logger=logger
           )
 
           simulation_group.add(simulation_data)
-          logger.debug(
-              (
-              "Added azerite essence '{}:{}:{}' in profile '{}' to simulation_group.".format(
-                  major_essence_id, rank, minor_essence_id, simulation_data.name
-              )
-              )
-          )
+          logger.debug((
+            "Added azerite essence '{}:{}:{}' in profile '{}' to simulation_group.".format(
+              major_essence_id, rank, minor_essence_id, simulation_data.name
+            )
+          ))
 
           # special case worldvein
           if major_essence_id == "4" or minor_essence_id == "4":
-              special_case = None
-              special_case = simulation_data.copy()
-              special_case.name += "+3"
-              special_case.simc_arguments.append("bfa.worldvein_allies=3")
-              simulation_group.add(special_case)
+            special_case = None
+            special_case = simulation_data.copy()
+            special_case.name += "+3"
+            special_case.simc_arguments.append("bfa.worldvein_allies=3")
+            simulation_group.add(special_case)
 
-      logger.info(
-        "Start {} essence combintion simulation for {} {}.".format(
-          fight_style, wow_class, wow_spec
-        )
-      )
+      logger.info("Start {} essence combintion simulation for {} {}.".format(fight_style, wow_class, wow_spec))
       try:
         if settings.use_raidbots and settings.apikey:
           settings.simc_hash = simulation_group.simulate_with_raidbots(settings.apikey)
@@ -122,21 +108,18 @@ def essence_combination_simulation(settings: object) -> None:
           simulation_group.simulate()
       except Exception as e:
         logger.error(
-          "{} essence simulation combintion for {} {} failed. {}".format(
-            fight_style.title(), wow_class, wow_spec, e
-          )
+          "{} essence simulation combintion for {} {} failed. {}".format(fight_style.title(), wow_class, wow_spec, e)
         )
         continue
       else:
         logger.info(
-          "{} essence combintion simulation for {} {} ended successfully. Cleaning up.".
-          format(fight_style.title(), wow_class, wow_spec)
+          "{} essence combintion simulation for {} {} ended successfully. Cleaning up.".format(
+            fight_style.title(), wow_class, wow_spec
+          )
         )
 
       for profile in simulation_group.profiles:
-        logger.debug(
-          "Profile '{}' DPS: {}".format(profile.name, profile.get_dps())
-        )
+        logger.debug("Profile '{}' DPS: {}".format(profile.name, profile.get_dps()))
 
       logger.debug("Created base dict for json export. {}".format(wanted_data))
 
@@ -148,11 +131,7 @@ def essence_combination_simulation(settings: object) -> None:
 
         if profile.name == 'baseline':
           wanted_data['data'][profile.name] = profile.get_dps()
-          logger.debug(
-            "Added '{}' with {} dps to json.".format(
-              profile.name, profile.get_dps()
-            )
-          )
+          logger.debug("Added '{}' with {} dps to json.".format(profile.name, profile.get_dps()))
           continue
 
         major_essence_id: int = int(profile.name.split('_')[0])
@@ -169,11 +148,7 @@ def essence_combination_simulation(settings: object) -> None:
               full_name += ' +' + plus
 
         wanted_data['data'][full_name] = profile.get_dps()
-        logger.debug(
-          "Added '{}' as '{}' with {} dps to json.".format(
-            profile.name, full_name, profile.get_dps()
-          )
-        )
+        logger.debug("Added '{}' as '{}' with {} dps to json.".format(profile.name, full_name, profile.get_dps()))
         # adding spell data to dict
         if not 'spell_ids' in wanted_data:
           wanted_data['spell_ids'] = {}
@@ -182,7 +157,8 @@ def essence_combination_simulation(settings: object) -> None:
           wanted_data['spell_ids'][major_essence_name] = essences[str(major_essence_id)]['major']['spell_id']
 
         if not minor_essence_name in wanted_data['spell_ids']:
-          wanted_data['spell_ids'][minor_essence_name + ' minor'] = essences[str(minor_essence_id)]['minor']['spell_id']
+          wanted_data['spell_ids'][minor_essence_name +
+                                   ' minor'] = essences[str(minor_essence_id)]['minor']['spell_id']
 
         # adding power ids to dict
         power_id_name = 'power_ids'
@@ -209,7 +185,7 @@ def essence_combination_simulation(settings: object) -> None:
 
       tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
       logger.debug("Sorted tmp_list: {}".format(tmp_list))
-      logger.info(f"Essence {tmp_list[0][0]} won with {tmp_list[0][1]} dps.")
+      logger.info("Essence {} won with {} dps.".format(tmp_list[0][0], tmp_list[0][1]))
 
       wanted_data["sorted_data_keys"] = []
       for essence_name, _ in tmp_list:
@@ -227,13 +203,12 @@ def essence_combination_simulation(settings: object) -> None:
 
       # write json to file
       with open(
-        "{}{}_{}_{}.json".format(
-          partial_path, wow_class.lower(), wow_spec.lower(), fight_style.lower()
-        ), "w", encoding="utf-8"
+        "{}{}_{}_{}.json".format(partial_path, wow_class.lower(), wow_spec.lower(), fight_style.lower()),
+        "w",
+        encoding="utf-8"
       ) as f:
         logger.debug("Print essence combinations json.")
         f.write(json.dumps(wanted_data, sort_keys=True, indent=4, ensure_ascii=False))
         logger.debug("Printed essence combinations json.")
 
   logger.debug("essence_combination_simulation ended")
-
