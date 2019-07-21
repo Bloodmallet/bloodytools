@@ -7,7 +7,7 @@
 
 ##
 # General setttings
-tier = "23"  # number or PR (PreRaid)
+tier = "24"  # number or PR (PreRaid)
 wow_class_spec_list = []  # leave empty to simulate all
 # wow_class_spec_list = [("shaman", "elemental"), ("mage", "frost")] # example for a specific list
 wow_class_spec_list = [
@@ -46,7 +46,7 @@ wow_class_spec_list = [
   ("warrior", "protection"),
 ]
 
-##
+###############################################################################
 # SimulationCraft
 executable = "../../SimulationCraft/simc.exe"
 fight_styles = [
@@ -59,7 +59,7 @@ profileset_work_threads = "2"
 ptr = "0"
 default_actions = "1"
 target_error = {
-  "patchwerk": "0.2",
+  "patchwerk": "0.1",
   "hecticaddcleave": "0.2",
   "beastlord": "0.2"
 }
@@ -67,6 +67,8 @@ threads = "8"
 
 use_custom_profile = False # custom profile overrides standard profile, standard profile is still used as baseline
 # use_custom_fight_style = False # NYI
+use_custom_apl = False
+use_custom_fight_style = False
 
 
 ###############################################################################
@@ -78,9 +80,10 @@ enable_race_simulations = True
 # Trinket simulations
 enable_trinket_simulations = True
 ilevel_step = 15  # ilevel_step is used to determine the size of each itemlevel step taken to max_ilevel
-max_ilevel = 415  # max_itemlevel determines the upper border of steps taken
-min_ilevel = 370  # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
+max_ilevel = 445  # max_itemlevel determines the upper border of steps taken
+min_ilevel = 400  # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
 # example: min 300, max 325, step 10, resulting simulated ilevels: 300, 310, 320
+lua_trinket_export = True
 
 
 ###############################################################################
@@ -91,20 +94,21 @@ talent_list = {
 }  # if no list is provided for a class-spec, all dps talent combinations will be run. If you want to only sim the base profiles, set 'talent_permutations' to False
 # talent_list = {
 #   ("shaman", "elemental"): [
-#     "2302023",
+#     "2301022",
 #   ],
 # }  # example for a talent list for Elemental Shamans
 talent_permutations = False  # set to False, to sim only the base profile talent combinations
+write_humanreadable_secondary_distribution_file = False
 
 
 ###############################################################################
 # Azerite traits
 enable_azerite_trait_simulations = True
 azerite_trait_ilevels = [ # determines the itemlevel used to sim the traits
-  "370",
-  "385",
   "400",
-  "415"
+  "415",
+  "430",
+  "445"
 ] # ascending order required
 
 
@@ -121,12 +125,20 @@ enable_talent_worth_simulations = False
 
 
 ###############################################################################
+# Azerite Essences (necklace)
+enable_azerite_essence_simulations = True
+
+
+###############################################################################
+# Azerite Essences Combinations (necklace)
+enable_azerite_essence_combination_simulations = True
+
+
+###############################################################################
 # Development setting - you usually don't want to touch these
 debug = False
 use_own_threading = False
 use_raidbots = False
-write_humanreadable_secondary_distribution_file = False
-lua_trinket_export = True
 try:
   from apikey import apikey
 except Exception:
