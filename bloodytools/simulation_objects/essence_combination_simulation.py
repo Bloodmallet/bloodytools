@@ -192,8 +192,11 @@ def essence_combination_simulation(settings: object) -> None:
         if not major_essence_name in wanted_data[power_id_name]:
           wanted_data[power_id_name][major_essence_name] = wow_lib.get_essence_power_id(major_essence_id)
 
-        if not minor_essence_name in wanted_data[power_id_name]:
+        if not "{} {}".format(minor_essence_name, 'minor') in wanted_data[power_id_name]:
           wanted_data[power_id_name][minor_essence_name + ' minor'] = wow_lib.get_essence_power_id(minor_essence_id)
+
+        # add information about the +3 special case (world vein resonance)
+        wanted_data[power_id_name]['3'] = 15
 
       # create ordered essence name list
       tmp_list = []
