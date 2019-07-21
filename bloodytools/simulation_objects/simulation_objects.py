@@ -311,7 +311,7 @@ class Simulation_Data():
       raise TypeError
 
     # raise AlreadySetError if one tries to overwrite previously set data
-    if self.dps:
+    if self.dps > -1:
       raise AlreadySetError(
         "Profile '{}' already had its dps value set to {}.".format(
           self.name, self.get_dps()
