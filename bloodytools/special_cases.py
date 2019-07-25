@@ -122,6 +122,31 @@ special_cases = {
               "description": "Classic 8.0 build"
             }
           ],
+          "Primal Primer": [
+            {
+              "suffix": "HH+TM+ElS",
+              "additional_input": ["talents=2302031"],
+              "link_data": {
+                "HH": { "spell_id": "201900" },
+                "TM": { "spell_id": "262395" },
+                "ElS": { "spell_id": "262624" }
+              },
+              "description": "Freezerburn / Fire build"
+            }
+          ],
+          "Strength of Earth": [
+            {
+              "suffix": "BF+LS+FoA+ESp",
+              "additional_input": ["talents=1102022"],
+              "link_data": {
+                "BF": { "spell_id": "246035" },
+                "LS": { "spell_id": "197992" },
+                "FoA": { "spell_id": "197211" },
+                "ESp": { "spell_id": "188089" }
+              },
+              "description": "Rockslide / Earth build"
+            }
+          ],       
           "Natural Harmony": [
             {
               "suffix": "SA",
@@ -130,47 +155,10 @@ special_cases = {
                 "SA": { "spell_id": "192087" },
               },
               "description": "Natural Harmony comparison on Freezerburn build with Searing Assault"
-            },
-            {
-              "suffix": "LiS+FFW+SA+Asc",
-              "additional_input": ["talents=3201033"],
-              "link_data": {
-                "LiS": { "spell_id": "192106" },
-                "FFW": { "spell_id": "262647" },
-                "SA": { "spell_id": "192087" },
-                "Asc": { "spell_id": "114051" }
-              },
-              "description": "Natural Harmony comparison on default build with Searing Assault"
-            },
-            {
-              "suffix": "LiS+FFW+Asc",
-              "additional_input": ["talents=3202033"],
-              "link_data": {
-                "LiS": { "spell_id": "192106" },
-                "FFW": { "spell_id": "262647" },
-                "Asc": { "spell_id": "114051" }
-              },
-              "description": "Natural Harmony comparison on default build with Hailstorm"
-            }
+            },            
           ],
         }
       },
-      "hecticaddcleave": {
-        "azerite_trait_simulations": {
-          "Thunderaan's Fury": [
-            {
-              "suffix": "LiS+FFW+HS",
-              "additional_input": ["talents=3201031"],
-              "link_data": {
-                "LiS": { "spell_id": "192106" },
-                "FFW": { "spell_id": "262647" },
-                "HS": { "spell_id": "210853" },
-              },
-              "description": "Classic 8.0 build"
-            }
-          ]
-        }
-      }
     }
   },
   "warrior": {
