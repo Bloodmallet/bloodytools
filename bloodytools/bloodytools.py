@@ -1676,7 +1676,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       logger.debug("Sorted tmp_list: {}".format(tmp_list))
       logger.info("Solo Azerite Trait {} won with {} dps.".format(tmp_list[0][0], tmp_list[0][1]))
 
-      azerite_weight_string = "( AzeritePowerWeights:1:\"{fight_style} {wow_spec} {wow_class}\":{class_id}:{spec_id}:".format(
+      azerite_weight_string = "( AzeritePowerWeights:2:\"{fight_style} {wow_spec} {wow_class}\":{class_id}:{spec_id}:".format(
         fight_style=fight_style.title(),
         wow_spec=wow_spec.title(),
         wow_class=wow_class.title(),
@@ -1734,7 +1734,7 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
               )
           azerite_forge_string_itemlevel += "^"
 
-      azerite_weight_string = azerite_weight_string[:-1] + " )"
+      azerite_weight_string = azerite_weight_string[:-1] + ": )"
 
       wanted_data["azerite_weight_{}".format(fight_style)] = azerite_weight_string
 
