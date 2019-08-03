@@ -196,14 +196,39 @@ def essence_simulation(settings: object) -> None:
       for i in range(1, 4):
         wanted_data['simulated_steps'].append(4 - i)     # get the steps into the proper order...descending
 
+      azerite_weight_string = "( AzeritePowerWeights:2:\"{fight_style} {wow_spec} {wow_class} essences\":{class_id}:{spec_id}: :".format(
+        fight_style=fight_style.title(),
+        wow_spec=wow_spec.title(),
+        wow_class=wow_class.title(),
+        class_id=wow_lib.get_class_id(wow_class),
+        spec_id=wow_lib.get_spec_id(wow_class, wow_spec)
+      )
+      tmp_aws_dict = {}
+      for essence_name in wanted_data["data"]:
+        if essence_name != 'baseline':
+          # looking for the trait id in essences dict
+          for key, value in essences.items():
+            if value['name'] in essence_name:
+              if not key in tmp_aws_dict:
+                tmp_aws_dict[key] = {}
+              if ' minor' in essence_name:
+                tmp_aws_dict[key]['minor'] = wanted_data['data'][essence_name][3] - wanted_data['data']['baseline'][1]
+              else:
+                tmp_aws_dict[key]['major'] = wanted_data['data'][essence_name][3] - wanted_data['data']['baseline'][1]
+
+      for key, value in tmp_aws_dict.items():
+        azerite_weight_string += " {}={}/{},".format(key, value['major'], value['minor'])
+
+      azerite_weight_string += " )"
+
+      wanted_data['azerite_weight_{}'.format(fight_style.lower())] = azerite_weight_string
+
       logger.debug("Final json: {}".format(wanted_data))
 
+      # write json to file
       partial_path: str = "results/essences/"
-
       if not os.path.isdir(partial_path):
         os.makedirs(partial_path)
-
-      # write json to file
       with open(
         "{}{}_{}_{}.json".format(partial_path, wow_class.lower(), wow_spec.lower(), fight_style.lower()),
         "w",
