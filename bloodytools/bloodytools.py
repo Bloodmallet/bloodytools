@@ -1883,6 +1883,11 @@ def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
       # spell id dict to allow link creation
       wanted_data["spell_ids"] = azerite_trait_name_spell_id_dict
 
+      # add azerite trait IDs to allow import string creation
+      wanted_data['azerite_ids'] = {}
+      for azerite_trait_spell_id in azerite_traits:
+        wanted_data['azerite_ids'][azerite_traits[azerite_trait_spell_id]['name']] = azerite_traits[azerite_trait_spell_id]['trait_id']
+
       logger.debug("Final json: {}".format(wanted_data))
 
       # create directory if it doesn't exist
