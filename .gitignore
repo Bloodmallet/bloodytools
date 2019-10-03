@@ -16,3 +16,10 @@
 *.simc
 log.txt
 apikey.py
+
+# sphinx autodoc documentation creation
+source/
+make.bat
+Makefile
+_static/
+build/
