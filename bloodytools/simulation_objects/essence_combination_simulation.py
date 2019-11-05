@@ -1,10 +1,11 @@
-from . import simulation_objects
-from utils import utils     # pylint: disable=no-name-in-module
-from simc_support import wow_lib
-from typing import List, Tuple
-
 import json
 import os
+from typing import List, Tuple
+
+from simc_support import wow_lib
+from utils.utils import create_base_json_dict, create_basic_profile_string
+
+from .simulation_objects import Simulation_Data, Simulation_Group
 
 
 def essence_combination_simulation(settings: object) -> None:
@@ -37,7 +38,7 @@ def essence_combination_simulation(settings: object) -> None:
       wanted_data = utils.create_base_json_dict("Essence Combinations", wow_class, wow_spec, fight_style, settings)
 
       essences = wow_lib.get_essences(wow_class.title(), wow_spec.title())
-      simulation_group = simulation_objects.Simulation_Group(
+      simulation_group = Simulation_Group(
         name="essence_combinations",
         threads=settings.threads,
         profileset_work_threads=settings.profileset_work_threads,
@@ -48,7 +49,7 @@ def essence_combination_simulation(settings: object) -> None:
       # add baseline
       simulation_data = None
 
-      simulation_data = simulation_objects.Simulation_Data(
+      simulation_data = Simulation_Data(
         name='baseline',
         fight_style=fight_style,
         profile=wanted_data['profile'],
@@ -73,7 +74,7 @@ def essence_combination_simulation(settings: object) -> None:
 
           simulation_data = None
 
-          simulation_data = simulation_objects.Simulation_Data(
+          simulation_data = Simulation_Data(
             name='{}_{}'.format(major_essence_id, minor_essence_id),
             fight_style=fight_style,
             simc_arguments=["azerite_essences={}:{}:1/{}:{}:0".format(major_essence_id, rank, minor_essence_id, rank)],

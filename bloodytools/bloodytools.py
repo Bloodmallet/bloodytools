@@ -30,17 +30,16 @@ import json
 import logging
 import os
 import re
-# import re
 import sys
 import time
 from typing import List, Tuple
 
 import settings     # settings.py file
 from simc_support import wow_lib
+from simulation_objects import simulation_objects as so
 from simulation_objects.azerite_trait_simulations import azerite_trait_simulations
 from simulation_objects.essence_combination_simulation import essence_combination_simulation
 from simulation_objects.essence_simulation import essence_simulation
-from simulation_objects import simulation_objects as so
 
 if settings.use_own_threading:
   import threading

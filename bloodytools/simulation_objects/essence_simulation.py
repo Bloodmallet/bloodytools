@@ -1,10 +1,11 @@
-from . import simulation_objects
-from utils import utils     # pylint: disable=no-name-in-module
-from simc_support import wow_lib
-from typing import List, Tuple
-
 import json
 import os
+from typing import List, Tuple
+
+from simc_support import wow_lib
+from utils.utils import create_base_json_dict, create_basic_profile_string
+
+from .simulation_objects import Simulation_Data, Simulation_Group
 
 
 def essence_simulation(settings: object) -> None:
@@ -27,17 +28,17 @@ def essence_simulation(settings: object) -> None:
 
       # check whether the baseline profile does exist
       try:
-        with open(utils.create_basic_profile_string(wow_class, wow_spec, settings.tier, settings), 'r') as f:
+        with open(create_basic_profile_string(wow_class, wow_spec, settings.tier, settings), 'r') as f:
           pass
       except FileNotFoundError:
         logger.warning("{} {} base profile not found. Skipping.".format(wow_spec.title(), wow_class.title()))
         continue
 
       # prepare result json
-      wanted_data = utils.create_base_json_dict("Essences", wow_class, wow_spec, fight_style, settings)
+      wanted_data = create_base_json_dict("Essences", wow_class, wow_spec, fight_style, settings)
 
       essences = wow_lib.get_essences(wow_class.title(), wow_spec.title())
-      simulation_group = simulation_objects.Simulation_Group(
+      simulation_group = Simulation_Group(
         name="essences",
         threads=settings.threads,
         profileset_work_threads=settings.profileset_work_threads,
@@ -48,7 +49,7 @@ def essence_simulation(settings: object) -> None:
       # add baseline
       simulation_data = None
 
-      simulation_data = simulation_objects.Simulation_Data(
+      simulation_data = Simulation_Data(
         name='baseline',
         fight_style=fight_style,
         profile=wanted_data['profile'],
@@ -71,7 +72,7 @@ def essence_simulation(settings: object) -> None:
 
             simulation_data = None
 
-            simulation_data = simulation_objects.Simulation_Data(
+            simulation_data = Simulation_Data(
               name='{}_{}_{}'.format(essence_id, rank, essence_type),
               fight_style=fight_style,
               simc_arguments=["azerite_essences={}:{}:{}".format(essence_id, rank, essence_type)],
