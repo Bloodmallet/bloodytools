@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# date data
 import datetime
+import logging
+import os
+import subprocess
+import sys
+import threading
+import uuid
+from typing import List, Union
+
 # wow game data and simc input checks
 from simc_support import simc_checks as simc_checks
-# required for file existance check
-import os
-# sys operations and data
-import sys
-from typing import Union, List
-import uuid
-import logging
-import threading
-
-import subprocess
 
 
 class Error(Exception):

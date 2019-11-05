@@ -3,12 +3,12 @@
 
 import datetime
 import logging
+import os
+import time
 import unittest
 import uuid
-import time
-import os
 
-from simulation_objects import simulation_objects
+from .simulation_objects import simulation_objects
 
 logger = logging.getLogger(__name__)
 
