@@ -2,22 +2,26 @@
 # -*- coding: utf-8 -*-
 """Welcome to bloodytools - a SimulationCraft automator/wrapper
 
-  Generate your data more easily without having to create each and every needed profile to do so by hand:
-    - races
-    - trinkets
-    - azerite traits
-    - secondary distributions
-    - gear path
+Generate your data more easily without having to create each and every needed profile to do so by hand:
+  - races
+  - trinkets
+  - azerite traits
+  - secondary distributions
+  - gear path
 
-  Output is usually saved as .json. But you can add different ways to output the data yourself.
+Output is usually saved as .json. But you can add different ways to output the data yourself.
 
-  Contact:  https://discord.gg/tFR2uvK Bloodmallet(EU)#8246
-  Github:   https://github.com/Bloodmallet/bloodytools
-  Support the development:
-            https://www.patreon.com/bloodmallet
-            https://www.paypal.me/bloodmallet
+Contact:
+  - https://discord.gg/tFR2uvK Bloodmallet(EU)#8246
 
-  May 2018
+Github:
+  - https://github.com/Bloodmallet/bloodytools
+
+Support the development:
+  - https://www.patreon.com/bloodmallet
+  - https://www.paypal.me/bloodmallet
+
+May 2018
 """
 
 from typing import List, Tuple
@@ -1124,13 +1128,15 @@ def secondary_distribution_simulations(
 def azerite_trait_simulations(specs: List[Tuple[str, str]]) -> None:
   """Simulate all azerite traits with an adjusted head itemlevel. Create json with trait values and with all known azerite items and their sumed up trait dps values.
 
-  Arguments:
-    specs {List[Tuple[wow_class:str, wow_spec:str]]} -- all wow_specs you want to be simulated
+  Args:
+    specs (List[Tuple[str, str]]): all wow_specs you want to be simulated, e.g. `[('shaman', 'elemental'), ('warrior', 'arms')]`
+
+  Raises:
+    e: [description]
 
   Returns:
-    None -- Files will be created in /results/azerite_traits/
+    None: Files will be created in /results/azerite_traits/
   """
-
   logger.debug("azerite_trait_simulations start")
   for fight_style in settings.fight_styles:
     for wow_class, wow_spec in specs:
