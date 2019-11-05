@@ -1,5 +1,6 @@
 # locald ev env
-/env
+env/
+env38/
 
 *.pyc
 
@@ -7,12 +8,12 @@
 .coverage
 
 # local editor
-/.vscode
+.vscode/
 
 # local type checks
-/.mypy_cache
+.mypy_cache/
 
-/bloodytools/results/*
+bloodytools/results/*
 *.simc
 log.txt
 apikey.py
