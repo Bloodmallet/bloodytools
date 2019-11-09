@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 from typing import List, Tuple
 
@@ -8,8 +7,6 @@ from special_cases import special_cases
 from utils.utils import (create_base_json_dict, create_basic_profile_string, tokenize_str)
 
 from .simulation_objects import Simulation_Data, Simulation_Group
-
-logger = logging.getLogger(__name__)
 
 
 def azerite_trait_simulations(settings) -> None:
@@ -24,6 +21,8 @@ def azerite_trait_simulations(settings) -> None:
   Returns:
     None: Files will be created in /results/azerite_traits/
   """
+  logger = settings.logger
+
   logger.debug("azerite_trait_simulations start")
   specs = settings.wow_class_spec_list
   for fight_style in settings.fight_styles:
@@ -258,7 +257,7 @@ def azerite_trait_simulations(settings) -> None:
             if base_trait != azerite_trait:
               simulation_group.add(simulation_data)
             else:
-              logger.info('Not adding {} to simulation_group'.format(base_trait))
+              logger.debug('Not adding {} to simulation_group'.format(base_trait))
           logger.debug((
             "Added azerite trait '{}' at itemlevel {} in profile '{}' to simulation_group.".format(
               azerite_trait, itemlevel, simulation_data.name
@@ -710,7 +709,7 @@ def azerite_trait_simulations(settings) -> None:
                 trait,
                 0,
               ))
-              logger.info('adding dps 0 for {} to tmp_tier1_ilvl list'.format(trait))
+              logger.debug('adding dps 0 for {} to tmp_tier1_ilvl list'.format(trait))
             tmp_tier1_stacked.append((
               trait, wanted_data["data"][trait][sorted(wanted_data["data"][trait])[-1]] -
               wanted_data["data"]["baseline"][sorted(wanted_data["data"][trait])[-1].replace("3_", "1_")]
@@ -799,8 +798,8 @@ def azerite_trait_simulations(settings) -> None:
         f.write(json.dumps(wanted_data, sort_keys=True, indent=4, ensure_ascii=False))
         logger.debug("Printed azerite_traits json.")
 
-      ##
-      # item export start (Azerite Items)
+      #########################################################################
+      # Export of Azerite Items
       azerite_items = wow_lib.get_azerite_items(wow_class, wow_spec)
 
       # create an export for each slot
@@ -868,8 +867,6 @@ def azerite_trait_simulations(settings) -> None:
               }
 
           # get maximum available itemlevel for an item from its traits
-          # (yey to not having to create lists of raid items...yet)
-
           max_available_itemlevel = 1000
           for trait in item['azeriteTraits']:
 
@@ -883,6 +880,16 @@ def azerite_trait_simulations(settings) -> None:
 
             if trait_ilvl < max_available_itemlevel:
               max_available_itemlevel = trait_ilvl
+
+          # get maximum available itemlevel for an item from the available dict
+          lookup_itemlevel: int = wow_lib.get_azerite_item_max_itemlevel(item["name"])
+          if lookup_itemlevel > -1 and lookup_itemlevel < max_available_itemlevel:
+            max_available_itemlevel = lookup_itemlevel
+
+          # early exit for this item if max_available_itemlevel is not in settings
+          if max_available_itemlevel not in [int(itemlevel) for itemlevel in settings.azerite_trait_ilevels]:
+            logger.debug(f'  Skipping {item["name"]} (max itemlevel: {max_available_itemlevel})')
+            continue
 
           # create trait lists for each tier [(trait_name, dps)]
           trait_dict = {2: [], 3: [], 4: []}
@@ -934,9 +941,7 @@ def azerite_trait_simulations(settings) -> None:
                   name, wanted_data["data"][name]['2_' + tmp_max_available_itemlevel[2:]] -
                   baseline_dps[tmp_max_available_itemlevel]
                 ))
-                logger.info('trait_dict: {}'.format(trait_dict[trait['tier']][-1]))
-
-          # logger.info('{}'.format(trait_dict))
+                logger.debug('trait_dict: {}'.format(trait_dict[trait['tier']][-1]))
 
           # create list of traits of item
           slot_export["used_azerite_traits_per_item"][item["name"]] = []
@@ -960,9 +965,11 @@ def azerite_trait_simulations(settings) -> None:
 
             # skip itemlevel if item (trait) can't scale up to this itemlevel
             if int(itemlevel) > max_available_itemlevel:
-              logger.info(
-                'skipping itemlevel for it is higher than the max available one: {} | {}'.format(
-                  itemlevel, max_available_itemlevel
+              logger.debug(
+                'skipping itemlevel of {}: {} | {}'.format(
+                  item["name"],
+                  itemlevel,
+                  max_available_itemlevel,
                 )
               )
               continue
