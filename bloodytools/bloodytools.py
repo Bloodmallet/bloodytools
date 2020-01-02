@@ -37,7 +37,8 @@ from typing import List, Tuple
 import settings     # settings.py file
 from simc_support import wow_lib
 from simulation_objects import simulation_objects as so
-from simulation_objects.azerite_trait_simulations import azerite_trait_simulations
+from simulation_objects.azerite_trait_simulation import azerite_trait_simulations
+from simulation_objects.corruption_simulation import corruption_simulation
 from simulation_objects.essence_combination_simulation import essence_combination_simulation
 from simulation_objects.essence_simulation import essence_simulation
 
@@ -1542,6 +1543,7 @@ def main():
     settings.enable_talent_worth_simulations = False
     settings.enable_azerite_essence_simulations = False
     settings.enable_azerite_essence_combination_simulations = False
+    settings.enable_corruption_simulations = False
 
     # set dev options
     settings.use_own_threading = False
@@ -1561,6 +1563,8 @@ def main():
       settings.enable_azerite_essence_simulations = True
     elif simulation_type == "essence_combinations":
       settings.enable_azerite_essence_combination_simulations = True
+    elif simulation_type == "corruptions":
+      settings.enable_corruption_simulations = True
 
   # if argument specified to simulate all, override settings
   elif args.sim_all:
@@ -1568,6 +1572,7 @@ def main():
     settings.enable_secondary_distributions_simulations = True
     settings.enable_trinket_simulations = True
     settings.enable_azerite_trait_simulations = True
+    settings.enable_corruption_simulations = True
     # set talent_list to empty to ensure all talent combinations are run
     settings.talent_list = {}
 
@@ -1790,6 +1795,21 @@ def main():
 
     if not settings.use_own_threading:
       logger.info("Essence combination simulations end.")
+
+  # trigger corruption simulations
+  if settings.enable_corruption_simulations:
+    if not settings.use_own_threading:
+      logger.info("Corruption simulations start.")
+
+    if settings.use_own_threading:
+      corruption_thread = threading.Thread(name="Corruption Thread", target=corruption_simulation, args=(settings,))
+      thread_list.append(corruption_thread)
+      corruption_thread.start()
+    else:
+      corruption_simulation(settings)
+
+    if not settings.use_own_threading:
+      logger.info("Corruption simulations end.")
 
   while thread_list:
     time.sleep(1)
