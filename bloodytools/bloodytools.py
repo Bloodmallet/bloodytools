@@ -165,7 +165,6 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     "trinket2",
     "main_hand",
     "off_hand",
-    "azerite_essences",
   ]
   pattern_slots = {}
   for element in item_slots:
@@ -193,6 +192,7 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     'position',
     'talents',
     'spec',
+    'azerite_essences',
   ]
   pattern_specifics = {}
   for element in character_specifics:
