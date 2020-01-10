@@ -28,14 +28,14 @@ def essence_combination_simulation(settings: object) -> None:
 
       # check whether the baseline profile does exist
       try:
-        with open(utils.create_basic_profile_string(wow_class, wow_spec, settings.tier, settings), 'r') as f:
+        with open(create_basic_profile_string(wow_class, wow_spec, settings.tier, settings), 'r') as f:
           pass
       except FileNotFoundError:
         logger.warning("{} {} base profile not found. Skipping.".format(wow_spec.title(), wow_class.title()))
         continue
 
       # prepare result json
-      wanted_data = utils.create_base_json_dict("Essence Combinations", wow_class, wow_spec, fight_style, settings)
+      wanted_data = create_base_json_dict("Essence Combinations", wow_class, wow_spec, fight_style, settings)
 
       essences = wow_lib.get_essences(wow_class.title(), wow_spec.title())
       simulation_group = Simulation_Group(
