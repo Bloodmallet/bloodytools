@@ -55,6 +55,25 @@ def corruption_simulation(settings: object) -> None:
         logger=logger
       )
 
+      # create corruption filter
+      blacklist = []
+      for corruption in corruptions:
+        for rank in corruptions[corruption]:
+          blacklist.append(corruptions[corruption][rank]['bonus_id'])
+      for item in wanted_data['profile']['items']:
+        for blacklisted in blacklist:
+          if not 'bonus_id' in wanted_data['profile']['items'][item].keys():
+            continue
+
+          if f'/{blacklisted}' in wanted_data['profile']['items'][item]['bonus_id']:
+            wanted_data['profile']['items'][item]['bonus_id'] = wanted_data['profile']['items'][item][
+              'bonus_id'].replace(f'/{blacklisted}', '')
+          elif f'{blacklisted}/' in wanted_data['profile']['items'][item]['bonus_id']:
+            wanted_data['profile']['items'][item]['bonus_id'] = wanted_data['profile']['items'][item][
+              'bonus_id'].replace(f'{blacklisted}/', '')
+          elif f'{blacklisted}' == wanted_data['profile']['items'][item]['bonus_id']:
+            del wanted_data['profile']['items'][item]['bonus_id']
+
       # add baseline
       simulation_data = None
 
