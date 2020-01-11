@@ -44,7 +44,10 @@ def corruption_simulation(settings: object) -> None:
         if key == 'bonus_id':
           continue
         back_string += f',{key}={wanted_data["profile"]["back"][key]}'
-      back_string += f',bonus_id={wanted_data["profile"]["back"]["bonus_id"]}'
+      try:
+        back_string += f',bonus_id={wanted_data["profile"]["back"]["bonus_id"]}'
+      except KeyError:
+        back_string += f',bonus_id='
 
       corruptions = get_corruptions(wow_class.title(), wow_spec.title())
       simulation_group = Simulation_Group(
