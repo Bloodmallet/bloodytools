@@ -85,8 +85,8 @@ def corruption_simulation(settings: object) -> None:
         fight_style=fight_style,
         profile=wanted_data['profile'],
         simc_arguments=[
-          '',
-        ],     # no special input is necessary in the baseline profile
+          'bfa.surging_vitality_damage_taken_period=1',
+        ],     # enables Surging Vitality to try and trigger each second
         target_error=settings.target_error[fight_style],
         ptr=settings.ptr,
         default_actions=settings.default_actions,
