@@ -205,18 +205,16 @@ def corruption_simulation(settings: object) -> None:
         if corruption_name == 'baseline':
           continue
 
-        # append highest rank of corruption to sortable dps list
-        tmp_list.append((
-          corruption_name,
-          wanted_data["data"][corruption_name][sorted(wanted_data["data"][corruption_name].keys(), reverse=True)[0]]
-        ))
+        highest_rank = sorted(wanted_data["data"][corruption_name].keys(), reverse=True)[0]
 
-        for rank in wanted_data["data"][corruption_name]:
-          tmp_list_2.append((
-            f'{corruption_name} {rank}',     # boy...this'll become a mess in the frontend...
-            (wanted_data["data"][corruption_name][rank] - wanted_data["data"]["baseline"]["1"]) /
-            wanted_data['corruption_rating'][corruption_name][rank]
-          ))
+        # append highest rank of corruption to sortable dps list
+        tmp_list.append((corruption_name, wanted_data["data"][corruption_name][highest_rank]))
+
+        tmp_list_2.append((
+          f'{corruption_name}',
+          (wanted_data["data"][corruption_name][highest_rank] - wanted_data["data"]["baseline"]["1"]) /
+          wanted_data['corruption_rating'][corruption_name][highest_rank]
+        ))
 
       logger.debug("tmp_list: {}".format(tmp_list))
       logger.debug("tmp_list_2: {}".format(tmp_list_2))
