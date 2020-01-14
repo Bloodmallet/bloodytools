@@ -63,6 +63,8 @@ def corruption_simulation(settings: object) -> None:
       for corruption in corruptions:
         for rank in corruptions[corruption]:
           blacklist.append(corruptions[corruption][rank]['bonus_id'])
+
+      # remove dps corruptions from profile
       for item in wanted_data['profile']['items']:
         for blacklisted in blacklist:
           if not 'bonus_id' in wanted_data['profile']['items'][item].keys():
@@ -76,6 +78,9 @@ def corruption_simulation(settings: object) -> None:
               'bonus_id'].replace(f'{blacklisted}/', '')
           elif f'{blacklisted}' == wanted_data['profile']['items'][item]['bonus_id']:
             del wanted_data['profile']['items'][item]['bonus_id']
+
+      # add +800 corruption to head
+      wanted_data["profile"]["head"]["bonus_id"] += '/6448'
 
       # add baseline
       simulation_data = None
