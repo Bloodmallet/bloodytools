@@ -42,10 +42,6 @@ def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str, settin
     basis_profile_string += "Tier{}/T{}_{}_{}".format(tier, tier, wow_class, wow_spec).title()
   basis_profile_string += ".simc"
 
-  # hardcode enhancement special T24 case
-  if wow_spec == 'enhancement':
-    basis_profile_string = basis_profile_string.split('.simc')[0] + '_Storm.simc'
-
   logger.debug("Created basis_profile_string '{}'.".format(basis_profile_string))
   logger.debug("create_basic_profile_string ended")
   return basis_profile_string
