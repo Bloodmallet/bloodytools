@@ -247,7 +247,10 @@ def corruption_simulation(settings: object) -> None:
         highest_ilevel = sorted(wanted_data['data'][corruption_name].keys(), reverse=True)[0]
 
         # append highest itemlevel of corruption to sortable dps list
-        tmp_list.append((corruption_name, wanted_data['data'][corruption_name][highest_ilevel]))
+        tmp_list.append((
+          corruption_name,
+          wanted_data['data'][corruption_name][highest_ilevel] - wanted_data['data']['baseline'][highest_ilevel]
+        ))
 
         tmp_list_2.append((
           f'{corruption_name}',
@@ -274,10 +277,8 @@ def corruption_simulation(settings: object) -> None:
       for corruption_name, _ in tmp_list_2:
         wanted_data["sorted_data_keys_2"].append(corruption_name)
 
-      # add simulated steps...err ranks
-      wanted_data['simulated_steps'] = []
-      for i in range(1, 4):
-        wanted_data['simulated_steps'].append(str(4 - i))     # get the steps into the proper order...descending
+      # add simulated steps
+      wanted_data['simulated_steps'] = settings.azerite_trait_ilevels[::-1]
 
       logger.debug("Final json: {}".format(wanted_data))
 
