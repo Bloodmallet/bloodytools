@@ -38,16 +38,16 @@ def corruption_simulation(settings: object) -> None:
       # prepare result json
       wanted_data = create_base_json_dict("Corruptions", wow_class, wow_spec, fight_style, settings)
 
-      # prepare back-string
-      back_string = 'back='
-      for key in wanted_data['profile']['back'].keys():
+      # prepare hands-string
+      hands_string = 'hands='
+      for key in wanted_data['profile']['hands'].keys():
         if key == 'bonus_id':
           continue
-        back_string += f',{key}={wanted_data["profile"]["back"][key]}'
+        hands_string += f',{key}={wanted_data["profile"]["hands"][key]}'
       try:
-        back_string += f',bonus_id={wanted_data["profile"]["back"]["bonus_id"]}'
+        hands_string += f',bonus_id={wanted_data["profile"]["hands"]["bonus_id"]}'
       except KeyError:
-        back_string += f',bonus_id='
+        hands_string += f',bonus_id='
 
       corruptions = get_corruptions(wow_class.title(), wow_spec.title())
       simulation_group = Simulation_Group(
@@ -82,24 +82,26 @@ def corruption_simulation(settings: object) -> None:
       # add +800 corruption to head
       wanted_data["profile"]["head"]["bonus_id"] += '/6448'
 
-      # add baseline
-      simulation_data = None
+      for itemlevel in settings.azerite_trait_ilevels:
+        # add baseline
+        simulation_data = None
 
-      simulation_data = Simulation_Data(
-        name='baseline',
-        fight_style=fight_style,
-        profile=wanted_data['profile'],
-        simc_arguments=[
-          'bfa.surging_vitality_damage_taken_period=1',
-        ],     # enables Surging Vitality to try and trigger each second
-        target_error=settings.target_error[fight_style],
-        ptr=settings.ptr,
-        default_actions=settings.default_actions,
-        executable=settings.executable,
-        iterations=settings.iterations,
-        logger=logger
-      )
-      simulation_group.add(simulation_data)
+        simulation_data = Simulation_Data(
+          name=f'baseline_{itemlevel}',
+          fight_style=fight_style,
+          profile=wanted_data['profile'],
+          simc_arguments=[
+            'bfa.surging_vitality_damage_taken_period=1',     # enables Surging Vitality to try and trigger each second
+            hands_string + f',ilevel={itemlevel}',
+          ],
+          target_error=settings.target_error[fight_style],
+          ptr=settings.ptr,
+          default_actions=settings.default_actions,
+          executable=settings.executable,
+          iterations=settings.iterations,
+          logger=logger
+        )
+        simulation_group.add(simulation_data)
 
       # create profiles for all corruptions and their ranks/level
       for corruption in corruptions.keys():
@@ -110,26 +112,52 @@ def corruption_simulation(settings: object) -> None:
           spell_id: int = corruptions[corruption][rank]['spell_id']
           corruption_rating: int = corruptions[corruption][rank]['corruption']
 
-          simulation_data = None
+          # ilevel scaling
+          if corruption in ["Infinite Stars", "Twisted Appendages", "Gushing Wound", "Lash of the Void"]:
+            for itemlevel in settings.azerite_trait_ilevels:
 
-          simulation_data = Simulation_Data(
-            name='{}_{}'.format(corruption, rank),
-            fight_style=fight_style,
-            simc_arguments=[f"{back_string}/{bonus_id}"],
-            target_error=settings.target_error[fight_style],
-            ptr=settings.ptr,
-            default_actions=settings.default_actions,
-            executable=settings.executable,
-            iterations=settings.iterations,
-            logger=logger
-          )
+              simulation_data = None
 
-          simulation_group.add(simulation_data)
-          logger.debug((
-            "Added Corruption '{}:{}' in profile '{}' to simulation_group.".format(
-              bonus_id, rank, simulation_data.name
+              simulation_data = Simulation_Data(
+                name='{}_{}_{}'.format(corruption, rank, itemlevel),
+                fight_style=fight_style,
+                simc_arguments=[f"{hands_string}/{bonus_id},ilevel={itemlevel}"],
+                target_error=settings.target_error[fight_style],
+                ptr=settings.ptr,
+                default_actions=settings.default_actions,
+                executable=settings.executable,
+                iterations=settings.iterations,
+                logger=logger
+              )
+
+              simulation_group.add(simulation_data)
+              logger.debug((
+                "Added Corruption '{}:{}:{}' in profile '{}' to simulation_group.".format(
+                  bonus_id, rank, itemlevel, simulation_data.name
+                )
+              ))
+
+          else:
+            simulation_data = None
+
+            simulation_data = Simulation_Data(
+              name='{}_{}'.format(corruption, rank),
+              fight_style=fight_style,
+              simc_arguments=[f"{hands_string}/{bonus_id},ilevel={settings.azerite_trait_ilevels[0]}"],
+              target_error=settings.target_error[fight_style],
+              ptr=settings.ptr,
+              default_actions=settings.default_actions,
+              executable=settings.executable,
+              iterations=settings.iterations,
+              logger=logger
             )
-          ))
+
+            simulation_group.add(simulation_data)
+            logger.debug((
+              "Added Corruption '{}:{}' in profile '{}' to simulation_group.".format(
+                bonus_id, rank, simulation_data.name
+              )
+            ))
 
       logger.info("Start {} corruption simulation for {} {}.".format(fight_style, wow_class, wow_spec))
       try:
@@ -160,42 +188,53 @@ def corruption_simulation(settings: object) -> None:
       # add dps values to json
       for profile in simulation_group.profiles:
 
-        if profile.name == 'baseline':
-          wanted_data['data'][profile.name] = {}
-          wanted_data['data'][profile.name]["1"] = profile.get_dps()
+        if 'baseline' in profile.name:
+          if not 'baseline' in wanted_data['data'].keys():
+            wanted_data['data']['baseline'] = {}
+
+          wanted_data['data']['baseline'][profile.name.split('_')[1]] = profile.get_dps()
           logger.debug("Added '{}' with {} dps to json.".format(profile.name, profile.get_dps()))
           continue
 
         corruption_name: str = profile.name.split('_')[0]
         corruption_rank: int = profile.name.split('_')[1]
+        corruption_name_rank: str = corruption_name + '_' + corruption_rank
+        corruption_ilevel: int = None
+        try:
+          corruption_ilevel = profile.name.split('_')[2]
+        except IndexError:
+          pass
         corruption_bonus_id: int = corruptions[corruption_name][corruption_rank]['bonus_id']
         corruption_spell_id: int = corruptions[corruption_name][corruption_rank]['spell_id']
         corruption_rating: int = corruptions[corruption_name][corruption_rank]['corruption']
 
         # create missing subdict for dps
-        if not corruption_name in wanted_data['data']:
-          wanted_data['data'][corruption_name] = {}
+        if not corruption_name_rank in wanted_data['data']:
+          wanted_data['data'][corruption_name_rank] = {}
 
-        wanted_data['data'][corruption_name][corruption_rank] = profile.get_dps()
-        logger.debug("Added '{}' with {} dps to json.".format(corruption_name, profile.get_dps()))
+        if corruption_ilevel == None:
+          wanted_data['data'][corruption_name_rank][settings.azerite_trait_ilevels[0]] = profile.get_dps()
+        else:
+          wanted_data['data'][corruption_name_rank][corruption_ilevel] = profile.get_dps()
+        logger.debug("Added '{}' with {} dps to json.".format(corruption_name_rank, profile.get_dps()))
 
         # create missing subdict for spell data
         if not 'spell_ids' in wanted_data:
           wanted_data['spell_ids'] = {}
 
-        if not corruption_name in wanted_data['spell_ids']:
-          wanted_data['spell_ids'][corruption_name] = {}
+        if not corruption_name_rank in wanted_data['spell_ids']:
+          wanted_data['spell_ids'][corruption_name_rank] = {}
 
-        wanted_data['spell_ids'][corruption_name][corruption_rank] = corruption_spell_id
+        wanted_data['spell_ids'][corruption_name_rank] = corruption_spell_id
 
         # create missing subdict for corruption rating
         if not 'corruption_rating' in wanted_data:
           wanted_data['corruption_rating'] = {}
 
-        if not corruption_name in wanted_data['corruption_rating']:
-          wanted_data['corruption_rating'][corruption_name] = {}
+        if not corruption_name_rank in wanted_data['corruption_rating']:
+          wanted_data['corruption_rating'][corruption_name_rank] = {}
 
-        wanted_data['corruption_rating'][corruption_name][corruption_rank] = corruption_rating
+        wanted_data['corruption_rating'][corruption_name_rank] = corruption_rating
 
       # create ordered corruption name list
       tmp_list = []     # dps
@@ -205,15 +244,15 @@ def corruption_simulation(settings: object) -> None:
         if corruption_name == 'baseline':
           continue
 
-        highest_rank = sorted(wanted_data["data"][corruption_name].keys(), reverse=True)[0]
+        highest_ilevel = sorted(wanted_data['data'][corruption_name].keys(), reverse=True)[0]
 
-        # append highest rank of corruption to sortable dps list
-        tmp_list.append((corruption_name, wanted_data["data"][corruption_name][highest_rank]))
+        # append highest itemlevel of corruption to sortable dps list
+        tmp_list.append((corruption_name, wanted_data['data'][corruption_name][highest_ilevel]))
 
         tmp_list_2.append((
           f'{corruption_name}',
-          (wanted_data["data"][corruption_name][highest_rank] - wanted_data["data"]["baseline"]["1"]) /
-          wanted_data['corruption_rating'][corruption_name][highest_rank]
+          (wanted_data['data'][corruption_name][highest_ilevel] - wanted_data['data']['baseline'][highest_ilevel]) /
+          wanted_data['corruption_rating'][corruption_name]
         ))
 
       logger.debug("tmp_list: {}".format(tmp_list))
