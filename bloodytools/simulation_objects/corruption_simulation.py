@@ -82,8 +82,8 @@ def corruption_simulation(settings: object) -> None:
       # add +800 corruption to head
       wanted_data["profile"]["head"]["bonus_id"] += '/6448'
 
+      # add baseline
       for itemlevel in settings.azerite_trait_ilevels:
-        # add baseline
         simulation_data = None
 
         simulation_data = Simulation_Data(
@@ -159,6 +159,14 @@ def corruption_simulation(settings: object) -> None:
               )
             ))
 
+            if corruption == 'Void Ritual':
+              copy = simulation_data.copy()
+              copy.name = '{}+Allies_{}'.format(corruption, rank)
+              copy.simc_arguments += [
+                'bfa.void_ritual_increased_chance_active=1',
+              ]
+              simulation_group.add(copy)
+
       logger.info("Start {} corruption simulation for {} {}.".format(fight_style, wow_class, wow_spec))
       try:
         if settings.use_raidbots and settings.apikey:
@@ -196,9 +204,10 @@ def corruption_simulation(settings: object) -> None:
           logger.debug("Added '{}' with {} dps to json.".format(profile.name, profile.get_dps()))
           continue
 
-        corruption_name: str = profile.name.split('_')[0]
+        corruption_full_name: str = profile.name.split('_')[0]
+        corruption_name: str = corruption_full_name.split('+')[0]
         corruption_rank: int = profile.name.split('_')[1]
-        corruption_name_rank: str = corruption_name + '_' + corruption_rank
+        corruption_name_rank: str = corruption_full_name + '_' + corruption_rank
         corruption_ilevel: int = None
         try:
           corruption_ilevel = profile.name.split('_')[2]
