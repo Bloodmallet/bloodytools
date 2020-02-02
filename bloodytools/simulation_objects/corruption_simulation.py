@@ -247,13 +247,14 @@ def corruption_simulation(settings: object) -> None:
 
       # create ordered corruption name list
       tmp_list = []     # dps
-      tmp_list_2 = []     # dps/corruption rating
+      tmp_list_2 = []     # dps/corruption rating without duplicates
       corruption_name: str
-      for corruption_name in wanted_data["data"]:
+      for corruption_name in wanted_data['data']:
         if corruption_name == 'baseline':
           continue
 
         highest_ilevel = sorted(wanted_data['data'][corruption_name].keys(), reverse=True)[0]
+        rank = corruption_name.split('_')[1]
 
         # append highest itemlevel of corruption to sortable dps list
         tmp_list.append((
@@ -261,11 +262,13 @@ def corruption_simulation(settings: object) -> None:
           wanted_data['data'][corruption_name][highest_ilevel] - wanted_data['data']['baseline'][highest_ilevel]
         ))
 
-        tmp_list_2.append((
-          f'{corruption_name}',
-          (wanted_data['data'][corruption_name][highest_ilevel] - wanted_data['data']['baseline'][highest_ilevel]) /
-          wanted_data['corruption_rating'][corruption_name]
-        ))
+        # don't add to list if a higher rank is available
+        if not corruption_name.split('_')[0] + '_' + str(int(rank) + 1) in wanted_data['data']:
+          tmp_list_2.append((
+            f'{corruption_name}',
+            (wanted_data['data'][corruption_name][highest_ilevel] - wanted_data['data']['baseline'][highest_ilevel]) /
+            wanted_data['corruption_rating'][corruption_name]
+          ))
 
       logger.debug("tmp_list: {}".format(tmp_list))
       logger.debug("tmp_list_2: {}".format(tmp_list_2))
