@@ -91,6 +91,11 @@ def trinket_simulation(settings: object) -> None:
             executable=settings.executable,
             logger=logger
           )
+
+          # reduce the uptime of the trinket for tanks
+          if wow_lib.get_raid_role(wow_class, wow_spec) == 'tank':
+            simulation_data.simc_arguments.append('bfa.voidtwisted_titanshard_percent_duration=0.1')
+
           simulation_group.add(simulation_data)
 
         # for each available itemlevel of the trinket
