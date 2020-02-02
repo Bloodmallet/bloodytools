@@ -116,6 +116,15 @@ def trinket_simulation(settings: object) -> None:
             )
             simulation_group.add(simulation_data)
 
+            # add enabled set bonus-special case
+            if trinket[0] == 'Void-Twisted Titanshard' or trinket[0] == 'Vita-Charged Titanshard':
+              copy = simulation_data.copy()
+              copy.name = "{}+Set {}".format(trinket[0], itemlevel)
+              copy.simc_arguments += [
+                'set_bonus=titanic_empowerment_2pc=1',
+              ]
+              simulation_group.add(copy)
+
       # create and simulate baseline profile
       logger.info("Start {} trinket simulation for {} {}.".format(fight_style, wow_class, wow_spec))
       try:
@@ -162,18 +171,19 @@ def trinket_simulation(settings: object) -> None:
 
       for profile in simulation_group.profiles:
 
-        name = profile.name[:profile.name.rfind(" ")]
+        full_name = profile.name[:profile.name.rfind(" ")]
+        name = full_name.split('+')[0]
         ilevel = profile.name[profile.name.rfind(" ") + 1:]
 
-        if not name in json_export["data"]:
-          json_export["data"][name] = {}
+        if not full_name in json_export["data"]:
+          json_export["data"][full_name] = {}
 
-        json_export["data"][name][ilevel] = profile.get_dps()
+        json_export["data"][full_name][ilevel] = profile.get_dps()
 
         # add translation to export
-        if not name in json_export["languages"] and not "baseline" in name:
+        if not full_name in json_export["languages"] and not "baseline" in full_name:
           try:
-            json_export["languages"][name] = wow_lib.get_trinket_translation(name)
+            json_export["languages"][full_name] = wow_lib.get_trinket_translation(name)
           except Exception as e:
             logger.debug("No translation found for {}.".format(name))
             logger.warning(e)
@@ -181,9 +191,9 @@ def trinket_simulation(settings: object) -> None:
         if not "data_sources" in json_export:
           json_export["data_sources"] = {}
 
-        if not name in json_export["data_sources"] and not "baseline" in name:
+        if not full_name in json_export["data_sources"] and not "baseline" in full_name:
           try:
-            json_export["data_sources"][name] = wow_lib.get_trinket(name=name).get_source()
+            json_export["data_sources"][full_name] = wow_lib.get_trinket(name=name).get_source()
           except:
             pass
 
@@ -191,7 +201,8 @@ def trinket_simulation(settings: object) -> None:
       json_export["item_ids"] = {}
       for trinket in json_export["data"]:
         if trinket != "baseline":
-          json_export["item_ids"][trinket] = wow_lib.get_trinket_id(trinket)
+          name = trinket.split('+')[0]
+          json_export["item_ids"][trinket] = wow_lib.get_trinket_id(name)
 
       logger.debug("Enriched json export: {}".format(json_export))
 
