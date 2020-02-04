@@ -113,7 +113,7 @@ def corruption_simulation(settings: object) -> None:
           corruption_rating: int = corruptions[corruption][rank]['corruption']
 
           # ilevel scaling
-          if corruption in ["Infinite Stars", "Twisted Appendages", "Gushing Wound", "Lash of the Void"]:
+          if corruption in ["Infinite Stars", "Twisted Appendage", "Gushing Wound", "Lash of the Void"]:
             for itemlevel in settings.azerite_trait_ilevels:
 
               simulation_data = None
