@@ -3,6 +3,7 @@ import os
 from typing import List, Tuple
 
 from simc_support import wow_lib
+from simc_support.game_data import Source
 from utils.utils import create_base_json_dict, create_basic_profile_string
 
 from .simulation_objects import Simulation_Data, Simulation_Group
@@ -117,10 +118,10 @@ def trinket_simulation(settings: object) -> None:
             simulation_group.add(simulation_data)
 
             # add enabled set bonus-special case
-            if trinket[0] == 'Void-Twisted Titanshard' or trinket[0] == 'Vita-Charged Titanshard':
+            if trinket[0] == 'Void-Twisted Titanshard' and itemlevel == settings.min_ilevel:
               copy = simulation_data.copy()
-              copy.name = "{}+Set {}".format(trinket[0], itemlevel)
-              copy.simc_arguments += [
+              copy.name = "Titanic Empowerment {}".format(itemlevel)
+              copy.simc_arguments = [
                 'set_bonus=titanic_empowerment_2pc=1',
               ]
               simulation_group.add(copy)
@@ -195,7 +196,10 @@ def trinket_simulation(settings: object) -> None:
           try:
             json_export["data_sources"][full_name] = wow_lib.get_trinket(name=name).get_source()
           except:
-            pass
+            if name == "Titanic Empowerment":
+              json_export["data_sources"][full_name] = Source.RAID
+            else:
+              pass
 
       # create item_id table
       json_export["item_ids"] = {}
@@ -203,6 +207,11 @@ def trinket_simulation(settings: object) -> None:
         if trinket != "baseline":
           name = trinket.split('+')[0]
           json_export["item_ids"][trinket] = wow_lib.get_trinket_id(name)
+          if json_export["item_ids"][trinket] == None:
+            del json_export["item_ids"][trinket]
+
+      # need to add spell data for the additional set effect
+      json_export["spell_ids"] = {"Titanic Empowerment": 315793}
 
       logger.debug("Enriched json export: {}".format(json_export))
 
