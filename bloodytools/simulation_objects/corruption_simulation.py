@@ -80,7 +80,8 @@ def corruption_simulation(settings: object) -> None:
             del wanted_data['profile']['items'][item]['bonus_id']
 
       # add +800 corruption to head
-      wanted_data["profile"]["head"]["bonus_id"] += '/6448'
+      wanted_data["profile"]["head"]["bonus_id"] += '/6448'     # legacy
+      wanted_data["profile"]["items"]["head"]["bonus_id"] += '/6448'
 
       # add baseline
       for itemlevel in settings.azerite_trait_ilevels:
