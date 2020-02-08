@@ -3,12 +3,12 @@
 
 import datetime
 import logging
+import os
+import time
 import unittest
 import uuid
-import time
-import os
 
-import simulation_objects
+from .simulation_objects import simulation_objects
 
 logger = logging.getLogger(__name__)
 
@@ -222,21 +222,15 @@ class TestSimulationDataMethods(unittest.TestCase):
     self.assertTrue(sd2.is_equal(sd1))
     self.assertTrue(sd1.is_equal(sd1))
     self.assertFalse(sd1.is_equal("Döner"))
-    sd_calculate_scale_factors = simulation_objects.Simulation_Data(
-      calculate_scale_factors="1"
-    )
+    sd_calculate_scale_factors = simulation_objects.Simulation_Data(calculate_scale_factors="1")
     self.assertFalse(sd_calculate_scale_factors.is_equal(sd1))
-    sd_default_actions = simulation_objects.Simulation_Data(
-      default_actions="0"
-    )
+    sd_default_actions = simulation_objects.Simulation_Data(default_actions="0")
     self.assertFalse(sd_default_actions.is_equal(sd1))
     sd_default_skill = simulation_objects.Simulation_Data(default_skill="0.5")
     self.assertFalse(sd_default_skill.is_equal(sd1))
     sd_executable = simulation_objects.Simulation_Data(executable="1")
     self.assertFalse(sd_executable.is_equal(sd1))
-    sd_fight_style = simulation_objects.Simulation_Data(
-      fight_style="helterskelter"
-    )
+    sd_fight_style = simulation_objects.Simulation_Data(fight_style="helterskelter")
     self.assertFalse(sd_fight_style.is_equal(sd1))
     sd_fixed_time = simulation_objects.Simulation_Data(fixed_time="0")
     self.assertFalse(sd_fixed_time.is_equal(sd1))
@@ -246,9 +240,7 @@ class TestSimulationDataMethods(unittest.TestCase):
     self.assertFalse(sd_iterations.is_equal(sd1))
     sd_log = simulation_objects.Simulation_Data(log="1")
     self.assertFalse(sd_log.is_equal(sd1))
-    sd_optimize_expressions = simulation_objects.Simulation_Data(
-      optimize_expressions="0"
-    )
+    sd_optimize_expressions = simulation_objects.Simulation_Data(optimize_expressions="0")
     self.assertFalse(sd_optimize_expressions.is_equal(sd1))
     sd_ptr = simulation_objects.Simulation_Data(ptr="1")
     self.assertFalse(sd_ptr.is_equal(sd1))
@@ -335,9 +327,7 @@ class TestSimulationDataMethods(unittest.TestCase):
     #     engine/
     if os.path.isfile("./SimulationCraft/engine/simc"):
       self.sd.executable = "./SimulationCraft/engine/simc"
-      self.sd.simc_arguments = [
-        "./SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"
-      ]
+      self.sd.simc_arguments = ["./SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"]
 
     # local dev test
     # SimulationCraft/
@@ -347,9 +337,7 @@ class TestSimulationDataMethods(unittest.TestCase):
     #     simulation_objects/
     elif os.path.isfile("../SimulationCraft/simc.exe"):
       self.sd.executable = "../SimulationCraft/simc.exe"
-      self.sd.simc_arguments = [
-        "../SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"
-      ]
+      self.sd.simc_arguments = ["../SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"]
 
     # use standard values
     # SimulationCraft/
@@ -385,10 +373,7 @@ class TestSimulationGroupDataInit(unittest.TestCase):
     self.sd2 = None
 
   def test_empty(self):
-    self.assertEqual(
-      type(simulation_objects.Simulation_Group()),
-      simulation_objects.Simulation_Group
-    )
+    self.assertEqual(type(simulation_objects.Simulation_Group()), simulation_objects.Simulation_Group)
 
   def test_correct_list_input(self):
     test = simulation_objects.Simulation_Group([self.sd1, self.sd2])
@@ -404,9 +389,7 @@ class TestSimulationGroupDataInit(unittest.TestCase):
     with self.assertRaises(ValueError):
       simulation_objects.Simulation_Group([self.sd1, tmp])
     with self.assertRaises(TypeError):
-      simulation_objects.Simulation_Group([
-        "why", "would", "anyone", "do", "this"
-      ])
+      simulation_objects.Simulation_Group(["why", "would", "anyone", "do", "this"])
 
   def test_wrong_input_type(self):
     with self.assertRaises(TypeError):
@@ -419,12 +402,8 @@ class TestSimulationGroupDataInit(unittest.TestCase):
 class TestSimulationGroupMethods(unittest.TestCase):
 
   def setUp(self):
-    self.sd1 = simulation_objects.Simulation_Data(
-      target_error="1.0", simc_arguments=["talents=2222222"]
-    )
-    self.sd2 = simulation_objects.Simulation_Data(
-      target_error=1.0, simc_arguments=["talents=1111111"]
-    )
+    self.sd1 = simulation_objects.Simulation_Data(target_error="1.0", simc_arguments=["talents=2222222"])
+    self.sd2 = simulation_objects.Simulation_Data(target_error=1.0, simc_arguments=["talents=1111111"])
     self.sg = simulation_objects.Simulation_Group([self.sd1, self.sd2])
 
   def test_selfcheck(self):
@@ -454,9 +433,7 @@ class TestSimulationGroupMethods(unittest.TestCase):
     #   SimulationCraft/
     if os.path.isfile("./SimulationCraft/simc"):
       self.sd2.executable = "./SimulationCraft/simc"
-      self.sd2.simc_arguments.insert(
-        0, "./SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"
-      )
+      self.sd2.simc_arguments.insert(0, "./SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc")
 
     # local dev test
     # SimulationCraft/
@@ -466,9 +443,7 @@ class TestSimulationGroupMethods(unittest.TestCase):
     #     simulation_objects/
     elif os.path.isfile("../SimulationCraft/simc.exe"):
       self.sd2.executable = "../SimulationCraft/simc.exe"
-      self.sd2.simc_arguments.insert(
-        0, "../SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"
-      )
+      self.sd2.simc_arguments.insert(0, "../SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc")
     sole_sg2 = simulation_objects.Simulation_Group(self.sd2)
     self.assertTrue(sole_sg2.simulate())
     self.sg.profiles = None
@@ -489,9 +464,7 @@ class TestSimulationGroupMethods(unittest.TestCase):
     #   SimulationCraft/
     if os.path.isfile("./SimulationCraft/simc"):
       self.sg.executable = "./SimulationCraft/simc"
-      self.sg.profiles[0].simc_arguments.insert(
-        0, "./SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"
-      )
+      self.sg.profiles[0].simc_arguments.insert(0, "./SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc")
 
     # local dev test
     # SimulationCraft/
@@ -501,9 +474,7 @@ class TestSimulationGroupMethods(unittest.TestCase):
     #     simulation_objects/
     elif os.path.isfile("../SimulationCraft/simc.exe"):
       self.sg.executable = "../SimulationCraft/simc.exe"
-      self.sg.profiles[0].simc_arguments.insert(
-        0, "../SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc"
-      )
+      self.sg.profiles[0].simc_arguments.insert(0, "../SimulationCraft/profiles/PreRaids/PR_Shaman_Elemental.simc")
     self.sg.profiles[1].simc_arguments = ["talents=3333333"]
     self.assertTrue(self.sg.simulate())
 
