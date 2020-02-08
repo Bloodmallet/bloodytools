@@ -7,7 +7,7 @@
 
 ##
 # General setttings
-tier = "24"     # number or PR (PreRaid)
+tier = "25"     # number or PR (PreRaid)
 wow_class_spec_list = []     # leave empty to simulate all
 # wow_class_spec_list = [("shaman", "elemental"), ("mage", "frost")] # example for a specific list
 wow_class_spec_list = [
@@ -78,8 +78,8 @@ enable_race_simulations = True
 # Trinket simulations
 enable_trinket_simulations = True
 ilevel_step = 15     # ilevel_step is used to determine the size of each itemlevel step taken to max_ilevel
-max_ilevel = 445     # max_itemlevel determines the upper border of steps taken
-min_ilevel = 400     # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
+max_ilevel = 475     # max_itemlevel determines the upper border of steps taken
+min_ilevel = 430     # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
 # example: min 300, max 325, step 10, resulting simulated ilevels: 300, 310, 320
 lua_trinket_export = True
 
@@ -101,10 +101,10 @@ write_humanreadable_secondary_distribution_file = False
 # Azerite traits
 enable_azerite_trait_simulations = True
 azerite_trait_ilevels = [ # determines the itemlevel used to sim the traits
-  "400",
-  "415",
   "430",
-  "445"
+  "445",
+  "460",
+  "475",
 ] # ascending order required
 
 ###############################################################################
@@ -124,6 +124,10 @@ enable_azerite_essence_simulations = True
 ###############################################################################
 # Azerite Essences Combinations (necklace)
 enable_azerite_essence_combination_simulations = True
+
+###############################################################################
+# Corruptions
+enable_corruption_simulations = True
 
 ###############################################################################
 # Development setting - you usually don't want to touch these
