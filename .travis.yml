@@ -1,4 +1,4 @@
-dist: trusty
+dist: bionic
 sudo: false
 
 language: cpp
@@ -14,7 +14,7 @@ addons:
     sources:
       - sourceline: 'ppa:ubuntu-toolchain-r/test'
     packages:
-      - g++-5
+      - g++
       - libcurl3
       - libcurl4-gnutls-dev
 
@@ -39,7 +39,7 @@ install:
   - git clone --depth 1 https://github.com/simulationcraft/simc.git SimulationCraft
   - cd SimulationCraft/engine
   # Build SimulationCraft executable
-  - make optimized CXX=g++-5 -j 2 SC_NO_NETWORKING=1
+  - make optimized -j 2 SC_NO_NETWORKING=1
   - cp simc ..
   - cd ..
   - chmod +x simc
