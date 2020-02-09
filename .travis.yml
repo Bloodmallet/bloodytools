@@ -36,7 +36,7 @@ install:
   - git clone --depth 1 https://github.com/simulationcraft/simc.git SimulationCraft
   - cd SimulationCraft/engine
   # Build SimulationCraft executable
-  - make optimized CXX=g++-5 -C engine -j 2
+  - make optimized CXX=g++-5
   - cp simc ..
   - cd ..
   - chmod +x simc
