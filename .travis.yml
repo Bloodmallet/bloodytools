@@ -3,6 +3,9 @@ sudo: false
 
 language: cpp
 
+os:
+  - linux
+
 compiler:
   - gcc
 
@@ -36,7 +39,7 @@ install:
   - git clone --depth 1 https://github.com/simulationcraft/simc.git SimulationCraft
   - cd SimulationCraft/engine
   # Build SimulationCraft executable
-  - make optimized CXX=g++-5
+  - make optimized CXX=g++-5 -j 2 SC_NO_NETWORKING=1
   - cp simc ..
   - cd ..
   - chmod +x simc
