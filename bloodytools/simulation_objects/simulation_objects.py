@@ -321,7 +321,8 @@ class Simulation_Data():
     Returns:
       int -- Average of parent and simulation_instance.
     """
-    if self.get_dps() and simulation_instance.get_dps():
+    if self.get_dps() and self.get_dps() != -1 and simulation_instance.get_dps(
+    ) and simulation_instance.get_dps() != -1:
       return int((self.get_dps() + simulation_instance.get_dps()) / 2)
     else:
       return None
