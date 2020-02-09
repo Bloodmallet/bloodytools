@@ -117,15 +117,6 @@ def trinket_simulation(settings: object) -> None:
             )
             simulation_group.add(simulation_data)
 
-            # add enabled set bonus-special case
-            if trinket[0] == 'Void-Twisted Titanshard' and itemlevel == settings.min_ilevel:
-              copy = simulation_data.copy()
-              copy.name = "Titanic Empowerment {}".format(itemlevel)
-              copy.simc_arguments = [
-                'set_bonus=titanic_empowerment_2pc=1',
-              ]
-              simulation_group.add(copy)
-
       # create and simulate baseline profile
       logger.info("Start {} trinket simulation for {} {}.".format(fight_style, wow_class, wow_spec))
       try:
@@ -196,10 +187,7 @@ def trinket_simulation(settings: object) -> None:
           try:
             json_export["data_sources"][full_name] = wow_lib.get_trinket(name=name).get_source()
           except:
-            if name == "Titanic Empowerment":
-              json_export["data_sources"][full_name] = Source.RAID
-            else:
-              pass
+            pass
 
       # create item_id table
       json_export["item_ids"] = {}
@@ -209,9 +197,6 @@ def trinket_simulation(settings: object) -> None:
           json_export["item_ids"][trinket] = wow_lib.get_trinket_id(name)
           if json_export["item_ids"][trinket] == None:
             del json_export["item_ids"][trinket]
-
-      # need to add spell data for the additional set effect
-      json_export["spell_ids"] = {"Titanic Empowerment": 315793}
 
       logger.debug("Enriched json export: {}".format(json_export))
 
