@@ -43,7 +43,6 @@ from simulation_objects.essence_combination_simulation import essence_combinatio
 from simulation_objects.essence_simulation import essence_simulation
 from simulation_objects.trinket_simulation import trinket_simulation
 
-
 if settings.use_own_threading:
   import threading
 
@@ -528,6 +527,7 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
         logger.debug("Printed race json.")
 
   logger.debug("race_simulations ended")
+
 
 def secondary_distribution_simulations(
   wow_class: str,
@@ -1164,6 +1164,12 @@ def main():
     default=False,
     help="Enables usage of 'custom_profile.txt' in addition to the base profile. Default: '{}'".format(settings.debug)
   )
+  parser.add_argument(
+    "--target_error",
+    metavar='STRING',
+    type=str,
+    help="Overwrites target_error for all simulations. Default: whatever is in setting.py"
+  )
   parser.add_argument("--raidbots", action="store_const", const=True, default=False, help="Don't try this at home")
 
   args = parser.parse_args()
@@ -1256,6 +1262,10 @@ def main():
   if args.use_custom_profile:
     settings.use_custom_profile = args.use_custom_profile
 
+  if args.target_error:
+    for fight_style in settings.target_error:
+      settings.target_error[fight_style] = args.target_error
+
   if args.raidbots:
     settings.use_raidbots = True
 
@@ -1296,9 +1306,7 @@ def main():
       logger.info("Starting Trinket simulations.")
 
     if settings.use_own_threading:
-      trinket_thread = threading.Thread(
-        name="Trinket Thread", target=trinket_simulation, args=(settings,)
-      )
+      trinket_thread = threading.Thread(name="Trinket Thread", target=trinket_simulation, args=(settings,))
       thread_list.append(trinket_thread)
       trinket_thread.start()
     else:
