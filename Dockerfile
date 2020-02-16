@@ -1,29 +1,28 @@
 # base image
-FROM alpine:latest
+FROM ubuntu:latest AS builder
 
 # install SimulationCraft
-RUN apk --no-cache add --virtual build_dependencies \
-    git \
-    g++ \
-    make && \
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git && \
     git clone --depth 1 https://github.com/simulationcraft/simc.git /app/SimulationCraft && \
-    make -C /app/SimulationCraft/engine optimized -j 2 SC_NO_NETWORKING=1 && \
-    apk del build_dependencies
+    make -C /app/SimulationCraft/engine optimized -j 2 SC_NO_NETWORKING=1
+
+FROM  ubuntu:latest AS worker
+# get built file
+COPY --from=builder /app/SimulationCraft/engine/simc /app/SimulationCraft/engine/
+COPY --from=builder /app/SimulationCraft/profiles/ /app/SimulationCraft/profiles/
 
 # install bloodytools
 COPY ./requirements.txt /app/bloodytools/
 WORKDIR /app
-RUN apk --no-cache add --virtual build_dependencies \
-    git && \
-    apk --no-cache add python3 && \
-    if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi && \
-    python3 -m ensurepip && \
+RUN apt-get update && apt-get install -y \
+    git \
+    python3 \
+    python3-pip && \
     python3 -m pip install --upgrade pip && \
-    rm -r /usr/lib/python*/ensurepip && \
     pip3 install --no-cache --upgrade pip setuptools wheel && \
-    if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi && \
-    pip3 install --no-cache-dir -r bloodytools/requirements.txt && \
-    apk del build_dependencies
+    pip3 install --no-cache-dir -r bloodytools/requirements.txt
 
 # remove obsolete simc files
 # RUN find /app/SimulationCraft -maxdepth 1 -type f
