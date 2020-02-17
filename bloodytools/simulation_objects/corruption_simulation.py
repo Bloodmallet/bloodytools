@@ -205,10 +205,8 @@ def corruption_simulation(settings: object) -> None:
           logger.debug("Added '{}' with {} dps to json.".format(profile.name, profile.get_dps()))
           continue
 
-        corruption_full_name: str = profile.name.split('_')[0] + '_' + profile.name.split('_')[1]
-        corruption_name: str = corruption_full_name.split('_')[0]
-        corruption_rank: int = corruption_full_name.split('_')[1].split('+')[0]
-        corruption_name_rank: str = corruption_name + '_' + corruption_rank
+        corruption_name: str = profile.name.split('_')[0]
+        corruption_rank: int = profile.name.split('_')[1].split('+')[0]
         corruption_ilevel: int = None
         try:
           corruption_ilevel = profile.name.split('_')[2]
@@ -217,6 +215,12 @@ def corruption_simulation(settings: object) -> None:
         corruption_bonus_id: int = corruptions[corruption_name][corruption_rank]['bonus_id']
         corruption_spell_id: int = corruptions[corruption_name][corruption_rank]['spell_id']
         corruption_rating: int = corruptions[corruption_name][corruption_rank]['corruption']
+        try:
+          corruption_full_name: str = corruption_name + '_' + corruption_rank + f' ({corruption_rating})' + '+' + profile.name.split(
+            '+'
+          )[1]
+        except IndexError:
+          corruption_full_name: str = corruption_name + '_' + corruption_rank + f' ({corruption_rating})'
 
         # create missing subdict for dps
         if not corruption_full_name in wanted_data['data']:
@@ -255,7 +259,7 @@ def corruption_simulation(settings: object) -> None:
           continue
 
         highest_ilevel = sorted(wanted_data['data'][corruption_name].keys(), reverse=True)[0]
-        rank = corruption_name.split('_')[1].split('+')[0]
+        rank = corruption_name.split('_')[1].split('+')[0].split(' (')[0]
 
         # append highest itemlevel of corruption to sortable dps list
         tmp_list.append((
@@ -266,10 +270,21 @@ def corruption_simulation(settings: object) -> None:
         # don't add to list if a higher rank is available
         higher_rank = None
         try:
-          higher_rank = corruption_name.split('_')[0] + '_' + str(int(rank) + 1) + '+' + corruption_name.split('+')[1]
+          higher_rank = corruption_name.split('_')[0] + '_' + str(
+            int(rank) + 1
+          ) + f' ({corruptions[corruption_name.split("_")[0]][str(int(rank) + 1)]["corruption"]})' + '+' + corruption_name.split(
+            '+'
+          )[1]
         except IndexError:
-          higher_rank = corruption_name.split('_')[0] + '_' + str(int(rank) + 1)
-        if higher_rank and not higher_rank in wanted_data['data']:
+          try:
+            higher_rank = corruption_name.split('_')[0] + '_' + str(
+              int(rank) + 1
+            ) + f' ({corruptions[corruption_name.split("_")[0]][str(int(rank) + 1)]["corruption"]})'
+          except KeyError:
+            pass
+        except KeyError:
+          pass
+        if not higher_rank:
           tmp_list_2.append((
             f'{corruption_name}',
             (wanted_data['data'][corruption_name][highest_ilevel] - wanted_data['data']['baseline'][highest_ilevel]) /
