@@ -8,7 +8,7 @@ import time
 import unittest
 import uuid
 
-from .simulation_objects import simulation_objects
+import simulation_objects
 
 logger = logging.getLogger(__name__)
 
@@ -252,7 +252,7 @@ class TestSimulationDataMethods(unittest.TestCase):
     self.assertFalse(sd_threads.is_equal(sd1))
 
   def test_get_dps(self):
-    self.assertEqual(self.sd.get_dps(), None)
+    self.assertEqual(self.sd.get_dps(), -1)
     self.sd.set_dps(12345.8)
     self.assertTrue(self.sd.get_dps(), 12345)
 
@@ -267,10 +267,10 @@ class TestSimulationDataMethods(unittest.TestCase):
     self.sd = simulation_objects.Simulation_Data()
     with self.assertRaises(TypeError):
       self.sd.set_dps("Bonjour", external="Bonsoir")
-    self.assertEqual(self.sd.get_dps(), None)
+    self.assertEqual(self.sd.get_dps(), -1)
     with self.assertRaises(ValueError):
       self.sd.set_dps("Bonjour", external=False)
-    self.assertEqual(self.sd.get_dps(), None)
+    self.assertEqual(self.sd.get_dps(), -1)
 
   def test_get_avg(self):
     sd = simulation_objects.Simulation_Data()

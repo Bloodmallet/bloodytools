@@ -13,6 +13,6 @@ setup(name='bloodytools',
   package_data={
     "": ["*.md", ],
   },
-  python_requires='>3.5',
+  python_requires='>3.6',
   license='GNU GENERAL PUBLIC LICENSE',
 )

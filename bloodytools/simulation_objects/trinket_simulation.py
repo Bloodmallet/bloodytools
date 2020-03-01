@@ -97,6 +97,20 @@ def trinket_simulation(settings: object) -> None:
           if wow_lib.get_raid_role(wow_class, wow_spec) == 'tank':
             simulation_data.simc_arguments.append('bfa.voidtwisted_titanshard_percent_duration=0.1')
 
+          custom_apl = None
+          if settings.custom_apl:
+            with open('custom_apl.txt') as f:
+              custom_apl = f.read()
+          if custom_apl:
+            simulation_data.simc_arguments.append(custom_apl)
+
+          custom_fight_style = None
+          if settings.custom_fight_style:
+            with open('custom_fight_style.txt') as f:
+              custom_fight_style = f.read()
+          if custom_fight_style:
+            simulation_data.simc_arguments.append(custom_fight_style)
+
           simulation_group.add(simulation_data)
 
         # for each available itemlevel of the trinket
@@ -116,15 +130,6 @@ def trinket_simulation(settings: object) -> None:
               logger=logger
             )
             simulation_group.add(simulation_data)
-
-            # add enabled set bonus-special case
-            if trinket[0] == 'Void-Twisted Titanshard' and itemlevel == settings.min_ilevel:
-              copy = simulation_data.copy()
-              copy.name = "Titanic Empowerment {}".format(itemlevel)
-              copy.simc_arguments = [
-                'set_bonus=titanic_empowerment_2pc=1',
-              ]
-              simulation_group.add(copy)
 
       # create and simulate baseline profile
       logger.info("Start {} trinket simulation for {} {}.".format(fight_style, wow_class, wow_spec))
@@ -196,10 +201,7 @@ def trinket_simulation(settings: object) -> None:
           try:
             json_export["data_sources"][full_name] = wow_lib.get_trinket(name=name).get_source()
           except:
-            if name == "Titanic Empowerment":
-              json_export["data_sources"][full_name] = Source.RAID
-            else:
-              pass
+            pass
 
       # create item_id table
       json_export["item_ids"] = {}
@@ -209,9 +211,6 @@ def trinket_simulation(settings: object) -> None:
           json_export["item_ids"][trinket] = wow_lib.get_trinket_id(name)
           if json_export["item_ids"][trinket] == None:
             del json_export["item_ids"][trinket]
-
-      # need to add spell data for the additional set effect
-      json_export["spell_ids"] = {"Titanic Empowerment": 315793}
 
       logger.debug("Enriched json export: {}".format(json_export))
 

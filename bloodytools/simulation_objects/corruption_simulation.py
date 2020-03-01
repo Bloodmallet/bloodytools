@@ -102,6 +102,20 @@ def corruption_simulation(settings: object) -> None:
           iterations=settings.iterations,
           logger=logger
         )
+        if itemlevel == settings.azerite_trait_ilevels[0]:
+          custom_apl = None
+          if settings.custom_apl:
+            with open('custom_apl.txt') as f:
+              custom_apl = f.read()
+          if custom_apl:
+            simulation_data.simc_arguments.append(custom_apl)
+
+          custom_fight_style = None
+          if settings.custom_fight_style:
+            with open('custom_fight_style.txt') as f:
+              custom_fight_style = f.read()
+          if custom_fight_style:
+            simulation_data.simc_arguments.append(custom_fight_style)
         simulation_group.add(simulation_data)
 
       # create profiles for all corruptions and their ranks/level
@@ -162,7 +176,7 @@ def corruption_simulation(settings: object) -> None:
 
             if corruption == 'Void Ritual':
               copy = simulation_data.copy()
-              copy.name = '{}+Allies_{}'.format(corruption, rank)
+              copy.name = '{}_{}+Allies'.format(corruption, rank)
               copy.simc_arguments += [
                 'bfa.void_ritual_increased_chance_active=1',
               ]
@@ -205,10 +219,8 @@ def corruption_simulation(settings: object) -> None:
           logger.debug("Added '{}' with {} dps to json.".format(profile.name, profile.get_dps()))
           continue
 
-        corruption_full_name: str = profile.name.split('_')[0]
-        corruption_name: str = corruption_full_name.split('+')[0]
-        corruption_rank: int = profile.name.split('_')[1]
-        corruption_name_rank: str = corruption_full_name + '_' + corruption_rank
+        corruption_name: str = profile.name.split('_')[0]
+        corruption_rank: int = profile.name.split('_')[1].split('+')[0]
         corruption_ilevel: int = None
         try:
           corruption_ilevel = profile.name.split('_')[2]
@@ -217,34 +229,40 @@ def corruption_simulation(settings: object) -> None:
         corruption_bonus_id: int = corruptions[corruption_name][corruption_rank]['bonus_id']
         corruption_spell_id: int = corruptions[corruption_name][corruption_rank]['spell_id']
         corruption_rating: int = corruptions[corruption_name][corruption_rank]['corruption']
+        try:
+          corruption_full_name: str = corruption_name + '_' + corruption_rank + f' ({corruption_rating})' + '+' + profile.name.split(
+            '+'
+          )[1]
+        except IndexError:
+          corruption_full_name: str = corruption_name + '_' + corruption_rank + f' ({corruption_rating})'
 
         # create missing subdict for dps
-        if not corruption_name_rank in wanted_data['data']:
-          wanted_data['data'][corruption_name_rank] = {}
+        if not corruption_full_name in wanted_data['data']:
+          wanted_data['data'][corruption_full_name] = {}
 
         if corruption_ilevel == None:
-          wanted_data['data'][corruption_name_rank][settings.azerite_trait_ilevels[0]] = profile.get_dps()
+          wanted_data['data'][corruption_full_name][settings.azerite_trait_ilevels[0]] = profile.get_dps()
         else:
-          wanted_data['data'][corruption_name_rank][corruption_ilevel] = profile.get_dps()
-        logger.debug("Added '{}' with {} dps to json.".format(corruption_name_rank, profile.get_dps()))
+          wanted_data['data'][corruption_full_name][corruption_ilevel] = profile.get_dps()
+        logger.debug("Added '{}' with {} dps to json.".format(corruption_full_name, profile.get_dps()))
 
         # create missing subdict for spell data
         if not 'spell_ids' in wanted_data:
           wanted_data['spell_ids'] = {}
 
-        if not corruption_name_rank in wanted_data['spell_ids']:
-          wanted_data['spell_ids'][corruption_name_rank] = {}
+        if not corruption_full_name in wanted_data['spell_ids']:
+          wanted_data['spell_ids'][corruption_full_name] = {}
 
-        wanted_data['spell_ids'][corruption_name_rank] = corruption_spell_id
+        wanted_data['spell_ids'][corruption_full_name] = corruption_spell_id
 
         # create missing subdict for corruption rating
         if not 'corruption_rating' in wanted_data:
           wanted_data['corruption_rating'] = {}
 
-        if not corruption_name_rank in wanted_data['corruption_rating']:
-          wanted_data['corruption_rating'][corruption_name_rank] = {}
+        if not corruption_full_name in wanted_data['corruption_rating']:
+          wanted_data['corruption_rating'][corruption_full_name] = {}
 
-        wanted_data['corruption_rating'][corruption_name_rank] = corruption_rating
+        wanted_data['corruption_rating'][corruption_full_name] = corruption_rating
 
       # create ordered corruption name list
       tmp_list = []     # dps
@@ -255,7 +273,7 @@ def corruption_simulation(settings: object) -> None:
           continue
 
         highest_ilevel = sorted(wanted_data['data'][corruption_name].keys(), reverse=True)[0]
-        rank = corruption_name.split('_')[1]
+        rank = corruption_name.split('_')[1].split('+')[0].split(' (')[0]
 
         # append highest itemlevel of corruption to sortable dps list
         tmp_list.append((
@@ -264,7 +282,23 @@ def corruption_simulation(settings: object) -> None:
         ))
 
         # don't add to list if a higher rank is available
-        if not corruption_name.split('_')[0] + '_' + str(int(rank) + 1) in wanted_data['data']:
+        higher_rank = None
+        try:
+          higher_rank = corruption_name.split('_')[0] + '_' + str(
+            int(rank) + 1
+          ) + f' ({corruptions[corruption_name.split("_")[0]][str(int(rank) + 1)]["corruption"]})' + '+' + corruption_name.split(
+            '+'
+          )[1]
+        except IndexError:
+          try:
+            higher_rank = corruption_name.split('_')[0] + '_' + str(
+              int(rank) + 1
+            ) + f' ({corruptions[corruption_name.split("_")[0]][str(int(rank) + 1)]["corruption"]})'
+          except KeyError:
+            pass
+        except KeyError:
+          pass
+        if not higher_rank or 'Ineffable Truth' in corruption_name:
           tmp_list_2.append((
             f'{corruption_name}',
             (wanted_data['data'][corruption_name][highest_ilevel] - wanted_data['data']['baseline'][highest_ilevel]) /

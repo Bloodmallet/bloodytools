@@ -192,7 +192,7 @@ def create_base_json_dict(data_type: str, wow_class: str, wow_spec: str, fight_s
 
   profile = extract_profile(profile_location, wow_class)
 
-  if settings.use_custom_profile:
+  if settings.custom_profile:
     profile = extract_profile('custom_profile.txt', wow_class, profile)
 
   # spike the export data with talent data

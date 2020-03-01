@@ -321,7 +321,8 @@ class Simulation_Data():
     Returns:
       int -- Average of parent and simulation_instance.
     """
-    if self.get_dps() and simulation_instance.get_dps():
+    if self.get_dps() and self.get_dps() != -1 and simulation_instance.get_dps(
+    ) and simulation_instance.get_dps() != -1:
       return int((self.get_dps() + simulation_instance.get_dps()) / 2)
     else:
       return None
@@ -788,7 +789,7 @@ class Simulation_Group():
             if "DPS Ranking:" in line:
               baseline_result = True
             # needs this check to prevent grabbing the boss dps
-            if self.profiles[0].name in line and baseline_result:
+            if (self.profiles[0].name in line or ' baseline' in line) and baseline_result:
               self.logger.debug(line)
               self.profiles[0].set_dps(line.split()[0], external=False)
               baseline_result = False
