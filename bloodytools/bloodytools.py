@@ -1295,6 +1295,7 @@ def main():
 
   if args.custom_apl:
     settings.custom_apl: bool = args.custom_apl
+    settings.default_actions = "0"
 
   if args.custom_fight_style:
     settings.custom_fight_style: bool = args.custom_fight_style
