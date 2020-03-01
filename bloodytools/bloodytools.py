@@ -258,7 +258,7 @@ def create_base_json_dict(data_type: str, wow_class: str, wow_spec: str, fight_s
 
   profile = extract_profile(profile_location, wow_class)
 
-  if settings.use_custom_profile:
+  if settings.custom_profile:
     profile = extract_profile('custom_profile.txt', wow_class, profile)
 
   # spike the export data with talent data
@@ -572,7 +572,7 @@ def secondary_distribution_simulations(
     # end this try early, no profile, no calculations
     return
 
-  if settings.use_custom_profile:
+  if settings.custom_profile:
     try:
       with open('custom_profile.txt', 'r') as f:
         for line in f:
@@ -635,14 +635,14 @@ def secondary_distribution_simulations(
           )
 
           custom_apl = None
-          if settings.use_custom_apl:
+          if settings.custom_apl:
             with open('custom_apl.txt') as f:
               custom_apl = f.read()
           if custom_apl:
             s_o.simc_arguments.append(custom_apl)
 
           custom_fight_style = None
-          if settings.use_custom_fight_style:
+          if settings.custom_fight_style:
             with open('custom_fight_style.txt') as f:
               custom_fight_style = f.read()
           if custom_fight_style:
@@ -1158,11 +1158,27 @@ def main():
     help="Activate a single simulation on the local machine. <simulation_types> are races, azerite_traits, secondary_distributions, talent_worth, trinkets, essences, essence_combinations. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk"
   )
   parser.add_argument(
-    "--use_custom_profile",
+    "--custom_profile",
     action="store_const",
     const=True,
     default=False,
     help="Enables usage of 'custom_profile.txt' in addition to the base profile. Default: '{}'".format(settings.debug)
+  )
+  parser.add_argument(
+    "--custom_apl",
+    action="store_const",
+    const=True,
+    default=False,
+    help="Enables usage of 'custom_apl.txt' in addition to the base profile. Default: '{}'".format(settings.debug)
+  )
+  parser.add_argument(
+    "--custom_fight_style",
+    action="store_const",
+    const=True,
+    default=False,
+    help="Enables usage of 'custom_fight_style.txt' in addition to the base profile. Default: '{}'".format(
+      settings.debug
+    )
   )
   parser.add_argument(
     "--target_error",
@@ -1226,21 +1242,6 @@ def main():
     elif simulation_type == "corruptions":
       settings.enable_corruption_simulations = True
 
-  # if argument specified to simulate all, override settings
-  elif args.sim_all:
-    settings.enable_race_simulations = True
-    settings.enable_secondary_distributions_simulations = True
-    settings.enable_trinket_simulations = True
-    settings.enable_azerite_trait_simulations = True
-    settings.enable_corruption_simulations = True
-    # set talent_list to empty to ensure all talent combinations are run
-    settings.talent_list = {}
-
-    settings.wow_class_spec_list = wow_lib.get_classes_specs()
-    logger.debug(
-      "Set enable_race_simulations, enable_secondary_distributions_simulations, enable_trinket_simulations, and enable_azerite_trait_simulations to True."
-    )
-
   # set new executable path if provided
   if args.executable:
     settings.executable = args.executable
@@ -1259,8 +1260,14 @@ def main():
   if args.ptr:
     settings.ptr = "1"
 
-  if args.use_custom_profile:
-    settings.use_custom_profile = args.use_custom_profile
+  if args.custom_profile:
+    settings.custom_profile: bool = args.custom_profile
+
+  if args.custom_apl:
+    settings.custom_apl: bool = args.custom_apl
+
+  if args.custom_fight_style:
+    settings.custom_fight_style: bool = args.custom_fight_style
 
   if args.target_error:
     for fight_style in settings.target_error:

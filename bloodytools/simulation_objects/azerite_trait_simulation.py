@@ -41,7 +41,7 @@ def azerite_trait_simulations(settings) -> None:
         # end this try early, no profile, no calculations
         continue
 
-      if settings.use_custom_profile:
+      if settings.custom_profile:
         try:
           with open('custom_profile.txt', 'r') as f:
             for line in f:
@@ -199,8 +199,8 @@ def azerite_trait_simulations(settings) -> None:
                 azerite_trait_name_spell_id_dict[entry["new_name"]] = azerite_trait_spell_id
 
             try:
-              special_case_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"
-                                                                                  ][azerite_trait]
+              special_case_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"][
+                azerite_trait]
             except Exception:
               pass
             else:
@@ -304,8 +304,8 @@ def azerite_trait_simulations(settings) -> None:
 
               # add spell ids to dict
               for new_addition in special_information["link_data"]:
-                azerite_trait_name_spell_id_dict[new_addition] = special_information["link_data"][new_addition
-                                                                                                  ]["spell_id"]
+                azerite_trait_name_spell_id_dict[new_addition] = special_information["link_data"][new_addition][
+                  "spell_id"]
 
               simulation_group.add(simulation_data)
               simulation_data = simulation_data.copy()
@@ -350,8 +350,8 @@ def azerite_trait_simulations(settings) -> None:
 
               # add spec specific special_cases profiles to the simulation_group
               try:
-                special_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"
-                                                                               ][azerite_trait]
+                special_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"][
+                  azerite_trait]
               except Exception as e:
                 logger.debug(
                   "No special case for {} of {} {} for fight_style {} was found. Error: {}".format(
@@ -422,8 +422,8 @@ def azerite_trait_simulations(settings) -> None:
 
               # add spec specific special_cases profiles to the simulation_group
               try:
-                special_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"
-                                                                               ][azerite_trait]
+                special_list = special_cases[wow_class][wow_spec][fight_style]["azerite_trait_simulations"][
+                  azerite_trait]
               except Exception as e:
                 logger.debug(
                   "No special case for {} of {} {} for fight_style {} was found. Error: {}".format(
