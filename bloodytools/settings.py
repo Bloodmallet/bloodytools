@@ -66,7 +66,7 @@ target_error = {
 threads = "8"
 
 custom_apl = False
-custom_fight_style = True
+custom_fight_style = False
 custom_profile = False     # custom profile overrides standard profile, standard profile is still used as baseline
 
 ###############################################################################
