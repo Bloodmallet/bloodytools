@@ -298,7 +298,7 @@ def corruption_simulation(settings: object) -> None:
             pass
         except KeyError:
           pass
-        if not higher_rank:
+        if not higher_rank or 'Ineffable Truth' in corruption_name:
           tmp_list_2.append((
             f'{corruption_name}',
             (wanted_data['data'][corruption_name][highest_ilevel] - wanted_data['data']['baseline'][highest_ilevel]) /
