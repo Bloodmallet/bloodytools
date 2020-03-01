@@ -54,7 +54,7 @@ logger.setLevel(logging.DEBUG)
 file_handler = logging.FileHandler("log.txt", "w", encoding="utf-8")
 file_handler.setLevel(logging.DEBUG)
 file_formatter = logging.Formatter(
-  "%(asctime)s - %(filename)s / %(funcName)s / %(lineno)s - %(levelname)s - %(message)s"
+  "%(asctime)s - %(filename)s / %(funcName)s:%(lineno)s - %(levelname)s - %(message)s"
 )
 file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)
@@ -416,6 +416,19 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             iterations=settings.iterations,
             logger=logger
           )
+          custom_apl = None
+          if settings.custom_apl:
+            with open('custom_apl.txt') as f:
+              custom_apl = f.read()
+          if custom_apl:
+            simulation_data.simc_arguments.append(custom_apl)
+
+          custom_fight_style = None
+          if settings.custom_fight_style:
+            with open('custom_fight_style.txt') as f:
+              custom_fight_style = f.read()
+          if custom_fight_style:
+            simulation_data.simc_arguments.append(custom_fight_style)
         else:
           simulation_data = so.Simulation_Data(
             name=race.title().replace("_", " "),
@@ -1029,6 +1042,21 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
         iterations=settings.iterations,
         logger=logger
       )
+
+      custom_apl = None
+      if settings.custom_apl:
+        with open('custom_apl.txt') as f:
+          custom_apl = f.read()
+      if custom_apl:
+        base_profile.simc_arguments.append(custom_apl)
+
+      custom_fight_style = None
+      if settings.custom_fight_style:
+        with open('custom_fight_style.txt') as f:
+          custom_fight_style = f.read()
+      if custom_fight_style:
+        base_profile.simc_arguments.append(custom_fight_style)
+
       simulation_group.add(base_profile)
 
       # add all talent combinations to the simulation_group
@@ -1208,7 +1236,9 @@ def main():
     # single sim will always use all cores unless --threads is defined
     settings.threads = ""
     settings.wow_class_spec_list = [(wow_class.lower(), wow_spec.lower())]
-    settings.fight_styles = [fight_style]
+    settings.fight_styles = [
+      fight_style,
+    ]
     settings.iterations = "20000"
     # disable all simulation types
     settings.enable_race_simulations = False

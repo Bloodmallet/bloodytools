@@ -102,6 +102,20 @@ def corruption_simulation(settings: object) -> None:
           iterations=settings.iterations,
           logger=logger
         )
+        if itemlevel == settings.azerite_trait_ilevels[0]:
+          custom_apl = None
+          if settings.custom_apl:
+            with open('custom_apl.txt') as f:
+              custom_apl = f.read()
+          if custom_apl:
+            simulation_data.simc_arguments.append(custom_apl)
+
+          custom_fight_style = None
+          if settings.custom_fight_style:
+            with open('custom_fight_style.txt') as f:
+              custom_fight_style = f.read()
+          if custom_fight_style:
+            simulation_data.simc_arguments.append(custom_fight_style)
         simulation_group.add(simulation_data)
 
       # create profiles for all corruptions and their ranks/level
