@@ -1,3 +1,5 @@
-mypy
+# mypy
 yapf
+# necessary for coverage check
+coveralls
 -r requirements.txt

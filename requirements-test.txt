@@ -1,2 +1,0 @@
-# necessary for coverage check
-coveralls
