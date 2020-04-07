@@ -28,9 +28,13 @@ def secondary_distribution_simulation(settings: object) -> None:
 
     for fight_style in settings.fight_styles:
         for wow_class, wow_spec in settings.wow_class_spec_list:
-            result_dict = create_base_json_dict(
-                "secondary_distributions", wow_class, wow_spec, fight_style, settings
-            )
+            try:
+                result_dict = create_base_json_dict(
+                    "secondary_distributions", wow_class, wow_spec, fight_style, settings
+                )
+            except FileNotFoundError:
+                logger.debug(f'Profile file not found. Skipping {wow_spec} {wow_class}.')
+                continue
 
             talent_combinations = None
             if not settings.talent_permutations:
