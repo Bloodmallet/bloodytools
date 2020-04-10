@@ -1012,6 +1012,13 @@ class Simulation_Group():
                             raise SimulationError(
                                 "Communication with Raidbots failed. Sent data was not accepted."
                             )
+                    except Exception as e:
+                        self.logger.error(
+                            'Sending task to raidbots failed. Response was: {}'.format(
+                                response.data
+                            )
+                        )
+                        raise e
 
                     try:
                         raidbots_response = json.loads(response.read())
