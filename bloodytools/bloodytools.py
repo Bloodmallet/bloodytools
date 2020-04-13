@@ -70,6 +70,14 @@ console_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s
 console_handler.setFormatter(console_formatter)
 logger.addHandler(console_handler)
 
+error_handler = logging.FileHandler('error.log', 'w', encoding='utf-8')
+error_handler.setLevel(logging.ERROR)
+error_formatter = logging.Formatter(
+    "%(asctime)s - %(filename)s / %(funcName)s:%(lineno)s - %(levelname)s - %(message)s"
+)
+error_handler.setFormatter(error_formatter)
+logger.addHandler(error_handler)
+
 
 def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str):
     """Create basic profile string to get the standard profile of a spec. Use this function to get the necessary string for your first argument of a simulation_data object.
