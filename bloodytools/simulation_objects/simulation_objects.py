@@ -1343,9 +1343,14 @@ class Simulation_Group():
                             )
 
                         with open("error_{}.txt".format(raidbots_sim_id), 'w') as f:
-                            f.write("############## INPUT ##############\n")
-                            f.write(json.dumps(raidbots_input))
-                            f.write("\n\n############## OUTPUT ##############\n")
+                            f.write("############## INPUT #############\n")
+                            f.write(data)
+                            f.write("\n\n############# RECEIVED ###########\n")
+                            try:
+                                f.write(json.dumps(raidbots_input))
+                            except Exception:
+                                pass
+                            f.write("\n\n############# OUTPUT #############\n")
                             f.write(json.dumps(raidbots_output))
 
                             try:
