@@ -1014,9 +1014,9 @@ class Simulation_Group():
                             )
                     except Exception as e:
                         self.logger.error(
-                            'Sending task to raidbots failed. Response was: <{}> {}'.format(
+                            'Sending task to raidbots failed. Exception was: <{}> {}'.format(
                                 type(e),
-                                response.data,
+                                e,
                             )
                         )
                         raise e
