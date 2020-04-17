@@ -1000,7 +1000,7 @@ class Simulation_Group():
                             backoff += 1
                             try:
                                 response = request.urlopen(req, timeout=30)
-                            except error.HTTPError as e:
+                            except (error.HTTPError, error.URLError) as e:
                                 self.logger.warning(
                                     "Sending the task {} to Raidbots failed ({}, {}). Retry in {}"
                                     .format(self.name, type(e), e.reason, 2**backoff)
