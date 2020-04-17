@@ -988,10 +988,10 @@ class Simulation_Group():
 
                     try:
                         response = request.urlopen(req, timeout=30)
-                    except error.HTTPError as e:
+                    except (error.HTTPError, error.URLError) as e:
                         self.logger.warning(
-                            "Sending the task {} to Raidbots failed ({}, {}, {}). Retrying in 1"
-                            .format(self.name, e.code, e.reason, e.read())
+                            "Sending the task {} to Raidbots failed ({}, {}). Retrying in 1"
+                            .format(self.name, type(e), e.reason)
                         )
 
                         backoff = 0
@@ -1003,7 +1003,7 @@ class Simulation_Group():
                             except error.HTTPError as e:
                                 self.logger.warning(
                                     "Sending the task {} to Raidbots failed ({}, {}). Retry in {}"
-                                    .format(self.name, e.code, e.reason, 2**backoff)
+                                    .format(self.name, type(e), e.reason, 2**backoff)
                                 )
                             else:
                                 break
@@ -1034,7 +1034,8 @@ class Simulation_Group():
                     # monitor simulation progress
                     self.logger.info("Simulation of {} is underway. Please wait".format(self.name))
 
-                    try:     # simulation progress
+                    # simulation progress
+                    try:
                         response = request.urlopen(
                             request.Request(
                                 "https://www.raidbots.com/api/job/{}".format(raidbots_sim_id),
