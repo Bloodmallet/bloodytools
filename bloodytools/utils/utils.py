@@ -2,6 +2,7 @@ import datetime
 import logging
 import re
 import requests
+import time
 import urllib3
 
 from simc_support import wow_lib
@@ -316,7 +317,7 @@ def request(
     data: dict = None,
     retries=6,
     session=None,
-    timeout=7,
+    timeout=30,
 ) -> dict:
     """Communicate with url and return response json dict. Handled
     retries, timeouts, and sticks to session if one is provided.
@@ -337,16 +338,21 @@ def request(
         dict: Response dictionary from url
     """
 
-    s = session or requests.Session()
-    # https://stackoverflow.com/a/35504626/8002464
-    retries_adapter = urllib3.util.retry.Retry(
-        total=retries,
-        backoff_factor=1,
-        status_forcelist=[429, 500, 502, 503, 504],
-    )
-    adapter = requests.adapters.HTTPAdapter(max_retries=retries_adapter)
-    # register adapter for target
-    s.mount('https://www.raidbots.com/', adapter)
+    if session:
+        s = session
+    else:
+        s = requests.Session()
+        # https://stackoverflow.com/a/35504626/8002464
+        retries_adapter = urllib3.util.retry.Retry(
+            total=retries,
+            read=retries,
+            connect=retries,
+            backoff_factor=1,
+            status_forcelist=[429, 500, 502, 503, 504],
+        )
+        adapter = requests.adapters.HTTPAdapter(max_retries=retries_adapter)
+        # register adapter for target
+        s.mount('https://www.raidbots.com/', adapter)
 
     headers = {
         'Content-Type': 'application/json',
@@ -365,6 +371,10 @@ def request(
         }
 
         response = s.post(url, json=body, headers=headers, timeout=timeout)
+
+        while response.status_code == 429:
+            time.sleep(10)
+            response = s.post(url, json=body, headers=headers, timeout=timeout)
 
     # get
     else:
