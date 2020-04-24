@@ -1222,7 +1222,7 @@ def main():
   if args.debug:
     settings.debug = args.debug
     logger.setLevel(logging.DEBUG)
-    ch.setLevel(logging.DEBUG)
+    console_handler.setLevel(logging.DEBUG)
     logger.debug("Set debug mode to {}".format(settings.debug))
 
   if args.single_sim:
