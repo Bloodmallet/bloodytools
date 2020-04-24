@@ -528,6 +528,7 @@ class Simulation_Group():
 
     self.name = name
     self.filename: str = ""
+    self.json_filename: str = None
     self.threads = threads
     # simulationcrafts own multithreading
     self.profileset_work_threads = profileset_work_threads
@@ -658,12 +659,12 @@ class Simulation_Group():
           # temporary file names
           self.uuid = str(uuid.uuid4())
           self.filename = "{}.simc".format(self.uuid)
-          json_filename = "{}.json".format(self.uuid)
+          self.json_filename = "{}.json".format(self.uuid)
 
           # write arguments to file
           with open(self.filename, "w") as f:
             # write the equal values to file
-            f.write("json={}\n".format(json_filename))
+            f.write("json={}\n".format(self.json_filename))
             f.write("profileset_metric={}\n".format(",".join(["dps"])))
             f.write("calculate_scale_factors={}\n".format(self.profiles[0].calculate_scale_factors))
             f.write("default_actions={}\n".format(self.profiles[0].default_actions))
@@ -786,13 +787,14 @@ class Simulation_Group():
 
 
           # parse results from generated json file
-          with open(json_filename) as json_file:
+          with open(self.json_filename) as json_file:
             json_data = json.load(json_file)
             
             self.set_json_data(json_data)
                   
           # remove json file after parsing
-          os.remove(json_filename)
+          if self.json_filename is not None:
+            os.remove(self.json_filename)
 
 
       else:
@@ -1213,7 +1215,7 @@ class Simulation_Group():
 
     return simc_hash
 
-  def set_json_data(self, data: dict):
+  def set_json_data(self, data: dict) -> None:
       self.logger.debug("Setting dps for baseprofile.")
       self.set_dps_of(
         data["sim"]["players"][0]["name"],
