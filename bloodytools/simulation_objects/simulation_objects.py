@@ -3,6 +3,7 @@
 
 import datetime
 import logging
+import json
 import os
 import subprocess
 import sys
@@ -641,6 +642,7 @@ class Simulation_Group():
           raise e
 
       elif len(self.profiles) >= 2:
+  
 
         # check for a path to executable
         if not self.executable:
@@ -653,19 +655,16 @@ class Simulation_Group():
             .format(self.filename)
           )
         else:
-          self.filename = str(uuid.uuid4()) + ".simc"
+          # temporary file names
+          self.uuid = str(uuid.uuid4())
+          self.filename = "{}.simc".format(self.uuid)
+          json_filename = "{}.json".format(self.uuid)
 
-          # if somehow the random naming function created the same name twice
-          if os.path.isfile(self.filename):
-            self.logger.info(
-              "Somehow the random filename generator generated a name ('{}') that is already on use.".format(
-                self.filename
-              )
-            )
-            self.filename = str(uuid.uuid4()) + ".simc"
           # write arguments to file
           with open(self.filename, "w") as f:
             # write the equal values to file
+            f.write("json={}\n".format(json_filename))
+            f.write("profileset_metric={}\n".format(",".join(["dps"])))
             f.write("calculate_scale_factors={}\n".format(self.profiles[0].calculate_scale_factors))
             f.write("default_actions={}\n".format(self.profiles[0].default_actions))
             f.write("default_skill={}\n".format(self.profiles[0].default_skill))
@@ -699,6 +698,7 @@ class Simulation_Group():
                       profile_name=profile.name, argument=special_argument
                     )
                   )
+          self.logger.debug("simulation options written to file {}".format(self.filename))
 
           # counter of failed simulation attempts
           fail_counter = 0
@@ -784,31 +784,25 @@ class Simulation_Group():
           baseline_result = False
           profileset_results = False
 
-          for line in self.simulation_output.splitlines():
-            # allow baseline dmg grab only in the dps listing, not from warnings
-            if "DPS Ranking:" in line:
-              baseline_result = True
-            # needs this check to prevent grabbing the boss dps
-            if (self.profiles[0].name in line or ' baseline' in line) and baseline_result:
-              self.logger.debug(line)
-              self.profiles[0].set_dps(line.split()[0], external=False)
-              baseline_result = False
 
-            if "Profilesets (median Damage per Second):" in line:
-              profileset_results = True
-              continue
+          # parse results from generated json file
+          with open(json_filename) as json_file:
+            json_data = json.load(json_file)
+            
+            for profile in self.profiles:
+              # grab baseline dmg
+              for player in json_data["sim"]["players"]:
+                if player["name"] == profile.name:
+                  profile.set_dps(player["collected_data"]["dps"]["mean"], external=False)
+            
+              # grab profileset dps
+              for result in json_data["sim"]["profilesets"]["results"]:
+                if result["name"] == profile.name:
+                  profile.set_dps(result["mean"], external=False)
+                  
+          # remove json file after parsing
+          os.remove(json_filename)
 
-            # prevents false positive from Waiting -data
-            if "" == line and profileset_results:
-              profileset_results = False
-              continue
-
-            # get dps values of the profileset-simulations
-            if profileset_results:
-              for profile in self.profiles:
-                # need this space to catch the difference of multiple profiles like 'tauren' and 'highmountain_tauren', "Tauren" and "Highmountain Tauren"
-                if line.split(" : ")[1] == profile.name:
-                  profile.set_dps(line.split()[0], external=False)
 
       else:
         raise NotSetYetError("No profiles were added to this simulation_group yet. Nothing can be simulated.")
