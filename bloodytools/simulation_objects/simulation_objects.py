@@ -789,16 +789,7 @@ class Simulation_Group():
           with open(json_filename) as json_file:
             json_data = json.load(json_file)
             
-            for profile in self.profiles:
-              # grab baseline dmg
-              for player in json_data["sim"]["players"]:
-                if player["name"] == profile.name:
-                  profile.set_dps(player["collected_data"]["dps"]["mean"], external=False)
-            
-              # grab profileset dps
-              for result in json_data["sim"]["profilesets"]["results"]:
-                if result["name"] == profile.name:
-                  profile.set_dps(result["mean"], external=False)
+            self.set_json_data(json_data)
                   
           # remove json file after parsing
           os.remove(json_filename)
@@ -1208,16 +1199,7 @@ class Simulation_Group():
             simc_hash = False
 
           # set basic profile dps
-          self.logger.debug("Setting dps for baseprofile.")
-          self.set_dps_of(
-            raidbots_data["sim"]["players"][0]["name"],
-            raidbots_data["sim"]["players"][0]["collected_data"]["dps"]["mean"]
-          )
-          self.logger.debug("Set dps for baseprofile.")
-
-          for profile in raidbots_data["sim"]["profilesets"]["results"]:
-            self.logger.debug("Setting dps for {}".format(profile["name"]))
-            self.set_dps_of(profile["name"], profile["mean"])
+          self.set_json_data(raidbots_data)
 
       else:
         raise NotSetYetError("No profiles were added to this simulation_group yet. Nothing can be simulated.")
@@ -1231,6 +1213,18 @@ class Simulation_Group():
 
     return simc_hash
 
+  def set_json_data(self, data: dict):
+      self.logger.debug("Setting dps for baseprofile.")
+      self.set_dps_of(
+        data["sim"]["players"][0]["name"],
+        data["sim"]["players"][0]["collected_data"]["dps"]["mean"]
+      )
+      self.logger.debug("Set dps for baseprofile.")
+
+      for profile in data["sim"]["profilesets"]["results"]:
+        self.logger.debug("Setting dps for {}".format(profile["name"]))
+        self.set_dps_of(profile["name"], profile["mean"])
+            
   def add(self, simulation_instance: Simulation_Data) -> bool:
     """Add another simulation_instance object to the group.
 
