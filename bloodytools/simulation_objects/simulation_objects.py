@@ -1216,16 +1216,21 @@ class Simulation_Group():
     return simc_hash
 
   def set_json_data(self, data: dict) -> None:
-      self.logger.debug("Setting dps for baseprofile.")
-      self.set_dps_of(
-        data["sim"]["players"][0]["name"],
-        data["sim"]["players"][0]["collected_data"]["dps"]["mean"]
-      )
-      self.logger.debug("Set dps for baseprofile.")
+    """Set simulation results from json report to profiles.
+    
+    Arguments:
+      data {dict} -- json data from SimulationCraft json report
+    """
+    self.logger.debug("Setting dps for baseprofile.")
+    self.set_dps_of(
+      data["sim"]["players"][0]["name"],
+      data["sim"]["players"][0]["collected_data"]["dps"]["mean"]
+    )
+    self.logger.debug("Set dps for baseprofile.")
 
-      for profile in data["sim"]["profilesets"]["results"]:
-        self.logger.debug("Setting dps for {}".format(profile["name"]))
-        self.set_dps_of(profile["name"], profile["mean"])
+    for profile in data["sim"]["profilesets"]["results"]:
+      self.logger.debug("Setting dps for {}".format(profile["name"]))
+      self.set_dps_of(profile["name"], profile["mean"])
             
   def add(self, simulation_instance: Simulation_Data) -> bool:
     """Add another simulation_instance object to the group.
