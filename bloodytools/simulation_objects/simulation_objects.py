@@ -787,7 +787,7 @@ class Simulation_Group():
 
 
           # parse results from generated json file
-          with open(self.json_filename) as json_file:
+          with open(self.json_filename, 'r') as json_file:
             json_data = json.load(json_file)
             
             self.set_json_data(json_data)
