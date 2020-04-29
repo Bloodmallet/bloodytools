@@ -1,22 +1,21 @@
 import json
 import os
-from typing import List, Tuple
 
+from bloodytools.simulation_objects.simulation_objects import Simulation_Data, Simulation_Group
+from bloodytools.utils.utils import create_base_json_dict, create_basic_profile_string
 from simc_support.wow_lib import get_corruptions
-from utils.utils import create_base_json_dict, create_basic_profile_string
-
-from .simulation_objects import Simulation_Data, Simulation_Group
+from typing import List, Tuple
 
 
 def corruption_simulation(settings: object) -> None:
     """Simulates all available corruptions for the given specs.
 
-  Args:
-    settings (object): [description]
+    Args:
+        settings (object): [description]
 
-  Returns:
-    None --
-  """
+    Returns:
+        None --
+    """
 
     logger = settings.logger
 

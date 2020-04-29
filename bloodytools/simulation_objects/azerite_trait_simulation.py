@@ -1,12 +1,18 @@
 import json
 import os
-from typing import List, Tuple
 
+from bloodytools.simulation_objects.simulation_objects import (
+    Simulation_Data,
+    Simulation_Group,
+)
+from bloodytools.special_cases import special_cases
+from bloodytools.utils.utils import (
+    create_base_json_dict,
+    create_basic_profile_string,
+    tokenize_str,
+)
 from simc_support import wow_lib
-from special_cases import special_cases
-from utils.utils import (create_base_json_dict, create_basic_profile_string, tokenize_str)
-
-from .simulation_objects import Simulation_Data, Simulation_Group
+from typing import List, Tuple
 
 
 def azerite_trait_simulations(settings) -> None:

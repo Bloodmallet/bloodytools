@@ -1,26 +1,26 @@
 import json
 import os
 
-from utils.utils import create_base_json_dict
-from utils.utils import create_basic_profile_string
+from bloodytools.simulation_objects.simulation_objects import Simulation_Data
+from bloodytools.simulation_objects.simulation_objects import Simulation_Group
+from bloodytools.utils.utils import create_base_json_dict
+from bloodytools.utils.utils import create_basic_profile_string
 from simc_support.wow_lib import get_talent_combinations
-from simulation_objects.simulation_objects import Simulation_Data
-from simulation_objects.simulation_objects import Simulation_Group
 
 
 def secondary_distribution_simulation(settings: object) -> None:
     """Simulates several secondary distributions for the baseline profile.
 
-  Arguments:
-    wow_class {str} -- [description]
-    wow_spec {str} -- [description]
+    Arguments:
+        wow_class {str} -- [description]
+        wow_spec {str} -- [description]
 
-  Keyword Arguments:
-    talent_combinations {List[str]} -- [description] (default: {[False]})
+    Keyword Arguments:
+        talent_combinations {List[str]} -- [description] (default: {[False]})
 
-  Returns:
-    List[so.Simulation_Group] -- [description]
-  """
+    Returns:
+        List[so.Simulation_Group] -- [description]
+    """
 
     logger = settings.logger
 

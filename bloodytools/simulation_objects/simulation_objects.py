@@ -9,10 +9,10 @@ import threading
 import time
 import uuid
 
+from bloodytools.utils.utils import request as r
 # wow game data and simc input checks
 from simc_support import simc_checks as simc_checks
 from typing import List, Union
-from utils.utils import request as r
 
 
 class Error(Exception):
@@ -237,17 +237,17 @@ class Simulation_Data():
 
     def is_equal(self, simulation_instance: 'simulation_data') -> bool:
         """Determines if the current and given simulation_data share the
-      same base. The following attributes are considered base:
-      calculate_scale_factors, default_actions, default_skill,
-      executable, fight_style, fixed_time, html, iterations, log,
-      optimize_expressions, ptr, ready_trigger, target_error, threads
+        same base. The following attributes are considered base:
+        calculate_scale_factors, default_actions, default_skill,
+        executable, fight_style, fixed_time, html, iterations, log,
+        optimize_expressions, ptr, ready_trigger, target_error, threads
 
-    Arguments:
-      simulation_instance {simulation_data} -- Instance of simulation_data
+        Arguments:
+            simulation_instance {simulation_data} -- Instance of simulation_data
 
-    Returns:
-      bool -- True if equallity between mentioned data is guaranteed.
-    """
+        Returns:
+            bool -- True if equallity between mentioned data is guaranteed.
+        """
 
         try:
             if self.calculate_scale_factors != simulation_instance.calculate_scale_factors:
@@ -285,25 +285,25 @@ class Simulation_Data():
     def get_dps(self) -> int:
         """Get the dps of the simulation_instance.
 
-    Returns:
-      int -- dps
-    """
+        Returns:
+            int -- dps
+        """
         return self.dps
 
     def set_dps(self, dps: Union[int, float, str], external: bool = True) -> None:
         """Set dps.
 
-    Arguments:
-      dps {int} -- simulated dps value
+        Arguments:
+            dps {int} -- simulated dps value
 
-    Keyword Arguments:
-      external {bool} -- special flag to know whether the core simulation function was used (default: {True})
+        Keyword Arguments:
+            external {bool} -- special flag to know whether the core simulation function was used (default: {True})
 
-    Raises:
-      TypeError -- Raised if external was not {bool}.
-      AlreadySetError -- Raised if dps was already set.
-      e -- Raised if casting dps to {int} fails.
-    """
+        Raises:
+            TypeError -- Raised if external was not {bool}.
+            AlreadySetError -- Raised if dps was already set.
+            e -- Raised if casting dps to {int} fails.
+        """
         # set external_simulation flag, defaults to True, so external simulations
         #  don't need to pay attention to this
         if type(external) == bool:
@@ -330,12 +330,12 @@ class Simulation_Data():
     def get_avg(self, simulation_instance: 'simulation_data') -> int:
         """Get the average between to the parent and given simulation_instance.
 
-    Arguments:
-      simulation_instance {simulation_data} -- A finished simulation_data instance.
+        Arguments:
+            simulation_instance {simulation_data} -- A finished simulation_data instance.
 
-    Returns:
-      int -- Average of parent and simulation_instance.
-    """
+        Returns:
+            int -- Average of parent and simulation_instance.
+        """
         if self.get_dps() and self.get_dps() != -1 and simulation_instance.get_dps(
         ) and simulation_instance.get_dps() != -1:
             return int((self.get_dps() + simulation_instance.get_dps()) / 2)
@@ -345,12 +345,12 @@ class Simulation_Data():
     def get_simulation_duration(self) -> datetime.timedelta:
         """Return the simulation duration.
 
-    Raises:
-      NotDoneYetError -- Raised if simulation is still in progress.
+        Raises:
+            NotDoneYetError -- Raised if simulation is still in progress.
 
-    Returns:
-      datetime.datetime -- Start time - End time
-    """
+        Returns:
+            datetime.datetime -- Start time - End time
+        """
 
         if self.so_simulation_start_time and self.so_simulation_end_time:
             return self.so_simulation_end_time - self.so_simulation_start_time
@@ -364,12 +364,12 @@ class Simulation_Data():
     def set_full_report(self, report: str) -> None:
         """Saves the report (simulation cmd output) to full_report.
 
-    Arguments:
-      report {str} -- The cmd output of the simulation.
+        Arguments:
+            report {str} -- The cmd output of the simulation.
 
-    Raises:
-      TypeError -- Raised if report was not a string.
-    """
+        Raises:
+            TypeError -- Raised if report was not a string.
+        """
         if type(report) == str:
             self.full_report = report
         else:
@@ -380,9 +380,9 @@ class Simulation_Data():
     def set_simulation_end_time(self) -> None:
         """Set so_simulation_end_time.
 
-    Raises:
-      AlreadySetError -- Raised if the simulation end time was already set.
-    """
+        Raises:
+            AlreadySetError -- Raised if the simulation end time was already set.
+        """
         if not self.so_simulation_end_time:
             self.so_simulation_end_time = datetime.datetime.utcnow()
         else:
@@ -392,19 +392,19 @@ class Simulation_Data():
 
     def set_simulation_start_time(self) -> None:
         """Set so_simulation_start_time. Can be done multiple times.
-    """
+        """
         self.so_simulation_start_time = datetime.datetime.utcnow()
 
     def simulate(self) -> int:
         """Simulates the data using SimulationCraft. Resulting dps are saved and returned.
 
-    Raises:
-      FileNotFoundError -- Raised if the simulation didn't start due to the executable not being found.
-      SimulationError -- Raised if the simulation failes multiple times.
+        Raises:
+            FileNotFoundError -- Raised if the simulation didn't start due to the executable not being found.
+            SimulationError -- Raised if the simulation failes multiple times.
 
-    Returns:
-      int -- DPS of the simulation
-    """
+        Returns:
+            int -- DPS of the simulation
+        """
         argument = [self.executable]
         argument.append("iterations=" + self.iterations)
         argument.append("target_error=" + self.target_error)
@@ -500,9 +500,9 @@ class Simulation_Data():
     def copy(self):
         """Create an identical, independent copy of the current Simulation_Data. WARNING: The name is identical too! You'll need to update it manually!
 
-    Returns:
-      Simulation_Data -- Deep copy of the current Simulation_Data
-    """
+        Returns:
+            Simulation_Data -- Deep copy of the current Simulation_Data
+        """
         new_sim_data = Simulation_Data(
             calculate_scale_factors=self.calculate_scale_factors,
             default_actions=self.default_actions,

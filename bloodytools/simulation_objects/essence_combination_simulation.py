@@ -1,22 +1,21 @@
 import json
 import os
-from typing import List, Tuple
 
+from bloodytools.simulation_objects.simulation_objects import Simulation_Data, Simulation_Group
+from bloodytools.utils.utils import create_base_json_dict, create_basic_profile_string
 from simc_support import wow_lib
-from utils.utils import create_base_json_dict, create_basic_profile_string
-
-from .simulation_objects import Simulation_Data, Simulation_Group
+from typing import List, Tuple
 
 
 def essence_combination_simulation(settings: object) -> None:
     """Simulates all available races for all given specs.
 
-  Arguments:
-    specs {List[Tuple[str, str]]} -- List of all wanted wow_specs
+    Arguments:
+        specs {List[Tuple[str, str]]} -- List of all wanted wow_specs
 
-  Returns:
-    None --
-  """
+    Returns:
+        None --
+    """
     logger = settings.logger
 
     logger.debug("essence_combination_simulation start")

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Welcome to bloodytools - a SimulationCraft automator/wrapper
 
 Generate your data more easily without having to create each and every needed profile to do so by hand:
@@ -32,17 +30,17 @@ import os
 import re
 import sys
 import time
-from typing import List, Tuple
 
-import settings     # settings.py file
+from bloodytools import settings     # settings.py file
+from bloodytools.simulation_objects import simulation_objects as so
+from bloodytools.simulation_objects.azerite_trait_simulation import azerite_trait_simulations
+from bloodytools.simulation_objects.corruption_simulation import corruption_simulation
+from bloodytools.simulation_objects.essence_combination_simulation import essence_combination_simulation
+from bloodytools.simulation_objects.essence_simulation import essence_simulation
+from bloodytools.simulation_objects.secondary_distribution_simulation import secondary_distribution_simulation
+from bloodytools.simulation_objects.trinket_simulation import trinket_simulation
 from simc_support import wow_lib
-from simulation_objects import simulation_objects as so
-from simulation_objects.azerite_trait_simulation import azerite_trait_simulations
-from simulation_objects.corruption_simulation import corruption_simulation
-from simulation_objects.essence_combination_simulation import essence_combination_simulation
-from simulation_objects.essence_simulation import essence_simulation
-from simulation_objects.trinket_simulation import trinket_simulation
-from simulation_objects.secondary_distribution_simulation import secondary_distribution_simulation
+from typing import List, Tuple
 
 if settings.use_own_threading:
     import threading
@@ -82,14 +80,14 @@ logger.addHandler(error_handler)
 def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str):
     """Create basic profile string to get the standard profile of a spec. Use this function to get the necessary string for your first argument of a simulation_data object.
 
-  Arguments:
-    wow_class {str} -- wow class, e.g. shaman
-    wow_spec {str} -- wow spec, e.g. elemental
-    tier {str} -- profile tier, e.g. 21 or PR
+    Arguments:
+        wow_class {str} -- wow class, e.g. shaman
+        wow_spec {str} -- wow spec, e.g. elemental
+        tier {str} -- profile tier, e.g. 21 or PR
 
-  Returns:
-    str -- relative link to the standard simc profile
-  """
+    Returns:
+        str -- relative link to the standard simc profile
+    """
 
     logger.debug("create_basic_profile_string start")
     # create the basis profile string
@@ -123,9 +121,9 @@ def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str):
 def pretty_timestamp() -> str:
     """Returns a pretty time stamp "YYYY-MM-DD HH:MM"
 
-  Returns:
-    str -- timestamp
-  """
+    Returns:
+        str -- timestamp
+    """
     # str(datetime.datetime.utcnow())[:-10] should be the same
     return datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M")
 
@@ -133,13 +131,13 @@ def pretty_timestamp() -> str:
 def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     """Extract all character specific data from a given file.
 
-  Arguments:
-      path {str} -- path to file, relative or absolute
-      profile {dict} -- profile input that should be updated
+    Arguments:
+        path {str} -- path to file, relative or absolute
+        profile {dict} -- profile input that should be updated
 
-  Returns:
-      dict -- all known character data
-  """
+    Returns:
+        dict -- all known character data
+    """
 
     logger.warning(
         'DEPRICATION WARNING: profile format change. Information will be stored in its own subsection. Read result file to already get the new format.'
@@ -249,15 +247,15 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
 def create_base_json_dict(data_type: str, wow_class: str, wow_spec: str, fight_style: str):
     """Creates as basic json dictionary. You'll need to add your data into 'data'. Can be extended.
 
-  Arguments:
-    data_type {str} -- e.g. Races, Trinkets, Azerite Traits (str is used in the title)
-    wow_class {str} -- [description]
-    wow_spec {str} -- [description]
-    fight_style {str} -- [description]
+    Arguments:
+        data_type {str} -- e.g. Races, Trinkets, Azerite Traits (str is used in the title)
+        wow_class {str} -- [description]
+        wow_spec {str} -- [description]
+        fight_style {str} -- [description]
 
-  Returns:
-    dict -- [description]
-  """
+    Returns:
+        dict -- [description]
+    """
 
     logger.debug("create_base_json_dict start")
 
@@ -318,12 +316,12 @@ def create_base_json_dict(data_type: str, wow_class: str, wow_spec: str, fight_s
 def tokenize_str(string: str) -> str:
     """Return SimulationCraft appropriate name.
 
-  Arguments:
-    string {str} -- E.g. "Tawnos, Urza's Apprentice"
+    Arguments:
+        string {str} -- E.g. "Tawnos, Urza's Apprentice"
 
-  Returns:
-    str -- "tawnos_urzas_apprentice"
-  """
+    Returns:
+        str -- "tawnos_urzas_apprentice"
+    """
 
     string = string.lower().split(" (")[0]
     # cleanse name
@@ -340,9 +338,9 @@ def tokenize_str(string: str) -> str:
 def get_simc_hash(path) -> str:
     """Get the FETCH_HEAD or shallow simc git hash.
 
-  Returns:
-    str -- [description]
-  """
+    Returns:
+        str -- [description]
+    """
 
     if ".exe" in path:
         new_path = path.split("simc.exe")[0]
@@ -382,12 +380,12 @@ def get_simc_hash(path) -> str:
 def race_simulations(specs: List[Tuple[str, str]]) -> None:
     """Simulates all available races for all given specs.
 
-  Arguments:
-    specs {List[Tuple[str, str]]} -- List of all wanted wow_specs
+    Arguments:
+        specs {List[Tuple[str, str]]} -- List of all wanted wow_specs
 
-  Returns:
-    None --
-  """
+    Returns:
+        None --
+    """
 
     logger.debug("race_simulations start")
     for fight_style in settings.fight_styles:
@@ -782,13 +780,13 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
 def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
     """Function generates all possible talent combinations for all specs. Including empty dps talent rows. This way the dps gain of each talent can be calculated.
 
-  Arguments:
-    specs {List[Tuple[str, str]]} -- wow_class, wow_spec
+    Arguments:
+        specs {List[Tuple[str, str]]} -- wow_class, wow_spec
 
-  Returns:
-    None -- [description]
-  Creates json result files.
-  """
+    Returns:
+        None -- [description]
+    Creates json result files.
+    """
 
     logger.debug("talent_worth_simulations start")
 
