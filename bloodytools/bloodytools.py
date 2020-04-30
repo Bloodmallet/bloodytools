@@ -31,14 +31,14 @@ import re
 import sys
 import time
 
-from bloodytools import settings     # settings.py file
-from bloodytools.simulation_objects import simulation_objects as so
-from bloodytools.simulation_objects.azerite_trait_simulation import azerite_trait_simulations
-from bloodytools.simulation_objects.corruption_simulation import corruption_simulation
-from bloodytools.simulation_objects.essence_combination_simulation import essence_combination_simulation
-from bloodytools.simulation_objects.essence_simulation import essence_simulation
-from bloodytools.simulation_objects.secondary_distribution_simulation import secondary_distribution_simulation
-from bloodytools.simulation_objects.trinket_simulation import trinket_simulation
+import settings     # settings.py file
+from simulation_objects import simulation_objects as so
+from simulation_objects.azerite_trait_simulation import azerite_trait_simulations
+from simulation_objects.corruption_simulation import corruption_simulation
+from simulation_objects.essence_combination_simulation import essence_combination_simulation
+from simulation_objects.essence_simulation import essence_simulation
+from simulation_objects.secondary_distribution_simulation import secondary_distribution_simulation
+from simulation_objects.trinket_simulation import trinket_simulation
 from simc_support import wow_lib
 from typing import List, Tuple
 
