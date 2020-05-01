@@ -1,5 +1,5 @@
 # base image
-FROM alpine:latest AS builder
+FROM alpine:latest AS build
 
 ARG THREADS=1
 
@@ -9,7 +9,7 @@ RUN apk --no-cache add --virtual build_dependencies \
     g++ \
     make && \
     git clone --depth 1 https://github.com/simulationcraft/simc.git /app/SimulationCraft && \
-    make -C /app/SimulationCraft/engine optimized -j $THREADS SC_NO_NETWORKING=1 && \
+    make -C /app/SimulationCraft/engine optimized -j $THREADS SC_NO_NETWORKING=1 LTO_THIN=1 SC_NO_NETWORKING=1 OPTS+="-Os -mtune=native" && \
     apk del build_dependencies
 
 # disable ptr to reduce build size
@@ -19,9 +19,8 @@ RUN apk --no-cache add --virtual build_dependencies \
 FROM alpine:latest
 
 # get compiled simc and profiles
-COPY --from=builder /app/SimulationCraft/engine/simc /app/SimulationCraft/engine/
-COPY --from=builder /app/SimulationCraft/profiles/ /app/SimulationCraft/profiles/
-COPY --from=builder /app/SimulationCraft/.git/ /app/SimulationCraft/.git/
+COPY --from=build /app/SimulationCraft/engine/simc /app/SimulationCraft/engine/
+COPY --from=build /app/SimulationCraft/profiles/ /app/SimulationCraft/profiles/
 
 # install bloodytools
 COPY ./requirements.txt /app/bloodytools/
