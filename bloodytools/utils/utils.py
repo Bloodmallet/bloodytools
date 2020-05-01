@@ -2,6 +2,7 @@ import datetime
 import logging
 import re
 import requests
+import settings
 import time
 import urllib3
 
@@ -384,3 +385,21 @@ def request(
     response.raise_for_status()
 
     return response.json()
+
+
+class Args(object):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.sim_all = False
+        self.executable = settings.executable
+        self.profileset_work_threads = settings.profileset_work_threads
+        self.threads = settings.threads
+        self.ptr = False
+        self.single_sim = ''
+        self.custom_profile = False
+        self.custom_apl = False
+        self.custom_fight_style = False
+        self.target_error = ''
+        self.raidbots = False
