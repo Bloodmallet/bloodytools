@@ -7,12 +7,10 @@ setup(
     version='1.0',
     author='Bloodmallet(EU)',
     author_email='bloodmalleteu@gmail.com',
-    dependency_links=[
-        'https://github.com/Bloodmallet/simc_support.git@master#egg=simc_support',
-    ],
     description='Allows multiple ways of automated data generation via SimulationCraft for World of Warcraft.',
     install_requires=[
         'requests',
+        'simc_support @ git+https://github.com/Bloodmallet/simc_support.git@master#egg=simc_support',
     ],
     license='GNU GENERAL PUBLIC LICENSE',
     packages=[
