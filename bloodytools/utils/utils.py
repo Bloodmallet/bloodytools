@@ -392,14 +392,15 @@ class Args(object):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.sim_all = False
-        self.executable = settings.executable
-        self.profileset_work_threads = settings.profileset_work_threads
-        self.threads = settings.threads
-        self.ptr = False
-        self.single_sim = ''
         self.custom_profile = False
         self.custom_apl = False
         self.custom_fight_style = False
-        self.target_error = ''
+        self.debug = False
+        self.executable = settings.executable
+        self.profileset_work_threads = settings.profileset_work_threads
+        self.ptr = False
         self.raidbots = False
+        self.single_sim = ''
+        self.sim_all = False
+        self.target_error = ''
+        self.threads = settings.threads
