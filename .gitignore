@@ -1,26 +1,26 @@
 # locald ev env
 env/
 env38/
+# local editor
+.vscode/
+# local type checks
+.mypy_cache/
+results/*
+# sphinx autodoc documentation creation
+source/
+_static/
+build/
+__pycache__/
 
 *.pyc
 
 # local coverage results
 .coverage
 
-# local editor
-.vscode/
-
-# local type checks
-.mypy_cache/
-
-bloodytools/results/*
 *.simc
 log.txt
+error.log
 apikey.py
 
-# sphinx autodoc documentation creation
-source/
 make.bat
 Makefile
-_static/
-build/

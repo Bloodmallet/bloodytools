@@ -31,50 +31,56 @@ import re
 import sys
 import time
 
-import settings     # settings.py file
-from simulation_objects import simulation_objects as so
-from simulation_objects.azerite_trait_simulation import azerite_trait_simulations
-from simulation_objects.corruption_simulation import corruption_simulation
-from simulation_objects.essence_combination_simulation import essence_combination_simulation
-from simulation_objects.essence_simulation import essence_simulation
-from simulation_objects.secondary_distribution_simulation import secondary_distribution_simulation
-from simulation_objects.trinket_simulation import trinket_simulation
+from bloodytools import settings     # settings.py file
+from bloodytools.simulation_objects import simulation_objects as so
+from bloodytools.simulation_objects.azerite_trait_simulation import azerite_trait_simulations
+from bloodytools.simulation_objects.corruption_simulation import corruption_simulation
+from bloodytools.simulation_objects.essence_combination_simulation import essence_combination_simulation
+from bloodytools.simulation_objects.essence_simulation import essence_simulation
+from bloodytools.simulation_objects.secondary_distribution_simulation import secondary_distribution_simulation
+from bloodytools.simulation_objects.trinket_simulation import trinket_simulation
 from simc_support import wow_lib
 from typing import List, Tuple
 
 if settings.use_own_threading:
     import threading
 
-# logging to file and console
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
-# file handler
-file_handler = logging.FileHandler("log.txt", "w", encoding="utf-8")
-file_handler.setLevel(logging.DEBUG)
-file_formatter = logging.Formatter(
-    "%(asctime)s - %(filename)s / %(funcName)s:%(lineno)s - %(levelname)s - %(message)s"
-)
-file_handler.setFormatter(file_formatter)
-logger.addHandler(file_handler)
 
-# console handler
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.INFO)
-if hasattr(settings, "debug"):
-    if settings.debug:
-        console_handler.setLevel(logging.DEBUG)
-console_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-console_handler.setFormatter(console_formatter)
-logger.addHandler(console_handler)
+def logger_config():
+    # logging to file and console
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
 
-error_handler = logging.FileHandler('error.log', 'w', encoding='utf-8')
-error_handler.setLevel(logging.ERROR)
-error_formatter = logging.Formatter(
-    "%(asctime)s - %(filename)s / %(funcName)s:%(lineno)s - %(levelname)s - %(message)s"
-)
-error_handler.setFormatter(error_formatter)
-logger.addHandler(error_handler)
+    # file handler
+    file_handler = logging.FileHandler("log.txt", "w", encoding="utf-8")
+    file_handler.setLevel(logging.DEBUG)
+    file_formatter = logging.Formatter(
+        "%(asctime)s - %(filename)s / %(funcName)s:%(lineno)s - %(levelname)s - %(message)s"
+    )
+    file_handler.setFormatter(file_formatter)
+    logger.addHandler(file_handler)
+
+    # console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    if hasattr(settings, "debug"):
+        if settings.debug:
+            console_handler.setLevel(logging.DEBUG)
+    console_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    console_handler.setFormatter(console_formatter)
+    logger.addHandler(console_handler)
+
+    error_handler = logging.FileHandler('error.log', 'w', encoding='utf-8')
+    error_handler.setLevel(logging.ERROR)
+    error_formatter = logging.Formatter(
+        "%(asctime)s - %(filename)s / %(funcName)s:%(lineno)s - %(levelname)s - %(message)s"
+    )
+    error_handler.setFormatter(error_formatter)
+    logger.addHandler(error_handler)
+
+    return logger
 
 
 def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str):
@@ -972,7 +978,6 @@ def main(args: object):
     if args.debug:
         settings.debug = args.debug
         logger.setLevel(logging.DEBUG)
-        console_handler.setLevel(logging.DEBUG)
         logger.debug("Set debug mode to {}".format(settings.debug))
 
     if args.single_sim:
@@ -1253,6 +1258,7 @@ def main(args: object):
 
 if __name__ == '__main__':
     logger.debug("__main__ start")
+    logger = logger_config()
 
     settings.logger = logger
 

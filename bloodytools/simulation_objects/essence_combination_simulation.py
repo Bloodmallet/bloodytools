@@ -1,12 +1,12 @@
 import json
 import os
 
+from bloodytools.simulation_objects.simulation_objects import Simulation_Data
+from bloodytools.simulation_objects.simulation_objects import Simulation_Group
+from bloodytools.utils.utils import create_base_json_dict
+from bloodytools.utils.utils import create_basic_profile_string
 from simc_support import wow_lib
-from simulation_objects.simulation_objects import Simulation_Data
-from simulation_objects.simulation_objects import Simulation_Group
 from typing import List, Tuple
-from utils.utils import create_base_json_dict
-from utils.utils import create_basic_profile_string
 
 
 def essence_combination_simulation(settings: object) -> None:

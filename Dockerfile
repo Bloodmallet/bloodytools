@@ -40,6 +40,6 @@ RUN apk --no-cache add --virtual build_dependencies \
 
 ## set bloodytools entrypoint, this container will be usable like a command line tool
 COPY . /app/bloodytools
-WORKDIR /app/bloodytools/bloodytools
-ENTRYPOINT ["python3", "./bloodytools.py", "--executable", "../../SimulationCraft/engine/simc"]
+WORKDIR /app/bloodytools
+ENTRYPOINT ["python3", "-m", "bloodytools", "--executable", "../SimulationCraft/engine/simc"]
 CMD ["--help"]

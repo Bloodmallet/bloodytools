@@ -1,11 +1,11 @@
 import json
 import os
 
+from bloodytools.simulation_objects.simulation_objects import Simulation_Data, Simulation_Group
+from bloodytools.utils.utils import create_base_json_dict, create_basic_profile_string
 from simc_support import wow_lib
 from simc_support.game_data import Source
-from simulation_objects.simulation_objects import Simulation_Data, Simulation_Group
 from typing import List, Tuple
-from utils.utils import create_base_json_dict, create_basic_profile_string
 
 
 def trinket_simulation(settings: object) -> None:
@@ -371,6 +371,9 @@ def trinket_simulation(settings: object) -> None:
                                         except Exception:
                                             trinket[itemlevel] = trinket[itemlevel +
                                                                          5] - average_increase
+
+            if not item_dict:
+                continue
 
             with open("results/trinkets/ItemDPS.lua", "w") as f:
                 logger.debug("Print trinket lua.")

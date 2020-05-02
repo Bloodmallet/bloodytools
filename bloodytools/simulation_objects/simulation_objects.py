@@ -12,7 +12,7 @@ import uuid
 # wow game data and simc input checks
 from simc_support import simc_checks as simc_checks
 from typing import List, Union
-from utils.utils import request as r
+from bloodytools.utils.utils import request as r
 
 
 class Error(Exception):

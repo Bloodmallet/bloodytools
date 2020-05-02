@@ -2,10 +2,10 @@ import datetime
 import logging
 import re
 import requests
-import settings
 import time
 import urllib3
 
+from bloodytools import settings
 from simc_support import wow_lib
 
 logger = logging.getLogger(__name__)
