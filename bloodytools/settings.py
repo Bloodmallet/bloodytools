@@ -11,47 +11,47 @@ tier = "25"     # number or PR (PreRaid)
 wow_class_spec_list = []     # leave empty to simulate all
 # wow_class_spec_list = [("shaman", "elemental"), ("mage", "frost")] # example for a specific list
 wow_class_spec_list = [
-  ("death_knight", "blood"),
-  ("death_knight", "frost"),
-  ("death_knight", "unholy"),
-  ("demon_hunter", "havoc"),
-  ("demon_hunter", "vengeance"),
-  ("druid", "balance"),
-  ("druid", "feral"),
-  ("druid", "guardian"),
-  ("hunter", "beast_mastery"),
-  ("hunter", "marksmanship"),
-  ("hunter", "survival"),
-  ("mage", "arcane"),
-  ("mage", "fire"),
-  ("mage", "frost"),
-  ("monk", "brewmaster"),
-  ("monk", "windwalker"),
-  ("paladin", "protection"),
-  ("paladin", "retribution"),
-  ("priest", "discipline"),
-  ("priest", "holy"),
-  ("priest", "shadow"),
-  ("rogue", "assassination"),
-  ("rogue", "outlaw"),
-  ("rogue", "subtlety"),
-  ("shaman", "elemental"),
-  ("shaman", "enhancement"),
-  ("shaman", "restoration"),
-  ("warlock", "affliction"),
-  ("warlock", "demonology"),
-  ("warlock", "destruction"),
-  ("warrior", "arms"),
-  ("warrior", "fury"),
-  ("warrior", "protection"),
+    ("death_knight", "blood"),
+    ("death_knight", "frost"),
+    ("death_knight", "unholy"),
+    ("demon_hunter", "havoc"),
+    ("demon_hunter", "vengeance"),
+    ("druid", "balance"),
+    ("druid", "feral"),
+    ("druid", "guardian"),
+    ("hunter", "beast_mastery"),
+    ("hunter", "marksmanship"),
+    ("hunter", "survival"),
+    ("mage", "arcane"),
+    ("mage", "fire"),
+    ("mage", "frost"),
+    ("monk", "brewmaster"),
+    ("monk", "windwalker"),
+    ("paladin", "protection"),
+    ("paladin", "retribution"),
+    ("priest", "discipline"),
+    ("priest", "holy"),
+    ("priest", "shadow"),
+    ("rogue", "assassination"),
+    ("rogue", "outlaw"),
+    ("rogue", "subtlety"),
+    ("shaman", "elemental"),
+    ("shaman", "enhancement"),
+    ("shaman", "restoration"),
+    ("warlock", "affliction"),
+    ("warlock", "demonology"),
+    ("warlock", "destruction"),
+    ("warrior", "arms"),
+    ("warrior", "fury"),
+    ("warrior", "protection"),
 ]
 
 ###############################################################################
 # SimulationCraft
-executable = "../../SimulationCraft/simc.exe"
+executable = "../SimulationCraft/simc.exe"
 fight_styles = [
-  "patchwerk",
-  "hecticaddcleave",
+    "patchwerk",
+    "hecticaddcleave",
      #"beastlord"
 ]
 iterations = "20000"     # sane value, should be enough for 0.2
@@ -59,9 +59,9 @@ profileset_work_threads = "2"
 ptr = "0"
 default_actions = "1"
 target_error = {
-  "patchwerk": "0.1",
-  "hecticaddcleave": "0.2",
-  "beastlord": "0.2",
+    "patchwerk": "0.1",
+    "hecticaddcleave": "0.2",
+    "beastlord": "0.2",
 }
 threads = "8"
 
@@ -100,10 +100,10 @@ write_humanreadable_secondary_distribution_file = False
 # Azerite traits
 enable_azerite_trait_simulations = True
 azerite_trait_ilevels = [ # determines the itemlevel used to sim the traits
-  "430",
-  "445",
-  "460",
-  "475",
+    "430",
+    "445",
+    "460",
+    "475",
 ] # ascending order required
 
 ###############################################################################
@@ -134,8 +134,8 @@ debug = False
 use_own_threading = False
 use_raidbots = False
 try:
-  from apikey import apikey
+    from bloodytools.apikey import apikey
 except Exception:
-  if use_raidbots:
-    exit("Error: apikey required! Add your apikey to apikey.py")
-  pass
+    if use_raidbots:
+        exit("Error: apikey required! Add your apikey to apikey.py")
+    pass
