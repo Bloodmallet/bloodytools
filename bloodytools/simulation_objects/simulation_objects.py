@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import json
 import os
 import requests
 import subprocess
@@ -544,7 +545,8 @@ class Simulation_Group():
 
     def __init__(
         self,
-        simulation_instance: Union[Simulation_Data, List[Simulation_Data]] = None,
+        simulation_instance: Union[Simulation_Data,
+                                   List[Simulation_Data]] = None,
         name: str = "",
         threads: str = "",
         profileset_work_threads: str = "",
@@ -556,6 +558,7 @@ class Simulation_Group():
 
         self.name = name
         self.filename: str = ""
+        self.json_filename: str = None
         self.threads = threads
         # simulationcrafts own multithreading
         self.profileset_work_threads = profileset_work_threads
@@ -687,23 +690,24 @@ class Simulation_Group():
                         .format(self.filename)
                     )
                 else:
-                    self.filename = str(uuid.uuid4()) + ".simc"
+                    # temporary file names
+                    self.uuid = str(uuid.uuid4())
+                    self.filename = "{}.simc".format(self.uuid)
+                    self.json_filename = "{}.json".format(self.uuid)
 
-                    # if somehow the random naming function created the same name twice
-                    if os.path.isfile(self.filename):
-                        self.logger.info(
-                            "Somehow the random filename generator generated a name ('{}') that is already on use."
-                            .format(self.filename)
-                        )
-                        self.filename = str(uuid.uuid4()) + ".simc"
                     # write arguments to file
                     with open(self.filename, "w") as f:
                         # write the equal values to file
+                        f.write("json={}\n".format(self.json_filename))
                         f.write(
                             "calculate_scale_factors={}\n".format(
                                 self.profiles[0].calculate_scale_factors
                             )
                         )
+                        f.write("profileset_metric={}\n".format(
+                            ",".join(["dps"])))
+                        f.write("calculate_scale_factors={}\n".format(
+                            self.profiles[0].calculate_scale_factors))
                         f.write("default_actions={}\n".format(
                             self.profiles[0].default_actions))
                         f.write("default_skill={}\n".format(
@@ -717,20 +721,15 @@ class Simulation_Group():
                         f.write("iterations={}\n".format(
                             self.profiles[0].iterations))
                         f.write("log={}\n".format(self.profiles[0].log))
-                        f.write(
-                            "optimize_expressions={}\n".format(
-                                self.profiles[0].optimize_expressions
-                            )
-                        )
+                        f.write("optimize_expressions={}\n".format(
+                            self.profiles[0].optimize_expressions))
                         if int(self.profiles[0].ptr) == 1:
                             f.write("ptr={}\n".format(self.profiles[0].ptr))
                         f.write("target_error={}\n".format(
                             self.profiles[0].target_error))
                         f.write("threads={}\n".format(self.threads))
-                        f.write(
-                            "profileset_work_threads={}\n".format(
-                                self.profileset_work_threads)
-                        )
+                        f.write("profileset_work_threads={}\n".format(
+                            self.profileset_work_threads))
 
                         # write all specific arguments to file
                         for profile in self.profiles:
@@ -851,35 +850,14 @@ class Simulation_Group():
                     baseline_result = False
                     profileset_results = False
 
-                    for line in self.simulation_output.splitlines():
-                        # allow baseline dmg grab only in the dps listing, not from warnings
-                        if "DPS Ranking:" in line:
-                            baseline_result = True
-                        # needs this check to prevent grabbing the boss dps
-                        if (
-                            self.profiles[0].name in line or ' baseline' in line
-                        ) and baseline_result:
-                            self.logger.debug(line)
-                            self.profiles[0].set_dps(
-                                line.split()[0], external=False)
-                            baseline_result = False
+                    # parse results from generated json file
+                    with open(self.json_filename, 'r') as json_file:
+                        json_data = json.load(json_file)
+                        self.set_json_data(json_data)
 
-                        if "Profilesets (median Damage per Second):" in line:
-                            profileset_results = True
-                            continue
-
-                        # prevents false positive from Waiting -data
-                        if "" == line and profileset_results:
-                            profileset_results = False
-                            continue
-
-                        # get dps values of the profileset-simulations
-                        if profileset_results:
-                            for profile in self.profiles:
-                                # need this space to catch the difference of multiple profiles like 'tauren' and 'highmountain_tauren', "Tauren" and "Highmountain Tauren"
-                                if line.split(" : ")[1] == profile.name:
-                                    profile.set_dps(
-                                        line.split()[0], external=False)
+                    # remove json file after parsing
+                    if self.json_filename is not None:
+                        os.remove(self.json_filename)
 
             else:
                 raise NotSetYetError(
@@ -1147,17 +1125,7 @@ class Simulation_Group():
                         simc_hash = False
 
                     # set basic profile dps
-                    self.logger.debug("Setting dps for baseprofile.")
-                    self.set_dps_of(
-                        raidbots_data["sim"]["players"][0]["name"],
-                        raidbots_data["sim"]["players"][0]["collected_data"]["dps"]["mean"]
-                    )
-                    self.logger.debug("Set dps for baseprofile.")
-
-                    for profile in raidbots_data["sim"]["profilesets"]["results"]:
-                        self.logger.debug(
-                            "Setting dps for {}".format(profile["name"]))
-                        self.set_dps_of(profile["name"], profile["mean"])
+                    self.set_json_data(raidbots_data)
 
             else:
                 raise NotSetYetError(
@@ -1175,6 +1143,23 @@ class Simulation_Group():
             return False
 
         return simc_hash
+
+    def set_json_data(self, data: dict) -> None:
+        """Set simulation results from json report to profiles.
+
+        Arguments:
+          data {dict} -- json data from SimulationCraft json report
+        """
+        self.logger.debug("Setting dps for baseprofile.")
+        self.set_dps_of(
+            data["sim"]["players"][0]["name"],
+            data["sim"]["players"][0]["collected_data"]["dps"]["mean"]
+        )
+        self.logger.debug("Set dps for baseprofile.")
+
+        for profile in data["sim"]["profilesets"]["results"]:
+            self.logger.debug("Setting dps for {}".format(profile["name"]))
+            self.set_dps_of(profile["name"], profile["mean"])
 
     def add(self, simulation_instance: Simulation_Data) -> bool:
         """Add another simulation_instance object to the group.
