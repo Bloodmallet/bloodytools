@@ -31,7 +31,8 @@ def corruption_simulation(settings: object) -> None:
             # check if the baseline profile does exist
             try:
                 with open(
-                    create_basic_profile_string(wow_class, wow_spec, settings.tier, settings), 'r'
+                    create_basic_profile_string(
+                        wow_class, wow_spec, settings.tier, settings), 'r'
                 ) as f:
                     pass
             except FileNotFoundError:
@@ -101,7 +102,8 @@ def corruption_simulation(settings: object) -> None:
                     fight_style=fight_style,
                     profile=wanted_data['profile'],
                     simc_arguments=[
-                        'bfa.surging_vitality_damage_taken_period=1',     # enables Surging Vitality to try and trigger each second
+                        # enables Surging Vitality to try and trigger each second
+                        'bfa.surging_vitality_damage_taken_period=1',
                         hands_string + f',ilevel={itemlevel}',
                     ],
                     target_error=settings.target_error[fight_style],
@@ -124,7 +126,8 @@ def corruption_simulation(settings: object) -> None:
                         with open('custom_fight_style.txt') as f:
                             custom_fight_style = f.read()
                     if custom_fight_style:
-                        simulation_data.simc_arguments.append(custom_fight_style)
+                        simulation_data.simc_arguments.append(
+                            custom_fight_style)
                 simulation_group.add(simulation_data)
 
             # create profiles for all corruptions and their ranks/level
@@ -145,9 +148,11 @@ def corruption_simulation(settings: object) -> None:
                             simulation_data = None
 
                             simulation_data = Simulation_Data(
-                                name='{}_{}_{}'.format(corruption, rank, itemlevel),
+                                name='{}_{}_{}'.format(
+                                    corruption, rank, itemlevel),
                                 fight_style=fight_style,
-                                simc_arguments=[f"{hands_string}/{bonus_id},ilevel={itemlevel}"],
+                                simc_arguments=[
+                                    f"{hands_string}/{bonus_id},ilevel={itemlevel}"],
                                 target_error=settings.target_error[fight_style],
                                 ptr=settings.ptr,
                                 default_actions=settings.default_actions,
@@ -201,7 +206,8 @@ def corruption_simulation(settings: object) -> None:
             )
             try:
                 if settings.use_raidbots and settings.apikey:
-                    settings.simc_hash = simulation_group.simulate_with_raidbots(settings.apikey)
+                    settings.simc_hash = simulation_group.simulate_with_raidbots(
+                        settings.apikey)
                 else:
                     simulation_group.simulate()
             except Exception as e:
@@ -219,9 +225,11 @@ def corruption_simulation(settings: object) -> None:
                 )
 
             for profile in simulation_group.profiles:
-                logger.debug("Profile '{}' DPS: {}".format(profile.name, profile.get_dps()))
+                logger.debug("Profile '{}' DPS: {}".format(
+                    profile.name, profile.get_dps()))
 
-            logger.debug("Created base dict for json export. {}".format(wanted_data))
+            logger.debug(
+                "Created base dict for json export. {}".format(wanted_data))
 
             if not 'data' in wanted_data:
                 wanted_data['data'] = {}
@@ -233,9 +241,11 @@ def corruption_simulation(settings: object) -> None:
                     if not 'baseline' in wanted_data['data'].keys():
                         wanted_data['data']['baseline'] = {}
 
-                    wanted_data['data']['baseline'][profile.name.split('_')[1]] = profile.get_dps()
+                    wanted_data['data']['baseline'][profile.name.split('_')[
+                        1]] = profile.get_dps()
                     logger.debug(
-                        "Added '{}' with {} dps to json.".format(profile.name, profile.get_dps())
+                        "Added '{}' with {} dps to json.".format(
+                            profile.name, profile.get_dps())
                     )
                     continue
 
@@ -257,7 +267,8 @@ def corruption_simulation(settings: object) -> None:
                         '+'
                     )[1]
                 except IndexError:
-                    corruption_full_name: str = corruption_name + '_' + corruption_rank + f' ({corruption_rating})'
+                    corruption_full_name: str = corruption_name + '_' + \
+                        corruption_rank + f' ({corruption_rating})'
 
                 # create missing subdict for dps
                 if not corruption_full_name in wanted_data['data']:
@@ -304,7 +315,8 @@ def corruption_simulation(settings: object) -> None:
                 highest_ilevel = sorted(
                     wanted_data['data'][corruption_name].keys(), reverse=True
                 )[0]
-                rank = corruption_name.split('_')[1].split('+')[0].split(' (')[0]
+                rank = corruption_name.split(
+                    '_')[1].split('+')[0].split(' (')[0]
 
                 # append highest itemlevel of corruption to sortable dps list
                 tmp_list.append((
@@ -342,16 +354,19 @@ def corruption_simulation(settings: object) -> None:
 
             tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
             logger.debug("Sorted tmp_list: {}".format(tmp_list))
-            logger.info("Corruption {} won with {} dps.".format(tmp_list[0][0], tmp_list[0][1]))
+            logger.info("Corruption {} won with {} dps.".format(
+                tmp_list[0][0], tmp_list[0][1]))
 
             wanted_data["sorted_data_keys"] = []
             for corruption_name, _ in tmp_list:
                 wanted_data["sorted_data_keys"].append(corruption_name)
 
-            tmp_list_2 = sorted(tmp_list_2, key=lambda item: item[1], reverse=True)
+            tmp_list_2 = sorted(
+                tmp_list_2, key=lambda item: item[1], reverse=True)
             logger.debug("Sorted tmp_list_2: {}".format(tmp_list_2))
             logger.info(
-                "Corruption {} won with {} dps.".format(tmp_list_2[0][0], tmp_list_2[0][1])
+                "Corruption {} won with {} dps.".format(
+                    tmp_list_2[0][0], tmp_list_2[0][1])
             )
 
             wanted_data["sorted_data_keys_2"] = []
@@ -376,7 +391,8 @@ def corruption_simulation(settings: object) -> None:
                 encoding="utf-8"
             ) as f:
                 logger.debug("Print corruption json.")
-                f.write(json.dumps(wanted_data, sort_keys=True, indent=4, ensure_ascii=False))
+                f.write(json.dumps(wanted_data, sort_keys=True,
+                                   indent=4, ensure_ascii=False))
                 logger.debug("Printed corruption json.")
 
     logger.debug("corruption_simulation ended")

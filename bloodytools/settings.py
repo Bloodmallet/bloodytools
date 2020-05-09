@@ -52,7 +52,7 @@ executable = "../SimulationCraft/simc.exe"
 fight_styles = [
     "patchwerk",
     "hecticaddcleave",
-     #"beastlord"
+    # "beastlord"
 ]
 iterations = "20000"     # sane value, should be enough for 0.2
 profileset_work_threads = "2"
@@ -67,7 +67,8 @@ threads = "8"
 
 custom_apl = False
 custom_fight_style = False
-custom_profile = False     # custom profile overrides standard profile, standard profile is still used as baseline
+# custom profile overrides standard profile, standard profile is still used as baseline
+custom_profile = False
 
 ###############################################################################
 # Race simulations
@@ -76,16 +77,19 @@ enable_race_simulations = True
 ###############################################################################
 # Trinket simulations
 enable_trinket_simulations = True
-ilevel_step = 15     # ilevel_step is used to determine the size of each itemlevel step taken to max_ilevel
+# ilevel_step is used to determine the size of each itemlevel step taken to max_ilevel
+ilevel_step = 15
 max_ilevel = 475     # max_itemlevel determines the upper border of steps taken
-min_ilevel = 430     # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
+# min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
+min_ilevel = 430
 # example: min 300, max 325, step 10, resulting simulated ilevels: 300, 310, 320
 lua_trinket_export = True
 
 ###############################################################################
 # Secondary distributions
 enable_secondary_distributions_simulations = True
-secondary_distributions_step_size = 10     # in percent of full available secondary sum
+# in percent of full available secondary sum
+secondary_distributions_step_size = 10
 talent_list = {
 }     # if no list is provided for a class-spec, all dps talent combinations will be run. If you want to only sim the base profiles, set 'talent_permutations' to False
 # talent_list = {
@@ -93,18 +97,19 @@ talent_list = {
 #     "2301022",
 #   ],
 # }  # example for a talent list for Elemental Shamans
-talent_permutations = False     # set to False, to sim only the base profile talent combinations
+# set to False, to sim only the base profile talent combinations
+talent_permutations = False
 write_humanreadable_secondary_distribution_file = False
 
 ###############################################################################
 # Azerite traits
 enable_azerite_trait_simulations = True
-azerite_trait_ilevels = [ # determines the itemlevel used to sim the traits
+azerite_trait_ilevels = [  # determines the itemlevel used to sim the traits
     "430",
     "445",
     "460",
     "475",
-] # ascending order required
+]  # ascending order required
 
 ###############################################################################
 # Gear path

@@ -1,5 +1,5 @@
 # mypy
-yapf
+autopep8
 # necessary for coverage check
 coveralls
 -e git+https://github.com/Bloodmallet/bloodytests.git@develop#egg=bloodytests

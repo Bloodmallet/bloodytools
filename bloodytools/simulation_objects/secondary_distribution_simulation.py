@@ -33,7 +33,8 @@ def secondary_distribution_simulation(settings: object) -> None:
                     "secondary_distributions", wow_class, wow_spec, fight_style, settings
                 )
             except FileNotFoundError:
-                logger.debug(f'Profile file not found. Skipping {wow_spec} {wow_class}.')
+                logger.debug(
+                    f'Profile file not found. Skipping {wow_spec} {wow_class}.')
                 continue
 
             talent_combinations = None
@@ -41,27 +42,34 @@ def secondary_distribution_simulation(settings: object) -> None:
                 talent_combinations = [result_dict['profile']['talents']]
             # if no talent list is provided, simulate all
             elif (wow_class, wow_spec) not in settings.talent_list:
-                talent_combinations = get_talent_combinations(wow_class, wow_spec)
+                talent_combinations = get_talent_combinations(
+                    wow_class, wow_spec)
             else:
                 # if talent list is provided, sim that
-                talent_combinations = settings.talent_list[(wow_class, wow_spec)]
+                talent_combinations = settings.talent_list[(
+                    wow_class, wow_spec)]
 
             secondary_amount = 0
 
             # get secondary sum from profile
             try:
                 with open(
-                    create_basic_profile_string(wow_class, wow_spec, settings.tier, settings), 'r'
+                    create_basic_profile_string(
+                        wow_class, wow_spec, settings.tier, settings), 'r'
                 ) as f:
                     for line in f:
                         if "gear_crit_rating=" in line:
-                            secondary_amount += int(line.split("=")[1].split()[0])
+                            secondary_amount += int(line.split("=")
+                                                    [1].split()[0])
                         elif "gear_haste_rating=" in line:
-                            secondary_amount += int(line.split("=")[1].split()[0])
+                            secondary_amount += int(line.split("=")
+                                                    [1].split()[0])
                         elif "gear_mastery_rating=" in line:
-                            secondary_amount += int(line.split("=")[1].split()[0])
+                            secondary_amount += int(line.split("=")
+                                                    [1].split()[0])
                         elif "gear_versatility_rating=" in line:
-                            secondary_amount += int(line.split("=")[1].split()[0])
+                            secondary_amount += int(line.split("=")
+                                                    [1].split()[0])
             except FileNotFoundError:
                 logger.warning(
                     "{} {} profile not found. Skipping.".format(
@@ -74,25 +82,32 @@ def secondary_distribution_simulation(settings: object) -> None:
                     with open('custom_profile', 'r') as f:
                         for line in f:
                             if "gear_crit_rating=" in line:
-                                c_secondary_amount += int(line.split("=")[1].split()[0])
+                                c_secondary_amount += int(line.split("=")
+                                                          [1].split()[0])
                             elif "gear_haste_rating=" in line:
-                                c_secondary_amount += int(line.split("=")[1].split()[0])
+                                c_secondary_amount += int(line.split("=")
+                                                          [1].split()[0])
                             elif "gear_mastery_rating=" in line:
-                                c_secondary_amount += int(line.split("=")[1].split()[0])
+                                c_secondary_amount += int(line.split("=")
+                                                          [1].split()[0])
                             elif "gear_versatility_rating=" in line:
-                                c_secondary_amount += int(line.split("=")[1].split()[0])
+                                c_secondary_amount += int(line.split("=")
+                                                          [1].split()[0])
                             elif 'secondary_sum=' in line:
-                                c_secondary_amount = int(line.split("=")[1].split()[0])
+                                c_secondary_amount = int(
+                                    line.split("=")[1].split()[0])
                                 logger.debug(
                                     "Found 'secondary_sum= in custom_profile. Using that value."
                                 )
                                 break
                 except FileNotFoundError:
-                    logger.warning("Custom profile not found. Using base profile.")
+                    logger.warning(
+                        "Custom profile not found. Using base profile.")
                 if c_secondary_amount > 0:
                     secondary_amount = c_secondary_amount
 
-            logger.debug("Extracted secondary_amount: {}".format(secondary_amount))
+            logger.debug(
+                "Extracted secondary_amount: {}".format(secondary_amount))
 
             # input generation
             distribution_multipliers = []
@@ -109,7 +124,8 @@ def secondary_distribution_simulation(settings: object) -> None:
                                 distribution_multipliers.append((c, h, m, v))
 
             logger.debug(
-                "'{}' different distributions generated.".format(len(distribution_multipliers))
+                "'{}' different distributions generated.".format(
+                    len(distribution_multipliers))
             )
 
             result_dict["sorted_data_keys"] = {}
@@ -140,16 +156,20 @@ def secondary_distribution_simulation(settings: object) -> None:
                             profile=result_dict['profile'],
                             simc_arguments=[
                                 "gear_crit_rating={}".format(
-                                    int(secondary_amount * (distribution_multiplier[0] / 100))
+                                    int(secondary_amount *
+                                        (distribution_multiplier[0] / 100))
                                 ),
                                 "gear_haste_rating={}".format(
-                                    int(secondary_amount * (distribution_multiplier[1] / 100))
+                                    int(secondary_amount *
+                                        (distribution_multiplier[1] / 100))
                                 ),
                                 "gear_mastery_rating={}".format(
-                                    int(secondary_amount * (distribution_multiplier[2] / 100))
+                                    int(secondary_amount *
+                                        (distribution_multiplier[2] / 100))
                                 ),
                                 "gear_versatility_rating={}".format(
-                                    int(secondary_amount * (distribution_multiplier[3] / 100))
+                                    int(secondary_amount *
+                                        (distribution_multiplier[3] / 100))
                                 ),
                             ],
                             ptr=settings.ptr,
@@ -190,16 +210,20 @@ def secondary_distribution_simulation(settings: object) -> None:
                                 logger=logger,
                                 simc_arguments=[
                                     "gear_crit_rating={}".format(
-                                        int(secondary_amount * (distribution_multiplier[0] / 100))
+                                        int(secondary_amount *
+                                            (distribution_multiplier[0] / 100))
                                     ),
                                     "gear_haste_rating={}".format(
-                                        int(secondary_amount * (distribution_multiplier[1] / 100))
+                                        int(secondary_amount *
+                                            (distribution_multiplier[1] / 100))
                                     ),
                                     "gear_mastery_rating={}".format(
-                                        int(secondary_amount * (distribution_multiplier[2] / 100))
+                                        int(secondary_amount *
+                                            (distribution_multiplier[2] / 100))
                                     ),
                                     "gear_versatility_rating={}".format(
-                                        int(secondary_amount * (distribution_multiplier[3] / 100))
+                                        int(secondary_amount *
+                                            (distribution_multiplier[3] / 100))
                                     ),
                                 ],
                                 ptr=settings.ptr,
@@ -237,7 +261,8 @@ def secondary_distribution_simulation(settings: object) -> None:
                 if settings.debug:
                     logger.debug("Talent combination: " + talent_combination)
                     for profile in simulation_group.profiles:
-                        logger.debug("  {}   {}".format(profile.name, profile.get_dps()))
+                        logger.debug("  {}   {}".format(
+                            profile.name, profile.get_dps()))
 
                 # create sorted list and add data to the result_dict
                 stat_dps_list = []
@@ -245,10 +270,12 @@ def secondary_distribution_simulation(settings: object) -> None:
 
                 for profile in simulation_group.profiles:
                     stat_dps_list.append((profile.name, profile.get_dps()))
-                    result_dict["data"][talent_combination][profile.name] = profile.get_dps()
+                    result_dict["data"][talent_combination][profile.name] = profile.get_dps(
+                    )
 
                 # sort list
-                stat_dps_list = sorted(stat_dps_list, key=lambda item: item[1], reverse=True)
+                stat_dps_list = sorted(
+                    stat_dps_list, key=lambda item: item[1], reverse=True)
                 logger.info(
                     "Stat distribution {} of talent combination {} won with {} dps.".format(
                         stat_dps_list[0][0], talent_combination, stat_dps_list[0][1]
@@ -294,14 +321,16 @@ def secondary_distribution_simulation(settings: object) -> None:
                         # c_h_m_v dps dps%
                         logger.debug(
                             "{}   {}  {}%".format(
-                                item[0], item[1], round(item[1] * 100 / stat_dps_list[0][1], 2)
+                                item[0], item[1], round(
+                                    item[1] * 100 / stat_dps_list[0][1], 2)
                             )
                         )
                         if settings.write_humanreadable_secondary_distribution_file:
                             f.write(
                                 "  {}   {}  {}%\n".format(
                                     item[0], item[1],
-                                    round(item[1] * 100 / stat_dps_list[0][1], 2)
+                                    round(item[1] * 100 /
+                                          stat_dps_list[0][1], 2)
                                 )
                             )
 

@@ -30,7 +30,8 @@ def essence_simulation(settings: object) -> None:
             # check whether the baseline profile does exist
             try:
                 with open(
-                    create_basic_profile_string(wow_class, wow_spec, settings.tier, settings), 'r'
+                    create_basic_profile_string(
+                        wow_class, wow_spec, settings.tier, settings), 'r'
                 ) as f:
                     pass
             except FileNotFoundError:
@@ -46,7 +47,8 @@ def essence_simulation(settings: object) -> None:
                 "Essences", wow_class, wow_spec, fight_style, settings
             )
 
-            essences = wow_lib.get_essences(wow_class.title(), wow_spec.title())
+            essences = wow_lib.get_essences(
+                wow_class.title(), wow_spec.title())
             simulation_group = Simulation_Group(
                 name="essences",
                 threads=settings.threads,
@@ -95,10 +97,12 @@ def essence_simulation(settings: object) -> None:
                         simulation_data = None
 
                         simulation_data = Simulation_Data(
-                            name='{}_{}_{}'.format(essence_id, rank, essence_type),
+                            name='{}_{}_{}'.format(
+                                essence_id, rank, essence_type),
                             fight_style=fight_style,
                             simc_arguments=[
-                                "azerite_essences={}:{}:{}".format(essence_id, rank, essence_type)
+                                "azerite_essences={}:{}:{}".format(
+                                    essence_id, rank, essence_type)
                             ],
                             target_error=settings.target_error[fight_style],
                             ptr=settings.ptr,
@@ -119,15 +123,18 @@ def essence_simulation(settings: object) -> None:
                             special_case = None
                             special_case = simulation_data.copy()
                             special_case.name += "+3"
-                            special_case.simc_arguments.append("bfa.worldvein_allies=3")
+                            special_case.simc_arguments.append(
+                                "bfa.worldvein_allies=3")
                             simulation_group.add(special_case)
 
             logger.info(
-                "Start {} essence simulation for {} {}.".format(fight_style, wow_class, wow_spec)
+                "Start {} essence simulation for {} {}.".format(
+                    fight_style, wow_class, wow_spec)
             )
             try:
                 if settings.use_raidbots and settings.apikey:
-                    settings.simc_hash = simulation_group.simulate_with_raidbots(settings.apikey)
+                    settings.simc_hash = simulation_group.simulate_with_raidbots(
+                        settings.apikey)
                 else:
                     simulation_group.simulate()
             except Exception as e:
@@ -145,9 +152,11 @@ def essence_simulation(settings: object) -> None:
                 )
 
             for profile in simulation_group.profiles:
-                logger.debug("Profile '{}' DPS: {}".format(profile.name, profile.get_dps()))
+                logger.debug("Profile '{}' DPS: {}".format(
+                    profile.name, profile.get_dps()))
 
-            logger.debug("Created base dict for json export. {}".format(wanted_data))
+            logger.debug(
+                "Created base dict for json export. {}".format(wanted_data))
 
             if not 'data' in wanted_data:
                 wanted_data['data'] = {}
@@ -159,14 +168,17 @@ def essence_simulation(settings: object) -> None:
                     wanted_data['data'][profile.name] = {}
                     wanted_data['data'][profile.name][1] = profile.get_dps()
                     logger.debug(
-                        "Added '{}' with {} dps to json.".format(profile.name, profile.get_dps())
+                        "Added '{}' with {} dps to json.".format(
+                            profile.name, profile.get_dps())
                     )
                     continue
 
-                essence_name: str = essences[profile.name.split('_')[0]]['name']
+                essence_name: str = essences[profile.name.split('_')[
+                    0]]['name']
                 essence_id: int = int(profile.name.split('_')[0])
                 essence_rank: int = int(profile.name.split('_')[1])
-                essence_type: int = int(profile.name.split('_')[2].split('+')[0])
+                essence_type: int = int(
+                    profile.name.split('_')[2].split('+')[0])
 
                 altered_essence_name: str = essence_name
                 if essence_type == 0:
@@ -182,9 +194,11 @@ def essence_simulation(settings: object) -> None:
                 if not altered_essence_name in wanted_data['data']:
                     wanted_data['data'][altered_essence_name] = {}
 
-                wanted_data['data'][altered_essence_name][essence_rank] = profile.get_dps()
+                wanted_data['data'][altered_essence_name][essence_rank] = profile.get_dps(
+                )
                 logger.debug(
-                    "Added '{}' with {} dps to json.".format(profile.name, profile.get_dps())
+                    "Added '{}' with {} dps to json.".format(
+                        profile.name, profile.get_dps())
                 )
                 # adding spell data to dict
                 if not 'spell_ids' in wanted_data:
@@ -218,12 +232,14 @@ def essence_simulation(settings: object) -> None:
             for essence_name in wanted_data["data"]:
                 if essence_name == 'baseline':
                     continue
-                tmp_list.append((essence_name, wanted_data["data"][essence_name][3]))
+                tmp_list.append(
+                    (essence_name, wanted_data["data"][essence_name][3]))
             logger.debug("tmp_list: {}".format(tmp_list))
 
             tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
             logger.debug("Sorted tmp_list: {}".format(tmp_list))
-            logger.info("Essence {} won with {} dps.".format(tmp_list[0][0], tmp_list[0][1]))
+            logger.info("Essence {} won with {} dps.".format(
+                tmp_list[0][0], tmp_list[0][1]))
 
             wanted_data["sorted_data_keys"] = []
             for essence_name, _ in tmp_list:
@@ -259,11 +275,13 @@ def essence_simulation(settings: object) -> None:
                                     3] - wanted_data['data']['baseline'][1]
 
             for key, value in tmp_aws_dict.items():
-                azerite_weight_string += " {}={}/{},".format(key, value['major'], value['minor'])
+                azerite_weight_string += " {}={}/{},".format(
+                    key, value['major'], value['minor'])
 
             azerite_weight_string += " )"
 
-            wanted_data['azerite_weight_{}'.format(fight_style.lower())] = azerite_weight_string
+            wanted_data['azerite_weight_{}'.format(
+                fight_style.lower())] = azerite_weight_string
 
             logger.debug("Final json: {}".format(wanted_data))
 
@@ -279,7 +297,8 @@ def essence_simulation(settings: object) -> None:
                 encoding="utf-8"
             ) as f:
                 logger.debug("Print essence json.")
-                f.write(json.dumps(wanted_data, sort_keys=True, indent=4, ensure_ascii=False))
+                f.write(json.dumps(wanted_data, sort_keys=True,
+                                   indent=4, ensure_ascii=False))
                 logger.debug("Printed essence json.")
 
     logger.debug("essence_simulation ended")

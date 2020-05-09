@@ -30,7 +30,8 @@ def essence_combination_simulation(settings: object) -> None:
             # check whether the baseline profile does exist
             try:
                 with open(
-                    create_basic_profile_string(wow_class, wow_spec, settings.tier, settings), 'r'
+                    create_basic_profile_string(
+                        wow_class, wow_spec, settings.tier, settings), 'r'
                 ) as f:
                     pass
             except FileNotFoundError:
@@ -46,7 +47,8 @@ def essence_combination_simulation(settings: object) -> None:
                 "Essence Combinations", wow_class, wow_spec, fight_style, settings
             )
 
-            essences = wow_lib.get_essences(wow_class.title(), wow_spec.title())
+            essences = wow_lib.get_essences(
+                wow_class.title(), wow_spec.title())
             simulation_group = Simulation_Group(
                 name="essence_combinations",
                 threads=settings.threads,
@@ -97,7 +99,8 @@ def essence_combination_simulation(settings: object) -> None:
                     simulation_data = None
 
                     simulation_data = Simulation_Data(
-                        name='{}_{}'.format(major_essence_id, minor_essence_id),
+                        name='{}_{}'.format(
+                            major_essence_id, minor_essence_id),
                         fight_style=fight_style,
                         simc_arguments=[
                             "azerite_essences={}:{}:1/{}:{}:0".format(
@@ -123,7 +126,8 @@ def essence_combination_simulation(settings: object) -> None:
                         special_case = None
                         special_case = simulation_data.copy()
                         special_case.name += "+3"
-                        special_case.simc_arguments.append("bfa.worldvein_allies=3")
+                        special_case.simc_arguments.append(
+                            "bfa.worldvein_allies=3")
                         simulation_group.add(special_case)
 
             logger.info(
@@ -133,7 +137,8 @@ def essence_combination_simulation(settings: object) -> None:
             )
             try:
                 if settings.use_raidbots and settings.apikey:
-                    settings.simc_hash = simulation_group.simulate_with_raidbots(settings.apikey)
+                    settings.simc_hash = simulation_group.simulate_with_raidbots(
+                        settings.apikey)
                 else:
                     simulation_group.simulate()
             except Exception as e:
@@ -150,9 +155,11 @@ def essence_combination_simulation(settings: object) -> None:
                 )
 
             for profile in simulation_group.profiles:
-                logger.debug("Profile '{}' DPS: {}".format(profile.name, profile.get_dps()))
+                logger.debug("Profile '{}' DPS: {}".format(
+                    profile.name, profile.get_dps()))
 
-            logger.debug("Created base dict for json export. {}".format(wanted_data))
+            logger.debug(
+                "Created base dict for json export. {}".format(wanted_data))
 
             if not 'data' in wanted_data:
                 wanted_data['data'] = {}
@@ -163,14 +170,18 @@ def essence_combination_simulation(settings: object) -> None:
                 if profile.name == 'baseline':
                     wanted_data['data'][profile.name] = profile.get_dps()
                     logger.debug(
-                        "Added '{}' with {} dps to json.".format(profile.name, profile.get_dps())
+                        "Added '{}' with {} dps to json.".format(
+                            profile.name, profile.get_dps())
                     )
                     continue
 
                 major_essence_id: int = int(profile.name.split('_')[0])
-                major_essence_name: str = essences[str(major_essence_id)]['name']
-                minor_essence_id: int = int(profile.name.split('_')[1].split('+')[0])
-                minor_essence_name: str = essences[str(minor_essence_id)]['name']
+                major_essence_name: str = essences[str(
+                    major_essence_id)]['name']
+                minor_essence_id: int = int(
+                    profile.name.split('_')[1].split('+')[0])
+                minor_essence_name: str = essences[str(
+                    minor_essence_id)]['name']
 
                 full_name = major_essence_name + " +" + minor_essence_name + " minor"
 
@@ -222,12 +233,14 @@ def essence_combination_simulation(settings: object) -> None:
             for essence_name in wanted_data["data"]:
                 if essence_name == 'baseline':
                     continue
-                tmp_list.append((essence_name, wanted_data["data"][essence_name]))
+                tmp_list.append(
+                    (essence_name, wanted_data["data"][essence_name]))
             logger.debug("tmp_list: {}".format(tmp_list))
 
             tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
             logger.debug("Sorted tmp_list: {}".format(tmp_list))
-            logger.info("Essence {} won with {} dps.".format(tmp_list[0][0], tmp_list[0][1]))
+            logger.info("Essence {} won with {} dps.".format(
+                tmp_list[0][0], tmp_list[0][1]))
 
             wanted_data["sorted_data_keys"] = []
             for essence_name, _ in tmp_list:
@@ -252,7 +265,8 @@ def essence_combination_simulation(settings: object) -> None:
                 encoding="utf-8"
             ) as f:
                 logger.debug("Print essence combinations json.")
-                f.write(json.dumps(wanted_data, sort_keys=True, indent=4, ensure_ascii=False))
+                f.write(json.dumps(wanted_data, sort_keys=True,
+                                   indent=4, ensure_ascii=False))
                 logger.debug("Printed essence combinations json.")
 
     logger.debug("essence_combination_simulation ended")

@@ -42,12 +42,15 @@ def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str, settin
 
     basis_profile_string += "profiles/"
     if tier == "PR":
-        basis_profile_string += "PreRaids/PR_{}_{}".format(wow_class.title(), wow_spec.title())
+        basis_profile_string += "PreRaids/PR_{}_{}".format(
+            wow_class.title(), wow_spec.title())
     else:
-        basis_profile_string += "Tier{}/T{}_{}_{}".format(tier, tier, wow_class, wow_spec).title()
+        basis_profile_string += "Tier{}/T{}_{}_{}".format(
+            tier, tier, wow_class, wow_spec).title()
     basis_profile_string += ".simc"
 
-    logger.debug("Created basis_profile_string '{}'.".format(basis_profile_string))
+    logger.debug("Created basis_profile_string '{}'.".format(
+        basis_profile_string))
     logger.debug("create_basic_profile_string ended")
     return basis_profile_string
 
@@ -106,7 +109,8 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     ]
     pattern_slots = {}
     for element in item_slots:
-        pattern_slots[element] = re.compile('^{}=([a-z0-9_=,/:.]*)$'.format(element))
+        pattern_slots[element] = re.compile(
+            '^{}=([a-z0-9_=,/:.]*)$'.format(element))
 
     # prepare regex for item defining attributes
     item_elements = [
@@ -120,7 +124,8 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     pattern_element = {}
     # don't recompile this for each slot
     for element in item_elements:
-        pattern_element[element] = re.compile(',{}=([a-z0-9_/:]*)'.format(element))
+        pattern_element[element] = re.compile(
+            ',{}=([a-z0-9_/:]*)'.format(element))
 
     # prepare regex for character defining information. like spec
     character_specifics = [
@@ -134,7 +139,8 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     ]
     pattern_specifics = {}
     for element in character_specifics:
-        pattern_specifics[element] = re.compile('^{}=([a-z0-9_./:]*)$'.format(element))
+        pattern_specifics[element] = re.compile(
+            '^{}=([a-z0-9_./:]*)$'.format(element))
 
     with open(path, 'r') as f:
         for line in f:
@@ -167,7 +173,8 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
                     for element in item_elements:
                         new_matches = pattern_element[element].search(new_line)
                         if new_matches:
-                            profile['items'][slot][element] = new_matches.group(1)
+                            profile['items'][slot][element] = new_matches.group(
+                                1)
                             # TODO: remove after some time (webfront-end needs to be updated)
                             if not slot in profile:
                                 profile[slot] = {}
@@ -195,7 +202,8 @@ def create_base_json_dict(
 
     timestamp = pretty_timestamp()
 
-    profile_location = create_basic_profile_string(wow_class, wow_spec, settings.tier, settings)
+    profile_location = create_basic_profile_string(
+        wow_class, wow_spec, settings.tier, settings)
 
     profile = extract_profile(profile_location, wow_class)
 
@@ -203,7 +211,9 @@ def create_base_json_dict(
         profile = extract_profile('custom_profile.txt', wow_class, profile)
 
     # spike the export data with talent data
-    talent_data = wow_lib.get_talent_dict(wow_class, wow_spec, settings.ptr == "1")
+    talent_data = wow_lib.get_talent_dict(
+        wow_class, wow_spec, settings.ptr == "1"
+    )
 
     # add class/ id number
     class_id = wow_lib.get_class_id(wow_class)
@@ -224,7 +234,7 @@ def create_base_json_dict(
                 wow_class=wow_class.title().replace("_", " "),
                 wow_spec=wow_spec.title().replace("_", " "),
                 fight_style=fight_style.title()
-            ),
+        ),
         "subtitle": subtitle,
         "simc_settings": {
             "tier": settings.tier,
@@ -233,9 +243,9 @@ def create_base_json_dict(
             "target_error": settings.target_error[fight_style],
             "ptr": settings.ptr,
             "simc_hash": settings.simc_hash,
-     # deprecated
+            # deprecated
             "class": wow_class,
-     # deprecated
+            # deprecated
             "spec": wow_spec
         },
         "data": {},

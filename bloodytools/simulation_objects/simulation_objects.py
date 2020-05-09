@@ -131,7 +131,8 @@ class Simulation_Data():
         if fight_style == "custom" or simc_checks.FightStyle().is_fight_style(fight_style):
             self.fight_style = fight_style
         else:
-            self.logger.warning("{} -- Using default value instead.".format(fight_style))
+            self.logger.warning(
+                "{} -- Using default value instead.".format(fight_style))
             self.fight_style = "patchwerk"
         # simc setting to enable/diable the fixed fight length
         if fixed_time == "0" or fixed_time == "1":
@@ -188,10 +189,12 @@ class Simulation_Data():
             character = []
             for name in profile['character']:
                 if name != 'class':
-                    character.append("{}={}".format(name, profile['character'][name]))
+                    character.append("{}={}".format(
+                        name, profile['character'][name]))
                 else:
                     character.append(
-                        "{}=baseline".format(profile['character'][name].replace("_", ""))
+                        "{}=baseline".format(
+                            profile['character'][name].replace("_", ""))
                     )
 
             items = []
@@ -325,7 +328,8 @@ class Simulation_Data():
             self.dps = int(float(dps))
         except Exception as e:
             raise e
-        self.logger.debug("Set DPS of profile '{}' to {}.".format(self.name, self.get_dps()))
+        self.logger.debug("Set DPS of profile '{}' to {}.".format(
+            self.name, self.get_dps()))
 
     def get_avg(self, simulation_instance: 'simulation_data') -> int:
         """Get the average between to the parent and given simulation_instance.
@@ -374,7 +378,8 @@ class Simulation_Data():
             self.full_report = report
         else:
             raise TypeError(
-                "Report of type '{}'' found but string was expected.".format(type(report))
+                "Report of type '{}'' found but string was expected.".format(
+                    type(report))
             )
 
     def set_simulation_end_time(self) -> None:
@@ -644,7 +649,8 @@ class Simulation_Group():
             # remove previously printed line
             print(" " * output_length, end="\r", flush=True)
             # write current output
-            print("{}".format(print_line), end='\r', flush=True)     # kill line break
+            print("{}".format(print_line), end='\r',
+                  flush=True)     # kill line break
 
     def simulate(self) -> bool:
         """Triggers the simulation of all profiles.
@@ -671,7 +677,8 @@ class Simulation_Group():
 
                 # check for a path to executable
                 if not self.executable:
-                    raise ValueError("No path_to_executable was set. Simulation can't start.")
+                    raise ValueError(
+                        "No path_to_executable was set. Simulation can't start.")
 
                 # write data to file, create file name
                 if self.filename:
@@ -697,13 +704,18 @@ class Simulation_Group():
                                 self.profiles[0].calculate_scale_factors
                             )
                         )
-                        f.write("default_actions={}\n".format(self.profiles[0].default_actions))
-                        f.write("default_skill={}\n".format(self.profiles[0].default_skill))
-                        f.write("fight_style={}\n".format(self.profiles[0].fight_style))
-                        f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
+                        f.write("default_actions={}\n".format(
+                            self.profiles[0].default_actions))
+                        f.write("default_skill={}\n".format(
+                            self.profiles[0].default_skill))
+                        f.write("fight_style={}\n".format(
+                            self.profiles[0].fight_style))
+                        f.write("fixed_time={}\n".format(
+                            self.profiles[0].fixed_time))
                         if self.profiles[0].html != "":
                             f.write("html={}\n".format(self.profiles[0].html))
-                        f.write("iterations={}\n".format(self.profiles[0].iterations))
+                        f.write("iterations={}\n".format(
+                            self.profiles[0].iterations))
                         f.write("log={}\n".format(self.profiles[0].log))
                         f.write(
                             "optimize_expressions={}\n".format(
@@ -712,10 +724,12 @@ class Simulation_Group():
                         )
                         if int(self.profiles[0].ptr) == 1:
                             f.write("ptr={}\n".format(self.profiles[0].ptr))
-                        f.write("target_error={}\n".format(self.profiles[0].target_error))
+                        f.write("target_error={}\n".format(
+                            self.profiles[0].target_error))
                         f.write("threads={}\n".format(self.threads))
                         f.write(
-                            "profileset_work_threads={}\n".format(self.profileset_work_threads)
+                            "profileset_work_threads={}\n".format(
+                                self.profileset_work_threads)
                         )
 
                         # write all specific arguments to file
@@ -724,10 +738,12 @@ class Simulation_Group():
                             if profile == self.profiles[0]:
                                 for argument in profile.simc_arguments:
                                     f.write("{}\n".format(argument))
-                                f.write("name=\"{}\"\n\n# Profileset start\n".format(profile.name))
+                                f.write(
+                                    "name=\"{}\"\n\n# Profileset start\n".format(profile.name))
                                 # or else in wrong scope
                                 f.write(
-                                    "ready_trigger={}\n".format(self.profiles[0].ready_trigger)
+                                    "ready_trigger={}\n".format(
+                                        self.profiles[0].ready_trigger)
                                 )
 
                             else:
@@ -753,15 +769,16 @@ class Simulation_Group():
                                 simulation_output = subprocess.Popen([
                                     self.executable, self.filename
                                 ],
-                                                                     stdout=subprocess.PIPE,
-                                                                     stderr=subprocess.STDOUT,
-                                                                     universal_newlines=True,
-                                                                     startupinfo=startupinfo)
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT,
+                                    universal_newlines=True,
+                                    startupinfo=startupinfo)
                             except FileNotFoundError as e:
                                 raise e
 
                             watcher = threading.Thread(
-                                target=self.monitor_simulation, args=(simulation_output,)
+                                target=self.monitor_simulation, args=(
+                                    simulation_output,)
                             )
                             watcher.start()
 
@@ -781,14 +798,15 @@ class Simulation_Group():
                                 simulation_output = subprocess.Popen([
                                     self.executable, self.filename
                                 ],
-                                                                     stdout=subprocess.PIPE,
-                                                                     stderr=subprocess.STDOUT,
-                                                                     universal_newlines=True)
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT,
+                                    universal_newlines=True)
                             except FileNotFoundError as e:
                                 raise e
 
                             watcher = threading.Thread(
-                                target=self.monitor_simulation, args=(simulation_output,)
+                                target=self.monitor_simulation, args=(
+                                    simulation_output,)
                             )
                             watcher.start()
 
@@ -802,9 +820,12 @@ class Simulation_Group():
 
                     # handle broken simulations
                     if fail_counter >= 5:
-                        self.logger.debug("ERROR: An Error occured during simulation.")
-                        self.logger.debug("args: " + str(simulation_output.args))
-                        self.logger.debug("stdout: " + str(self.simulation_output))
+                        self.logger.debug(
+                            "ERROR: An Error occured during simulation.")
+                        self.logger.debug(
+                            "args: " + str(simulation_output.args))
+                        self.logger.debug(
+                            "stdout: " + str(self.simulation_output))
                         self.logger.debug(
                             "'name=value error's can occur when relative paths are wrong. They need to be relative paths from <bloodytools> to your SimulationCraft directory."
                         )
@@ -839,7 +860,8 @@ class Simulation_Group():
                             self.profiles[0].name in line or ' baseline' in line
                         ) and baseline_result:
                             self.logger.debug(line)
-                            self.profiles[0].set_dps(line.split()[0], external=False)
+                            self.profiles[0].set_dps(
+                                line.split()[0], external=False)
                             baseline_result = False
 
                         if "Profilesets (median Damage per Second):" in line:
@@ -856,7 +878,8 @@ class Simulation_Group():
                             for profile in self.profiles:
                                 # need this space to catch the difference of multiple profiles like 'tauren' and 'highmountain_tauren', "Tauren" and "Highmountain Tauren"
                                 if line.split(" : ")[1] == profile.name:
-                                    profile.set_dps(line.split()[0], external=False)
+                                    profile.set_dps(
+                                        line.split()[0], external=False)
 
             else:
                 raise NotSetYetError(
@@ -922,11 +945,16 @@ class Simulation_Group():
                     # write arguments to file
                     with open(self.filename, "w") as f:
                         # write the equal values to file
-                        f.write("default_actions={}\n".format(self.profiles[0].default_actions))
-                        f.write("default_skill={}\n".format(self.profiles[0].default_skill))
-                        f.write("fight_style={}\n".format(self.profiles[0].fight_style))
-                        f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
-                        f.write("iterations={}\n".format(self.profiles[0].iterations))
+                        f.write("default_actions={}\n".format(
+                            self.profiles[0].default_actions))
+                        f.write("default_skill={}\n".format(
+                            self.profiles[0].default_skill))
+                        f.write("fight_style={}\n".format(
+                            self.profiles[0].fight_style))
+                        f.write("fixed_time={}\n".format(
+                            self.profiles[0].fixed_time))
+                        f.write("iterations={}\n".format(
+                            self.profiles[0].iterations))
                         f.write(
                             "optimize_expressions={}\n".format(
                                 self.profiles[0].optimize_expressions
@@ -934,7 +962,8 @@ class Simulation_Group():
                         )
                         if int(self.profiles[0].ptr) == 1:
                             f.write("ptr={}\n".format(self.profiles[0].ptr))
-                        f.write("target_error={}\n".format(self.profiles[0].target_error))
+                        f.write("target_error={}\n".format(
+                            self.profiles[0].target_error))
 
                         # write all specific arguments to file
                         for profile in self.profiles:
@@ -942,10 +971,12 @@ class Simulation_Group():
                             if profile == self.profiles[0]:
                                 for argument in profile.simc_arguments:
                                     f.write("{}\n".format(argument))
-                                f.write("name=\"{}\"\n\n# Profileset start\n".format(profile.name))
+                                f.write(
+                                    "name=\"{}\"\n\n# Profileset start\n".format(profile.name))
                                 # or else in wrong scope
                                 f.write(
-                                    "ready_trigger={}\n".format(self.profiles[0].ready_trigger)
+                                    "ready_trigger={}\n".format(
+                                        self.profiles[0].ready_trigger)
                                 )
 
                             else:
@@ -978,7 +1009,8 @@ class Simulation_Group():
                     raidbots_sim_id = raidbots_response["simId"]
 
                     # monitor simulation progress
-                    self.logger.info("Simulation of {} is underway. Please wait".format(self.name))
+                    self.logger.info(
+                        "Simulation of {} is underway. Please wait".format(self.name))
 
                     time.sleep(4)
 
@@ -990,7 +1022,8 @@ class Simulation_Group():
                         )
                     except Exception as e:
                         self.logger.error(e)
-                        progress = {"job": {"state": ""}, "retriesRemaining": 8}
+                        progress = {"job": {"state": ""},
+                                    "retriesRemaining": 8}
 
                     # not a proper back off in this case, due to the progress of a simulation not being properly monitorable with exponential backoff
                     backoff = 0
@@ -1010,7 +1043,8 @@ class Simulation_Group():
                             backoff += 360
 
                         self.logger.info(
-                            "{} progress {}%".format(self.name, progress["job"]["progress"])
+                            "{} progress {}%".format(
+                                self.name, progress["job"]["progress"])
                         )
                         self.logger.debug(progress)
 
@@ -1022,9 +1056,11 @@ class Simulation_Group():
                     if progress["job"]["state"] == "failed" and int(
                         progress["retriesRemaining"]
                     ) <= 0:
-                        raise SimulationError("Simulation failed. No Retries possible.")
+                        raise SimulationError(
+                            "Simulation failed. No Retries possible.")
 
-                    self.logger.info("Simulating {} is done. Fetching data.".format(self.name))
+                    self.logger.info(
+                        "Simulating {} is done. Fetching data.".format(self.name))
 
                     # simulation is done, get data
                     raidbots_data = r(
@@ -1032,7 +1068,8 @@ class Simulation_Group():
                         session=self.session
                     )
 
-                    self.logger.info("Fetching data for {} succeeded.".format(self.name))
+                    self.logger.info(
+                        "Fetching data for {} succeeded.".format(self.name))
                     self.logger.debug(f'{raidbots_data}')
 
                     # if too many profilesets were simulated, get the full json
@@ -1044,7 +1081,8 @@ class Simulation_Group():
                                 f'https://www.raidbots.com/reports/{raidbots_sim_id}/data.full.json',
                                 session=self.session
                             )
-                            self.logger.info("Fetching data for {} succeeded.".format(self.name))
+                            self.logger.info(
+                                "Fetching data for {} succeeded.".format(self.name))
                             self.logger.debug(f'{raidbots_data}')
 
                     # if simulation failed
@@ -1057,7 +1095,8 @@ class Simulation_Group():
                         )
 
                         self.logger.debug(
-                            "Fetching input data for {} succeeded.".format(self.name)
+                            "Fetching input data for {} succeeded.".format(
+                                self.name)
                         )
                         self.logger.debug(raidbots_input)
 
@@ -1066,7 +1105,8 @@ class Simulation_Group():
                             session=self.session
                         )
                         self.logger.debug(
-                            "Fetching output data for {} succeeded.".format(self.name)
+                            "Fetching output data for {} succeeded.".format(
+                                self.name)
                         )
                         self.logger.debug(raidbots_output)
 
@@ -1081,7 +1121,8 @@ class Simulation_Group():
                             try:
                                 f.write(
                                     "\n\n############## DATA ##############\n{}".format(
-                                        json.dumps(raidbots_data, sort_keys=True, indent=4)
+                                        json.dumps(raidbots_data,
+                                                   sort_keys=True, indent=4)
                                     )
                                 )
                             except Exception:
@@ -1101,7 +1142,8 @@ class Simulation_Group():
                     try:
                         simc_hash = raidbots_data['git_revision']
                     except Exception:
-                        self.logger.error("'git_revision' not found in raidbots answer.")
+                        self.logger.error(
+                            "'git_revision' not found in raidbots answer.")
                         simc_hash = False
 
                     # set basic profile dps
@@ -1113,7 +1155,8 @@ class Simulation_Group():
                     self.logger.debug("Set dps for baseprofile.")
 
                     for profile in raidbots_data["sim"]["profilesets"]["results"]:
-                        self.logger.debug("Setting dps for {}".format(profile["name"]))
+                        self.logger.debug(
+                            "Setting dps for {}".format(profile["name"]))
                         self.set_dps_of(profile["name"], profile["mean"])
 
             else:
@@ -1174,7 +1217,8 @@ class Simulation_Group():
             if profile.name == profile_name:
                 return profile.get_dps()
         raise KeyError(
-            "Profile_name '{}' wasn't found in the simulation_group.".format(profile_name)
+            "Profile_name '{}' wasn't found in the simulation_group.".format(
+                profile_name)
         )
 
     def set_dps_of(self, profile_name: str, dps: Union[int, float, str]) -> bool:
@@ -1183,7 +1227,8 @@ class Simulation_Group():
                 if profile.name == profile_name:
                     profile.set_dps(dps, external=False)
         except Exception as e:
-            self.logger.error("Setting dps for profile {} failed. {}".format(profile_name, e))
+            self.logger.error(
+                "Setting dps for profile {} failed. {}".format(profile_name, e))
             return False
         else:
             return True

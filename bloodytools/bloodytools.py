@@ -68,7 +68,8 @@ def logger_config():
     if hasattr(settings, "debug"):
         if settings.debug:
             console_handler.setLevel(logging.DEBUG)
-    console_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    console_formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(message)s")
     console_handler.setFormatter(console_formatter)
     logger.addHandler(console_handler)
 
@@ -114,12 +115,15 @@ def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str):
 
     basis_profile_string += "profiles/"
     if tier == "PR":
-        basis_profile_string += "PreRaids/PR_{}_{}".format(wow_class.title(), wow_spec.title())
+        basis_profile_string += "PreRaids/PR_{}_{}".format(
+            wow_class.title(), wow_spec.title())
     else:
-        basis_profile_string += "Tier{}/T{}_{}_{}".format(tier, tier, wow_class, wow_spec).title()
+        basis_profile_string += "Tier{}/T{}_{}_{}".format(
+            tier, tier, wow_class, wow_spec).title()
     basis_profile_string += ".simc"
 
-    logger.debug("Created basis_profile_string '{}'.".format(basis_profile_string))
+    logger.debug("Created basis_profile_string '{}'.".format(
+        basis_profile_string))
     logger.debug("create_basic_profile_string ended")
     return basis_profile_string
 
@@ -178,7 +182,8 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     ]
     pattern_slots = {}
     for element in item_slots:
-        pattern_slots[element] = re.compile('^{}=([a-z0-9_=,/:.]*)$'.format(element))
+        pattern_slots[element] = re.compile(
+            '^{}=([a-z0-9_=,/:.]*)$'.format(element))
 
     # prepare regex for item defining attributes
     item_elements = [
@@ -192,7 +197,8 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     pattern_element = {}
     # don't recompile this for each slot
     for element in item_elements:
-        pattern_element[element] = re.compile(',{}=([a-z0-9_/:]*)'.format(element))
+        pattern_element[element] = re.compile(
+            ',{}=([a-z0-9_/:]*)'.format(element))
 
     # prepare regex for character defining information. like spec
     character_specifics = [
@@ -206,7 +212,8 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     ]
     pattern_specifics = {}
     for element in character_specifics:
-        pattern_specifics[element] = re.compile('^{}=([a-z0-9_./:]*)$'.format(element))
+        pattern_specifics[element] = re.compile(
+            '^{}=([a-z0-9_./:]*)$'.format(element))
 
     with open(path, 'r') as f:
         for line in f:
@@ -239,7 +246,8 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
                     for element in item_elements:
                         new_matches = pattern_element[element].search(new_line)
                         if new_matches:
-                            profile['items'][slot][element] = new_matches.group(1)
+                            profile['items'][slot][element] = new_matches.group(
+                                1)
                             # TODO: remove after some time (webfront-end needs to be updated)
                             if not slot in profile:
                                 profile[slot] = {}
@@ -267,7 +275,8 @@ def create_base_json_dict(data_type: str, wow_class: str, wow_spec: str, fight_s
 
     timestamp = pretty_timestamp()
 
-    profile_location = create_basic_profile_string(wow_class, wow_spec, settings.tier)
+    profile_location = create_basic_profile_string(
+        wow_class, wow_spec, settings.tier)
 
     profile = extract_profile(profile_location, wow_class)
 
@@ -275,7 +284,8 @@ def create_base_json_dict(data_type: str, wow_class: str, wow_spec: str, fight_s
         profile = extract_profile('custom_profile.txt', wow_class, profile)
 
     # spike the export data with talent data
-    talent_data = wow_lib.get_talent_dict(wow_class, wow_spec, settings.ptr == "1")
+    talent_data = wow_lib.get_talent_dict(
+        wow_class, wow_spec, settings.ptr == "1")
 
     # add class/ id number
     class_id = wow_lib.get_class_id(wow_class)
@@ -296,7 +306,7 @@ def create_base_json_dict(data_type: str, wow_class: str, wow_spec: str, fight_s
                 wow_class=wow_class.title().replace("_", " "),
                 wow_spec=wow_spec.title().replace("_", " "),
                 fight_style=fight_style.title()
-            ),
+        ),
         "subtitle": subtitle,
         "simc_settings": {
             "tier": settings.tier,
@@ -305,9 +315,9 @@ def create_base_json_dict(data_type: str, wow_class: str, wow_spec: str, fight_s
             "target_error": settings.target_error[fight_style],
             "ptr": settings.ptr,
             "simc_hash": settings.simc_hash,
-     # deprecated
+            # deprecated
             "class": wow_class,
-     # deprecated
+            # deprecated
             "spec": wow_spec
         },
         "data": {},
@@ -400,7 +410,8 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             # check whether the baseline profile does exist
             try:
                 with open(
-                    create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
+                    create_basic_profile_string(
+                        wow_class, wow_spec, settings.tier), 'r'
                 ) as f:
                     pass
             except FileNotFoundError:
@@ -412,7 +423,8 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
                 continue
 
             # prepare result json
-            wanted_data = create_base_json_dict("Races", wow_class, wow_spec, fight_style)
+            wanted_data = create_base_json_dict(
+                "Races", wow_class, wow_spec, fight_style)
 
             races = wow_lib.get_races_for_class(wow_class)
             simulation_group = so.Simulation_Group(
@@ -453,7 +465,8 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
                         with open('custom_fight_style.txt') as f:
                             custom_fight_style = f.read()
                     if custom_fight_style:
-                        simulation_data.simc_arguments.append(custom_fight_style)
+                        simulation_data.simc_arguments.append(
+                            custom_fight_style)
                 else:
                     simulation_data = so.Simulation_Data(
                         name=race.title().replace("_", " "),
@@ -469,7 +482,8 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
 
                     # adding argument for zandalari trolls
                     if race == 'zandalari_troll':
-                        simulation_data.simc_arguments.append('zandalari_loa=kimbul')
+                        simulation_data.simc_arguments.append(
+                            'zandalari_loa=kimbul')
                         simulation_data.name += ' Kimbul'
 
                 simulation_group.add(simulation_data)
@@ -484,10 +498,12 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
                     simulation_data = None
                     for loa in ['bwonsamdi', 'paku']:
                         simulation_data = so.Simulation_Data(
-                            name='{} {}'.format(race.title().replace("_", " "), loa.title()),
+                            name='{} {}'.format(
+                                race.title().replace("_", " "), loa.title()),
                             fight_style=fight_style,
                             simc_arguments=[
-                                "race={}".format(race), 'zandalari_loa={}'.format(loa)
+                                "race={}".format(
+                                    race), 'zandalari_loa={}'.format(loa)
                             ],
                             target_error=settings.target_error[fight_style],
                             ptr=settings.ptr,
@@ -504,11 +520,13 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
                         ))
 
             logger.info(
-                "Start {} race simulation for {} {}.".format(fight_style, wow_class, wow_spec)
+                "Start {} race simulation for {} {}.".format(
+                    fight_style, wow_class, wow_spec)
             )
             try:
                 if settings.use_raidbots and settings.apikey:
-                    settings.simc_hash = simulation_group.simulate_with_raidbots(settings.apikey)
+                    settings.simc_hash = simulation_group.simulate_with_raidbots(
+                        settings.apikey)
                 else:
                     simulation_group.simulate()
             except Exception as e:
@@ -526,15 +544,18 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
                 )
 
             for profile in simulation_group.profiles:
-                logger.debug("Profile '{}' DPS: {}".format(profile.name, profile.get_dps()))
+                logger.debug("Profile '{}' DPS: {}".format(
+                    profile.name, profile.get_dps()))
 
-            logger.debug("Created base dict for json export. {}".format(wanted_data))
+            logger.debug(
+                "Created base dict for json export. {}".format(wanted_data))
 
             # add dps values to json
             for profile in simulation_group.profiles:
                 wanted_data["data"][profile.name] = profile.get_dps()
                 logger.debug(
-                    "Added '{}' with {} dps to json.".format(profile.name, profile.get_dps())
+                    "Added '{}' with {} dps to json.".format(
+                        profile.name, profile.get_dps())
                 )
                 # add race translations to the final json
                 translated_name = wow_lib.get_race_translation(profile.name)
@@ -562,7 +583,8 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
 
             tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
             logger.debug("Sorted tmp_list: {}".format(tmp_list))
-            logger.info("Race {} won with {} dps.".format(tmp_list[0][0], tmp_list[0][1]))
+            logger.info("Race {} won with {} dps.".format(
+                tmp_list[0][0], tmp_list[0][1]))
 
             wanted_data["sorted_data_keys"] = []
             for race, _ in tmp_list:
@@ -582,7 +604,8 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
                 encoding="utf-8"
             ) as f:
                 logger.debug("Print race json.")
-                f.write(json.dumps(wanted_data, sort_keys=True, indent=4, ensure_ascii=False))
+                f.write(json.dumps(wanted_data, sort_keys=True,
+                                   indent=4, ensure_ascii=False))
                 logger.debug("Printed race json.")
 
     logger.debug("race_simulations ended")
@@ -597,7 +620,8 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
             # check whether the baseline profile does exist
             try:
                 with open(
-                    create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
+                    create_basic_profile_string(
+                        wow_class, wow_spec, settings.tier), 'r'
                 ) as f:
                     pass
             except FileNotFoundError:
@@ -610,7 +634,8 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
 
             # initial profiles and data
             secondary_sum = 0
-            base_profile_string = create_basic_profile_string(wow_class, wow_spec, settings.tier)
+            base_profile_string = create_basic_profile_string(
+                wow_class, wow_spec, settings.tier)
 
             try:
                 with open(base_profile_string, 'r') as f:
@@ -650,7 +675,8 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
                     logger=logger,
                     simc_arguments=[
                         base_profile_string,
-                        "gear_crit_rating={}".format(crit_rating + settings.step_size),
+                        "gear_crit_rating={}".format(
+                            crit_rating + settings.step_size),
                         "gear_haste_rating={}".format(haste_rating),
                         "gear_mastery_rating={}".format(mastery_rating),
                         "gear_versatility_rating={}".format(vers_rating)
@@ -668,7 +694,8 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
                     logger=logger,
                     simc_arguments=[
                         "gear_crit_rating={}".format(crit_rating),
-                        "gear_haste_rating={}".format(haste_rating + settings.step_size),
+                        "gear_haste_rating={}".format(
+                            haste_rating + settings.step_size),
                         "gear_mastery_rating={}".format(mastery_rating),
                         "gear_versatility_rating={}".format(vers_rating)
                     ],
@@ -686,7 +713,8 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
                     simc_arguments=[
                         "gear_crit_rating={}".format(crit_rating),
                         "gear_haste_rating={}".format(haste_rating),
-                        "gear_mastery_rating={}".format(mastery_rating + settings.step_size),
+                        "gear_mastery_rating={}".format(
+                            mastery_rating + settings.step_size),
                         "gear_versatility_rating={}".format(vers_rating)
                     ],
                     ptr=settings.ptr,
@@ -704,7 +732,8 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
                         "gear_crit_rating={}".format(crit_rating),
                         "gear_haste_rating={}".format(haste_rating),
                         "gear_mastery_rating={}".format(mastery_rating),
-                        "gear_versatility_rating={}".format(vers_rating + settings.step_size)
+                        "gear_versatility_rating={}".format(
+                            vers_rating + settings.step_size)
                     ],
                     ptr=settings.ptr,
                     default_actions=settings.default_actions
@@ -770,7 +799,8 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
 
             logger.info(gear_path)
 
-            result = create_base_json_dict("Gear Path", wow_class, wow_spec, fight_style)
+            result = create_base_json_dict(
+                "Gear Path", wow_class, wow_spec, fight_style)
 
             result['data'] = gear_path
 
@@ -778,7 +808,8 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
                 os.makedirs('results/gear_path/')
 
             with open(
-                'results/gear_path/{}_{}_{}.json'.format(wow_class, wow_spec, fight_style), 'w'
+                'results/gear_path/{}_{}_{}.json'.format(
+                    wow_class, wow_spec, fight_style), 'w'
             ) as f:
                 json.dump(result, f, indent=4, sort_keys=True)
 
@@ -802,7 +833,8 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
             # check whether the baseline profile does exist
             try:
                 with open(
-                    create_basic_profile_string(wow_class, wow_spec, settings.tier), 'r'
+                    create_basic_profile_string(
+                        wow_class, wow_spec, settings.tier), 'r'
                 ) as f:
                     pass
             except FileNotFoundError:
@@ -813,7 +845,8 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
                 )
                 continue
 
-            base_profile_string = create_basic_profile_string(wow_class, wow_spec, settings.tier)
+            base_profile_string = create_basic_profile_string(
+                wow_class, wow_spec, settings.tier)
 
             simulation_group = so.Simulation_Group(
                 name="{} {} {}".format(fight_style, wow_spec, wow_class),
@@ -823,7 +856,9 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
                 logger=logger
             )
 
-            talent_blueprint = wow_lib.get_talent_blueprint(wow_class, wow_spec)
+            talent_blueprint = wow_lib.get_talent_blueprint(
+                wow_class, wow_spec
+            )
 
             talent_combinations = []
 
@@ -850,7 +885,8 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
                                             if talent_combination[tmp_count + location] != "0":
                                                 abort = True
                                             tmp_count += location + 1
-                                            location = talent_blueprint[tmp_count:].find("0")
+                                            location = talent_blueprint[tmp_count:].find(
+                                                "0")
 
                                         # skip talent combinations with too many (more than one) not chosen dps values
                                         if talent_combination.count(
@@ -861,15 +897,18 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
                                         if abort:
                                             continue
 
-                                        talent_combinations.append(talent_combination)
+                                        talent_combinations.append(
+                                            talent_combination)
             logger.debug(
-                "Creating talent combinations: Done. Created {}.".format(len(talent_combinations))
+                "Creating talent combinations: Done. Created {}.".format(
+                    len(talent_combinations))
             )
 
             base_profile = so.Simulation_Data(
                 name="{}".format(talent_combinations[0]),
                 fight_style=fight_style,
-                simc_arguments=[base_profile_string, "talents={}".format(talent_combinations[0])],
+                simc_arguments=[base_profile_string,
+                                "talents={}".format(talent_combinations[0])],
                 target_error=settings.target_error[fight_style],
                 ptr=settings.ptr,
                 default_actions=settings.default_actions,
@@ -911,7 +950,8 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
 
             logger.info(
                 "Talent Worth {} {} {} {} profiles.".format(
-                    wow_spec, wow_class, fight_style, len(simulation_group.profiles)
+                    wow_spec, wow_class, fight_style, len(
+                        simulation_group.profiles)
                 )
             )
 
@@ -921,7 +961,8 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
             else:
                 simulation_group.simulate()
 
-            export_json = create_base_json_dict("Talent Worth", wow_class, wow_spec, fight_style)
+            export_json = create_base_json_dict(
+                "Talent Worth", wow_class, wow_spec, fight_style)
 
             # save all generated data in "data"
             for profile in simulation_group.profiles:
@@ -932,9 +973,11 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
 
             for talent_combination in export_json["data"]:
                 if talent_combination.count("0") == talent_blueprint.count("0"):
-                    tmp_1.append((talent_combination, export_json["data"][talent_combination]))
+                    tmp_1.append(
+                        (talent_combination, export_json["data"][talent_combination]))
                 else:
-                    tmp_2.append((talent_combination, export_json["data"][talent_combination]))
+                    tmp_2.append(
+                        (talent_combination, export_json["data"][talent_combination]))
 
             tmp_1 = sorted(tmp_1, key=lambda item: item[1], reverse=True)
             tmp_2 = sorted(tmp_2, key=lambda item: item[1], reverse=True)
@@ -963,7 +1006,8 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
             # write json to file
             with open(file_name + ".json", "w", encoding="utf-8") as f:
                 logger.debug("Print talent_worth json.")
-                f.write(json.dumps(export_json, sort_keys=True, indent=4, ensure_ascii=False))
+                f.write(json.dumps(export_json, sort_keys=True,
+                                   indent=4, ensure_ascii=False))
                 logger.debug("Printed talent_worth json.")
 
     logger.debug("talent_worth_simulations end")
@@ -983,9 +1027,11 @@ def main(args: object):
     if args.single_sim:
         logger.debug("-s / --single_sim detected")
         try:
-            simulation_type, wow_class, wow_spec, fight_style = args.single_sim.split(',')
+            simulation_type, wow_class, wow_spec, fight_style = args.single_sim.split(
+                ',')
         except Exception:
-            logger.error("-s / --single_sim arg is missing parameters. Read -h.")
+            logger.error(
+                "-s / --single_sim arg is missing parameters. Read -h.")
             sys.exit("Input error. Bloodytools terminates.")
 
         # single sim will always use all cores unless --threads is defined
@@ -1040,7 +1086,8 @@ def main(args: object):
     # set new profileset_work_threads if provided
     if args.profileset_work_threads:
         settings.profileset_work_threads = args.profileset_work_threads
-        logger.debug("Set profileset_work_threads to {}".format(settings.profileset_work_threads))
+        logger.debug("Set profileset_work_threads to {}".format(
+            settings.profileset_work_threads))
 
     if args.ptr:
         settings.ptr = "1"
@@ -1244,7 +1291,8 @@ def main(args: object):
         time.sleep(1)
         for thread in thread_list:
             if thread.is_alive():
-                logger.debug("{} is still in progress.".format(thread.getName()))
+                logger.debug(
+                    "{} is still in progress.".format(thread.getName()))
             else:
                 logger.info("{} finished.".format(thread.getName()))
                 thread_list.remove(thread)
@@ -1295,7 +1343,8 @@ if __name__ == '__main__':
         "--threads",
         metavar="NUMBER",
         type=str,
-        help="Number of threads used by SimulationCraft. Default: '{}'".format(settings.threads)
+        help="Number of threads used by SimulationCraft. Default: '{}'".format(
+            settings.threads)
     )
     parser.add_argument(
         "--debug",

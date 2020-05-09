@@ -44,7 +44,8 @@ if __name__ == '__main__':
         "--threads",
         metavar="NUMBER",
         type=str,
-        help="Number of threads used by SimulationCraft. Default: '{}'".format(settings.threads)
+        help="Number of threads used by SimulationCraft. Default: '{}'".format(
+            settings.threads)
     )
     parser.add_argument(
         "--debug",

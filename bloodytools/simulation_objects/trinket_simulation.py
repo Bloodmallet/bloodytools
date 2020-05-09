@@ -33,7 +33,8 @@ def trinket_simulation(settings: object) -> None:
             # check whether the baseline profile does exist
             try:
                 with open(
-                    create_basic_profile_string(wow_class, wow_spec, settings.tier, settings), 'r'
+                    create_basic_profile_string(
+                        wow_class, wow_spec, settings.tier, settings), 'r'
                 ) as f:
                     pass
             except FileNotFoundError:
@@ -52,7 +53,8 @@ def trinket_simulation(settings: object) -> None:
             # get main-trinkets
             trinket_list = wow_lib.get_trinkets_for_spec(wow_class, wow_spec)
             # get secondary-trinket (standard stat stick)
-            second_trinket = wow_lib.get_second_trinket_for_spec(wow_class, wow_spec)
+            second_trinket = wow_lib.get_second_trinket_for_spec(
+                wow_class, wow_spec)
 
             # fix profile for this type of simulations
             json_export['profile']['items'].pop('trinket1')
@@ -118,7 +120,8 @@ def trinket_simulation(settings: object) -> None:
                         with open('custom_fight_style.txt') as f:
                             custom_fight_style = f.read()
                     if custom_fight_style:
-                        simulation_data.simc_arguments.append(custom_fight_style)
+                        simulation_data.simc_arguments.append(
+                            custom_fight_style)
 
                     simulation_group.add(simulation_data)
 
@@ -135,7 +138,8 @@ def trinket_simulation(settings: object) -> None:
                             iterations=settings.iterations,
                             target_error=settings.target_error[fight_style],
                             simc_arguments=[
-                                "trinket1=,id={},ilevel={}".format(trinket[1], itemlevel)
+                                "trinket1=,id={},ilevel={}".format(
+                                    trinket[1], itemlevel)
                             ],
                             ptr=settings.ptr,
                             default_actions=settings.default_actions,
@@ -146,11 +150,13 @@ def trinket_simulation(settings: object) -> None:
 
             # create and simulate baseline profile
             logger.info(
-                "Start {} trinket simulation for {} {}.".format(fight_style, wow_class, wow_spec)
+                "Start {} trinket simulation for {} {}.".format(
+                    fight_style, wow_class, wow_spec)
             )
             try:
                 if settings.use_raidbots and settings.apikey:
-                    settings.simc_hash = simulation_group.simulate_with_raidbots(settings.apikey)
+                    settings.simc_hash = simulation_group.simulate_with_raidbots(
+                        settings.apikey)
                 else:
                     simulation_group.simulate()
             except Exception as e:
@@ -173,7 +179,8 @@ def trinket_simulation(settings: object) -> None:
                         "{} {} DPS, baseline + {}".format(
                             profile.name, profile.get_dps(),
                             profile.get_dps() -
-                            simulation_group.get_dps_of("baseline {}".format(settings.min_ilevel))
+                            simulation_group.get_dps_of(
+                                "baseline {}".format(settings.min_ilevel))
                         )
                     )
                 except Exception as e:
@@ -181,12 +188,15 @@ def trinket_simulation(settings: object) -> None:
                         "Exception was thrown when trying to fetch the following data from simulation_group: profile.name, profile.get_dps(), profile.get_dps() - simulation_group.get_dps_of(\"baseline {}\".format(settings.min_ilevel))"
                     )
                     logger.debug("profile.name {}".format(profile.name))
-                    logger.debug("profile.get_dps() {}".format(profile.get_dps()))
-                    logger.debug("settings.min_ilevel {}".format(settings.min_ilevel))
+                    logger.debug(
+                        "profile.get_dps() {}".format(profile.get_dps()))
+                    logger.debug("settings.min_ilevel {}".format(
+                        settings.min_ilevel))
                     logger.debug(
                         "simulation_group.get_dps_of(\"baseline {{}}\".format(settings.min_ilevel)) {}"
                         .format(
-                            simulation_group.get_dps_of("baseline {}".format(settings.min_ilevel))
+                            simulation_group.get_dps_of(
+                                "baseline {}".format(settings.min_ilevel))
                         )
                     )
 
@@ -210,9 +220,11 @@ def trinket_simulation(settings: object) -> None:
                 # add translation to export
                 if not full_name in json_export["languages"] and not "baseline" in full_name:
                     try:
-                        json_export["languages"][full_name] = wow_lib.get_trinket_translation(name)
+                        json_export["languages"][full_name] = wow_lib.get_trinket_translation(
+                            name)
                     except Exception as e:
-                        logger.debug("No translation found for {}.".format(name))
+                        logger.debug(
+                            "No translation found for {}.".format(name))
                         logger.warning(e)
 
                 if not "data_sources" in json_export:
@@ -230,7 +242,8 @@ def trinket_simulation(settings: object) -> None:
             for trinket in json_export["data"]:
                 if trinket != "baseline":
                     name = trinket.split('+')[0]
-                    json_export["item_ids"][trinket] = wow_lib.get_trinket_id(name)
+                    json_export["item_ids"][trinket] = wow_lib.get_trinket_id(
+                        name)
                     if json_export["item_ids"][trinket] == None:
                         del json_export["item_ids"][trinket]
 
@@ -240,13 +253,15 @@ def trinket_simulation(settings: object) -> None:
             tmp_list = []
             for trinket in json_export["data"]:
                 if trinket != "baseline":
-                    tmp_list.append((trinket, max(json_export["data"][trinket].values())))
+                    tmp_list.append(
+                        (trinket, max(json_export["data"][trinket].values())))
             logger.debug("tmp_list: {}".format(tmp_list))
 
             tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
             logger.debug("Sorted tmp_list: {}".format(tmp_list))
 
-            logger.info("Trinket {} won with {} dps.".format(tmp_list[0][0], tmp_list[0][1]))
+            logger.info("Trinket {} won with {} dps.".format(
+                tmp_list[0][0], tmp_list[0][1]))
 
             json_export["sorted_data_keys"] = []
             for trinket, _ in tmp_list:
@@ -274,7 +289,8 @@ def trinket_simulation(settings: object) -> None:
                 encoding="utf-8"
             ) as f:
                 logger.debug("Print trinket json.")
-                f.write(json.dumps(json_export, sort_keys=True, indent=4, ensure_ascii=False))
+                f.write(json.dumps(json_export, sort_keys=True,
+                                   indent=4, ensure_ascii=False))
                 logger.debug("Printed trinket json.")
 
         # LUA data exporter
@@ -283,7 +299,8 @@ def trinket_simulation(settings: object) -> None:
             item_dict = {}     # intended structure: itemID -> class -> spec -> itemlevel
 
             for wow_class in simulation_results:
-                wow_class_id = wow_class if human_readable else wow_lib.get_class_id(wow_class)
+                wow_class_id = wow_class if human_readable else wow_lib.get_class_id(
+                    wow_class)
 
                 for wow_spec in simulation_results[wow_class]:
                     wow_spec_id = wow_spec if human_readable else wow_lib.get_spec_id(
@@ -293,9 +310,11 @@ def trinket_simulation(settings: object) -> None:
                     for profile in simulation_results[wow_class][wow_spec].profiles:
                         if profile.name != "baseline {}".format(settings.min_ilevel):
                             name = profile.name[:profile.name.rfind(" ")]
-                            ilevel = int(profile.name[profile.name.rfind(" ") + 1:])
+                            ilevel = int(
+                                profile.name[profile.name.rfind(" ") + 1:])
 
-                            item_id = name if human_readable else wow_lib.get_trinket_id(name)
+                            item_id = name if human_readable else wow_lib.get_trinket_id(
+                                name)
 
                             if not item_id in item_dict:
                                 item_dict[item_id] = {}
@@ -308,9 +327,9 @@ def trinket_simulation(settings: object) -> None:
 
                             item_dict[item_id][wow_class_id][wow_spec_id][
                                 ilevel] = profile.get_dps(
-                                ) - simulation_results[wow_class][wow_spec].get_dps_of(
+                            ) - simulation_results[wow_class][wow_spec].get_dps_of(
                                     "baseline {}".format(settings.min_ilevel)
-                                )
+                            )
 
             logger.debug("item_dict: {}".format(item_dict))
 
@@ -335,7 +354,8 @@ def trinket_simulation(settings: object) -> None:
                             ):
                                 if itemlevel in trinket:
                                     if lower_dps:
-                                        dps_sum += trinket[itemlevel] - lower_dps
+                                        dps_sum += trinket[itemlevel] - \
+                                            lower_dps
                                         itemlevels_counted += 1
                                     lower_dps = trinket[itemlevel]
 
@@ -345,7 +365,8 @@ def trinket_simulation(settings: object) -> None:
                             )
 
                             average_increase = int(
-                                dps_sum / itemlevels_counted / (settings.ilevel_step / 5)
+                                dps_sum / itemlevels_counted /
+                                (settings.ilevel_step / 5)
                             )
 
                             logger.debug(
@@ -354,7 +375,8 @@ def trinket_simulation(settings: object) -> None:
                             )
 
                             try:
-                                trinket_data = wow_lib.get_trinket(item_id=item)
+                                trinket_data = wow_lib.get_trinket(
+                                    item_id=item)
                             except Exception:
                                 # failes due to the human readability check
                                 trinket_data = wow_lib.get_trinket(name=item)
@@ -362,7 +384,7 @@ def trinket_simulation(settings: object) -> None:
                             for itemlevel in range(settings.min_ilevel, settings.max_ilevel, 5):
                                 # if itemlevel is valid for that item
                                 if itemlevel >= trinket_data.min_itemlevel and itemlevel <= trinket_data.max_itemlevel:
-                                    #if itemlevel is missing, we add it
+                                    # if itemlevel is missing, we add it
                                     if not itemlevel in trinket:
                                         # is able to catch up to +15 ilevel steps
                                         try:
