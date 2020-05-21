@@ -874,8 +874,11 @@ def azerite_trait_simulations(settings) -> None:
                         tmp_tier1_stacked.append((
                             trait,
                             wanted_data["data"][trait][sorted(wanted_data["data"][trait])[-1]] -
-                            wanted_data["data"]["baseline"][sorted(wanted_data["data"][trait]
-                                                                   )[-1].replace("3_", "1_")]
+                            wanted_data["data"]["baseline"][
+                                sorted(
+                                    wanted_data["data"][trait]
+                                )[-1].replace("3_", "1_").replace("2_", "1_")
+                            ]
                         ))
                     else:
                         if int(trait_id) != 263978:
