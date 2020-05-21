@@ -9,7 +9,7 @@ RUN apk --no-cache add --virtual build_dependencies \
     g++ \
     make && \
     git clone --depth 1 https://github.com/simulationcraft/simc.git /app/SimulationCraft && \
-    make -C /app/SimulationCraft/engine optimized -j $THREADS SC_NO_NETWORKING=1 LTO_THIN=1 SC_NO_NETWORKING=1 OPTS+="-Os -mtune=native" && \
+    make -C /app/SimulationCraft/engine optimized -j $THREADS SC_NO_NETWORKING=1 LTO_THIN=1 OPTS+="-Os -mtune=native" && \
     apk del build_dependencies
 
 # disable ptr to reduce build size
