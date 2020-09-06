@@ -1,10 +1,9 @@
 import json
 import os
 
-from bloodytools.simulation_objects.simulation_objects import Simulation_Data, Simulation_Group
+from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from bloodytools.utils.utils import create_base_json_dict, create_basic_profile_string
 from simc_support import wow_lib
-from simc_support.game_data import Source
 from typing import List, Tuple
 
 
