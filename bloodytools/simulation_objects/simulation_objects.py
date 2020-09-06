@@ -239,7 +239,7 @@ class Simulation_Data():
         # simulation start time
         self.so_simulation_start_time: datetime.datetime = None
 
-    def is_equal(self, simulation_instance: 'simulation_data') -> bool:
+    def is_equal(self, simulation_instance: 'Simulation_Data') -> bool:
         """Determines if the current and given simulation_data share the
         same base. The following attributes are considered base:
         calculate_scale_factors, default_actions, default_skill,
@@ -332,7 +332,7 @@ class Simulation_Data():
         self.logger.debug("Set DPS of profile '{}' to {}.".format(
             self.name, self.get_dps()))
 
-    def get_avg(self, simulation_instance: 'simulation_data') -> int:
+    def get_avg(self, simulation_instance: 'Simulation_Data') -> int:
         """Get the average between to the parent and given simulation_instance.
 
         Arguments:
@@ -431,6 +431,7 @@ class Simulation_Data():
         argument.append("ready_trigger=" + self.ready_trigger)
 
         fail_counter = 0
+        simulation_output: subprocess.CompletedProcess = None
         # should prevent additional empty windows popping up...on win32 systems without breaking different OS
         if sys.platform == 'win32':
             # call simulationcraft in the background. Save output for processing
@@ -485,7 +486,7 @@ class Simulation_Data():
         self.set_full_report(simulation_output.stdout)
 
         is_actor = False
-        run_dps: str
+        run_dps: str = None
         for line in simulation_output.stdout.splitlines():
             # needs this check to prevent grabbing the boss dps
             if "DPS Ranking:" in line:
@@ -757,6 +758,7 @@ class Simulation_Group():
 
                     # counter of failed simulation attempts
                     fail_counter = 0
+                    simulation_output: subprocess.CompletedProcess = None
                     # should prevent additional empty windows popping up...on win32 systems without breaking different OS
                     if sys.platform == 'win32':
                         # call simulationcraft in the background. Save output for processing
