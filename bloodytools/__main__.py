@@ -1,7 +1,7 @@
 from bloodytools import settings
-from bloodytools.bloodytools import arg_parse_config
-from bloodytools.bloodytools import main
-from bloodytools.bloodytools import logger_config
+from bloodytools.utils.utils import arg_parse_config
+from bloodytools.utils.utils import logger_config
+from bloodytools.main import main
 
 if __name__ == '__main__':
     logger = logger_config()
