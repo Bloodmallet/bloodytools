@@ -29,21 +29,21 @@ import logging
 import os
 import re
 import sys
+import threading
 import time
 
-from bloodytools import settings     # settings.py file
+from bloodytools import settings
 from bloodytools.simulation_objects import simulation_objects as so
-from bloodytools.simulation_objects.azerite_trait_simulation import azerite_trait_simulations
-from bloodytools.simulation_objects.corruption_simulation import corruption_simulation
-from bloodytools.simulation_objects.essence_combination_simulation import essence_combination_simulation
-from bloodytools.simulation_objects.essence_simulation import essence_simulation
 from bloodytools.simulation_objects.secondary_distribution_simulation import secondary_distribution_simulation
 from bloodytools.simulation_objects.trinket_simulation import trinket_simulation
+from bloodytools.utils.utils import create_base_json_dict
+from bloodytools.utils.utils import create_basic_profile_string
+from bloodytools.utils.utils import get_simc_hash
+
+
 from simc_support import wow_lib
 from typing import List, Tuple
 
-if settings.use_own_threading:
-    import threading
 
 logger = logging.getLogger(__name__)
 
@@ -84,48 +84,100 @@ def logger_config():
     return logger
 
 
-def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str):
-    """Create basic profile string to get the standard profile of a spec. Use this function to get the necessary string for your first argument of a simulation_data object.
+def arg_parse_config():
+    parser = argparse.ArgumentParser(
+        description="Simulate different aspects of World of Warcraft data."
+    )
+    parser.add_argument(
+        "-a",
+        "--all",
+        dest="sim_all",
+        action="store_const",
+        const=True,
+        default=False,
+        help="Simulate races, trinkets, secondary distributions, and azerite traits for all specs and all talent combinations."
+    )
+    parser.add_argument(
+        "--executable",
+        metavar="PATH",
+        type=str,
+        help="Relative path to SimulationCrafts executable. Default: '{}'".format(
+            settings.executable
+        )
+    )
+    parser.add_argument(
+        "--profileset_work_threads",
+        metavar="NUMBER",
+        type=str,
+        help="Number of threads used per profileset by SimulationCraft. Default: '{}'".format(
+            settings.profileset_work_threads
+        )
+    )
+    parser.add_argument(
+        "--threads",
+        metavar="NUMBER",
+        type=str,
+        help="Number of threads used by SimulationCraft. Default: '{}'".format(
+            settings.threads)
+    )
+    parser.add_argument(
+        "--debug",
+        action="store_const",
+        const=True,
+        default=settings.debug,
+        help="Enables debug modus. Default: '{}'".format(settings.debug)
+    )
+    parser.add_argument(
+        "-ptr", action="store_const", const=True, default=False, help="Enables ptr."
+    )
+    # sim only one type of data generation for one spec
+    parser.add_argument(
+        "-s",
+        "--single_sim",
+        dest="single_sim",
+        metavar="STRING",
+        type=str,
+        help="Activate a single simulation on the local machine. <simulation_types> are races, azerite_traits, secondary_distributions, talent_worth, trinkets, essences, essence_combinations. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk"
+    )
+    parser.add_argument(
+        "--custom_profile",
+        action="store_const",
+        const=True,
+        default=False,
+        help="Enables usage of 'custom_profile.txt' in addition to the base profile. Default: '{}'"
+        .format(settings.debug)
+    )
+    parser.add_argument(
+        "--custom_apl",
+        action="store_const",
+        const=True,
+        default=False,
+        help="Enables usage of 'custom_apl.txt' in addition to the base profile. Default: '{}'"
+        .format(settings.debug)
+    )
+    parser.add_argument(
+        "--custom_fight_style",
+        action="store_const",
+        const=True,
+        default=False,
+        help="Enables usage of 'custom_fight_style.txt' in addition to the base profile. Default: '{}'"
+        .format(settings.debug)
+    )
+    parser.add_argument(
+        "--target_error",
+        metavar='STRING',
+        type=str,
+        help="Overwrites target_error for all simulations. Default: whatever is in setting.py"
+    )
+    parser.add_argument(
+        "--raidbots",
+        action="store_const",
+        const=True,
+        default=False,
+        help="Don't try this at home"
+    )
 
-    Arguments:
-        wow_class {str} -- wow class, e.g. shaman
-        wow_spec {str} -- wow spec, e.g. elemental
-        tier {str} -- profile tier, e.g. 21 or PR
-
-    Returns:
-        str -- relative link to the standard simc profile
-    """
-
-    logger.debug("create_basic_profile_string start")
-    # create the basis profile string
-    split_path: list = settings.executable.split("simc")
-    if len(split_path) > 2:
-        # the path contains multiple "simc"
-        basis_profile_string: str = "simc".join(split_path[:-1])
-    else:
-        basis_profile_string: str = split_path[0]
-
-    # fix path for linux users
-    if basis_profile_string.endswith("/engine/"):
-        split_path = basis_profile_string.split("/engine/")
-        if len(split_path) > 2:
-            basis_profile_string = "/engine/".join(split_path[:-1])
-        else:
-            basis_profile_string = split_path[0] + "/"
-
-    basis_profile_string += "profiles/"
-    if tier == "PR":
-        basis_profile_string += "PreRaids/PR_{}_{}".format(
-            wow_class.title(), wow_spec.title())
-    else:
-        basis_profile_string += "Tier{}/T{}_{}_{}".format(
-            tier, tier, wow_class, wow_spec).title()
-    basis_profile_string += ".simc"
-
-    logger.debug("Created basis_profile_string '{}'.".format(
-        basis_profile_string))
-    logger.debug("create_basic_profile_string ended")
-    return basis_profile_string
+    return parser.parse_args()
 
 
 def pretty_timestamp() -> str:
@@ -258,142 +310,7 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     return profile
 
 
-def create_base_json_dict(data_type: str, wow_class: str, wow_spec: str, fight_style: str):
-    """Creates as basic json dictionary. You'll need to add your data into 'data'. Can be extended.
-
-    Arguments:
-        data_type {str} -- e.g. Races, Trinkets, Azerite Traits (str is used in the title)
-        wow_class {str} -- [description]
-        wow_spec {str} -- [description]
-        fight_style {str} -- [description]
-
-    Returns:
-        dict -- [description]
-    """
-
-    logger.debug("create_base_json_dict start")
-
-    timestamp = pretty_timestamp()
-
-    profile_location = create_basic_profile_string(
-        wow_class, wow_spec, settings.tier)
-
-    profile = extract_profile(profile_location, wow_class)
-
-    if settings.custom_profile:
-        profile = extract_profile('custom_profile.txt', wow_class, profile)
-
-    # spike the export data with talent data
-    talent_data = wow_lib.get_talent_dict(
-        wow_class, wow_spec, settings.ptr == "1")
-
-    # add class/ id number
-    class_id = wow_lib.get_class_id(wow_class)
-    spec_id = wow_lib.get_spec_id(wow_class, wow_spec)
-
-    subtitle = "UTC {timestamp}".format(timestamp=timestamp)
-    if settings.simc_hash:
-        subtitle += " | SimC build: <a href=\"https://github.com/simulationcraft/simc/commit/{simc_hash}\" target=\"blank\">{simc_hash_short}</a>".format(
-            simc_hash=settings.simc_hash, simc_hash_short=settings.simc_hash[0:7]
-        )
-
-    return {
-        "data_type": "{}".format(data_type.lower().replace(" ", "_")),
-        "timestamp": timestamp,
-        "title":
-            "{data_type} | {wow_spec} {wow_class} | {fight_style}".format(
-                data_type=data_type.title(),
-                wow_class=wow_class.title().replace("_", " "),
-                wow_spec=wow_spec.title().replace("_", " "),
-                fight_style=fight_style.title()
-        ),
-        "subtitle": subtitle,
-        "simc_settings": {
-            "tier": settings.tier,
-            "fight_style": fight_style,
-            "iterations": settings.iterations,
-            "target_error": settings.target_error[fight_style],
-            "ptr": settings.ptr,
-            "simc_hash": settings.simc_hash,
-            # deprecated
-            "class": wow_class,
-            # deprecated
-            "spec": wow_spec
-        },
-        "data": {},
-        "languages": {},
-        "profile": profile,
-        "talent_data": talent_data,
-        "class_id": class_id,
-        "spec_id": spec_id
-    }
-
-
-def tokenize_str(string: str) -> str:
-    """Return SimulationCraft appropriate name.
-
-    Arguments:
-        string {str} -- E.g. "Tawnos, Urza's Apprentice"
-
-    Returns:
-        str -- "tawnos_urzas_apprentice"
-    """
-
-    string = string.lower().split(" (")[0]
-    # cleanse name
-    if "__" in string or " " in string or "-" in string or "'" in string or "," in string:
-        return tokenize_str(
-            string.replace("'", "").replace("-", "").replace(" ",
-                                                             "_").replace("__",
-                                                                          "_").replace(",", "")
-        )
-
-    return string
-
-
-def get_simc_hash(path) -> str:
-    """Get the FETCH_HEAD or shallow simc git hash.
-
-    Returns:
-        str -- [description]
-    """
-
-    if ".exe" in path:
-        new_path = path.split("simc.exe")[0]
-    else:
-        new_path = path[:-5]     # cut "/simc" from unix path
-        if "engine" in new_path[-6:]:
-            new_path = new_path[:-6]
-
-    # add path to file to variable
-    new_path += ".git/FETCH_HEAD"
-
-    try:
-        with open(new_path, 'r', encoding='utf-8') as f:
-            for line in f:
-                if "'bfa-dev'" in line:
-                    simc_hash = line.split()[0]
-    except FileNotFoundError:
-        try:
-            with open('../../SimulationCraft/.git/shallow', 'r', encoding='utf-8') as f:
-                for line in f:
-                    simc_hash = line.strip()
-        except FileNotFoundError:
-            logger.warning(
-                "Couldn't extract SimulationCraft git hash. Result files won't contain a sane hash."
-            )
-            simc_hash = None
-        except Exception as e:
-            logger.error(e)
-            raise e
-    except Exception as e:
-        logger.error(e)
-        raise e
-
-    return simc_hash
-
-
-def race_simulations(specs: List[Tuple[str, str]]) -> None:
+def race_simulations(specs: List[Tuple[str, str]], settings) -> None:
     """Simulates all available races for all given specs.
 
     Arguments:
@@ -411,7 +328,7 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
             try:
                 with open(
                     create_basic_profile_string(
-                        wow_class, wow_spec, settings.tier), 'r'
+                        wow_class, wow_spec, settings.tier, settings), 'r'
                 ) as f:
                     pass
             except FileNotFoundError:
@@ -424,7 +341,7 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
 
             # prepare result json
             wanted_data = create_base_json_dict(
-                "Races", wow_class, wow_spec, fight_style)
+                "Races", wow_class, wow_spec, fight_style, settings)
 
             races = wow_lib.get_races_for_class(wow_class)
             simulation_group = so.Simulation_Group(
@@ -611,7 +528,7 @@ def race_simulations(specs: List[Tuple[str, str]]) -> None:
     logger.debug("race_simulations ended")
 
 
-def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
+def gear_path_simulations(specs: List[Tuple[str, str]], settings) -> None:
 
     for fight_style in settings.fight_styles:
         gear_path = []
@@ -621,7 +538,7 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
             try:
                 with open(
                     create_basic_profile_string(
-                        wow_class, wow_spec, settings.tier), 'r'
+                        wow_class, wow_spec, settings.tier, settings), 'r'
                 ) as f:
                     pass
             except FileNotFoundError:
@@ -635,7 +552,7 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
             # initial profiles and data
             secondary_sum = 0
             base_profile_string = create_basic_profile_string(
-                wow_class, wow_spec, settings.tier)
+                wow_class, wow_spec, settings.tier, settings)
 
             try:
                 with open(base_profile_string, 'r') as f:
@@ -800,7 +717,7 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
             logger.info(gear_path)
 
             result = create_base_json_dict(
-                "Gear Path", wow_class, wow_spec, fight_style)
+                "Gear Path", wow_class, wow_spec, fight_style, settings)
 
             result['data'] = gear_path
 
@@ -814,7 +731,7 @@ def gear_path_simulations(specs: List[Tuple[str, str]]) -> None:
                 json.dump(result, f, indent=4, sort_keys=True)
 
 
-def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
+def talent_worth_simulations(specs: List[Tuple[str, str]], settings) -> None:
     """Function generates all possible talent combinations for all specs. Including empty dps talent rows. This way the dps gain of each talent can be calculated.
 
     Arguments:
@@ -834,7 +751,7 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
             try:
                 with open(
                     create_basic_profile_string(
-                        wow_class, wow_spec, settings.tier), 'r'
+                        wow_class, wow_spec, settings.tier, settings), 'r'
                 ) as f:
                     pass
             except FileNotFoundError:
@@ -846,7 +763,7 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
                 continue
 
             base_profile_string = create_basic_profile_string(
-                wow_class, wow_spec, settings.tier)
+                wow_class, wow_spec, settings.tier, settings)
 
             simulation_group = so.Simulation_Group(
                 name="{} {} {}".format(fight_style, wow_spec, wow_class),
@@ -962,7 +879,7 @@ def talent_worth_simulations(specs: List[Tuple[str, str]]) -> None:
                 simulation_group.simulate()
 
             export_json = create_base_json_dict(
-                "Talent Worth", wow_class, wow_spec, fight_style)
+                "Talent Worth", wow_class, wow_spec, fight_style, settings)
 
             # save all generated data in "data"
             for profile in simulation_group.profiles:
@@ -1093,14 +1010,14 @@ def main(args: object):
         settings.ptr = "1"
 
     if args.custom_profile:
-        settings.custom_profile: bool = args.custom_profile
+        settings.custom_profile = args.custom_profile
 
     if args.custom_apl:
-        settings.custom_apl: bool = args.custom_apl
+        settings.custom_apl = args.custom_apl
         settings.default_actions = "0"
 
     if args.custom_fight_style:
-        settings.custom_fight_style: bool = args.custom_fight_style
+        settings.custom_fight_style = args.custom_fight_style
 
     if args.target_error:
         for fight_style in settings.target_error:
@@ -1132,12 +1049,12 @@ def main(args: object):
 
         if settings.use_own_threading:
             race_thread = threading.Thread(
-                name="Race Thread", target=race_simulations, args=(settings.wow_class_spec_list,)
+                name="Race Thread", target=race_simulations, args=(settings.wow_class_spec_list, settings)
             )
             thread_list.append(race_thread)
             race_thread.start()
         else:
-            race_simulations(settings.wow_class_spec_list)
+            race_simulations(settings.wow_class_spec_list, settings)
 
         if not settings.use_own_threading:
             logger.info("Race simulations finished.")
@@ -1179,23 +1096,6 @@ def main(args: object):
         if not settings.use_own_threading:
             logger.info("Secondary Distribution simulations finished.")
 
-    # trigger azerite trait simulations
-    if settings.enable_azerite_trait_simulations:
-        if not settings.use_own_threading:
-            logger.info("Starting Azerite Trait simulations.")
-
-        if settings.use_own_threading:
-            azerite_trait_thread = threading.Thread(
-                name="Azerite Traits Thread", target=azerite_trait_simulations, args=(settings,)
-            )
-            thread_list.append(azerite_trait_thread)
-            azerite_trait_thread.start()
-        else:
-            azerite_trait_simulations(settings)
-
-        if not settings.use_own_threading:
-            logger.info("Azerite Trait simulations finished.")
-
     # trigger gear path simulations
     if settings.enable_gear_path:
         if not settings.use_own_threading:
@@ -1205,12 +1105,12 @@ def main(args: object):
             gearing_path_thread = threading.Thread(
                 name="Gear Path Thread",
                 target=gear_path_simulations,
-                args=(settings.wow_class_spec_list,)
+                args=(settings.wow_class_spec_list, settings)
             )
             thread_list.append(gearing_path_thread)
             gearing_path_thread.start()
         else:
-            gear_path_simulations(settings.wow_class_spec_list)
+            gear_path_simulations(settings.wow_class_spec_list, settings)
 
         if not settings.use_own_threading:
             logger.info("Gear Path simulations end.")
@@ -1224,68 +1124,15 @@ def main(args: object):
             talent_worth_thread = threading.Thread(
                 name="Talent Worth Thread",
                 target=talent_worth_simulations,
-                args=(settings.wow_class_spec_list,)
+                args=(settings.wow_class_spec_list, settings)
             )
             thread_list.append(talent_worth_thread)
             talent_worth_thread.start()
         else:
-            talent_worth_simulations(settings.wow_class_spec_list)
+            talent_worth_simulations(settings.wow_class_spec_list, settings)
 
         if not settings.use_own_threading:
             logger.info("Talent Worth simulations end.")
-
-    # trigger essence simulations
-    if settings.enable_azerite_essence_simulations:
-        if not settings.use_own_threading:
-            logger.info("Essence simulations start.")
-
-        if settings.use_own_threading:
-            essence_thread = threading.Thread(
-                name="Essence Thread", target=essence_simulation, args=(settings,)
-            )
-            thread_list.append(essence_thread)
-            essence_thread.start()
-        else:
-            essence_simulation(settings)
-
-        if not settings.use_own_threading:
-            logger.info("Essence simulations end.")
-
-    # trigger essence simulations
-    if settings.enable_azerite_essence_combination_simulations:
-        if not settings.use_own_threading:
-            logger.info("Essence combination simulations start.")
-
-        if settings.use_own_threading:
-            essence_combination_thread = threading.Thread(
-                name="Essence Combinations Thread",
-                target=essence_combination_simulation,
-                args=(settings,)
-            )
-            thread_list.append(essence_combination_thread)
-            essence_combination_thread.start()
-        else:
-            essence_combination_simulation(settings)
-
-        if not settings.use_own_threading:
-            logger.info("Essence combination simulations end.")
-
-    # trigger corruption simulations
-    if settings.enable_corruption_simulations:
-        if not settings.use_own_threading:
-            logger.info("Corruption simulations start.")
-
-        if settings.use_own_threading:
-            corruption_thread = threading.Thread(
-                name="Corruption Thread", target=corruption_simulation, args=(settings,)
-            )
-            thread_list.append(corruption_thread)
-            corruption_thread.start()
-        else:
-            corruption_simulation(settings)
-
-        if not settings.use_own_threading:
-            logger.info("Corruption simulations end.")
 
     while thread_list:
         time.sleep(1)
@@ -1310,100 +1157,7 @@ if __name__ == '__main__':
 
     settings.logger = logger
 
-    # interface parameters
-    parser = argparse.ArgumentParser(
-        description="Simulate different aspects of World of Warcraft data."
-    )
-    parser.add_argument(
-        "-a",
-        "--all",
-        dest="sim_all",
-        action="store_const",
-        const=True,
-        default=False,
-        help="Simulate races, trinkets, secondary distributions, and azerite traits for all specs and all talent combinations."
-    )
-    parser.add_argument(
-        "--executable",
-        metavar="PATH",
-        type=str,
-        help="Relative path to SimulationCrafts executable. Default: '{}'".format(
-            settings.executable
-        )
-    )
-    parser.add_argument(
-        "--profileset_work_threads",
-        metavar="NUMBER",
-        type=str,
-        help="Number of threads used per profileset by SimulationCraft. Default: '{}'".format(
-            settings.profileset_work_threads
-        )
-    )
-    parser.add_argument(
-        "--threads",
-        metavar="NUMBER",
-        type=str,
-        help="Number of threads used by SimulationCraft. Default: '{}'".format(
-            settings.threads)
-    )
-    parser.add_argument(
-        "--debug",
-        action="store_const",
-        const=True,
-        default=settings.debug,
-        help="Enables debug modus. Default: '{}'".format(settings.debug)
-    )
-    parser.add_argument(
-        "-ptr", action="store_const", const=True, default=False, help="Enables ptr."
-    )
-    # sim only one type of data generation for one spec
-    parser.add_argument(
-        "-s",
-        "--single_sim",
-        dest="single_sim",
-        metavar="STRING",
-        type=str,
-        help="Activate a single simulation on the local machine. <simulation_types> are races, azerite_traits, secondary_distributions, talent_worth, trinkets, essences, essence_combinations. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk"
-    )
-    parser.add_argument(
-        "--custom_profile",
-        action="store_const",
-        const=True,
-        default=False,
-        help="Enables usage of 'custom_profile.txt' in addition to the base profile. Default: '{}'"
-        .format(settings.debug)
-    )
-    parser.add_argument(
-        "--custom_apl",
-        action="store_const",
-        const=True,
-        default=False,
-        help="Enables usage of 'custom_apl.txt' in addition to the base profile. Default: '{}'"
-        .format(settings.debug)
-    )
-    parser.add_argument(
-        "--custom_fight_style",
-        action="store_const",
-        const=True,
-        default=False,
-        help="Enables usage of 'custom_fight_style.txt' in addition to the base profile. Default: '{}'"
-        .format(settings.debug)
-    )
-    parser.add_argument(
-        "--target_error",
-        metavar='STRING',
-        type=str,
-        help="Overwrites target_error for all simulations. Default: whatever is in setting.py"
-    )
-    parser.add_argument(
-        "--raidbots",
-        action="store_const",
-        const=True,
-        default=False,
-        help="Don't try this at home"
-    )
-
-    args = parser.parse_args()
+    args = arg_parse_config()
 
     main(args)
     logger.debug("__main__ ended")
