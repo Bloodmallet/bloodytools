@@ -551,7 +551,8 @@ class Simulation_Group():
         threads: str = "",
         profileset_work_threads: str = "",
         executable: str = "",
-        logger: logging.Logger = None
+        logger: logging.Logger = None,
+        remove_files: bool = True,
     ) -> None:
         self.logger = logger or logging.getLogger(__name__)
         self.logger.debug("simulation_group initiated.")
@@ -560,6 +561,7 @@ class Simulation_Group():
         self.filename: str = ""
         self.json_filename: str = None
         self.threads = threads
+        self.remove_files = remove_files
         # simulationcrafts own multithreading
         self.profileset_work_threads = profileset_work_threads
         self.executable = executable
@@ -839,7 +841,7 @@ class Simulation_Group():
 
                         raise SimulationError(self.error)
 
-                    else:
+                    elif self.remove_files:
                         # remove profilesets file
                         os.remove(self.filename)
                         self.filename = None
@@ -856,7 +858,7 @@ class Simulation_Group():
                         self.set_json_data(json_data)
 
                     # remove json file after parsing
-                    if self.json_filename is not None:
+                    if self.json_filename is not None and self.remove_files:
                         os.remove(self.json_filename)
 
             else:
