@@ -8,17 +8,19 @@ import urllib3
 
 from bloodytools import settings
 from simc_support.game_data.Talent import get_talent_dict
+from simc_support.game_data.WowSpec import WowSpec
+from simc_support.game_data.WowClass import WowClass
 
 logger = logging.getLogger(__name__)
 
 
-def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str, settings: object):
+def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: object):
     """Create basic profile string to get the standard profile of a spec. Use this function to get the necessary string for your first argument of a simulation_data object.
 
   Arguments:
-    wow_class {str} -- wow class, e.g. shaman
-    wow_spec {str} -- wow spec, e.g. elemental
+    wow_spec {WowSpec} -- wow spec, e.g. elemental shaman
     tier {str} -- profile tier, e.g. 21 or PR
+    settings {object}
 
   Returns:
     str -- relative link to the standard simc profile
@@ -44,10 +46,10 @@ def create_basic_profile_string(wow_class: str, wow_spec: str, tier: str, settin
     basis_profile_string += "profiles/"
     if tier == "PR":
         basis_profile_string += "PreRaids/PR_{}_{}".format(
-            wow_class.title(), wow_spec.title())
+            wow_spec.wow_class.simc_name.title(), wow_spec.simc_name.title())
     else:
         basis_profile_string += "Tier{}/T{}_{}_{}".format(
-            tier, tier, wow_class, wow_spec).title()
+            tier, tier, wow_spec.wow_class.simc_name, wow_spec.simc_name).title()
     basis_profile_string += ".simc"
 
     logger.debug("Created basis_profile_string '{}'.".format(
@@ -66,7 +68,7 @@ def pretty_timestamp() -> str:
     return datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M")
 
 
-def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
+def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dict:
     """Extract all character specific data from a given file.
 
   Arguments:
@@ -77,17 +79,13 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
       dict -- all known character data
   """
 
-    logger.warning(
-        'DEPRICATION WARNING: profile format change. Information will be stored in its own subsection. Read result file to already get the new format.'
-    )
-
     if not profile:
         profile = {}
 
     if not 'character' in profile:
         profile['character'] = {}
 
-    profile['character']['class'] = wow_class
+    profile['character']['class'] = wow_class.simc_name
 
     # prepare regex for each extractable slot
     item_slots = [
@@ -126,7 +124,8 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
     # don't recompile this for each slot
     for element in item_elements:
         pattern_element[element] = re.compile(
-            ',{}=([a-z0-9_/:]*)'.format(element))
+            ',{}=([a-z0-9_/:]*)'.format(element)
+        )
 
     # prepare regex for character defining information. like spec
     character_specifics = [
@@ -150,8 +149,6 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
                 matches = pattern_specifics[specific].search(line)
                 if matches:
                     profile['character'][specific] = matches.group(1)
-                    # TODO: remove after some time (webfront-end needs to be updated)
-                    profile[specific] = matches.group(1)
 
             for slot in item_slots:
 
@@ -176,16 +173,12 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
                         if new_matches:
                             profile['items'][slot][element] = new_matches.group(
                                 1)
-                            # TODO: remove after some time (webfront-end needs to be updated)
-                            if not slot in profile:
-                                profile[slot] = {}
-                            profile[slot][element] = new_matches.group(1)
 
     return profile
 
 
 def create_base_json_dict(
-    data_type: str, wow_class: str, wow_spec: str, fight_style: str, settings: object
+    data_type: str, wow_spec: WowSpec, fight_style: str, settings: object
 ):
     """Creates as basic json dictionary. You'll need to add your data into 'data'. Can be extended.
 
@@ -204,20 +197,27 @@ def create_base_json_dict(
     timestamp = pretty_timestamp()
 
     profile_location = create_basic_profile_string(
-        wow_class, wow_spec, settings.tier, settings)
+        wow_spec,
+        settings.tier,
+        settings
+    )
 
-    profile = extract_profile(profile_location, wow_class)
+    profile = extract_profile(profile_location, wow_spec.wow_class)
 
     if settings.custom_profile:
-        profile = extract_profile('custom_profile.txt', wow_class, profile)
+        profile = extract_profile(
+            'custom_profile.txt',
+            wow_spec.wow_class,
+            profile
+        )
 
     # spike the export data with talent data
     talent_data = get_talent_dict(
-        wow_class, wow_spec, settings.ptr == "1"
+        wow_spec, settings.ptr == "1"
     )
 
     # add class/ id number
-    class_id = wow_class.id
+    class_id = wow_spec.wow_class.id
     spec_id = wow_spec.id
 
     subtitle = "UTC {timestamp}".format(timestamp=timestamp)
@@ -232,8 +232,8 @@ def create_base_json_dict(
         "title":
             "{data_type} | {wow_spec} {wow_class} | {fight_style}".format(
                 data_type=data_type.title(),
-                wow_class=wow_class.title().replace("_", " "),
-                wow_spec=wow_spec.title().replace("_", " "),
+                wow_class=wow_spec.wow_class.full_name,
+                wow_spec=wow_spec.full_name,
                 fight_style=fight_style.title()
         ),
         "subtitle": subtitle,
@@ -245,9 +245,9 @@ def create_base_json_dict(
             "ptr": settings.ptr,
             "simc_hash": settings.simc_hash,
             # deprecated
-            "class": wow_class,
+            "class": wow_spec.wow_class.simc_name,
             # deprecated
-            "spec": wow_spec
+            "spec": wow_spec.simc_name
         },
         "data": {},
         "languages": {},
