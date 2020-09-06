@@ -11,7 +11,7 @@ import time
 import uuid
 
 # wow game data and simc input checks
-from simc_support import simc_checks as simc_checks
+from simc_support.simc_data.FightStyle import FIGHTSTYLES
 from typing import List, Union
 from bloodytools.utils.utils import request as r
 
@@ -129,7 +129,7 @@ class Simulation_Data():
                 self.logger.error("{}".format(e))
                 raise e
         # simc setting to determine the fight style
-        if fight_style == "custom" or simc_checks.FightStyle().is_fight_style(fight_style):
+        if fight_style == "custom" or fight_style in FIGHTSTYLES:
             self.fight_style = fight_style
         else:
             self.logger.warning(
