@@ -22,7 +22,6 @@ Support the development:
 May 2018
 """
 
-import argparse
 import datetime
 import json
 import logging
@@ -33,7 +32,7 @@ import threading
 import time
 
 from bloodytools import settings
-from bloodytools.simulation_objects import simulation_objects as so
+from bloodytools.simulation_objects.simulation_objects import Simulation_Data, Simulation_Group
 from bloodytools.simulation_objects.secondary_distribution_simulation import secondary_distribution_simulation
 from bloodytools.simulation_objects.trinket_simulation import trinket_simulation
 from bloodytools.utils.utils import create_base_json_dict
@@ -213,7 +212,7 @@ def race_simulations(specs: List[Tuple[str, str]], settings) -> None:
                 "Races", wow_class, wow_spec, fight_style, settings)
 
             races = wow_lib.get_races_for_class(wow_class)
-            simulation_group = so.Simulation_Group(
+            simulation_group = Simulation_Group(
                 name="race_simulations",
                 threads=settings.threads,
                 profileset_work_threads=settings.profileset_work_threads,
@@ -227,7 +226,7 @@ def race_simulations(specs: List[Tuple[str, str]], settings) -> None:
 
                 if race == races[0]:
 
-                    simulation_data = so.Simulation_Data(
+                    simulation_data = Simulation_Data(
                         name=race.title().replace("_", " "),
                         fight_style=fight_style,
                         profile=wanted_data['profile'],
@@ -254,7 +253,7 @@ def race_simulations(specs: List[Tuple[str, str]], settings) -> None:
                         simulation_data.simc_arguments.append(
                             custom_fight_style)
                 else:
-                    simulation_data = so.Simulation_Data(
+                    simulation_data = Simulation_Data(
                         name=race.title().replace("_", " "),
                         fight_style=fight_style,
                         simc_arguments=["race={}".format(race)],
@@ -283,7 +282,7 @@ def race_simulations(specs: List[Tuple[str, str]], settings) -> None:
                     # create more loa profiles and add them
                     simulation_data = None
                     for loa in ['bwonsamdi', 'paku']:
-                        simulation_data = so.Simulation_Data(
+                        simulation_data = Simulation_Data(
                             name='{} {}'.format(
                                 race.title().replace("_", " "), loa.title()),
                             fight_style=fight_style,
@@ -445,7 +444,7 @@ def gear_path_simulations(specs: List[Tuple[str, str]], settings) -> None:
 
             while crit_rating + haste_rating + mastery_rating + vers_rating < secondary_sum:
 
-                simulation_group = so.Simulation_Group(
+                simulation_group = Simulation_Group(
                     name="{} {} {}".format(fight_style, wow_spec, wow_class),
                     executable=settings.executable,
                     threads=settings.threads,
@@ -453,7 +452,7 @@ def gear_path_simulations(specs: List[Tuple[str, str]], settings) -> None:
                     logger=logger
                 )
 
-                crit_profile = so.Simulation_Data(
+                crit_profile = Simulation_Data(
                     name="crit_profile",
                     executable=settings.executable,
                     fight_style=fight_style,
@@ -472,7 +471,7 @@ def gear_path_simulations(specs: List[Tuple[str, str]], settings) -> None:
                 )
                 simulation_group.add(crit_profile)
 
-                haste_profile = so.Simulation_Data(
+                haste_profile = Simulation_Data(
                     name="haste_profile",
                     executable=settings.executable,
                     fight_style=fight_style,
@@ -490,7 +489,7 @@ def gear_path_simulations(specs: List[Tuple[str, str]], settings) -> None:
                 )
                 simulation_group.add(haste_profile)
 
-                mastery_profile = so.Simulation_Data(
+                mastery_profile = Simulation_Data(
                     name="mastery_profile",
                     executable=settings.executable,
                     fight_style=fight_style,
@@ -508,7 +507,7 @@ def gear_path_simulations(specs: List[Tuple[str, str]], settings) -> None:
                 )
                 simulation_group.add(mastery_profile)
 
-                vers_profile = so.Simulation_Data(
+                vers_profile = Simulation_Data(
                     name="vers_profile",
                     executable=settings.executable,
                     fight_style=fight_style,
@@ -634,7 +633,7 @@ def talent_worth_simulations(specs: List[Tuple[str, str]], settings) -> None:
             base_profile_string = create_basic_profile_string(
                 wow_class, wow_spec, settings.tier, settings)
 
-            simulation_group = so.Simulation_Group(
+            simulation_group = Simulation_Group(
                 name="{} {} {}".format(fight_style, wow_spec, wow_class),
                 executable=settings.executable,
                 threads=settings.threads,
@@ -690,7 +689,7 @@ def talent_worth_simulations(specs: List[Tuple[str, str]], settings) -> None:
                     len(talent_combinations))
             )
 
-            base_profile = so.Simulation_Data(
+            base_profile = Simulation_Data(
                 name="{}".format(talent_combinations[0]),
                 fight_style=fight_style,
                 simc_arguments=[base_profile_string,
@@ -721,7 +720,7 @@ def talent_worth_simulations(specs: List[Tuple[str, str]], settings) -> None:
 
             # add all talent combinations to the simulation_group
             for talent_combination in talent_combinations[1:]:
-                simulation_data = so.Simulation_Data(
+                simulation_data = Simulation_Data(
                     name="{}".format(talent_combination),
                     fight_style=fight_style,
                     simc_arguments=["talents={}".format(talent_combination)],
