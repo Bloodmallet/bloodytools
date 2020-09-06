@@ -175,7 +175,7 @@ def race_simulation(specs: List[Tuple[str, str]], settings) -> None:
                 translated_name = wow_lib.get_race_translation(profile.name)
                 if translated_name:
                     wanted_data["languages"][profile.name
-                                             ] = wow_lib.get_race_translation(profile.name)
+                                             ] = translated_name
                 else:
                     fake_translation = profile.name.title().replace("_", " ")
                     wanted_data['languages'][profile.name] = {
