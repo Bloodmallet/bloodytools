@@ -271,9 +271,11 @@ def tokenize_str(string: str) -> str:
     # cleanse name
     if "__" in string or " " in string or "-" in string or "'" in string or "," in string:
         return tokenize_str(
-            string.replace("'", "").replace("-", "").replace(" ",
-                                                             "_").replace("__",
-                                                                          "_").replace(",", "")
+            string.replace("'", "")
+            .replace("-", "")
+            .replace(" ", "_")
+            .replace("__", "_")
+            .replace(",", "")
         )
 
     return string
@@ -295,7 +297,7 @@ def get_simc_hash(path) -> str:
 
     # add path to file to variable
     new_path += ".git/FETCH_HEAD"
-
+    simc_hash: str = None
     try:
         with open(new_path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -310,7 +312,6 @@ def get_simc_hash(path) -> str:
             logger.warning(
                 "Couldn't extract SimulationCraft git hash. Result files won't contain a sane hash."
             )
-            simc_hash = None
         except Exception as e:
             logger.error(e)
             raise e
