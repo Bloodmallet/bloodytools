@@ -10,6 +10,7 @@ You need
 - [Python 3.6](https://www.python.org/downloads/) or newer,
 - [simc_support](https://github.com/Bloodmallet/simc_support) (which is handled in the requirements.txt).
 
+
 ## Download
 Download or clone this repository next to your SimulationCraft directory.
 
@@ -39,11 +40,11 @@ $ <env_name>\Scripts\active
 - "(env)" should appear in front of your line
 - Check python version again: `python --version`
 - `python -m pip install --upgrade pip` to update the installer of extra tools
-- `pip install -r requirements.txt`
+- `pip install -U -r requirements.txt`
 Congratulations, you're ready to execute the command of `Getting started` in your already open Commandline/Powershell/Terminal.
 
 ## Getting started
-Edit settings.py to your liking using a text editor like Notepad++. Start python environement. Start bloodytools.
+Edit `bloodytools/settings.py` to your liking using a text editor like Notepad++. Start python environement. Start bloodytools.
 ```sh
 $ cd ~/bloodytools
 $ <env_name>/Scripts/activate
@@ -51,7 +52,7 @@ $ <env_name>/Scripts/activate
 ```
 
 ## Development
-If you see a lack of features somewhere or ways to improve the quality of the code, please contact me or create an [issue](https://github.com/Bloodmallet/bloodytools/issues). You can also fork this project and create a pull request with your ideas. Please use `autopep8` to format your code.
+If you see a lack of features somewhere or ways to improve the quality of the code, please contact me or create an [issue](https://github.com/Bloodmallet/bloodytools/issues). You can also fork this project and create a pull request with your ideas. Please use `black` to format your code.
 
 ## Contact
 Meet me in [Discord](https://discord.gg/sXfmMkm). My username is Bloodmallet(EU)#8246.
