@@ -28,43 +28,51 @@ import sys
 import threading
 import time
 
+
 from bloodytools import settings
+
 # from bloodytools.simulations.gear_path_simulation import gear_path_simulation
 # from bloodytools.simulations.race_simulation import race_simulation
 # from bloodytools.simulations.secondary_distribution_simulation import secondary_distribution_simulation
 from bloodytools.simulations.trinket_simulation import trinket_simulation
+from bloodytools.simulations.soul_bind_simulation import soul_bind_simulation
+
 # from bloodytools.simulations.talent_worth_simulation import talent_worth_simulation
 from bloodytools.utils.utils import get_simc_hash
 from bloodytools.utils.utils import arg_parse_config
 from bloodytools.utils.utils import logger_config
 from simc_support.game_data.WowSpec import WOWSPECS, get_wow_spec
 
-logger = logging.getLogger(__name__)
 
-
-def main(args: object):
-    logger.debug("main start")
-    logger.info("Bloodytools at your service.")
+def main():
+    args = arg_parse_config()
 
     # activate debug mode as early as possible
     if args.debug:
         settings.debug = args.debug
-        logger.setLevel(logging.DEBUG)
-        logger.debug("Set debug mode to {}".format(settings.debug))
+
+    logger = logger_config()
+
+    settings.logger = logger
+
+    logger.debug("main start")
+    logger.info("Bloodytools at your service.")
 
     if args.single_sim:
         logger.debug("-s / --single_sim detected")
         try:
             simulation_type, wow_class, wow_spec, fight_style = args.single_sim.split(
-                ',')
+                ","
+            )
         except Exception:
-            logger.error(
-                "-s / --single_sim arg is missing parameters. Read -h.")
+            logger.error("-s / --single_sim arg is missing parameters. Read -h.")
             sys.exit("Input error. Bloodytools terminates.")
 
         # single sim will always use all cores unless --threads is defined
         settings.threads = ""
-        settings.wow_class_spec_list = [get_wow_spec(wow_class, wow_spec), ]
+        settings.wow_class_spec_list = [
+            get_wow_spec(wow_class, wow_spec),
+        ]
         settings.fight_styles = [
             fight_style,
         ]
@@ -75,6 +83,7 @@ def main(args: object):
         settings.enable_secondary_distributions_simulations = False
         settings.enable_gear_path = False
         settings.enable_talent_worth_simulations = False
+        settings.enable_soul_bind_simulations = False
 
         # set dev options
         settings.use_own_threading = False
@@ -85,6 +94,8 @@ def main(args: object):
         #     settings.enable_race_simulations = True
         if simulation_type == "trinkets":
             settings.enable_trinket_simulations = True
+        elif simulation_type == "soul_binds":
+            settings.enable_soul_bind_simulations = True
         # elif simulation_type == "secondary_distributions":
         #     settings.enable_secondary_distributions_simulations = True
         # elif simulation_type == "talent_worth":
@@ -103,8 +114,9 @@ def main(args: object):
     # set new profileset_work_threads if provided
     if args.profileset_work_threads:
         settings.profileset_work_threads = args.profileset_work_threads
-        logger.debug("Set profileset_work_threads to {}".format(
-            settings.profileset_work_threads))
+        logger.debug(
+            "Set profileset_work_threads to {}".format(settings.profileset_work_threads)
+        )
 
     if args.ptr:
         settings.ptr = "1"
@@ -130,7 +142,7 @@ def main(args: object):
     new_hash = get_simc_hash(settings.executable)
     if new_hash:
         settings.simc_hash = new_hash
-    if not hasattr(settings, 'simc_hash'):
+    if not hasattr(settings, "simc_hash"):
         settings.simc_hash = None
 
     bloodytools_start_time = datetime.datetime.utcnow()
@@ -176,6 +188,22 @@ def main(args: object):
 
         if not settings.use_own_threading:
             logger.info("Trinket simulations finished.")
+
+    if settings.enable_soul_bind_simulations:
+        if not settings.use_own_threading:
+            logger.info("Starting Soul Bind simulations.")
+
+        if settings.use_own_threading:
+            soul_bind_thread = threading.Thread(
+                name="Soul Bind Thread", target=soul_bind_simulation, args=(settings,)
+            )
+            thread_list.append(soul_bind_thread)
+            soul_bind_thread.start()
+        else:
+            soul_bind_simulation(settings)
+
+        if not settings.use_own_threading:
+            logger.info("Soul Bind simulations finished.")
 
     # TODO: re-enable other simulation types
     # trigger secondary distributions
@@ -242,26 +270,18 @@ def main(args: object):
         time.sleep(1)
         for thread in thread_list:
             if thread.is_alive():
-                logger.debug(
-                    "{} is still in progress.".format(thread.getName()))
+                logger.debug("{} is still in progress.".format(thread.getName()))
             else:
                 logger.info("{} finished.".format(thread.getName()))
                 thread_list.remove(thread)
 
     logger.info(
-        "Bloodytools took {} to finish."
-        .format(datetime.datetime.utcnow() - bloodytools_start_time)
+        "Bloodytools took {} to finish.".format(
+            datetime.datetime.utcnow() - bloodytools_start_time
+        )
     )
     logger.debug("main ended")
 
 
-if __name__ == '__main__':
-    logger.debug("__main__ start")
-    logger = logger_config()
-
-    settings.logger = logger
-
-    args = arg_parse_config()
-
-    main(args)
-    logger.debug("__main__ ended")
+if __name__ == "__main__":
+    main()
