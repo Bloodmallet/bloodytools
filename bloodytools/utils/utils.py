@@ -17,14 +17,14 @@ logger = logging.getLogger(__name__)
 def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: object):
     """Create basic profile string to get the standard profile of a spec. Use this function to get the necessary string for your first argument of a simulation_data object.
 
-  Arguments:
-    wow_spec {WowSpec} -- wow spec, e.g. elemental shaman
-    tier {str} -- profile tier, e.g. 21 or PR
-    settings {object}
+    Arguments:
+      wow_spec {WowSpec} -- wow spec, e.g. elemental shaman
+      tier {str} -- profile tier, e.g. 21 or PR
+      settings {object}
 
-  Returns:
-    str -- relative link to the standard simc profile
-  """
+    Returns:
+      str -- relative link to the standard simc profile
+    """
 
     logger.debug("create_basic_profile_string start")
     # create the basis profile string
@@ -46,14 +46,15 @@ def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: object):
     basis_profile_string += "profiles/"
     if tier == "PR":
         basis_profile_string += "PreRaids/PR_{}_{}".format(
-            wow_spec.wow_class.simc_name.title(), wow_spec.simc_name.title())
+            wow_spec.wow_class.simc_name.title(), wow_spec.simc_name.title()
+        )
     else:
         basis_profile_string += "Tier{}/T{}_{}_{}".format(
-            tier, tier, wow_spec.wow_class.simc_name, wow_spec.simc_name).title()
+            tier, tier, wow_spec.wow_class.simc_name, wow_spec.simc_name
+        ).title()
     basis_profile_string += ".simc"
 
-    logger.debug("Created basis_profile_string '{}'.".format(
-        basis_profile_string))
+    logger.debug("Created basis_profile_string '{}'.".format(basis_profile_string))
     logger.debug("create_basic_profile_string ended")
     return basis_profile_string
 
@@ -61,9 +62,9 @@ def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: object):
 def pretty_timestamp() -> str:
     """Returns a pretty time stamp "YYYY-MM-DD HH:MM"
 
-  Returns:
-    str -- timestamp
-  """
+    Returns:
+      str -- timestamp
+    """
     # str(datetime.datetime.utcnow())[:-10] should be the same
     return datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M")
 
@@ -71,21 +72,21 @@ def pretty_timestamp() -> str:
 def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dict:
     """Extract all character specific data from a given file.
 
-  Arguments:
-      path {str} -- path to file, relative or absolute
-      profile {dict} -- profile input that should be updated
+    Arguments:
+        path {str} -- path to file, relative or absolute
+        profile {dict} -- profile input that should be updated
 
-  Returns:
-      dict -- all known character data
-  """
+    Returns:
+        dict -- all known character data
+    """
 
     if not profile:
         profile = {}
 
-    if not 'character' in profile:
-        profile['character'] = {}
+    if not "character" in profile:
+        profile["character"] = {}
 
-    profile['character']['class'] = wow_class.simc_name
+    profile["character"]["class"] = wow_class.simc_name
 
     # prepare regex for each extractable slot
     item_slots = [
@@ -108,8 +109,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     ]
     pattern_slots = {}
     for element in item_slots:
-        pattern_slots[element] = re.compile(
-            '^{}=([a-z0-9_=,/:.]*)$'.format(element))
+        pattern_slots[element] = re.compile("^{}=([a-z0-9_=,/:.]*)$".format(element))
 
     # prepare regex for item defining attributes
     item_elements = [
@@ -117,62 +117,58 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
         "bonus_id",
         "azerite_powers",
         "enchant",
-        "azerite_level",     # neck
+        "azerite_level",  # neck
         "ilevel",
     ]
     pattern_element = {}
     # don't recompile this for each slot
     for element in item_elements:
-        pattern_element[element] = re.compile(
-            ',{}=([a-z0-9_/:]*)'.format(element)
-        )
+        pattern_element[element] = re.compile(",{}=([a-z0-9_/:]*)".format(element))
 
     # prepare regex for character defining information. like spec
     character_specifics = [
-        'level',
-        'race',
-        'role',
-        'position',
-        'talents',
-        'spec',
-        'azerite_essences',
+        "level",
+        "race",
+        "role",
+        "position",
+        "talents",
+        "spec",
+        "azerite_essences",
     ]
     pattern_specifics = {}
     for element in character_specifics:
-        pattern_specifics[element] = re.compile(
-            '^{}=([a-z0-9_./:]*)$'.format(element))
+        pattern_specifics[element] = re.compile("^{}=([a-z0-9_./:]*)$".format(element))
 
-    with open(path, 'r') as f:
+    with open(path, "r") as f:
         for line in f:
             for specific in character_specifics:
 
                 matches = pattern_specifics[specific].search(line)
                 if matches:
-                    profile['character'][specific] = matches.group(1)
+                    profile["character"][specific] = matches.group(1)
 
             for slot in item_slots:
 
-                if not 'items' in profile:
-                    profile['items'] = {}
+                if not "items" in profile:
+                    profile["items"] = {}
 
                 matches = pattern_slots[slot].search(line)
                 # slot line found
                 if matches:
                     new_line = matches.group(1)
                     if not slot in profile:
-                        profile['items'][slot] = {}
+                        profile["items"][slot] = {}
 
                     # allow pre-prepared profiles to get emptied if input wants to overwrite with empty
                     # 'head=' as a head example for an empty overwrite
                     if not new_line:
-                        profile['items'].pop(slot, None)
+                        profile["items"].pop(slot, None)
 
                     # check for all elements
                     for element in item_elements:
                         new_matches = pattern_element[element].search(new_line)
                         if new_matches:
-                            profile['items'][slot][element] = new_matches.group(
-                                1)
+                            profile["items"][slot][element] = new_matches.group(1)
 
     return profile
 
@@ -182,39 +178,29 @@ def create_base_json_dict(
 ):
     """Creates as basic json dictionary. You'll need to add your data into 'data'. Can be extended.
 
-  Arguments:
-    data_type {str} -- e.g. Races, Trinkets, Azerite Traits (str is used in the title)
-    wow_class {str} -- [description]
-    wow_spec {str} -- [description]
-    fight_style {str} -- [description]
+    Arguments:
+      data_type {str} -- e.g. Races, Trinkets, Azerite Traits (str is used in the title)
+      wow_class {str} -- [description]
+      wow_spec {str} -- [description]
+      fight_style {str} -- [description]
 
-  Returns:
-    dict -- [description]
-  """
+    Returns:
+      dict -- [description]
+    """
 
     logger.debug("create_base_json_dict start")
 
     timestamp = pretty_timestamp()
 
-    profile_location = create_basic_profile_string(
-        wow_spec,
-        settings.tier,
-        settings
-    )
+    profile_location = create_basic_profile_string(wow_spec, settings.tier, settings)
 
     profile = extract_profile(profile_location, wow_spec.wow_class)
 
     if settings.custom_profile:
-        profile = extract_profile(
-            'custom_profile.txt',
-            wow_spec.wow_class,
-            profile
-        )
+        profile = extract_profile("custom_profile.txt", wow_spec.wow_class, profile)
 
     # spike the export data with talent data
-    talent_data = get_talent_dict(
-        wow_spec, settings.ptr == "1"
-    )
+    talent_data = get_talent_dict(wow_spec, settings.ptr == "1")
 
     # add class/ id number
     class_id = wow_spec.wow_class.id
@@ -222,19 +208,18 @@ def create_base_json_dict(
 
     subtitle = "UTC {timestamp}".format(timestamp=timestamp)
     if settings.simc_hash:
-        subtitle += " | SimC build: <a href=\"https://github.com/simulationcraft/simc/commit/{simc_hash}\" target=\"blank\">{simc_hash_short}</a>".format(
+        subtitle += ' | SimC build: <a href="https://github.com/simulationcraft/simc/commit/{simc_hash}" target="blank">{simc_hash_short}</a>'.format(
             simc_hash=settings.simc_hash, simc_hash_short=settings.simc_hash[0:7]
         )
 
     return {
         "data_type": "{}".format(data_type.lower().replace(" ", "_")),
         "timestamp": timestamp,
-        "title":
-            "{data_type} | {wow_spec} {wow_class} | {fight_style}".format(
-                data_type=data_type.title(),
-                wow_class=wow_spec.wow_class.full_name,
-                wow_spec=wow_spec.full_name,
-                fight_style=fight_style.title()
+        "title": "{data_type} | {wow_spec} {wow_class} | {fight_style}".format(
+            data_type=data_type.title(),
+            wow_class=wow_spec.wow_class.full_name,
+            wow_spec=wow_spec.full_name,
+            fight_style=fight_style.title(),
         ),
         "subtitle": subtitle,
         "simc_settings": {
@@ -247,30 +232,36 @@ def create_base_json_dict(
             # deprecated
             "class": wow_spec.wow_class.simc_name,
             # deprecated
-            "spec": wow_spec.simc_name
+            "spec": wow_spec.simc_name,
         },
         "data": {},
         "languages": {},
         "profile": profile,
         "talent_data": talent_data,
         "class_id": class_id,
-        "spec_id": spec_id
+        "spec_id": spec_id,
     }
 
 
 def tokenize_str(string: str) -> str:
     """Return SimulationCraft appropriate name.
 
-  Arguments:
-    string {str} -- E.g. "Tawnos, Urza's Apprentice"
+    Arguments:
+      string {str} -- E.g. "Tawnos, Urza's Apprentice"
 
-  Returns:
-    str -- "tawnos_urzas_apprentice"
-  """
+    Returns:
+      str -- "tawnos_urzas_apprentice"
+    """
 
     string = string.lower().split(" (")[0]
     # cleanse name
-    if "__" in string or " " in string or "-" in string or "'" in string or "," in string:
+    if (
+        "__" in string
+        or " " in string
+        or "-" in string
+        or "'" in string
+        or "," in string
+    ):
         return tokenize_str(
             string.replace("'", "")
             .replace("-", "")
@@ -285,14 +276,14 @@ def tokenize_str(string: str) -> str:
 def get_simc_hash(path) -> str:
     """Get the FETCH_HEAD or shallow simc git hash.
 
-  Returns:
-    str -- [description]
-  """
+    Returns:
+      str -- [description]
+    """
 
     if ".exe" in path:
         new_path = path.split("simc.exe")[0]
     else:
-        new_path = path[:-5]     # cut "/simc" from unix path
+        new_path = path[:-5]  # cut "/simc" from unix path
         if "engine" in new_path[-6:]:
             new_path = new_path[:-6]
 
@@ -300,13 +291,13 @@ def get_simc_hash(path) -> str:
     new_path += ".git/FETCH_HEAD"
     simc_hash: str = None
     try:
-        with open(new_path, 'r', encoding='utf-8') as f:
+        with open(new_path, "r", encoding="utf-8") as f:
             for line in f:
                 if "'bfa-dev'" in line:
                     simc_hash = line.split()[0]
     except FileNotFoundError:
         try:
-            with open('../../SimulationCraft/.git/shallow', 'r', encoding='utf-8') as f:
+            with open("../../SimulationCraft/.git/shallow", "r", encoding="utf-8") as f:
                 for line in f:
                     simc_hash = line.strip()
         except FileNotFoundError:
@@ -326,7 +317,7 @@ def get_simc_hash(path) -> str:
 def request(
     url: str,
     *,
-    apikey: str = '',
+    apikey: str = "",
     data: dict = None,
     retries=6,
     session=None,
@@ -365,22 +356,22 @@ def request(
         )
         adapter = requests.adapters.HTTPAdapter(max_retries=retries_adapter)
         # register adapter for target
-        s.mount('https://www.raidbots.com/', adapter)
+        s.mount("https://www.raidbots.com/", adapter)
 
     headers = {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Bloodmallet\'s shitty tool',
+        "Content-Type": "application/json",
+        "User-Agent": "Bloodmallet's shitty tool",
     }
 
     # post
     if data:
         body = {
-            'advancedInput': data,
-            'apiKey': apikey,
-            'iterations': 100000,
-            'reportName': 'Bloodmallet\'s shitty tool',
-            'simcVersion': 'nightly',
-            'type': 'advanced',
+            "advancedInput": data,
+            "apiKey": apikey,
+            "iterations": 100000,
+            "reportName": "Bloodmallet's shitty tool",
+            "simcVersion": "nightly",
+            "type": "advanced",
         }
 
         response = s.post(url, json=body, headers=headers, timeout=timeout)
@@ -400,7 +391,6 @@ def request(
 
 
 class Args(object):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -412,9 +402,9 @@ class Args(object):
         self.profileset_work_threads = settings.profileset_work_threads
         self.ptr = False
         self.raidbots = False
-        self.single_sim = ''
+        self.single_sim = ""
         self.sim_all = False
-        self.target_error = ''
+        self.target_error = ""
         self.threads = settings.threads
 
 
@@ -422,6 +412,16 @@ def logger_config():
     # logging to file and console
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
+
+    # console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    if hasattr(settings, "debug"):
+        if settings.debug:
+            console_handler.setLevel(logging.DEBUG)
+    console_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    console_handler.setFormatter(console_formatter)
+    logger.addHandler(console_handler)
 
     # file handler
     file_handler = logging.FileHandler("log.txt", "w", encoding="utf-8")
@@ -432,18 +432,7 @@ def logger_config():
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)
 
-    # console handler
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
-    if hasattr(settings, "debug"):
-        if settings.debug:
-            console_handler.setLevel(logging.DEBUG)
-    console_formatter = logging.Formatter(
-        "%(asctime)s - %(levelname)s - %(message)s")
-    console_handler.setFormatter(console_formatter)
-    logger.addHandler(console_handler)
-
-    error_handler = logging.FileHandler('error.log', 'w', encoding='utf-8')
+    error_handler = logging.FileHandler("error.log", "w", encoding="utf-8")
     error_handler.setLevel(logging.ERROR)
     error_formatter = logging.Formatter(
         "%(asctime)s - %(filename)s / %(funcName)s:%(lineno)s - %(levelname)s - %(message)s"
@@ -465,7 +454,7 @@ def arg_parse_config():
         action="store_const",
         const=True,
         default=False,
-        help="Simulate races, trinkets, secondary distributions, and azerite traits for all specs and all talent combinations."
+        help="Simulate races, trinkets, secondary distributions, and azerite traits for all specs and all talent combinations.",
     )
     parser.add_argument(
         "--executable",
@@ -473,7 +462,7 @@ def arg_parse_config():
         type=str,
         help="Relative path to SimulationCrafts executable. Default: '{}'".format(
             settings.executable
-        )
+        ),
     )
     parser.add_argument(
         "--profileset_work_threads",
@@ -481,21 +470,22 @@ def arg_parse_config():
         type=str,
         help="Number of threads used per profileset by SimulationCraft. Default: '{}'".format(
             settings.profileset_work_threads
-        )
+        ),
     )
     parser.add_argument(
         "--threads",
         metavar="NUMBER",
         type=str,
         help="Number of threads used by SimulationCraft. Default: '{}'".format(
-            settings.threads)
+            settings.threads
+        ),
     )
     parser.add_argument(
         "--debug",
         action="store_const",
         const=True,
         default=settings.debug,
-        help="Enables debug modus. Default: '{}'".format(settings.debug)
+        help="Enables debug modus. Default: '{}'".format(settings.debug),
     )
     parser.add_argument(
         "-ptr", action="store_const", const=True, default=False, help="Enables ptr."
@@ -507,44 +497,47 @@ def arg_parse_config():
         dest="single_sim",
         metavar="STRING",
         type=str,
-        help="Activate a single simulation on the local machine. <simulation_types> are races, azerite_traits, secondary_distributions, talent_worth, trinkets, essences, essence_combinations. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk"
+        help="Activate a single simulation on the local machine. <simulation_types> are races, secondary_distributions, talent_worth, trinkets, soul_binds. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk",
     )
     parser.add_argument(
         "--custom_profile",
         action="store_const",
         const=True,
         default=False,
-        help="Enables usage of 'custom_profile.txt' in addition to the base profile. Default: '{}'"
-        .format(settings.debug)
+        help="Enables usage of 'custom_profile.txt' in addition to the base profile. Default: '{}'".format(
+            settings.debug
+        ),
     )
     parser.add_argument(
         "--custom_apl",
         action="store_const",
         const=True,
         default=False,
-        help="Enables usage of 'custom_apl.txt' in addition to the base profile. Default: '{}'"
-        .format(settings.debug)
+        help="Enables usage of 'custom_apl.txt' in addition to the base profile. Default: '{}'".format(
+            settings.debug
+        ),
     )
     parser.add_argument(
         "--custom_fight_style",
         action="store_const",
         const=True,
         default=False,
-        help="Enables usage of 'custom_fight_style.txt' in addition to the base profile. Default: '{}'"
-        .format(settings.debug)
+        help="Enables usage of 'custom_fight_style.txt' in addition to the base profile. Default: '{}'".format(
+            settings.debug
+        ),
     )
     parser.add_argument(
         "--target_error",
-        metavar='STRING',
+        metavar="STRING",
         type=str,
-        help="Overwrites target_error for all simulations. Default: whatever is in setting.py"
+        help="Overwrites target_error for all simulations. Default: whatever is in setting.py",
     )
     parser.add_argument(
         "--raidbots",
         action="store_const",
         const=True,
         default=False,
-        help="Don't try this at home"
+        help="Don't try this at home",
     )
 
     return parser.parse_args()
