@@ -1,4 +1,4 @@
 # Lib with World of Warcraft game data for simulations and some input checks for SimulationCraft.
--e git+https://github.com/Bloodmallet/simc_support.git@master#egg=simc_support
-
+simc-support
 requests
+black
