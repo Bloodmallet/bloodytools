@@ -86,6 +86,10 @@ start_value = 50
 enable_talent_worth_simulations = False
 
 ###############################################################################
+# Soul Bind
+enable_soul_bind_simulations = False
+
+###############################################################################
 # Development setting - you usually don't want to touch these
 debug = False
 use_own_threading = False
