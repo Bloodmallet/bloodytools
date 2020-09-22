@@ -32,7 +32,8 @@ import time
 from bloodytools import settings
 
 # from bloodytools.simulations.gear_path_simulation import gear_path_simulation
-# from bloodytools.simulations.race_simulation import race_simulation
+from bloodytools.simulations.race_simulation import race_simulation
+
 # from bloodytools.simulations.secondary_distribution_simulation import secondary_distribution_simulation
 from bloodytools.simulations.trinket_simulation import trinket_simulation
 from bloodytools.simulations.soul_bind_simulation import soul_bind_simulation
@@ -90,9 +91,9 @@ def main():
         settings.use_raidbots = False
 
         # TODO: re-enable other simulation types
-        # if simulation_type == "races":
-        #     settings.enable_race_simulations = True
-        if simulation_type == "trinkets":
+        if simulation_type == "races":
+            settings.enable_race_simulations = True
+        elif simulation_type == "trinkets":
             settings.enable_trinket_simulations = True
         elif simulation_type == "soul_binds":
             settings.enable_soul_bind_simulations = True
@@ -154,23 +155,24 @@ def main():
     # list of all active threads. when empty, terminate tool
     thread_list = []
 
-    # TODO: re-enable other simulation types
     # trigger race simulations
-    # if settings.enable_race_simulations:
-    #     if not settings.use_own_threading:
-    #         logger.info("Starting Race simulations.")
+    if settings.enable_race_simulations:
+        if not settings.use_own_threading:
+            logger.info("Starting Race simulations.")
 
-    #     if settings.use_own_threading:
-    #         race_thread = threading.Thread(
-    #             name="Race Thread", target=race_simulation, args=(settings.wow_class_spec_list, settings)
-    #         )
-    #         thread_list.append(race_thread)
-    #         race_thread.start()
-    #     else:
-    #         race_simulation(settings.wow_class_spec_list, settings)
+        if settings.use_own_threading:
+            race_thread = threading.Thread(
+                name="Race Thread",
+                target=race_simulation,
+                args=(settings),
+            )
+            thread_list.append(race_thread)
+            race_thread.start()
+        else:
+            race_simulation(settings)
 
-    #     if not settings.use_own_threading:
-    #         logger.info("Race simulations finished.")
+        if not settings.use_own_threading:
+            logger.info("Race simulations finished.")
 
     # trigger trinket simulations
     if settings.enable_trinket_simulations:
