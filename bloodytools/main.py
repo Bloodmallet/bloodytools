@@ -23,7 +23,6 @@ May 2018
 """
 
 import datetime
-import logging
 import sys
 import threading
 import time
@@ -34,13 +33,15 @@ from bloodytools import settings
 # from bloodytools.simulations.gear_path_simulation import gear_path_simulation
 from bloodytools.simulations.race_simulation import race_simulation
 
-# from bloodytools.simulations.secondary_distribution_simulation import secondary_distribution_simulation
-from bloodytools.simulations.trinket_simulation import trinket_simulation
+from bloodytools.simulations.secondary_distribution_simulation import (
+    secondary_distribution_simulation,
+)
 from bloodytools.simulations.soul_bind_simulation import soul_bind_simulation
+from bloodytools.simulations.trinket_simulation import trinket_simulation
 
 # from bloodytools.simulations.talent_worth_simulation import talent_worth_simulation
-from bloodytools.utils.utils import get_simc_hash
 from bloodytools.utils.utils import arg_parse_config
+from bloodytools.utils.utils import get_simc_hash
 from bloodytools.utils.utils import logger_config
 from simc_support.game_data.WowSpec import WOWSPECS, get_wow_spec
 
@@ -97,8 +98,8 @@ def main():
             settings.enable_trinket_simulations = True
         elif simulation_type == "soul_binds":
             settings.enable_soul_bind_simulations = True
-        # elif simulation_type == "secondary_distributions":
-        #     settings.enable_secondary_distributions_simulations = True
+        elif simulation_type == "secondary_distributions":
+            settings.enable_secondary_distributions_simulations = True
         # elif simulation_type == "talent_worth":
         #     settings.enable_talent_worth_simulations = True
 
@@ -207,26 +208,25 @@ def main():
         if not settings.use_own_threading:
             logger.info("Soul Bind simulations finished.")
 
-    # TODO: re-enable other simulation types
     # trigger secondary distributions
-    # if settings.enable_secondary_distributions_simulations:
+    if settings.enable_secondary_distributions_simulations:
 
-    #     if not settings.use_own_threading:
-    #         logger.info("Starting Secondary Distribtion simulations.")
+        if not settings.use_own_threading:
+            logger.info("Starting Secondary Distribtion simulations.")
 
-    #     if settings.use_own_threading:
-    #         secondary_distribution_thread = threading.Thread(
-    #             name="Secondary Distribution Thread",
-    #             target=secondary_distribution_simulation,
-    #             args=(settings,)
-    #         )
-    #         thread_list.append(secondary_distribution_thread)
-    #         secondary_distribution_thread.start()
-    #     else:
-    #         secondary_distribution_simulation(settings)
+        if settings.use_own_threading:
+            secondary_distribution_thread = threading.Thread(
+                name="Secondary Distribution Thread",
+                target=secondary_distribution_simulation,
+                args=(settings,),
+            )
+            thread_list.append(secondary_distribution_thread)
+            secondary_distribution_thread.start()
+        else:
+            secondary_distribution_simulation(settings)
 
-    #     if not settings.use_own_threading:
-    #         logger.info("Secondary Distribution simulations finished.")
+        if not settings.use_own_threading:
+            logger.info("Secondary Distribution simulations finished.")
 
     # TODO: re-enable other simulation types
     # trigger gear path simulations
