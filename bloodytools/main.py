@@ -38,6 +38,7 @@ from bloodytools.simulations.secondary_distribution_simulation import (
 )
 from bloodytools.simulations.soul_bind_simulation import soul_bind_simulation
 from bloodytools.simulations.trinket_simulation import trinket_simulation
+from bloodytools.simulations.legendary_simulations import legendary_simulation
 
 # from bloodytools.simulations.talent_worth_simulation import talent_worth_simulation
 from bloodytools.utils.utils import arg_parse_config
@@ -91,7 +92,6 @@ def main():
         settings.use_own_threading = False
         settings.use_raidbots = False
 
-        # TODO: re-enable other simulation types
         if simulation_type == "races":
             settings.enable_race_simulations = True
         elif simulation_type == "trinkets":
@@ -100,6 +100,9 @@ def main():
             settings.enable_soul_bind_simulations = True
         elif simulation_type == "secondary_distributions":
             settings.enable_secondary_distributions_simulations = True
+        elif simulation_type == "legendaries":
+            settings.enable_legendary_simulations = True
+        # TODO: re-enable other simulation types
         # elif simulation_type == "talent_worth":
         #     settings.enable_talent_worth_simulations = True
 
@@ -192,6 +195,7 @@ def main():
         if not settings.use_own_threading:
             logger.info("Trinket simulations finished.")
 
+    # trigger soul bind (nodes) simulations
     if settings.enable_soul_bind_simulations:
         if not settings.use_own_threading:
             logger.info("Starting Soul Bind simulations.")
@@ -207,6 +211,23 @@ def main():
 
         if not settings.use_own_threading:
             logger.info("Soul Bind simulations finished.")
+
+    # trigger legendary simulations
+    if settings.enable_legendary_simulations:
+        if not settings.use_own_threading:
+            logger.info("Starting Legendary simulations.")
+
+        if settings.use_own_threading:
+            legendary_thread = threading.Thread(
+                name="Legendary Thread", target=legendary_simulation, args=(settings,)
+            )
+            thread_list.append(legendary_thread)
+            legendary_thread.start()
+        else:
+            legendary_simulation(settings)
+
+        if not settings.use_own_threading:
+            logger.info("Legendary simulations finished.")
 
     # trigger secondary distributions
     if settings.enable_secondary_distributions_simulations:
