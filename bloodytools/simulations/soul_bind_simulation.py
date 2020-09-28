@@ -50,9 +50,7 @@ def soul_bind_simulation(settings: object) -> None:
                 ) as f:
                     pass
             except FileNotFoundError:
-                logger.warning(
-                    "{} {} base profile not found. Skipping.".format(wow_spec)
-                )
+                logger.warning("{} base profile not found. Skipping.".format(wow_spec))
                 continue
 
             # prepare result json
@@ -68,7 +66,6 @@ def soul_bind_simulation(settings: object) -> None:
                 threads=settings.threads,
                 profileset_work_threads=settings.profileset_work_threads,
                 executable=settings.executable,
-                logger=logger,
             )
 
             simulation_data = Simulation_Data(
@@ -81,7 +78,6 @@ def soul_bind_simulation(settings: object) -> None:
                 default_actions=settings.default_actions,
                 executable=settings.executable,
                 iterations=settings.iterations,
-                logger=logger,
             )
             custom_apl = None
             if settings.custom_apl:
@@ -115,7 +111,6 @@ def soul_bind_simulation(settings: object) -> None:
                     default_actions=settings.default_actions,
                     executable=settings.executable,
                     iterations=settings.iterations,
-                    logger=logger,
                 )
 
                 simulation_group.add(simulation_data)

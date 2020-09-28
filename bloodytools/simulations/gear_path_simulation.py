@@ -73,7 +73,6 @@ def gear_path_simulation(specs: List[Tuple[str, str]], settings) -> None:
                     executable=settings.executable,
                     threads=settings.threads,
                     profileset_work_threads=settings.profileset_work_threads,
-                    logger=logger,
                 )
 
                 crit_profile = Simulation_Data(
@@ -81,7 +80,6 @@ def gear_path_simulation(specs: List[Tuple[str, str]], settings) -> None:
                     executable=settings.executable,
                     fight_style=fight_style,
                     target_error=settings.target_error[fight_style],
-                    logger=logger,
                     simc_arguments=[
                         base_profile_string,
                         "gear_crit_rating={}".format(crit_rating + settings.step_size),
@@ -99,7 +97,6 @@ def gear_path_simulation(specs: List[Tuple[str, str]], settings) -> None:
                     executable=settings.executable,
                     fight_style=fight_style,
                     target_error=settings.target_error[fight_style],
-                    logger=logger,
                     simc_arguments=[
                         "gear_crit_rating={}".format(crit_rating),
                         "gear_haste_rating={}".format(
@@ -118,7 +115,6 @@ def gear_path_simulation(specs: List[Tuple[str, str]], settings) -> None:
                     executable=settings.executable,
                     fight_style=fight_style,
                     target_error=settings.target_error[fight_style],
-                    logger=logger,
                     simc_arguments=[
                         "gear_crit_rating={}".format(crit_rating),
                         "gear_haste_rating={}".format(haste_rating),
@@ -137,7 +133,6 @@ def gear_path_simulation(specs: List[Tuple[str, str]], settings) -> None:
                     executable=settings.executable,
                     fight_style=fight_style,
                     target_error=settings.target_error[fight_style],
-                    logger=logger,
                     simc_arguments=[
                         "gear_crit_rating={}".format(crit_rating),
                         "gear_haste_rating={}".format(haste_rating),

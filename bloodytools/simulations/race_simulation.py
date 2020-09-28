@@ -54,7 +54,6 @@ def race_simulation(settings) -> None:
                 threads=settings.threads,
                 profileset_work_threads=settings.profileset_work_threads,
                 executable=settings.executable,
-                logger=logger,
             )
 
             for race in races:
@@ -73,7 +72,6 @@ def race_simulation(settings) -> None:
                         default_actions=settings.default_actions,
                         executable=settings.executable,
                         iterations=settings.iterations,
-                        logger=logger,
                     )
                     custom_apl = None
                     if settings.custom_apl:
@@ -98,7 +96,6 @@ def race_simulation(settings) -> None:
                         default_actions=settings.default_actions,
                         executable=settings.executable,
                         iterations=settings.iterations,
-                        logger=logger,
                     )
 
                     # adding argument for zandalari trolls
@@ -131,7 +128,6 @@ def race_simulation(settings) -> None:
                             default_actions=settings.default_actions,
                             executable=settings.executable,
                             iterations=settings.iterations,
-                            logger=logger,
                         )
                         simulation_group.add(simulation_data)
                         logger.debug(

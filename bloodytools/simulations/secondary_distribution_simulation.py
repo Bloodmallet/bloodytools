@@ -146,7 +146,6 @@ def secondary_distribution_simulation(settings: object) -> None:
                     threads=settings.threads,
                     profileset_work_threads=settings.profileset_work_threads,
                     executable=settings.executable,
-                    logger=logger,
                 )
 
                 for distribution_multiplier in distribution_multipliers:
@@ -163,7 +162,6 @@ def secondary_distribution_simulation(settings: object) -> None:
                             fight_style=fight_style,
                             target_error=settings.target_error[fight_style],
                             iterations=settings.iterations,
-                            logger=logger,
                             profile=result_dict["profile"],
                             simc_arguments=[
                                 "gear_crit_rating={}".format(
@@ -228,7 +226,6 @@ def secondary_distribution_simulation(settings: object) -> None:
                                 fight_style=fight_style,
                                 target_error=settings.target_error[fight_style],
                                 iterations=settings.iterations,
-                                logger=logger,
                                 simc_arguments=[
                                     "gear_crit_rating={}".format(
                                         int(

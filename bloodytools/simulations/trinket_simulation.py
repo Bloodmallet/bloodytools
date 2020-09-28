@@ -240,7 +240,6 @@ def trinket_simulation(settings: object) -> None:
                 threads=settings.threads,
                 profileset_work_threads=settings.profileset_work_threads,
                 executable=settings.executable,
-                logger=logger,
             )
 
             for trinket in trinket_list:
@@ -258,7 +257,6 @@ def trinket_simulation(settings: object) -> None:
                         ptr=settings.ptr,
                         default_actions=settings.default_actions,
                         executable=settings.executable,
-                        logger=logger,
                     )
 
                     custom_apl = None
@@ -295,7 +293,6 @@ def trinket_simulation(settings: object) -> None:
                         ptr=settings.ptr,
                         default_actions=settings.default_actions,
                         executable=settings.executable,
-                        logger=logger,
                     )
                     simulation_group.add(simulation_data)
 

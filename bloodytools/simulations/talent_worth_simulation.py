@@ -51,7 +51,6 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
                 executable=settings.executable,
                 threads=settings.threads,
                 profileset_work_threads=settings.profileset_work_threads,
-                logger=logger,
             )
 
             talent_blueprint = wow_lib.get_talent_blueprint(wow_class, wow_spec)
@@ -123,7 +122,6 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
                 default_actions=settings.default_actions,
                 executable=settings.executable,
                 iterations=settings.iterations,
-                logger=logger,
             )
 
             custom_apl = None
@@ -153,7 +151,6 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
                     default_actions=settings.default_actions,
                     executable=settings.executable,
                     iterations=settings.iterations,
-                    logger=logger,
                 )
                 simulation_group.add(simulation_data)
 
