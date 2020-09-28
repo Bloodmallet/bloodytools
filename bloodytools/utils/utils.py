@@ -412,7 +412,7 @@ class Args(object):
 
 def logger_config():
     # logging to file and console
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__.split(".")[0])
     logger.setLevel(logging.DEBUG)
 
     # console handler
@@ -434,6 +434,7 @@ def logger_config():
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)
 
+    # error file handler
     error_handler = logging.FileHandler("error.log", "w", encoding="utf-8")
     error_handler.setLevel(logging.ERROR)
     error_formatter = logging.Formatter(

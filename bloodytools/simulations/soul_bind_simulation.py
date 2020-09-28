@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 
 from bloodytools.utils.utils import create_basic_profile_string, create_base_json_dict
@@ -7,6 +8,8 @@ from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Da
 from simc_support.game_data.SoulBind import SOULBINDS, SoulBindTalent
 from simc_support.game_data.WowSpec import WowSpec
 from typing import List
+
+logger = logging.getLogger(__name__)
 
 
 def soul_bind_simulation(settings: object) -> None:
@@ -18,8 +21,7 @@ def soul_bind_simulation(settings: object) -> None:
     Returns:
         None --
     """
-    logger = settings.logger
-    logger.debug("race_simulations start")
+    logger.debug("soul_bind_simulation start")
 
     specs: List[WowSpec] = settings.wow_class_spec_list
 
@@ -62,7 +64,7 @@ def soul_bind_simulation(settings: object) -> None:
             )
 
             simulation_group = Simulation_Group(
-                name="race_simulations",
+                name="soul_bind_simulation",
                 threads=settings.threads,
                 profileset_work_threads=settings.profileset_work_threads,
                 executable=settings.executable,

@@ -21,7 +21,6 @@ def legendary_simulation(settings) -> None:
     Returns:
         None --
     """
-    logger = settings.logger
     logger.debug("legendary_simulation start")
 
     specs: List[WowSpec] = settings.wow_class_spec_list

@@ -56,8 +56,6 @@ def main():
 
     logger = logger_config()
 
-    settings.logger = logger
-
     logger.debug("main start")
     logger.info("Bloodytools at your service.")
 

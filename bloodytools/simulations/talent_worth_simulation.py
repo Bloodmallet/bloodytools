@@ -1,10 +1,13 @@
-import os
 import json
+import logging
+import os
 
 from bloodytools.utils.utils import create_basic_profile_string, create_base_json_dict
 from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Data
 from simc_support import wow_lib
 from typing import List, Tuple
+
+logger = logging.getLogger(__name__)
 
 
 def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
@@ -17,8 +20,6 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
         None -- [description]
     Creates json result files.
     """
-    logger = settings.logger
-
     logger.debug("talent_worth_simulations start")
 
     for fight_style in settings.fight_styles:
@@ -28,7 +29,9 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
             try:
                 with open(
                     create_basic_profile_string(
-                        wow_class, wow_spec, settings.tier, settings), 'r'
+                        wow_class, wow_spec, settings.tier, settings
+                    ),
+                    "r",
                 ) as f:
                     pass
             except FileNotFoundError:
@@ -40,19 +43,18 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
                 continue
 
             base_profile_string = create_basic_profile_string(
-                wow_class, wow_spec, settings.tier, settings)
+                wow_class, wow_spec, settings.tier, settings
+            )
 
             simulation_group = Simulation_Group(
                 name="{} {} {}".format(fight_style, wow_spec, wow_class),
                 executable=settings.executable,
                 threads=settings.threads,
                 profileset_work_threads=settings.profileset_work_threads,
-                logger=logger
+                logger=logger,
             )
 
-            talent_blueprint = wow_lib.get_talent_blueprint(
-                wow_class, wow_spec
-            )
+            talent_blueprint = wow_lib.get_talent_blueprint(wow_class, wow_spec)
 
             talent_combinations = []
 
@@ -66,7 +68,13 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
                                     for seventh in range(4):
 
                                         talent_combination = "{}{}{}{}{}{}{}".format(
-                                            first, second, third, forth, fifth, sixth, seventh
+                                            first,
+                                            second,
+                                            third,
+                                            forth,
+                                            fifth,
+                                            sixth,
+                                            seventh,
                                         )
 
                                         abort = False
@@ -76,51 +84,58 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
                                         # compare all non-dps locations, use only dps talent rows
                                         location = talent_blueprint.find("0")
                                         while location > -1:
-                                            if talent_combination[tmp_count + location] != "0":
+                                            if (
+                                                talent_combination[tmp_count + location]
+                                                != "0"
+                                            ):
                                                 abort = True
                                             tmp_count += location + 1
-                                            location = talent_blueprint[tmp_count:].find(
-                                                "0")
+                                            location = talent_blueprint[
+                                                tmp_count:
+                                            ].find("0")
 
                                         # skip talent combinations with too many (more than one) not chosen dps values
-                                        if talent_combination.count(
-                                            "0"
-                                        ) > talent_blueprint.count("0") + 1:
+                                        if (
+                                            talent_combination.count("0")
+                                            > talent_blueprint.count("0") + 1
+                                        ):
                                             abort = True
 
                                         if abort:
                                             continue
 
-                                        talent_combinations.append(
-                                            talent_combination)
+                                        talent_combinations.append(talent_combination)
             logger.debug(
                 "Creating talent combinations: Done. Created {}.".format(
-                    len(talent_combinations))
+                    len(talent_combinations)
+                )
             )
 
             base_profile = Simulation_Data(
                 name="{}".format(talent_combinations[0]),
                 fight_style=fight_style,
-                simc_arguments=[base_profile_string,
-                                "talents={}".format(talent_combinations[0])],
+                simc_arguments=[
+                    base_profile_string,
+                    "talents={}".format(talent_combinations[0]),
+                ],
                 target_error=settings.target_error[fight_style],
                 ptr=settings.ptr,
                 default_actions=settings.default_actions,
                 executable=settings.executable,
                 iterations=settings.iterations,
-                logger=logger
+                logger=logger,
             )
 
             custom_apl = None
             if settings.custom_apl:
-                with open('custom_apl.txt') as f:
+                with open("custom_apl.txt") as f:
                     custom_apl = f.read()
             if custom_apl:
                 base_profile.simc_arguments.append(custom_apl)
 
             custom_fight_style = None
             if settings.custom_fight_style:
-                with open('custom_fight_style.txt') as f:
+                with open("custom_fight_style.txt") as f:
                     custom_fight_style = f.read()
             if custom_fight_style:
                 base_profile.simc_arguments.append(custom_fight_style)
@@ -138,14 +153,13 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
                     default_actions=settings.default_actions,
                     executable=settings.executable,
                     iterations=settings.iterations,
-                    logger=logger
+                    logger=logger,
                 )
                 simulation_group.add(simulation_data)
 
             logger.info(
                 "Talent Worth {} {} {} {} profiles.".format(
-                    wow_spec, wow_class, fight_style, len(
-                        simulation_group.profiles)
+                    wow_spec, wow_class, fight_style, len(simulation_group.profiles)
                 )
             )
 
@@ -156,7 +170,8 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
                 simulation_group.simulate()
 
             export_json = create_base_json_dict(
-                "Talent Worth", wow_class, wow_spec, fight_style, settings)
+                "Talent Worth", wow_class, wow_spec, fight_style, settings
+            )
 
             # save all generated data in "data"
             for profile in simulation_group.profiles:
@@ -168,10 +183,12 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
             for talent_combination in export_json["data"]:
                 if talent_combination.count("0") == talent_blueprint.count("0"):
                     tmp_1.append(
-                        (talent_combination, export_json["data"][talent_combination]))
+                        (talent_combination, export_json["data"][talent_combination])
+                    )
                 else:
                     tmp_2.append(
-                        (talent_combination, export_json["data"][talent_combination]))
+                        (talent_combination, export_json["data"][talent_combination])
+                    )
 
             tmp_1 = sorted(tmp_1, key=lambda item: item[1], reverse=True)
             tmp_2 = sorted(tmp_2, key=lambda item: item[1], reverse=True)
@@ -200,8 +217,11 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
             # write json to file
             with open(file_name + ".json", "w", encoding="utf-8") as f:
                 logger.debug("Print talent_worth json.")
-                f.write(json.dumps(export_json, sort_keys=True,
-                                   indent=4, ensure_ascii=False))
+                f.write(
+                    json.dumps(
+                        export_json, sort_keys=True, indent=4, ensure_ascii=False
+                    )
+                )
                 logger.debug("Printed talent_worth json.")
 
     logger.debug("talent_worth_simulations end")

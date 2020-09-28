@@ -26,8 +26,6 @@ def secondary_distribution_simulation(settings: object) -> None:
         List[so.Simulation_Group] -- [description]
     """
 
-    logger = settings.logger
-
     logger.debug("secondary_distribution_simulations start")
 
     specs: List[WowSpec] = settings.wow_class_spec_list
