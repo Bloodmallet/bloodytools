@@ -26,7 +26,7 @@ import datetime
 import sys
 import threading
 import time
-
+import logging
 
 from bloodytools import settings
 
@@ -39,6 +39,7 @@ from bloodytools.simulations.secondary_distribution_simulation import (
 from bloodytools.simulations.soul_bind_simulation import soul_bind_simulation
 from bloodytools.simulations.trinket_simulation import trinket_simulation
 from bloodytools.simulations.legendary_simulations import legendary_simulation
+from bloodytools.simulations.conduit_simulation import conduit_simulation
 
 # from bloodytools.simulations.talent_worth_simulation import talent_worth_simulation
 from bloodytools.utils.utils import arg_parse_config
@@ -54,7 +55,7 @@ def main():
     if args.debug:
         settings.debug = args.debug
 
-    logger = logger_config()
+    logger = logger_config(logging.getLogger("bloodytools"), args.debug)
 
     logger.debug("main start")
     logger.info("Bloodytools at your service.")
@@ -85,6 +86,7 @@ def main():
         settings.enable_gear_path = False
         settings.enable_talent_worth_simulations = False
         settings.enable_soul_bind_simulations = False
+        settings.enable_conduit_simulations = False
 
         # set dev options
         settings.use_own_threading = False
@@ -96,6 +98,8 @@ def main():
             settings.enable_trinket_simulations = True
         elif simulation_type == "soul_binds":
             settings.enable_soul_bind_simulations = True
+        elif simulation_type == "conduits":
+            settings.enable_conduit_simulations = True
         elif simulation_type == "secondary_distributions":
             settings.enable_secondary_distributions_simulations = True
         elif simulation_type == "legendaries":
@@ -103,6 +107,8 @@ def main():
         # TODO: re-enable other simulation types
         # elif simulation_type == "talent_worth":
         #     settings.enable_talent_worth_simulations = True
+        else:
+            raise ValueError("Unknown simulation type entered.")
 
     # set new executable path if provided
     if args.executable:
@@ -209,6 +215,23 @@ def main():
 
         if not settings.use_own_threading:
             logger.info("Soul Bind simulations finished.")
+
+    # trigger conduit simulations
+    if settings.enable_conduit_simulations:
+        if not settings.use_own_threading:
+            logger.info("Starting Conduit simulations.")
+
+        if settings.use_own_threading:
+            conduit_thread = threading.Thread(
+                name="Conduit Thread", target=conduit_simulation, args=(settings,)
+            )
+            thread_list.append(conduit_thread)
+            conduit_thread.start()
+        else:
+            conduit_simulation(settings)
+
+        if not settings.use_own_threading:
+            logger.info("Conduit simulations finished.")
 
     # trigger legendary simulations
     if settings.enable_legendary_simulations:

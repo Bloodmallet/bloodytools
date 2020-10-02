@@ -92,6 +92,10 @@ enable_talent_worth_simulations = False
 enable_soul_bind_simulations = False
 
 ###############################################################################
+# Conduit
+enable_conduit_simulations = False
+
+###############################################################################
 # Legendary simulations
 enable_legendary_simulations = False
 

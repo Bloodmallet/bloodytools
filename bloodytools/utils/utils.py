@@ -410,17 +410,15 @@ class Args(object):
         self.threads = settings.threads
 
 
-def logger_config():
+def logger_config(logger: logging.Logger, debug=False):
     # logging to file and console
-    logger = logging.getLogger(__name__.split(".")[0])
     logger.setLevel(logging.DEBUG)
 
     # console handler
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
-    if hasattr(settings, "debug"):
-        if settings.debug:
-            console_handler.setLevel(logging.DEBUG)
+    if debug:
+        console_handler.setLevel(logging.DEBUG)
     console_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     console_handler.setFormatter(console_formatter)
     logger.addHandler(console_handler)
@@ -500,7 +498,7 @@ def arg_parse_config():
         dest="single_sim",
         metavar="STRING",
         type=str,
-        help="Activate a single simulation on the local machine. <simulation_types> are races, secondary_distributions, talent_worth, trinkets, soul_binds, legendaries. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk",
+        help="Activate a single simulation on the local machine. <simulation_types> are races, secondary_distributions, talent_worth, trinkets, soul_binds, conduits, and legendaries. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk",
     )
     parser.add_argument(
         "--custom_profile",
