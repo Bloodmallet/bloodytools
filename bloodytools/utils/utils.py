@@ -237,7 +237,7 @@ def create_base_json_dict(
             "spec": wow_spec.simc_name,
         },
         "data": {},
-        "languages": {},
+        "translations": {},
         "profile": profile,
         "talent_data": talent_data,
         "class_id": class_id,

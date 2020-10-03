@@ -49,7 +49,6 @@ def conduit_simulation(settings: object) -> None:
                 settings,
             )
 
-            wanted_data["translations"] = {}
             wanted_data["spell_ids"] = {}
             wanted_data["covenant_mapping"] = {}
             for conduit in CONDUITS:

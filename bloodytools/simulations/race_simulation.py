@@ -192,12 +192,12 @@ def race_simulation(settings) -> None:
 
                 # add race translations to the final json
                 translated_name = race.translations.get_dict()
-                wanted_data["languages"][profile.name] = translated_name
+                wanted_data["translations"][profile.name] = translated_name
 
                 if "Zandalari" in profile.name:
-                    for language in wanted_data["languages"][profile.name]:
-                        wanted_data["languages"][profile.name][language] = (
-                            wanted_data["languages"][profile.name][language]
+                    for language in wanted_data["translations"][profile.name]:
+                        wanted_data["translations"][profile.name][language] = (
+                            wanted_data["translations"][profile.name][language]
                             + f" {profile.name.split()[-1]}"
                         )
 
