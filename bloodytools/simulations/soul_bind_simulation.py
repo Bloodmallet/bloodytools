@@ -61,6 +61,13 @@ def soul_bind_simulation(settings: object) -> None:
                 settings,
             )
 
+            wanted_data["spell_ids"] = {}
+            for node in nodes:
+                wanted_data["translations"][
+                    node.full_name
+                ] = node.translations.get_dict()
+                wanted_data["spell_ids"][node.full_name] = node.spell_id
+
             simulation_group = Simulation_Group(
                 name="soul_bind_simulation",
                 threads=settings.threads,
@@ -162,17 +169,6 @@ def soul_bind_simulation(settings: object) -> None:
                         profile.name, profile.get_dps()
                     )
                 )
-
-                if "baseline" in profile.name:
-                    continue
-
-                node: SoulBindTalent = None
-                for element in nodes:
-                    if element.full_name == profile.name:
-                        node = element
-                # add soul bind translations to the final json
-                wanted_data["languages"][profile.name] = node.translations.get_dict()
-                wanted_data["spell_ids"][profile.name] = node.spell_id
 
             # create ordered soul bind name list
             tmp_list = []

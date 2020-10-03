@@ -65,6 +65,13 @@ def legendary_simulation(settings) -> None:
                     item_bonus_ids
                 )
 
+            wanted_data["spell_ids"] = {}
+            for legendary in legendaries:
+                wanted_data["translations"][
+                    legendary.full_name
+                ] = legendary.translations.get_dict()
+                wanted_data["spell_ids"][legendary.full_name] = legendary.spell_id
+
             simulation_group = Simulation_Group(
                 name="legendary_simulations",
                 threads=settings.threads,
@@ -178,11 +185,6 @@ def legendary_simulation(settings) -> None:
                 for element in legendaries:
                     if element.full_name == profile.name:
                         legendary = element
-
-                # add legendary translations to the final json
-                if not "baseline" in profile.name:
-                    translated_name = legendary.translations.get_dict()
-                    wanted_data["languages"][profile.name] = translated_name
 
             # create ordered legendary name list
             tmp_list = []
