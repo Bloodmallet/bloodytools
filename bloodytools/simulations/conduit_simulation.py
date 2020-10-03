@@ -39,6 +39,8 @@ def conduit_simulation(settings: object) -> None:
                 logger.warning("{} base profile not found. Skipping.".format(wow_spec))
                 continue
 
+            CONDUITS = get_conduits_for_spec(wow_spec)
+
             # prepare result json
             wanted_data = create_base_json_dict(
                 "Conduits",
@@ -46,6 +48,21 @@ def conduit_simulation(settings: object) -> None:
                 fight_style,
                 settings,
             )
+
+            wanted_data["translations"] = {}
+            wanted_data["spell_ids"] = {}
+            wanted_data["covenant_mapping"] = {}
+            for conduit in CONDUITS:
+                wanted_data["translations"][
+                    conduit.full_name
+                ] = conduit.translations.get_dict()
+                wanted_data["spell_ids"][conduit.full_name] = conduit.spell_id
+                if len(conduit.covenants) == 1:
+                    wanted_data["covenant_mapping"][
+                        conduit.full_name
+                    ] = conduit.covenants[0].id
+                else:
+                    wanted_data["covenant_mapping"][conduit.full_name] = 0
 
             simulation_group = Simulation_Group(
                 name="conduit_simulation",
@@ -107,7 +124,7 @@ def conduit_simulation(settings: object) -> None:
                     )
                 )
 
-            for conduit in get_conduits_for_spec(wow_spec):
+            for conduit in CONDUITS:
                 for rank in conduit.ranks:
 
                     simulation_data = None
