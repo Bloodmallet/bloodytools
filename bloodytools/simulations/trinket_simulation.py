@@ -232,6 +232,19 @@ def trinket_simulation(settings: object) -> None:
                 "ilevel": str(settings.min_ilevel),
             }
 
+            json_export["data_active"] = {}
+            json_export["data_sources"] = {}
+            json_export["item_ids"] = {}
+            json_export["data"]["baseline"] = {}
+            for trinket in trinket_list:
+                json_export["translations"][
+                    trinket.name
+                ] = trinket.translations.get_dict()
+                json_export["data"][trinket.name] = {}
+                json_export["data_active"][trinket.name] = trinket.on_use
+                json_export["data_sources"][trinket.name] = trinket.source.value
+                json_export["item_ids"][trinket.name] = trinket.item_id
+
             if not wow_spec.wow_class.simc_name in simulation_results:
                 simulation_results[wow_spec.wow_class.simc_name] = {}
 
@@ -353,10 +366,6 @@ def trinket_simulation(settings: object) -> None:
                 wow_spec.simc_name
             ] = simulation_group
 
-            json_export["data_active"] = {}
-            for trinket in trinket_list:
-                json_export["data_active"][trinket.name] = trinket.on_use
-
             for profile in simulation_group.profiles:
 
                 full_name = profile.name[: profile.name.rfind(" ")]
@@ -367,43 +376,7 @@ def trinket_simulation(settings: object) -> None:
                 except ValueError:
                     trinket = None
 
-                if not full_name in json_export["data"]:
-                    json_export["data"][full_name] = {}
-
                 json_export["data"][full_name][ilevel] = profile.get_dps()
-
-                # add translation to export
-                if (
-                    not full_name in json_export["languages"]
-                    and not "baseline" in full_name
-                ):
-                    try:
-                        json_export["languages"][
-                            full_name
-                        ] = trinket.translations.get_dict()
-                    except Exception as e:
-                        logger.debug("No translation found for {}.".format(name))
-                        logger.warning(e)
-
-                if not "data_sources" in json_export:
-                    json_export["data_sources"] = {}
-
-                if (
-                    not full_name in json_export["data_sources"]
-                    and not "baseline" in full_name
-                ):
-                    try:
-                        json_export["data_sources"][full_name] = trinket.source.value
-                    except:
-                        pass
-
-            # create item_id table
-            json_export["item_ids"] = {}
-            for trinket_name in json_export["data"]:
-                if trinket_name != "baseline":
-                    name = trinket_name.split("+")[0]
-                    trinket = _get_trinket(trinket_list, name)
-                    json_export["item_ids"][trinket_name] = trinket.item_id
 
             logger.debug("Enriched json export: {}".format(json_export))
 
