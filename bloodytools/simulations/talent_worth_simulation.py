@@ -4,17 +4,17 @@ import os
 
 from bloodytools.utils.utils import create_basic_profile_string, create_base_json_dict
 from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Data
-from simc_support import wow_lib
+from simc_support.game_data.WowSpec import WowSpec
 from typing import List, Tuple
 
 logger = logging.getLogger(__name__)
 
 
-def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
+def talent_worth_simulation(settings) -> None:
     """Function generates all possible talent combinations for all specs. Including empty dps talent rows. This way the dps gain of each talent can be calculated.
 
     Arguments:
-        specs {List[Tuple[str, str]]} -- wow_class, wow_spec
+        settings {object} -- bloodytools/settings.py
 
     Returns:
         None -- [description]
@@ -22,15 +22,15 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
     """
     logger.debug("talent_worth_simulations start")
 
-    for fight_style in settings.fight_styles:
-        for wow_class, wow_spec in specs:
+    specs: List[WowSpec] = settings.wow_class_spec_list
 
+    for fight_style in settings.fight_styles:
+        for wow_spec in specs:
+            wow_class = wow_spec.wow_class
             # check whether the baseline profile does exist
             try:
                 with open(
-                    create_basic_profile_string(
-                        wow_class, wow_spec, settings.tier, settings
-                    ),
+                    create_basic_profile_string(wow_spec, settings.tier, settings),
                     "r",
                 ) as f:
                     pass
@@ -43,7 +43,7 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
                 continue
 
             base_profile_string = create_basic_profile_string(
-                wow_class, wow_spec, settings.tier, settings
+                wow_spec, settings.tier, settings
             )
 
             simulation_group = Simulation_Group(
@@ -53,7 +53,7 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
                 profileset_work_threads=settings.profileset_work_threads,
             )
 
-            talent_blueprint = wow_lib.get_talent_blueprint(wow_class, wow_spec)
+            talent_blueprint = wow_spec.talents_blueprint
 
             talent_combinations = []
 
@@ -110,6 +110,7 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
                 )
             )
 
+            # no talents profile
             base_profile = Simulation_Data(
                 name="{}".format(talent_combinations[0]),
                 fight_style=fight_style,
@@ -167,7 +168,7 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
                 simulation_group.simulate()
 
             export_json = create_base_json_dict(
-                "Talent Worth", wow_class, wow_spec, fight_style, settings
+                "Talent Worth", wow_spec, fight_style, settings
             )
 
             # save all generated data in "data"
@@ -201,13 +202,12 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
             for item in tmp_2:
                 export_json["sorted_data_keys_2"].append(item[0])
 
+            path = "results/talent_worth/"
             # create directory if it doesn't exist
-            if not os.path.isdir("results/talent_worth/"):
-                os.makedirs("results/talent_worth/")
+            if not os.path.isdir(path):
+                os.makedirs(path)
 
-            file_name = "results/talent_worth/{}_{}_{}".format(
-                wow_class.lower(), wow_spec.lower(), fight_style.lower()
-            )
+            file_name = f"{path}{wow_class.simc_name}_{wow_spec.simc_name}_{fight_style.lower()}"
             if settings.ptr == "1":
                 file_name += "_ptr"
 
@@ -222,4 +222,3 @@ def talent_worth_simulation(specs: List[Tuple[str, str]], settings) -> None:
                 logger.debug("Printed talent_worth json.")
 
     logger.debug("talent_worth_simulations end")
-    pass
