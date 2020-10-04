@@ -93,7 +93,7 @@ class Simulation_Data:
         else:
             self.calculate_scale_factors = "0"
         # simc setting to manage default apl usage
-        if default_actions == "0" or default_actions == "1":
+        if default_actions in ["0", "1"]:
             self.default_actions = default_actions
         else:
             self.default_actions = "1"
