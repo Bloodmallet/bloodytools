@@ -200,6 +200,8 @@ def conduit_simulation(settings: object) -> None:
             # create ordered conduit name list
             tmp_list = []
             for conduit in wanted_data["data"]:
+                if "baseline" in conduit:
+                    continue
                 tmp_list.append(
                     (
                         conduit,
