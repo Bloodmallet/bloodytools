@@ -123,8 +123,14 @@ def conduit_simulation(settings: object) -> None:
                     )
                 )
 
+            wanted_data["simulated_steps"] = []
             for conduit in CONDUITS:
                 for rank in conduit.ranks:
+
+                    if rank not in wanted_data["simulated_steps"]:
+                        wanted_data["simulated_steps"] = [rank] + wanted_data[
+                            "simulated_steps"
+                        ]
 
                     simulation_data = None
 
