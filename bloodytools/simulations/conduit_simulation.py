@@ -139,7 +139,7 @@ def conduit_simulation(settings: object) -> None:
                         fight_style=fight_style,
                         simc_arguments=[
                             f"covenant={covenant_name}",
-                            f"soulbind={conduit.id}:{rank+1}",
+                            f"soulbind={conduit.id}:{rank}",
                         ],
                         target_error=settings.target_error[fight_style],
                         ptr=settings.ptr,
