@@ -70,12 +70,12 @@ def azerite_trait_simulations(settings) -> None:
             )
 
             # fix base profile to match sim
-            wanted_data["profile"]["head"].pop("azerite_powers")
-            wanted_data["profile"]["shoulders"].pop("azerite_powers")
-            wanted_data["profile"]["chest"].pop("azerite_powers")
-            wanted_data['profile']['items']['head'].pop('azerite_powers')
-            wanted_data['profile']['items']['shoulders'].pop('azerite_powers')
-            wanted_data['profile']['items']['chest'].pop('azerite_powers')
+            wanted_data["profile"]["head"].pop("azerite_powers", None)
+            wanted_data["profile"]["shoulders"].pop("azerite_powers", None)
+            wanted_data["profile"]["chest"].pop("azerite_powers", None)
+            wanted_data['profile']['items']['head'].pop('azerite_powers', None)
+            wanted_data['profile']['items']['shoulders'].pop('azerite_powers', None)
+            wanted_data['profile']['items']['chest'].pop('azerite_powers', None)
 
             # adjust profile data for frontend for general special cases
             try:
@@ -1000,13 +1000,13 @@ def azerite_trait_simulations(settings) -> None:
                 )
 
                 # fix base profile to match sim
-                slot_export["profile"]["head"].pop("azerite_powers")
-                slot_export["profile"]["shoulders"].pop("azerite_powers")
-                slot_export["profile"]["chest"].pop("azerite_powers")
-                slot_export['profile']['items']['head'].pop('azerite_powers')
+                slot_export["profile"]["head"].pop("azerite_powers", None)
+                slot_export["profile"]["shoulders"].pop("azerite_powers", None)
+                slot_export["profile"]["chest"].pop("azerite_powers", None)
+                slot_export['profile']['items']['head'].pop('azerite_powers', None)
                 slot_export['profile']['items']['shoulders'].pop(
-                    'azerite_powers')
-                slot_export['profile']['items']['chest'].pop('azerite_powers')
+                    'azerite_powers', None)
+                slot_export['profile']['items']['chest'].pop('azerite_powers', None)
 
                 slot_export["simulated_steps"] = []
                 for itemlevel in settings.azerite_trait_ilevels:

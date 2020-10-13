@@ -1,6 +1,7 @@
 # locald ev env
 env/
 env38/
+env_shadowlands/
 # local editor
 .vscode/
 # local type checks

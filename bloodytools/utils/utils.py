@@ -207,6 +207,11 @@ def create_base_json_dict(
 
     profile = extract_profile(profile_location, wow_class)
 
+    try:
+        profile = extract_profile(f'custom_{wow_class}_{wow_spec}.txt', wow_class, profile)
+    except FileNotFoundError:
+        logger.warning("custom spec profile not found")
+
     if settings.custom_profile:
         profile = extract_profile('custom_profile.txt', wow_class, profile)
 

@@ -7,8 +7,8 @@
 
 ##
 # General setttings
-tier = "25"     # number or PR (PreRaid)
-wow_class_spec_list = []     # leave empty to simulate all
+tier = "PR"  # number or PR (PreRaid)
+wow_class_spec_list = []  # leave empty to simulate all
 # wow_class_spec_list = [("shaman", "elemental"), ("mage", "frost")] # example for a specific list
 wow_class_spec_list = [
     ("death_knight", "blood"),
@@ -27,23 +27,23 @@ wow_class_spec_list = [
     ("mage", "frost"),
     ("monk", "brewmaster"),
     ("monk", "windwalker"),
-    ("paladin", "protection"),
+    # ("paladin", "protection"),
     ("paladin", "retribution"),
     ("priest", "discipline"),
-    ("priest", "holy"),
+    # ("priest", "holy"),
     ("priest", "shadow"),
     ("rogue", "assassination"),
     ("rogue", "outlaw"),
     ("rogue", "subtlety"),
-    ("shaman", "elemental"),
-    ("shaman", "enhancement"),
-    ("shaman", "restoration"),
+    # ("shaman", "elemental"),
+    # ("shaman", "enhancement"),
+    # ("shaman", "restoration"),
     ("warlock", "affliction"),
     ("warlock", "demonology"),
     ("warlock", "destruction"),
     ("warrior", "arms"),
     ("warrior", "fury"),
-    ("warrior", "protection"),
+    # ("warrior", "protection"),
 ]
 
 ###############################################################################
@@ -54,7 +54,7 @@ fight_styles = [
     "hecticaddcleave",
     # "beastlord"
 ]
-iterations = "20000"     # sane value, should be enough for 0.2
+iterations = "20000"  # sane value, should be enough for 0.2
 profileset_work_threads = "2"
 ptr = "0"
 default_actions = "1"
@@ -79,9 +79,9 @@ enable_race_simulations = True
 enable_trinket_simulations = True
 # ilevel_step is used to determine the size of each itemlevel step taken to max_ilevel
 ilevel_step = 15
-max_ilevel = 475     # max_itemlevel determines the upper border of steps taken
+max_ilevel = 140  # max_itemlevel determines the upper border of steps taken
 # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
-min_ilevel = 430
+min_ilevel = 100
 # example: min 300, max 325, step 10, resulting simulated ilevels: 300, 310, 320
 lua_trinket_export = True
 
@@ -90,8 +90,9 @@ lua_trinket_export = True
 enable_secondary_distributions_simulations = True
 # in percent of full available secondary sum
 secondary_distributions_step_size = 10
-talent_list = {
-}     # if no list is provided for a class-spec, all dps talent combinations will be run. If you want to only sim the base profiles, set 'talent_permutations' to False
+talent_list = (
+    {}
+)  # if no list is provided for a class-spec, all dps talent combinations will be run. If you want to only sim the base profiles, set 'talent_permutations' to False
 # talent_list = {
 #   ("shaman", "elemental"): [
 #     "2301022",
@@ -105,10 +106,9 @@ write_humanreadable_secondary_distribution_file = False
 # Azerite traits
 enable_azerite_trait_simulations = True
 azerite_trait_ilevels = [  # determines the itemlevel used to sim the traits
-    "430",
-    "445",
-    "460",
-    "475",
+    "100",
+    "115",
+    "130",
 ]  # ascending order required
 
 ###############################################################################
@@ -131,7 +131,7 @@ enable_azerite_essence_combination_simulations = True
 
 ###############################################################################
 # Corruptions
-enable_corruption_simulations = True
+enable_corruption_simulations = False
 
 ###############################################################################
 # Development setting - you usually don't want to touch these

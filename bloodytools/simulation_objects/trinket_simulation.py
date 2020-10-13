@@ -130,7 +130,7 @@ def trinket_simulation(settings: object) -> None:
                     settings.min_ilevel, settings.max_ilevel + 1, settings.ilevel_step
                 ):
 
-                    if itemlevel >= trinket[2] and itemlevel <= trinket[3]:
+                    if itemlevel + 300 >= trinket[2] and itemlevel + 300 <= trinket[3]:
 
                         simulation_data = Simulation_Data(
                             name="{} {}".format(trinket[0], itemlevel),

@@ -50,7 +50,7 @@ logger = logging.getLogger(__name__)
 
 def logger_config():
     # logging to file and console
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger("bloodytools")
     logger.setLevel(logging.DEBUG)
 
     # file handler
@@ -279,6 +279,11 @@ def create_base_json_dict(data_type: str, wow_class: str, wow_spec: str, fight_s
         wow_class, wow_spec, settings.tier)
 
     profile = extract_profile(profile_location, wow_class)
+
+    try:
+        profile = extract_profile(f'custom_{wow_class}_{wow_spec}.txt', wow_class, profile)
+    except FileNotFoundError:
+        pass
 
     if settings.custom_profile:
         profile = extract_profile('custom_profile.txt', wow_class, profile)
