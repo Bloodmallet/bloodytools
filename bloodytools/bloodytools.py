@@ -166,9 +166,11 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
         "head",
         "neck",
         "shoulders",
+        "shoulder",
         "back",
         "chest",
         "wrists",
+        "wrist",
         "hands",
         "waist",
         "legs",
@@ -180,6 +182,10 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
         "main_hand",
         "off_hand",
     ]
+    official_name = {
+        "shoulder": "shoulders",
+        "wrist": "wrists"
+    }
     pattern_slots = {}
     for element in item_slots:
         pattern_slots[element] = re.compile(
@@ -193,12 +199,13 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
         "enchant",
         "azerite_level",     # neck
         "ilevel",
+        "gem_id",
     ]
     pattern_element = {}
     # don't recompile this for each slot
     for element in item_elements:
         pattern_element[element] = re.compile(
-            ',{}=([a-z0-9_/:]*)'.format(element))
+            ',{}=\"?([a-z0-9_/:]*)\"?'.format(element))
 
     # prepare regex for character defining information. like spec
     character_specifics = [
@@ -231,27 +238,30 @@ def extract_profile(path: str, wow_class: str, profile: dict = None) -> dict:
                     profile['items'] = {}
 
                 matches = pattern_slots[slot].search(line)
+                slot_name = slot
+                if slot in official_name:
+                    slot_name = official_name[slot]
                 # slot line found
                 if matches:
                     new_line = matches.group(1)
-                    if not slot in profile:
-                        profile['items'][slot] = {}
+                    if not slot_name in profile:
+                        profile['items'][slot_name] = {}
 
                     # allow pre-prepared profiles to get emptied if input wants to overwrite with empty
                     # 'head=' as a head example for an empty overwrite
                     if not new_line:
-                        profile['items'].pop(slot, None)
+                        profile['items'].pop(slot_name, None)
 
                     # check for all elements
                     for element in item_elements:
                         new_matches = pattern_element[element].search(new_line)
                         if new_matches:
-                            profile['items'][slot][element] = new_matches.group(
+                            profile['items'][slot_name][element] = new_matches.group(
                                 1)
                             # TODO: remove after some time (webfront-end needs to be updated)
-                            if not slot in profile:
-                                profile[slot] = {}
-                            profile[slot][element] = new_matches.group(1)
+                            if not slot_name in profile:
+                                profile[slot_name] = {}
+                            profile[slot_name][element] = new_matches.group(1)
 
     logger.debug(profile)
 
