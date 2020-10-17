@@ -1,6 +1,7 @@
 import argparse
 import datetime
 import logging
+import os
 import re
 import requests
 import time
@@ -79,6 +80,9 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     Returns:
         dict -- all known character data
     """
+
+    if os.stat(path).st_size == 0:
+        raise ValueError("Empty file")
 
     if not profile:
         profile = {}
@@ -210,7 +214,10 @@ def create_base_json_dict(
         profile = None
 
     if settings.custom_profile:
-        profile = extract_profile("custom_profile.txt", wow_spec.wow_class, profile)
+        try:
+            profile = extract_profile("custom_profile.txt", wow_spec.wow_class, profile)
+        except ValueError:
+            profile = None
 
     if not profile:
         raise FileNotFoundError("No profile found or provided.")
