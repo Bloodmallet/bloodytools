@@ -204,10 +204,16 @@ def create_base_json_dict(
 
     profile_location = create_basic_profile_string(wow_spec, settings.tier, settings)
 
-    profile = extract_profile(profile_location, wow_spec.wow_class)
+    try:
+        profile = extract_profile(profile_location, wow_spec.wow_class)
+    except FileNotFoundError:
+        profile = None
 
     if settings.custom_profile:
         profile = extract_profile("custom_profile.txt", wow_spec.wow_class, profile)
+
+    if not profile:
+        raise FileNotFoundError("No profile found or provided.")
 
     # spike the export data with talent data
     talent_data = get_talent_dict(wow_spec, settings.ptr == "1")
