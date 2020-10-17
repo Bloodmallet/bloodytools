@@ -84,36 +84,30 @@ def secondary_distribution_simulation(settings: object) -> None:
                 logger.warning("{} profile not found. Skipping.".format(wow_spec))
 
             if settings.custom_profile:
-                c_secondary_amount = 0
-                try:
-                    with open("custom_profile", "r") as f:
-                        for line in f:
-                            if "gear_crit_rating=" in line:
-                                secondary_amount += int(
-                                    line.split("gear_crit_rating=")[1].strip()
-                                )
-                            elif "gear_haste_rating=" in line:
-                                secondary_amount += int(
-                                    line.split("gear_haste_rating=")[1].strip()
-                                )
-                            elif "gear_mastery_rating=" in line:
-                                secondary_amount += int(
-                                    line.split("gear_mastery_rating=")[1].strip()
-                                )
-                            elif "gear_versatility_rating=" in line:
-                                secondary_amount += int(
-                                    line.split("gear_versatility_rating=")[1].strip()
-                                )
-                            elif "secondary_sum=" in line:
-                                c_secondary_amount = int(line.split("=")[1].split()[0])
-                                logger.debug(
-                                    "Found 'secondary_sum= in custom_profile. Using that value."
-                                )
-                                break
-                except FileNotFoundError:
-                    logger.warning("Custom profile not found. Using base profile.")
-                if c_secondary_amount > 0:
-                    secondary_amount = c_secondary_amount
+                simulation = Simulation_Data(
+                    name="Grab dem secondary values",
+                    fight_style=fight_style,
+                    target_error=settings.target_error[fight_style],
+                    iterations="1",
+                    profile=result_dict["profile"],
+                    ptr=settings.ptr,
+                    default_actions=settings.default_actions,
+                    executable=settings.executable,
+                )
+                simulation.simulate()
+
+                stats = 0
+                for stat in [
+                    "crit_rating",
+                    "haste_rating",
+                    "mastery_rating",
+                    "versatility_rating",
+                ]:
+                    stats += simulation.json_data["sim"]["players"][0][
+                        "collected_data"
+                    ]["buffed_stats"]["stats"][stat]
+
+                secondary_amount = int(stats)
 
             logger.debug("Extracted secondary_amount: {}".format(secondary_amount))
 
