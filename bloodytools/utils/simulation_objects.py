@@ -411,7 +411,13 @@ class Simulation_Data:
         Returns:
             int -- DPS of the simulation
         """
+        # temporary file names
+        self.uuid = str(uuid.uuid4())
+        self.filename = "{}.simc".format(self.uuid)
+        self.json_filename = "{}.json".format(self.uuid)
+
         argument = [self.executable]
+        argument.append("json=" + self.json_filename)
         argument.append("iterations=" + self.iterations)
         argument.append("target_error=" + self.target_error)
         argument.append("fight_style=" + self.fight_style)
@@ -485,21 +491,11 @@ class Simulation_Data:
         # save output
         self.set_full_report(simulation_output.stdout)
 
-        is_actor = False
-        run_dps: str = None
-        for line in simulation_output.stdout.splitlines():
-            # needs this check to prevent grabbing the boss dps
-            if "DPS Ranking:" in line:
-                is_actor = True
+        # parse results from generated json file
+        with open(self.json_filename, "r") as json_file:
+            self.json_data = json.load(json_file)
+            self.set_json_data(self.json_data)
 
-            if is_actor and self.name in line:
-                run_dps = line
-                is_actor = False
-
-        dps_value = run_dps.split()[0]
-
-        # save dps value
-        self.set_dps(dps_value, external=False)
         self.set_simulation_end_time()
 
         return self.get_dps()
@@ -538,6 +534,18 @@ class Simulation_Data:
         new_sim_data.so_simulation_start_time = self.so_simulation_start_time
 
         return new_sim_data
+
+    def set_json_data(self, data: dict) -> None:
+        """Set simulation results from json report to profiles.
+
+        Arguments:
+          data {dict} -- json data from SimulationCraft json report
+        """
+        logger.debug("Setting dps for baseprofile.")
+        self.set_dps(
+            data["sim"]["players"][0]["collected_data"]["dps"]["mean"], external=False
+        )
+        logger.debug("Set dps for profile.")
 
 
 class Simulation_Group:
@@ -865,8 +873,8 @@ class Simulation_Group:
 
                     # parse results from generated json file
                     with open(self.json_filename, "r") as json_file:
-                        json_data = json.load(json_file)
-                        self.set_json_data(json_data)
+                        self.json_data = json.load(json_file)
+                        self.set_json_data(self.json_data)
 
                     # remove json file after parsing
                     if self.json_filename is not None and self.remove_files:
