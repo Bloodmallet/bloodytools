@@ -93,9 +93,11 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
         "head",
         "neck",
         "shoulders",
+        "shoulder",
         "back",
         "chest",
         "wrists",
+        "wrist",
         "hands",
         "waist",
         "legs",
@@ -107,6 +109,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
         "main_hand",
         "off_hand",
     ]
+    unified_slot_names = {"shoulder": "shoulders", "wrist": "wrists"}
     pattern_slots = {}
     for element in item_slots:
         pattern_slots[element] = re.compile("^{}=([a-z0-9_=,/:.]*)$".format(element))
@@ -119,6 +122,8 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
         "enchant",
         "azerite_level",  # neck
         "ilevel",
+        "gem_id",
+        "enchant_id",
     ]
     pattern_element = {}
     # don't recompile this for each slot
@@ -156,21 +161,24 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
 
                 matches = pattern_slots[slot].search(line)
                 # slot line found
+                slot_name = slot
+                if slot_name in unified_slot_names:
+                    slot_name = unified_slot_names[slot_name]
                 if matches:
                     new_line = matches.group(1)
-                    if not slot in profile:
-                        profile["items"][slot] = {}
+                    if not slot_name in profile:
+                        profile["items"][slot_name] = {}
 
                     # allow pre-prepared profiles to get emptied if input wants to overwrite with empty
                     # 'head=' as a head example for an empty overwrite
                     if not new_line:
-                        profile["items"].pop(slot, None)
+                        profile["items"].pop(slot_name, None)
 
                     # check for all elements
                     for element in item_elements:
                         new_matches = pattern_element[element].search(new_line)
                         if new_matches:
-                            profile["items"][slot][element] = new_matches.group(1)
+                            profile["items"][slot_name][element] = new_matches.group(1)
 
     return profile
 
