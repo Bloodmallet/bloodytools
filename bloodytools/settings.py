@@ -85,7 +85,7 @@ start_value = 50
 
 ###############################################################################
 # Talent worth
-enable_talent_worth_simulations = False
+enable_talent_simulations = False
 
 ###############################################################################
 # Soul Bind

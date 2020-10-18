@@ -519,7 +519,7 @@ def arg_parse_config():
         dest="single_sim",
         metavar="STRING",
         type=str,
-        help="Activate a single simulation on the local machine. <simulation_types> are races, secondary_distributions, talent_worth, trinkets, soul_binds, conduits, and legendaries. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk",
+        help="Activate a single simulation on the local machine. <simulation_types> are races, secondary_distributions, talents, trinkets, soul_binds, conduits, and legendaries. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk",
     )
     parser.add_argument(
         "--custom_profile",

@@ -10,7 +10,7 @@ from typing import List, Tuple
 logger = logging.getLogger(__name__)
 
 
-def talent_worth_simulation(settings) -> None:
+def talent_simulation(settings) -> None:
     """Function generates all possible talent combinations for all specs. Including empty dps talent rows. This way the dps gain of each talent can be calculated.
 
     Arguments:
@@ -20,7 +20,7 @@ def talent_worth_simulation(settings) -> None:
         None -- [description]
     Creates json result files.
     """
-    logger.debug("talent_worth_simulations start")
+    logger.debug("talent_simulations start")
 
     specs: List[WowSpec] = settings.wow_class_spec_list
 
@@ -44,6 +44,10 @@ def talent_worth_simulation(settings) -> None:
 
             base_profile_string = create_basic_profile_string(
                 wow_spec, settings.tier, settings
+            )
+
+            export_json = create_base_json_dict(
+                "Talents", wow_spec, fight_style, settings
             )
 
             simulation_group = Simulation_Group(
@@ -114,6 +118,7 @@ def talent_worth_simulation(settings) -> None:
             base_profile = Simulation_Data(
                 name="{}".format(talent_combinations[0]),
                 fight_style=fight_style,
+                profile=export_json["profile"],
                 simc_arguments=[
                     base_profile_string,
                     "talents={}".format(talent_combinations[0]),
@@ -156,7 +161,7 @@ def talent_worth_simulation(settings) -> None:
                 simulation_group.add(simulation_data)
 
             logger.info(
-                "Talent Worth {} {} {} {} profiles.".format(
+                "Talent {} {} {} {} profiles.".format(
                     wow_spec, wow_class, fight_style, len(simulation_group.profiles)
                 )
             )
@@ -166,10 +171,6 @@ def talent_worth_simulation(settings) -> None:
                 simulation_group.simulate_with_raidbots(settings.apikey)
             else:
                 simulation_group.simulate()
-
-            export_json = create_base_json_dict(
-                "Talent Worth", wow_spec, fight_style, settings
-            )
 
             # save all generated data in "data"
             for profile in simulation_group.profiles:
@@ -202,7 +203,7 @@ def talent_worth_simulation(settings) -> None:
             for item in tmp_2:
                 export_json["sorted_data_keys_2"].append(item[0])
 
-            path = "results/talent_worth/"
+            path = "results/talents/"
             # create directory if it doesn't exist
             if not os.path.isdir(path):
                 os.makedirs(path)
@@ -213,12 +214,12 @@ def talent_worth_simulation(settings) -> None:
 
             # write json to file
             with open(file_name + ".json", "w", encoding="utf-8") as f:
-                logger.debug("Print talent_worth json.")
+                logger.debug("Print talents json.")
                 f.write(
                     json.dumps(
                         export_json, sort_keys=True, indent=4, ensure_ascii=False
                     )
                 )
-                logger.debug("Printed talent_worth json.")
+                logger.debug("Printed talents json.")
 
-    logger.debug("talent_worth_simulations end")
+    logger.debug("talent_simulations end")

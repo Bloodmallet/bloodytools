@@ -38,7 +38,7 @@ from bloodytools.simulations.secondary_distribution_simulation import (
     secondary_distribution_simulation,
 )
 from bloodytools.simulations.soul_bind_simulation import soul_bind_simulation
-from bloodytools.simulations.talent_worth_simulation import talent_worth_simulation
+from bloodytools.simulations.talent_simulation import talent_simulation
 from bloodytools.simulations.trinket_simulation import trinket_simulation
 from bloodytools.utils.utils import arg_parse_config
 from bloodytools.utils.utils import get_simc_hash
@@ -82,7 +82,7 @@ def main():
         settings.enable_trinket_simulations = False
         settings.enable_secondary_distributions_simulations = False
         settings.enable_gear_path = False
-        settings.enable_talent_worth_simulations = False
+        settings.enable_talent_simulations = False
         settings.enable_soul_bind_simulations = False
         settings.enable_conduit_simulations = False
 
@@ -102,8 +102,8 @@ def main():
             settings.enable_secondary_distributions_simulations = True
         elif simulation_type == "legendaries":
             settings.enable_legendary_simulations = True
-        elif simulation_type == "talent_worth":
-            settings.enable_talent_worth_simulations = True
+        elif simulation_type == "talents":
+            settings.enable_talent_simulations = True
         else:
             raise ValueError("Unknown simulation type entered.")
 
@@ -288,24 +288,24 @@ def main():
     #         logger.info("Gear Path simulations end.")
 
     # TODO: re-enable other simulation types
-    # trigger talent worth simulations
-    if settings.enable_talent_worth_simulations:
+    # trigger talent simulations
+    if settings.enable_talent_simulations:
         if not settings.use_own_threading:
-            logger.info("Talent Worth simulations start.")
+            logger.info("Talent simulations start.")
 
         if settings.use_own_threading:
-            talent_worth_thread = threading.Thread(
-                name="Talent Worth Thread",
-                target=talent_worth_simulation,
+            talent_thread = threading.Thread(
+                name="Talent Thread",
+                target=talent_simulation,
                 args=(settings,),
             )
-            thread_list.append(talent_worth_thread)
-            talent_worth_thread.start()
+            thread_list.append(talent_thread)
+            talent_thread.start()
         else:
-            talent_worth_simulation(settings)
+            talent_simulation(settings)
 
         if not settings.use_own_threading:
-            logger.info("Talent Worth simulations end.")
+            logger.info("Talent simulations end.")
 
     while thread_list:
         time.sleep(1)
