@@ -496,6 +496,10 @@ class Simulation_Data:
             self.json_data = json.load(json_file)
             self.set_json_data(self.json_data)
 
+        # remove json file after parsing
+        if self.json_filename is not None and self.remove_files:
+            os.remove(self.json_filename)
+
         self.set_simulation_end_time()
 
         return self.get_dps()
