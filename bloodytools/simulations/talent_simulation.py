@@ -120,7 +120,6 @@ def talent_simulation(settings) -> None:
                 fight_style=fight_style,
                 profile=export_json["profile"],
                 simc_arguments=[
-                    base_profile_string,
                     "talents={}".format(talent_combinations[0]),
                 ],
                 target_error=settings.target_error[fight_style],
