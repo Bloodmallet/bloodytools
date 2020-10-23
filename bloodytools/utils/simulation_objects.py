@@ -81,6 +81,7 @@ class Simulation_Data:
         simc_arguments: list = [],
         target_error: str = "0.1",
         threads: str = "",
+        remove_files: bool = True,
     ) -> None:
 
         super(Simulation_Data, self).__init__()
@@ -218,6 +219,7 @@ class Simulation_Data:
                 self.threads = ""
         else:
             self.threads = ""
+        self.remove_files = remove_files
 
         # set independant default values
         # creation time of the simulation object
