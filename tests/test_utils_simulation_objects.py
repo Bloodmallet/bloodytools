@@ -1,28 +1,22 @@
 import datetime
-import logging
 import os
 import time
 import unittest
 import uuid
 
-from bloodytools.simulation_objects import simulation_objects
-
-logger = logging.getLogger(__name__)
+from bloodytools.utils import simulation_objects
 
 
 class TestSimulationDataInit(unittest.TestCase):
-    """Simple tests for the handling of init values for objects of the simulation_data class.
-  """
+    """Simple tests for the handling of init values for objects of the simulation_data class."""
 
     def tearDown(self):
-        """Cleans up after each test.
-    """
+        """Cleans up after each test."""
 
         self.sd = None
 
     def test_empty(self):
-        """Test all available and left empty input values for their correct default values.
-    """
+        """Test all available and left empty input values for their correct default values."""
 
         self.sd = simulation_objects.Simulation_Data()
         self.assertEqual(self.sd.calculate_scale_factors, "0")
@@ -47,11 +41,9 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertEqual(self.sd.so_simulation_start_time, None)
 
     def test_calculate_scale_factors(self):
-        """Test input checks of calculate_scale_factors.
-    """
+        """Test input checks of calculate_scale_factors."""
 
-        self.sd = simulation_objects.Simulation_Data(
-            calculate_scale_factors="1")
+        self.sd = simulation_objects.Simulation_Data(calculate_scale_factors="1")
         self.assertEqual(self.sd.calculate_scale_factors, "1")
         self.assertNotEqual(self.sd.calculate_scale_factors, "0")
         self.assertNotEqual(self.sd.calculate_scale_factors, str)
@@ -60,8 +52,7 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.calculate_scale_factors, int)
 
     def test_default_actions(self):
-        """Test input checks of default_actions.
-        """
+        """Test input checks of default_actions."""
         self.sd = simulation_objects.Simulation_Data(default_actions="1")
         self.assertEqual(self.sd.default_actions, "1")
         self.assertNotEqual(self.sd.default_actions, "0")
@@ -71,8 +62,7 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.default_actions, int)
 
     def test_fight_style(self):
-        self.sd = simulation_objects.Simulation_Data(
-            fight_style="helterskelter")
+        self.sd = simulation_objects.Simulation_Data(fight_style="helterskelter")
         self.assertEqual(self.sd.fight_style, "helterskelter")
         self.assertNotEqual(self.sd.fight_style, "0")
         self.assertNotEqual(self.sd.fight_style, str)
@@ -80,9 +70,9 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.fight_style, dict)
         self.assertNotEqual(self.sd.fight_style, int)
         # simc_checks needs improvements to catch this
-        #self.sd = None
-        #self.sd = simulation_objects.Simulation_Data( fight_style=1234 )
-        #self.assertEqual( self.sd.fight_style, "patchwerk" )
+        # self.sd = None
+        # self.sd = simulation_objects.Simulation_Data( fight_style=1234 )
+        # self.assertEqual( self.sd.fight_style, "patchwerk" )
 
     def test_fixed_time(self):
         self.sd = simulation_objects.Simulation_Data(fixed_time="1")
@@ -146,8 +136,7 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.optimize_expressions, dict)
         self.assertNotEqual(self.sd.optimize_expressions, int)
         self.sd = None
-        self.sd = simulation_objects.Simulation_Data(
-            optimize_expressions=["1"])
+        self.sd = simulation_objects.Simulation_Data(optimize_expressions=["1"])
         self.assertEqual(self.sd.optimize_expressions, "1")
 
     def test_ptr(self):
@@ -200,8 +189,7 @@ class TestSimulationDataInit(unittest.TestCase):
 
 
 class TestSimulationDataMethods(unittest.TestCase):
-    """Tests for all methods of the simulation_data class.
-    """
+    """Tests for all methods of the simulation_data class."""
 
     def setUp(self):
         self.sd = simulation_objects.Simulation_Data()
@@ -220,16 +208,13 @@ class TestSimulationDataMethods(unittest.TestCase):
             calculate_scale_factors="1"
         )
         self.assertFalse(sd_calculate_scale_factors.is_equal(sd1))
-        sd_default_actions = simulation_objects.Simulation_Data(
-            default_actions="0")
+        sd_default_actions = simulation_objects.Simulation_Data(default_actions="0")
         self.assertFalse(sd_default_actions.is_equal(sd1))
-        sd_default_skill = simulation_objects.Simulation_Data(
-            default_skill="0.5")
+        sd_default_skill = simulation_objects.Simulation_Data(default_skill="0.5")
         self.assertFalse(sd_default_skill.is_equal(sd1))
         sd_executable = simulation_objects.Simulation_Data(executable="1")
         self.assertFalse(sd_executable.is_equal(sd1))
-        sd_fight_style = simulation_objects.Simulation_Data(
-            fight_style="helterskelter")
+        sd_fight_style = simulation_objects.Simulation_Data(fight_style="helterskelter")
         self.assertFalse(sd_fight_style.is_equal(sd1))
         sd_fixed_time = simulation_objects.Simulation_Data(fixed_time="0")
         self.assertFalse(sd_fixed_time.is_equal(sd1))
@@ -240,15 +225,14 @@ class TestSimulationDataMethods(unittest.TestCase):
         sd_log = simulation_objects.Simulation_Data(log="1")
         self.assertFalse(sd_log.is_equal(sd1))
         sd_optimize_expressions = simulation_objects.Simulation_Data(
-            optimize_expressions="0")
+            optimize_expressions="0"
+        )
         self.assertFalse(sd_optimize_expressions.is_equal(sd1))
         sd_ptr = simulation_objects.Simulation_Data(ptr="1")
         self.assertFalse(sd_ptr.is_equal(sd1))
-        sd_ready_trigger = simulation_objects.Simulation_Data(
-            ready_trigger="0")
+        sd_ready_trigger = simulation_objects.Simulation_Data(ready_trigger="0")
         self.assertFalse(sd_ready_trigger.is_equal(sd1))
-        sd_target_error = simulation_objects.Simulation_Data(
-            target_error="0.5")
+        sd_target_error = simulation_objects.Simulation_Data(target_error="0.5")
         self.assertFalse(sd_target_error.is_equal(sd1))
         sd_threads = simulation_objects.Simulation_Data(threads="4")
         self.assertFalse(sd_threads.is_equal(sd1))
@@ -305,8 +289,7 @@ class TestSimulationDataMethods(unittest.TestCase):
         after = datetime.datetime.utcnow()
         self.assertTrue(self.sd.so_simulation_end_time >= before)
         self.assertTrue(self.sd.so_simulation_end_time <= after)
-        self.assertEqual(type(self.sd.so_simulation_end_time),
-                         datetime.datetime)
+        self.assertEqual(type(self.sd.so_simulation_end_time), datetime.datetime)
         with self.assertRaises(simulation_objects.AlreadySetError):
             self.sd.set_simulation_end_time()
 
@@ -317,8 +300,7 @@ class TestSimulationDataMethods(unittest.TestCase):
         after = datetime.datetime.utcnow()
         self.assertTrue(self.sd.so_simulation_start_time >= before)
         self.assertTrue(self.sd.so_simulation_start_time <= after)
-        self.assertEqual(
-            type(self.sd.so_simulation_start_time), datetime.datetime)
+        self.assertEqual(type(self.sd.so_simulation_start_time), datetime.datetime)
         self.assertEqual(self.sd.set_simulation_start_time(), None)
 
     def test_simulate(self):
@@ -371,8 +353,7 @@ class TestSimulationDataMethods(unittest.TestCase):
         self.sd.target_error = "1.0"
         self.assertEqual(type(self.sd.simulate()), int)
         self.assertTrue(self.sd.get_dps() > 0)
-        self.assertEqual(type(self.sd.so_simulation_end_time),
-                         datetime.datetime)
+        self.assertEqual(type(self.sd.so_simulation_end_time), datetime.datetime)
 
     def test_simulate_fail(self):
         self.sd.executable = "Not_a_correct_value"
@@ -381,8 +362,7 @@ class TestSimulationDataMethods(unittest.TestCase):
 
 
 class TestSimulationGroupDataInit(unittest.TestCase):
-    """Test handling of init values
-    """
+    """Test handling of init values"""
 
     def setUp(self):
         self.sd1 = simulation_objects.Simulation_Data()
@@ -394,8 +374,8 @@ class TestSimulationGroupDataInit(unittest.TestCase):
 
     def test_empty(self):
         self.assertEqual(
-            type(simulation_objects.Simulation_Group()
-                 ), simulation_objects.Simulation_Group
+            type(simulation_objects.Simulation_Group()),
+            simulation_objects.Simulation_Group,
         )
 
     def test_correct_list_input(self):
@@ -413,7 +393,8 @@ class TestSimulationGroupDataInit(unittest.TestCase):
             simulation_objects.Simulation_Group([self.sd1, tmp])
         with self.assertRaises(TypeError):
             simulation_objects.Simulation_Group(
-                ["why", "would", "anyone", "do", "this"])
+                ["why", "would", "anyone", "do", "this"]
+            )
 
     def test_wrong_input_type(self):
         with self.assertRaises(TypeError):
@@ -421,8 +402,7 @@ class TestSimulationGroupDataInit(unittest.TestCase):
 
 
 class TestSimulationGroupMethods(unittest.TestCase):
-    """Test methods of simulation_group
-    """
+    """Test methods of simulation_group"""
 
     def setUp(self):
         self.sd1 = simulation_objects.Simulation_Data(
@@ -542,5 +522,5 @@ class TestSimulationGroupMethods(unittest.TestCase):
         self.assertFalse(self.sg.simulate())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -46,18 +46,7 @@ from bloodytools.utils.utils import logger_config
 from simc_support.game_data.WowSpec import WOWSPECS, get_wow_spec
 
 
-def main():
-    args = arg_parse_config()
-
-    # activate debug mode as early as possible
-    if args.debug:
-        settings.debug = args.debug
-
-    logger = logger_config(logging.getLogger("bloodytools"), args.debug)
-
-    logger.debug("main start")
-    logger.info("Bloodytools at your service.")
-
+def _update_settings(args: object, logger: logging.Logger) -> None:
     if args.single_sim:
         logger.debug("-s / --single_sim detected")
         try:
@@ -144,6 +133,22 @@ def main():
     if args.raidbots:
         settings.use_raidbots = True
 
+
+def main(args=None):
+    if not args:
+        args = arg_parse_config()
+
+    # activate debug mode as early as possible
+    if args.debug:
+        settings.debug = args.debug
+
+    logger = logger_config(logging.getLogger("bloodytools"), args.debug)
+
+    logger.debug("main start")
+    logger.info("Bloodytools at your service.")
+
+    _update_settings(args, logger)
+
     # only
     new_hash = get_simc_hash(settings.executable)
     if new_hash:
@@ -154,7 +159,7 @@ def main():
     bloodytools_start_time = datetime.datetime.utcnow()
 
     # empty class-spec list? great, we'll run all class-spec combinations
-    if not settings.wow_class_spec_list:
+    if not hasattr(settings, "wow_class_spec_list"):
         settings.wow_class_spec_list = WOWSPECS
 
     # list of all active threads. when empty, terminate tool

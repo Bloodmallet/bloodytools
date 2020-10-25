@@ -422,6 +422,9 @@ class Args(object):
         self.custom_fight_style = False
         self.debug = False
         self.executable = settings.executable
+        self.fight_styles = [
+            "patchwerk",
+        ]
         self.profileset_work_threads = settings.profileset_work_threads
         self.ptr = False
         self.raidbots = False
@@ -429,6 +432,7 @@ class Args(object):
         self.sim_all = False
         self.target_error = ""
         self.threads = settings.threads
+        self.wow_class_spec_list = []
 
 
 def logger_config(logger: logging.Logger, debug=False):
