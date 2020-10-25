@@ -43,16 +43,6 @@ def soul_bind_simulation(settings: object) -> None:
     for fight_style in settings.fight_styles:
         for wow_spec in specs:
 
-            # check whether the baseline profile does exist
-            try:
-                with open(
-                    create_basic_profile_string(wow_spec, settings.tier, settings), "r"
-                ) as f:
-                    pass
-            except FileNotFoundError:
-                logger.warning("{} base profile not found. Skipping.".format(wow_spec))
-                continue
-
             # prepare result json
             wanted_data = create_base_json_dict(
                 "Soul Binds",

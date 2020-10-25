@@ -17,23 +17,6 @@ def gear_path_simulation(specs: List[Tuple[str, str]], settings) -> None:
         gear_path = []
         for wow_class, wow_spec in specs:
 
-            # check whether the baseline profile does exist
-            try:
-                with open(
-                    create_basic_profile_string(
-                        wow_class, wow_spec, settings.tier, settings
-                    ),
-                    "r",
-                ) as f:
-                    pass
-            except FileNotFoundError:
-                logger.warning(
-                    "{} {} profile not found. Skipping.".format(
-                        wow_spec.title(), wow_class.title()
-                    )
-                )
-                continue
-
             # initial profiles and data
             secondary_sum = 0
             base_profile_string = create_basic_profile_string(

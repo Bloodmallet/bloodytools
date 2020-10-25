@@ -203,16 +203,6 @@ def trinket_simulation(settings: object) -> None:
         simulation_results = {}
         for wow_spec in specs:
 
-            # check whether the baseline profile does exist
-            try:
-                with open(
-                    create_basic_profile_string(wow_spec, settings.tier, settings), "r"
-                ) as f:
-                    pass
-            except FileNotFoundError:
-                logger.warning("{} profile not found. Skipping.".format(wow_spec))
-                continue
-
             # json exporter
             json_export = create_base_json_dict(
                 "trinkets", wow_spec, fight_style, settings
