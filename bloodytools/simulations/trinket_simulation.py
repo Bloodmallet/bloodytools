@@ -214,8 +214,8 @@ def trinket_simulation(settings: object) -> None:
             second_trinket = get_versatility_trinket(wow_spec.stat)
 
             # fix profile for this type of simulations
-            json_export["profile"]["items"].pop("trinket1")
-            json_export["profile"]["items"].pop("trinket2")
+            json_export["profile"]["items"].pop("trinket1", None)
+            json_export["profile"]["items"].pop("trinket2", None)
             json_export["profile"]["items"]["trinket2"] = {
                 "id": second_trinket.item_id,
                 "bonus_id": second_trinket.bonus_ids[0],
