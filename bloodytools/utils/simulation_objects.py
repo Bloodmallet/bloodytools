@@ -759,6 +759,10 @@ class Simulation_Group:
                         for profile in self.profiles:
                             # first used profile needs to be written as normal profile instead of profileset
                             if profile == self.profiles[0]:
+                                logger.debug(
+                                    "simc_arguments of first profile of simulation_group"
+                                )
+                                logger.debug(profile.simc_arguments)
                                 for argument in profile.simc_arguments:
                                     f.write("{}\n".format(argument))
                                 f.write(
