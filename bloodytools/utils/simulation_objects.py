@@ -782,6 +782,8 @@ class Simulation_Group:
                                         )
                                     )
 
+                    with open(self.filename, "r") as f:
+                        logger.debug(f.read())
                     # counter of failed simulation attempts
                     fail_counter = 0
                     simulation_output: subprocess.CompletedProcess = None
