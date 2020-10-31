@@ -116,6 +116,7 @@ def talent_simulation(settings) -> None:
                 with open("custom_apl.txt") as f:
                     custom_apl = f.read()
             if custom_apl:
+                base_profile.simc_arguments.append("# custom_apl")
                 base_profile.simc_arguments.append(custom_apl)
 
             custom_fight_style = None
@@ -123,6 +124,7 @@ def talent_simulation(settings) -> None:
                 with open("custom_fight_style.txt") as f:
                     custom_fight_style = f.read()
             if custom_fight_style:
+                base_profile.simc_arguments.append("# custom_fight_style")
                 base_profile.simc_arguments.append(custom_fight_style)
 
             simulation_group.add(base_profile)

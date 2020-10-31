@@ -188,6 +188,8 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
                         if new_matches:
                             profile["items"][slot_name][element] = new_matches.group(1)
 
+    logger.debug(f"extracted profile: {profile}")
+
     return profile
 
 

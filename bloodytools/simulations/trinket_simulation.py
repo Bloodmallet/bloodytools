@@ -267,6 +267,7 @@ def trinket_simulation(settings: object) -> None:
                         with open("custom_apl.txt") as f:
                             custom_apl = f.read()
                     if custom_apl:
+                        simulation_data.simc_arguments.append("# custom_apl")
                         simulation_data.simc_arguments.append(custom_apl)
 
                     custom_fight_style = None
@@ -274,6 +275,7 @@ def trinket_simulation(settings: object) -> None:
                         with open("custom_fight_style.txt") as f:
                             custom_fight_style = f.read()
                     if custom_fight_style:
+                        simulation_data.simc_arguments.append("# custom_fight_style")
                         simulation_data.simc_arguments.append(custom_fight_style)
 
                     simulation_group.add(simulation_data)
