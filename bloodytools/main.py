@@ -32,6 +32,7 @@ from bloodytools import settings
 
 # from bloodytools.simulations.gear_path_simulation import gear_path_simulation
 from bloodytools.simulations.conduit_simulation import conduit_simulation
+from bloodytools.simulations.covenant_simulation import covenant_simulation
 from bloodytools.simulations.legendary_simulations import legendary_simulation
 from bloodytools.simulations.race_simulation import race_simulation
 from bloodytools.simulations.secondary_distribution_simulation import (
@@ -76,6 +77,7 @@ def _update_settings(args: object, logger: logging.Logger) -> None:
         settings.enable_talent_simulations = False
         settings.enable_soul_bind_simulations = False
         settings.enable_conduit_simulations = False
+        settings.enable_covenant_simulations = False
 
         # set dev options
         settings.use_own_threading = False
@@ -95,6 +97,8 @@ def _update_settings(args: object, logger: logging.Logger) -> None:
             settings.enable_legendary_simulations = True
         elif simulation_type == "talents":
             settings.enable_talent_simulations = True
+        elif simulation_type == "covenants":
+            settings.enable_covenant_simulations = True
         else:
             raise ValueError("Unknown simulation type entered.")
 
@@ -313,6 +317,25 @@ def main(args=None):
 
         if not settings.use_own_threading:
             logger.info("Talent simulations end.")
+
+    # trigger covenant simulations
+    if settings.enable_covenant_simulations:
+        if not settings.use_own_threading:
+            logger.info("Covenant simulations start.")
+
+        if settings.use_own_threading:
+            covenant_thread = threading.Thread(
+                name="Covenant Thread",
+                target=covenant_simulation,
+                args=(settings,),
+            )
+            thread_list.append(covenant_thread)
+            covenant_thread.start()
+        else:
+            covenant_simulation(settings)
+
+        if not settings.use_own_threading:
+            logger.info("Covenant simulations end.")
 
     while thread_list:
         time.sleep(1)
