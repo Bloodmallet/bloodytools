@@ -127,7 +127,9 @@ class Simulation_Data:
         if fight_style == "custom" or fight_style in FIGHTSTYLES:
             self.fight_style = fight_style
         else:
-            logger.warning("{} -- Using default value instead.".format(fight_style))
+            logger.warning(
+                "{} -- Using default (patchwerk) value instead.".format(fight_style)
+            )
             self.fight_style = "patchwerk"
         # simc setting to enable/diable the fixed fight length
         if fixed_time == "0" or fixed_time == "1":

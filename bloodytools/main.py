@@ -65,6 +65,8 @@ def _update_settings(args: object, logger: logging.Logger) -> None:
         settings.fight_styles = [
             fight_style,
         ]
+        if args.target_error:
+            settings.target_error[fight_style] = args.target_error
         settings.iterations = "20000"
         # disable all simulation types
         settings.enable_race_simulations = False

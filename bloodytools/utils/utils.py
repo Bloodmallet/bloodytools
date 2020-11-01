@@ -255,7 +255,7 @@ def create_base_json_dict(
             "tier": settings.tier,
             "fight_style": fight_style,
             "iterations": settings.iterations,
-            "target_error": settings.target_error[fight_style],
+            "target_error": settings.target_error.get(fight_style, "0.1"),
             "ptr": settings.ptr,
             "simc_hash": settings.simc_hash,
             # deprecated
