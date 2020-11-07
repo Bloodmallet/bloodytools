@@ -1,3 +1,4 @@
+wheel
 # mypy
 black
 # necessary for coverage check
