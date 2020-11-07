@@ -6,12 +6,18 @@ from bloodytools.utils.utils import create_base_json_dict
 from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Data
 
 from simc_support.game_data.Conduit import get_conduits_for_spec
-from simc_support.game_data.Covenant import COVENANTS
+from simc_support.game_data.Covenant import COVENANTS, get_covenant
 from simc_support.game_data.SoulBind import SOULBINDS, SoulBindTalent
+
 from simc_support.game_data.WowSpec import WowSpec
 from typing import List
 
 logger = logging.getLogger(__name__)
+
+CONDUITMAXRANK = 7
+ranks = [
+    7,
+]  # list(range(1, CONDUITMAXRANK + 1))
 
 
 def soul_bind_simulation(settings: object) -> None:
@@ -53,6 +59,13 @@ def soul_bind_simulation(settings: object) -> None:
                 settings,
             )
 
+            wanted_data["covenant_ids"] = {}
+            for covenant in COVENANTS:
+                wanted_data["covenant_ids"][covenant.full_name] = covenant.id
+                wanted_data["translations"][
+                    covenant.full_name
+                ] = covenant.translations.get_dict()
+
             wanted_data["soul_bind_paths"] = {}
             for soul_bind in SOULBINDS:
                 wanted_data["soul_bind_paths"][soul_bind.full_name] = [
@@ -70,9 +83,9 @@ def soul_bind_simulation(settings: object) -> None:
                     node.full_name
                 ] = node.translations.get_dict()
                 wanted_data["spell_ids"][node.full_name] = node.spell_id
-                wanted_data["covenant_mapping"][
-                    node.full_name
-                ] = node.soul_bind.covenant.id
+                wanted_data["covenant_mapping"][node.full_name] = [
+                    node.soul_bind.covenant.id
+                ]
 
             conduits = get_conduits_for_spec(wow_spec)
             for conduit in conduits:
@@ -80,12 +93,9 @@ def soul_bind_simulation(settings: object) -> None:
                     conduit.full_name
                 ] = conduit.translations.get_dict()
                 wanted_data["spell_ids"][conduit.full_name] = conduit.spell_id
-                if len(conduit.covenants) == 1:
-                    wanted_data["covenant_mapping"][
-                        conduit.full_name
-                    ] = conduit.covenants[0].id
-                else:
-                    wanted_data["covenant_mapping"][conduit.full_name] = 0
+                wanted_data["covenant_mapping"][conduit.full_name] = list(
+                    [conduit.id for conduit in conduit.covenants]
+                )
 
             simulation_group = Simulation_Group(
                 name="soul_bind_simulation",
@@ -94,41 +104,13 @@ def soul_bind_simulation(settings: object) -> None:
                 executable=settings.executable,
             )
 
-            simulation_data = Simulation_Data(
-                name="baseline_0",
-                fight_style=fight_style,
-                profile=wanted_data["profile"],
-                simc_arguments=["covenant=none", "soulbind="],
-                target_error=settings.target_error[fight_style],
-                ptr=settings.ptr,
-                default_actions=settings.default_actions,
-                executable=settings.executable,
-                iterations=settings.iterations,
-            )
-            custom_apl = None
-            if settings.custom_apl:
-                with open("custom_apl.txt") as f:
-                    custom_apl = f.read()
-            if custom_apl:
-                simulation_data.simc_arguments.append("# custom_apl")
-                simulation_data.simc_arguments.append(custom_apl)
-
-            custom_fight_style = None
-            if settings.custom_fight_style:
-                with open("custom_fight_style.txt") as f:
-                    custom_fight_style = f.read()
-            if custom_fight_style:
-                simulation_data.simc_arguments.append("# custom_fight_style")
-                simulation_data.simc_arguments.append(custom_fight_style)
-
-            simulation_group.add(simulation_data)
-
             for covenant in COVENANTS:
                 simulation_data = None
 
                 simulation_data = Simulation_Data(
                     name=f"baseline_{covenant.id}",
                     fight_style=fight_style,
+                    profile=wanted_data["profile"],
                     simc_arguments=[
                         f"covenant={covenant.simc_name}",
                         "soulbind=",
@@ -154,7 +136,7 @@ def soul_bind_simulation(settings: object) -> None:
                 simulation_data = None
 
                 simulation_data = Simulation_Data(
-                    name=node.full_name,
+                    name=f"{node.full_name}_{node.soul_bind.covenant.id}",
                     fight_style=fight_style,
                     simc_arguments=[
                         f"covenant={node.soul_bind.covenant.simc_name}",
@@ -177,45 +159,82 @@ def soul_bind_simulation(settings: object) -> None:
                 )
 
             wanted_data["simulated_steps"] = []
-            for conduit in conduits:
-                for rank in conduit.ranks:
+            for rank in ranks:
+                if rank not in wanted_data["simulated_steps"]:
+                    wanted_data["simulated_steps"] = [rank] + wanted_data[
+                        "simulated_steps"
+                    ]
 
-                    if rank not in wanted_data["simulated_steps"]:
-                        wanted_data["simulated_steps"] = [rank] + wanted_data[
-                            "simulated_steps"
-                        ]
+                # track which conduit combinations are already being simulated
+                combos = []
+                for conduit in conduits:
+                    combos.append(conduit.id)
 
-                    simulation_data = None
+                    for covenant in conduit.covenants:
 
-                    covenant_name = (
-                        "none"
-                        if len(conduit.covenants) > 1
-                        else conduit.covenants[0].simc_name
-                    )
+                        simulation_data = None
 
-                    simulation_data = Simulation_Data(
-                        name=f"{conduit.full_name}_{rank}",
-                        fight_style=fight_style,
-                        simc_arguments=[
-                            f"covenant={covenant_name}",
-                            f"soulbind={conduit.id}:{rank}",
-                        ],
-                        target_error=settings.target_error[fight_style],
-                        ptr=settings.ptr,
-                        default_actions=settings.default_actions,
-                        executable=settings.executable,
-                        iterations=settings.iterations,
-                    )
+                        simulation_data = Simulation_Data(
+                            name=f"{conduit.full_name}_{covenant.id}_{rank}",
+                            fight_style=fight_style,
+                            simc_arguments=[
+                                f"covenant={covenant.simc_name}",
+                                f"soulbind={conduit.id}:{rank}",
+                            ],
+                            target_error=settings.target_error[fight_style],
+                            ptr=settings.ptr,
+                            default_actions=settings.default_actions,
+                            executable=settings.executable,
+                            iterations=settings.iterations,
+                        )
 
-                    simulation_group.add(simulation_data)
-                    logger.debug(
-                        (
-                            "Added conduit '{}' at rank {} in profile '{}' to simulation_group.".format(
-                                conduit.full_name, rank, simulation_data.name
+                        simulation_group.add(simulation_data)
+                        logger.debug(
+                            (
+                                "Added conduit '{}' for '{}' at rank {} in profile '{}' to simulation_group.".format(
+                                    conduit.full_name,
+                                    covenant.full_name,
+                                    rank,
+                                    simulation_data.name,
+                                )
                             )
                         )
-                    )
 
+                        secondary_conduits = [
+                            c
+                            for c in conduits
+                            if c.id not in combos and covenant in c.covenants
+                        ]
+
+                        for secondary_conduit in secondary_conduits:
+                            simulation_data = None
+
+                            simulation_data = Simulation_Data(
+                                name=f"{conduit.full_name}+{secondary_conduit.full_name}_{covenant.id}_{rank}",
+                                fight_style=fight_style,
+                                simc_arguments=[
+                                    f"covenant={covenant.simc_name}",
+                                    f"soulbind={conduit.id}:{rank}/{secondary_conduit.id}:{rank}",
+                                ],
+                                target_error=settings.target_error[fight_style],
+                                ptr=settings.ptr,
+                                default_actions=settings.default_actions,
+                                executable=settings.executable,
+                                iterations=settings.iterations,
+                            )
+
+                            simulation_group.add(simulation_data)
+                            logger.debug(
+                                (
+                                    "Added conduit '{}' and secondary condui '{}' for '{}' at rank {} in profile '{}' to simulation_group.".format(
+                                        conduit.full_name,
+                                        secondary_conduit.full_name,
+                                        covenant.full_name,
+                                        rank,
+                                        simulation_data.name,
+                                    )
+                                )
+                            )
             logger.info(
                 "Start {} soul bind node simulation for {}.".format(
                     fight_style, wow_spec
@@ -247,20 +266,22 @@ def soul_bind_simulation(settings: object) -> None:
                 logger.debug(f"Profile '{profile.name}' DPS: {profile.get_dps()}")
 
                 name = profile.name.split("_")[0]
+                covenant_id = int(profile.name.split("_")[1])
+                covenant = get_covenant(id=covenant_id).full_name
                 try:
-                    rank = int(profile.name.split("_")[1])
+                    rank = int(profile.name.split("_")[2])
                 except IndexError:
                     rank = None
 
+                if name not in wanted_data["data"]:
+                    wanted_data["data"][name] = {}
+
                 if isinstance(rank, int):
-                    if name not in wanted_data["data"]:
-                        wanted_data["data"][name] = {}
-                    logger.info(wanted_data["data"])
-                    logger.info(name)
-                    logger.info(rank)
-                    wanted_data["data"][name][rank] = profile.get_dps()
+                    if covenant not in wanted_data["data"][name]:
+                        wanted_data["data"][name][covenant] = {}
+                    wanted_data["data"][name][covenant][rank] = profile.get_dps()
                 else:
-                    wanted_data["data"][name] = profile.get_dps()
+                    wanted_data["data"][name][covenant] = profile.get_dps()
 
                 logger.debug(
                     "Added '{}' with {} dps to json.".format(
@@ -268,47 +289,61 @@ def soul_bind_simulation(settings: object) -> None:
                     )
                 )
 
+            logger.debug(wanted_data)
+
             # create ordered soul bind name list
-            for rank in conduits[0].ranks:
+            for rank in ranks:
+                for covenant in COVENANTS:
 
-                tmp_list = []
-                for talent in wanted_data["data"]:
-                    if "baseline" in talent:
-                        continue
+                    tmp_list = []
+                    for talent in wanted_data["data"]:
+                        if "baseline" in talent:
+                            continue
 
-                    try:
-                        tmp_list.append(
-                            (
-                                talent,
-                                wanted_data["data"][talent][rank]
-                                - wanted_data["data"][f"baseline"][
-                                    wanted_data["covenant_mapping"][talent]
-                                ],
+                        if "+" in talent:
+                            continue
+
+                        try:
+                            tmp_list.append(
+                                (
+                                    talent,
+                                    wanted_data["data"][talent][covenant.full_name][
+                                        rank
+                                    ]
+                                    - wanted_data["data"]["baseline"][
+                                        covenant.full_name
+                                    ],
+                                )
                             )
-                        )
-                    except TypeError:
-                        tmp_list.append(
-                            (
-                                talent,
-                                wanted_data["data"][talent]
-                                - wanted_data["data"][f"baseline"][
-                                    wanted_data["covenant_mapping"][talent]
-                                ],
+                        except TypeError:
+                            tmp_list.append(
+                                (
+                                    talent,
+                                    wanted_data["data"][talent][covenant.full_name]
+                                    - wanted_data["data"][f"baseline"][
+                                        covenant.full_name
+                                    ],
+                                )
                             )
+                        except KeyError:
+                            continue
+                    logger.debug(
+                        "tmp_list for covenant {}: {}".format(
+                            covenant.full_name, tmp_list
                         )
-                logger.debug("tmp_list: {}".format(tmp_list))
-
-                tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
-                logger.debug("Sorted tmp_list: {}".format(tmp_list))
-                logger.info(
-                    "Soul Bind Talent '{}' won with {} dps.".format(
-                        tmp_list[0][0], tmp_list[0][1]
                     )
-                )
 
-                wanted_data[f"sorted_data_keys_{rank}"] = [
-                    soul_bind for soul_bind, _ in tmp_list
-                ]
+                    tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
+                    logger.debug("Sorted tmp_list: {}".format(tmp_list))
+                    logger.info(
+                        "Soul Bind Talent '{}' ({}) won with {} dps.".format(
+                            tmp_list[0][0], covenant.full_name, tmp_list[0][1]
+                        )
+                    )
+
+                    wanted_data[f"sorted_data_keys_{covenant.simc_name}_{rank}"] = [
+                        soul_bind for soul_bind, _ in tmp_list
+                    ]
 
             logger.debug("Final json: {}".format(wanted_data))
 
