@@ -39,6 +39,7 @@ from bloodytools.simulations.secondary_distribution_simulation import (
     secondary_distribution_simulation,
 )
 from bloodytools.simulations.soul_bind_simulation import soul_bind_simulation
+from bloodytools.simulations.soul_bind_node_simulation import soul_bind_node_simulation
 from bloodytools.simulations.talent_simulation import talent_simulation
 from bloodytools.simulations.trinket_simulation import trinket_simulation
 from bloodytools.utils.utils import arg_parse_config
@@ -76,6 +77,7 @@ def _update_settings(args: object, logger: logging.Logger) -> None:
         settings.enable_gear_path = False
         settings.enable_talent_simulations = False
         settings.enable_soul_bind_simulations = False
+        settings.enable_soul_bind_node_simulations = False
         settings.enable_conduit_simulations = False
         settings.enable_covenant_simulations = False
 
@@ -89,6 +91,8 @@ def _update_settings(args: object, logger: logging.Logger) -> None:
             settings.enable_trinket_simulations = True
         elif simulation_type == "soul_binds":
             settings.enable_soul_bind_simulations = True
+        elif simulation_type == "soul_bind_nodes":
+            settings.enable_soul_bind_node_simulations = True
         elif simulation_type == "conduits":
             settings.enable_conduit_simulations = True
         elif simulation_type == "secondary_distributions":
@@ -208,13 +212,34 @@ def main(args=None):
             logger.info("Trinket simulations finished.")
 
     # trigger soul bind (nodes) simulations
+    if settings.enable_soul_bind_node_simulations:
+        if not settings.use_own_threading:
+            logger.info("Starting Soul Bind Node simulations.")
+
+        if settings.use_own_threading:
+            soul_bind_node_thread = threading.Thread(
+                name="Soul Bind Node Thread",
+                target=soul_bind_node_simulation,
+                args=(settings,),
+            )
+            thread_list.append(soul_bind_node_thread)
+            soul_bind_node_thread.start()
+        else:
+            soul_bind_node_simulation(settings)
+
+        if not settings.use_own_threading:
+            logger.info("Soul Bind Node simulations finished.")
+
+    # trigger soul bind (nodes+conduits) simulations
     if settings.enable_soul_bind_simulations:
         if not settings.use_own_threading:
             logger.info("Starting Soul Bind simulations.")
 
         if settings.use_own_threading:
             soul_bind_thread = threading.Thread(
-                name="Soul Bind Thread", target=soul_bind_simulation, args=(settings,)
+                name="Soul Bind Thread",
+                target=soul_bind_simulation,
+                args=(settings,),
             )
             thread_list.append(soul_bind_thread)
             soul_bind_thread.start()

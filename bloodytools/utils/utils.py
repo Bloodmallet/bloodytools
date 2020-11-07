@@ -258,10 +258,6 @@ def create_base_json_dict(
             "target_error": settings.target_error.get(fight_style, "0.1"),
             "ptr": settings.ptr,
             "simc_hash": settings.simc_hash,
-            # deprecated
-            "class": wow_spec.wow_class.simc_name,
-            # deprecated
-            "spec": wow_spec.simc_name,
         },
         "data": {},
         "translations": {},
@@ -529,7 +525,7 @@ def arg_parse_config():
         dest="single_sim",
         metavar="STRING",
         type=str,
-        help="Activate a single simulation on the local machine. <simulation_types> are races, secondary_distributions, talents, trinkets, covenants, soul_binds, conduits, and legendaries. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk",
+        help="Activate a single simulation on the local machine. <simulation_types> are races, secondary_distributions, talents, trinkets, covenants, soul_binds, soul_bind_nodes, conduits, and legendaries. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk",
     )
     parser.add_argument(
         "--custom_profile",

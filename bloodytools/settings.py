@@ -96,6 +96,10 @@ enable_covenant_simulations = False
 enable_soul_bind_simulations = False
 
 ###############################################################################
+# Soul Bind Node
+enable_soul_bind_node_simulations = False
+
+###############################################################################
 # Conduit
 enable_conduit_simulations = False
 
