@@ -66,12 +66,7 @@ def soul_bind_simulation(settings: object) -> None:
                     covenant.full_name
                 ] = covenant.translations.get_dict()
 
-            wanted_data["soul_bind_paths"] = {}
             for soul_bind in SOULBINDS:
-                wanted_data["soul_bind_paths"][soul_bind.full_name] = [
-                    [talent.full_name for talent in path]
-                    for path in soul_bind.talent_paths
-                ]
                 wanted_data["translations"][
                     soul_bind.full_name
                 ] = soul_bind.translations.get_dict()
@@ -290,6 +285,80 @@ def soul_bind_simulation(settings: object) -> None:
                 )
 
             logger.debug(wanted_data)
+
+            # finding the best paths:
+            wanted_data["soul_bind_paths"] = {}
+            for rank in ranks:
+                wanted_data["soul_bind_paths"][rank] = {}
+                for soul_bind in SOULBINDS:
+                    dps_paths = []
+                    for path in soul_bind.talent_paths:
+                        filtered_path = [
+                            talent for talent in path if talent.is_dps_increase
+                        ]
+                        dps_values = []
+                        cnt_potency = 0
+                        for talent in filtered_path:
+                            if talent.is_potency:
+                                # search through all double-potency conduits, if it's available twice
+                                # search through all potency conduits
+                                # add dps
+                                cnt_potency += 1
+                            elif not (
+                                talent.is_potency
+                                or talent.is_finesse
+                                or talent.is_endurance
+                            ):
+                                dps_values.append(
+                                    wanted_data["data"][talent.full_name][
+                                        soul_bind.covenant.full_name
+                                    ]
+                                )
+                        # add potency dps values
+                        if cnt_potency == 2:
+                            double_potencies = [
+                                (
+                                    name,
+                                    wanted_data["data"][name][
+                                        soul_bind.covenant.full_name
+                                    ][rank],
+                                )
+                                for name in wanted_data["data"].keys()
+                                if "+" in name
+                                and soul_bind.covenant.full_name
+                                in wanted_data["data"][name]
+                            ]
+                            winner = max(
+                                double_potencies, key=lambda key_value: key_value[1]
+                            )
+                            dps_values.append(
+                                wanted_data["data"][winner[0]][
+                                    soul_bind.covenant.full_name
+                                ][rank]
+                            )
+                        elif cnt_potency == 1:
+                            potencies = [
+                                (
+                                    conduit,
+                                    wanted_data["data"][conduit.full_name][
+                                        soul_bind.covenant.full_name
+                                    ][rank],
+                                )
+                                for conduit in conduits
+                                if conduit.is_potency
+                                and soul_bind.covenant in conduit.covenants
+                            ]
+                            winner = max(potencies, key=lambda key_value: key_value[1])
+                            dps_values.append(
+                                wanted_data["data"][winner[0].full_name][
+                                    soul_bind.covenant.full_name
+                                ][rank]
+                            )
+                        dps_paths.append([path, sum(dps_values)])
+                    winner = max(dps_paths, key=lambda key_value: key_value[1])
+                    wanted_data["soul_bind_paths"][rank][soul_bind.full_name] = [
+                        talent.full_name for talent in winner[0]
+                    ]
 
             # create ordered soul bind name list
             for rank in ranks:
