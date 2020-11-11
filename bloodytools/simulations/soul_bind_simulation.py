@@ -66,12 +66,15 @@ def soul_bind_simulation(settings: object) -> None:
                     covenant.full_name
                 ] = covenant.translations.get_dict()
 
+            wanted_data["covenant_mapping"] = {}
             for soul_bind in SOULBINDS:
                 wanted_data["translations"][
                     soul_bind.full_name
                 ] = soul_bind.translations.get_dict()
+                wanted_data["covenant_mapping"][soul_bind.full_name] = [
+                    soul_bind.covenant.id
+                ]
 
-            wanted_data["covenant_mapping"] = {}
             wanted_data["spell_ids"] = {}
             for node in nodes:
                 wanted_data["translations"][
@@ -290,6 +293,7 @@ def soul_bind_simulation(settings: object) -> None:
             wanted_data["soul_bind_paths"] = {}
             for rank in ranks:
                 wanted_data["soul_bind_paths"][rank] = {}
+                soul_bind_dps = []
                 for soul_bind in SOULBINDS:
                     dps_paths = []
                     for path in soul_bind.talent_paths:
@@ -354,11 +358,48 @@ def soul_bind_simulation(settings: object) -> None:
                                     soul_bind.covenant.full_name
                                 ][rank]
                             )
-                        dps_paths.append([path, sum(dps_values)])
+
+                        # compare only dps gains, without baseline dps
+                        dps_paths.append(
+                            [
+                                path,
+                                sum(
+                                    map(
+                                        lambda value: value
+                                        - wanted_data["data"]["baseline"][
+                                            soul_bind.covenant.full_name
+                                        ],
+                                        dps_values,
+                                    )
+                                ),
+                            ]
+                        )
+
                     winner = max(dps_paths, key=lambda key_value: key_value[1])
                     wanted_data["soul_bind_paths"][rank][soul_bind.full_name] = [
                         talent.full_name for talent in winner[0]
                     ]
+                    # add soul bind dps to "data"
+                    if soul_bind.full_name not in wanted_data["data"]:
+                        wanted_data["data"][soul_bind.full_name] = {}
+                    wanted_data["data"][soul_bind.full_name][rank] = (
+                        winner[1]
+                        + wanted_data["data"]["baseline"][soul_bind.covenant.full_name]
+                    )
+
+                    soul_bind_dps.append(
+                        (
+                            soul_bind.full_name,
+                            wanted_data["data"][soul_bind.full_name][rank],
+                        )
+                    )
+                ordered_soul_binds = sorted(
+                    soul_bind_dps, key=lambda e: e[1], reverse=True
+                )
+                wanted_data["sorted_data_keys"] = {}
+                wanted_data["sorted_data_keys"][rank] = [
+                    soul_bind[0] for soul_bind in ordered_soul_binds
+                ]
 
             # create ordered soul bind name list
             for rank in ranks:
