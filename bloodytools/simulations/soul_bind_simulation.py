@@ -300,6 +300,7 @@ def soul_bind_simulation(settings: object) -> None:
                         filtered_path = [
                             talent for talent in path if talent.is_dps_increase
                         ]
+                        purged_path = []
                         dps_values = []
                         cnt_potency = 0
                         for talent in filtered_path:
@@ -318,6 +319,7 @@ def soul_bind_simulation(settings: object) -> None:
                                         soul_bind.covenant.full_name
                                     ]
                                 )
+                                purged_path.append(talent.full_name)
                         # add potency dps values
                         if cnt_potency == 2:
                             double_potencies = [
@@ -340,6 +342,7 @@ def soul_bind_simulation(settings: object) -> None:
                                     soul_bind.covenant.full_name
                                 ][rank]
                             )
+                            purged_path += winner[0].split("+")
                         elif cnt_potency == 1:
                             potencies = [
                                 (
@@ -358,10 +361,11 @@ def soul_bind_simulation(settings: object) -> None:
                                     soul_bind.covenant.full_name
                                 ][rank]
                             )
+                            purged_path.append(winner[0].full_name)
 
                         # compare only dps gains, without baseline dps
                         dps_paths.append(
-                            [
+                            (
                                 path,
                                 sum(
                                     map(
@@ -372,12 +376,14 @@ def soul_bind_simulation(settings: object) -> None:
                                         dps_values,
                                     )
                                 ),
-                            ]
+                                purged_path,
+                            )
                         )
 
                     winner = max(dps_paths, key=lambda key_value: key_value[1])
-                    wanted_data["soul_bind_paths"][rank][soul_bind.full_name] = [
-                        talent.full_name for talent in winner[0]
+
+                    wanted_data["soul_bind_paths"][rank][soul_bind.full_name] = winner[
+                        2
                     ]
                     # add soul bind dps to "data"
                     if soul_bind.full_name not in wanted_data["data"]:
