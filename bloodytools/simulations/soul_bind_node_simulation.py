@@ -45,7 +45,7 @@ def soul_bind_node_simulation(settings: object) -> None:
 
             # prepare result json
             wanted_data = create_base_json_dict(
-                "Soul Bind Nodes",
+                "Soulbind Nodes",
                 wow_spec,
                 fight_style,
                 settings,
