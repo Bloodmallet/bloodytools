@@ -32,7 +32,7 @@ def talent_simulation(settings) -> None:
                 "Talents", wow_spec, fight_style, settings
             )
 
-            export_json["profile"]["character"].pop("talents", None)
+            export_json["profile"]["character"]["talents"] = "0000000"
 
             simulation_group = Simulation_Group(
                 name="{} {} {}".format(fight_style, wow_spec, wow_class),
