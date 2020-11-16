@@ -149,7 +149,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     pattern_specifics = {}
     for element in character_specifics:
         pattern_specifics[element] = re.compile(
-            '^{}="?([a-z0-9_./:]*)"?'.format(element)
+            '^{}="?([a-z0-9_./:,]*)"?'.format(element)
         )
 
     with open(path, "r") as f:
