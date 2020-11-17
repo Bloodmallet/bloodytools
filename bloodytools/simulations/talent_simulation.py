@@ -106,7 +106,7 @@ def talent_simulation(settings) -> None:
                 simc_arguments=[
                     "talents={}".format(talent_combinations[0]),
                 ],
-                target_error=settings.target_error[fight_style],
+                target_error=settings.target_error.get(fight_style, "0.1"),
                 ptr=settings.ptr,
                 default_actions=settings.default_actions,
                 executable=settings.executable,
@@ -137,7 +137,7 @@ def talent_simulation(settings) -> None:
                     name="{}".format(talent_combination),
                     fight_style=fight_style,
                     simc_arguments=["talents={}".format(talent_combination)],
-                    target_error=settings.target_error[fight_style],
+                    target_error=settings.target_error.get(fight_style, "0.1"),
                     ptr=settings.ptr,
                     default_actions=settings.default_actions,
                     executable=settings.executable,

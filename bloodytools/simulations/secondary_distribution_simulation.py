@@ -87,7 +87,7 @@ def secondary_distribution_simulation(settings: object) -> None:
                 simulation = Simulation_Data(
                     name="Grab dem secondary values",
                     fight_style=fight_style,
-                    target_error=settings.target_error[fight_style],
+                    target_error=settings.target_error.get(fight_style, "0.1"),
                     iterations="1",
                     profile=result_dict["profile"],
                     ptr=settings.ptr,
@@ -154,7 +154,7 @@ def secondary_distribution_simulation(settings: object) -> None:
                                 distribution_multiplier[3],
                             ),
                             fight_style=fight_style,
-                            target_error=settings.target_error[fight_style],
+                            target_error=settings.target_error.get(fight_style, "0.1"),
                             iterations=settings.iterations,
                             profile=result_dict["profile"],
                             simc_arguments=[
@@ -220,7 +220,9 @@ def secondary_distribution_simulation(settings: object) -> None:
                                     distribution_multiplier[3],
                                 ),
                                 fight_style=fight_style,
-                                target_error=settings.target_error[fight_style],
+                                target_error=settings.target_error.get(
+                                    fight_style, "0.1"
+                                ),
                                 iterations=settings.iterations,
                                 simc_arguments=[
                                     "gear_crit_rating={}".format(

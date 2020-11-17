@@ -252,7 +252,7 @@ def trinket_simulation(settings: object) -> None:
                         name="baseline {}".format(settings.min_ilevel),
                         fight_style=fight_style,
                         iterations=settings.iterations,
-                        target_error=settings.target_error[fight_style],
+                        target_error=settings.target_error.get(fight_style, "0.1"),
                         profile=json_export["profile"],
                         simc_arguments=[
                             "trinket1=",
@@ -289,7 +289,7 @@ def trinket_simulation(settings: object) -> None:
                         name="{} {}".format(trinket.name, itemlevel),
                         fight_style=fight_style,
                         iterations=settings.iterations,
-                        target_error=settings.target_error[fight_style],
+                        target_error=settings.target_error.get(fight_style, "0.1"),
                         simc_arguments=[
                             "trinket1=,id={},ilevel={}".format(
                                 trinket.item_id, itemlevel

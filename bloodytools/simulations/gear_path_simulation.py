@@ -62,7 +62,7 @@ def gear_path_simulation(specs: List[Tuple[str, str]], settings) -> None:
                     name="crit_profile",
                     executable=settings.executable,
                     fight_style=fight_style,
-                    target_error=settings.target_error[fight_style],
+                    target_error=settings.target_error.get(fight_style, "0.1"),
                     simc_arguments=[
                         base_profile_string,
                         "gear_crit_rating={}".format(crit_rating + settings.step_size),
@@ -79,7 +79,7 @@ def gear_path_simulation(specs: List[Tuple[str, str]], settings) -> None:
                     name="haste_profile",
                     executable=settings.executable,
                     fight_style=fight_style,
-                    target_error=settings.target_error[fight_style],
+                    target_error=settings.target_error.get(fight_style, "0.1"),
                     simc_arguments=[
                         "gear_crit_rating={}".format(crit_rating),
                         "gear_haste_rating={}".format(
@@ -97,7 +97,7 @@ def gear_path_simulation(specs: List[Tuple[str, str]], settings) -> None:
                     name="mastery_profile",
                     executable=settings.executable,
                     fight_style=fight_style,
-                    target_error=settings.target_error[fight_style],
+                    target_error=settings.target_error.get(fight_style, "0.1"),
                     simc_arguments=[
                         "gear_crit_rating={}".format(crit_rating),
                         "gear_haste_rating={}".format(haste_rating),
@@ -115,7 +115,7 @@ def gear_path_simulation(specs: List[Tuple[str, str]], settings) -> None:
                     name="vers_profile",
                     executable=settings.executable,
                     fight_style=fight_style,
-                    target_error=settings.target_error[fight_style],
+                    target_error=settings.target_error.get(fight_style, "0.1"),
                     simc_arguments=[
                         "gear_crit_rating={}".format(crit_rating),
                         "gear_haste_rating={}".format(haste_rating),
