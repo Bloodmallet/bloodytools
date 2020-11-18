@@ -103,9 +103,13 @@ def secondary_distribution_simulation(settings: object) -> None:
                     "mastery_rating",
                     "versatility_rating",
                 ]:
-                    stats += simulation.json_data["sim"]["players"][0][
-                        "collected_data"
-                    ]["buffed_stats"]["stats"][stat]
+                    try:
+                        stats += simulation.json_data["sim"]["players"][0][
+                            "collected_data"
+                        ]["buffed_stats"]["stats"][stat]
+                    except KeyError:
+                        # stat is not present in profile
+                        pass
 
                 secondary_amount = int(stats)
 
