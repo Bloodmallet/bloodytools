@@ -40,19 +40,23 @@ def legendary_simulation(settings) -> None:
 
             # remove any existing legendary effects
             for item in wanted_data["profile"]["items"]:
-                item_bonus_ids: List[str] = None
+                item_bonus_ids: List[str] = []
                 try:
-                    item_bonus_ids = wanted_data["profile"]["items"][item][
+                    tmp_item_bonus_ids = wanted_data["profile"]["items"][item][
                         "bonus_id"
                     ].split("/")
                 except KeyError:
                     continue
-                item_bonus_ids = [
+                for element in tmp_item_bonus_ids:
+                    for b_id in element.split(":"):
+                        item_bonus_ids.append(b_id)
+
+                filtered_item_bonus_ids = [
                     b_id for b_id in item_bonus_ids if not int(b_id) in bonus_ids
                 ]
 
                 wanted_data["profile"]["items"][item]["bonus_id"] = "/".join(
-                    item_bonus_ids
+                    filtered_item_bonus_ids
                 )
 
             wanted_data["spell_ids"] = {}
