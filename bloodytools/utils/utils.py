@@ -14,6 +14,8 @@ from simc_support.game_data.WowClass import WowClass
 
 logger = logging.getLogger(__name__)
 
+SIMC_BRANCH = "shadowlands"
+
 
 def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: object):
     """Create basic profile string to get the standard profile of a spec. Use this function to get the necessary string for your first argument of a simulation_data object.
@@ -84,8 +86,9 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     if os.stat(path).st_size == 0:
         raise ValueError("Empty file")
 
-    if not profile:
-        profile = {}
+    provided_profile = profile
+
+    profile = {}
 
     if not "character" in profile:
         profile["character"] = {}
@@ -116,7 +119,9 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     unified_slot_names = {"shoulder": "shoulders", "wrist": "wrists"}
     pattern_slots = {}
     for element in item_slots:
-        pattern_slots[element] = re.compile('^{}="?([a-z0-9_=,/:.]*)"?'.format(element))
+        pattern_slots[element] = re.compile(
+            '^{}="?([a-z0-9_=,/:\'.-]*)"?'.format(element)
+        )
 
     # prepare regex for item defining attributes
     item_elements = [
@@ -149,7 +154,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     pattern_specifics = {}
     for element in character_specifics:
         pattern_specifics[element] = re.compile(
-            '^{}="?([a-z0-9_./:,]*)"?'.format(element)
+            '^{}="?([a-z0-9_./:\',-]*)"?'.format(element)
         )
 
     with open(path, "r") as f:
@@ -188,7 +193,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
 
     logger.debug(f"extracted profile: {profile}")
 
-    return profile
+    return profile if profile["items"] else provided_profile
 
 
 def create_base_json_dict(
@@ -311,28 +316,13 @@ def get_simc_hash(path) -> str:
             new_path = new_path[:-6]
 
     # add path to file to variable
-    new_path += ".git/FETCH_HEAD"
+    new_path += f".git/refs/heads/{SIMC_BRANCH}"
     simc_hash: str = None
     try:
         with open(new_path, "r", encoding="utf-8") as f:
-            for line in f:
-                if "'bfa-dev'" in line:
-                    simc_hash = line.split()[0]
-    except FileNotFoundError:
-        try:
-            with open("../../SimulationCraft/.git/shallow", "r", encoding="utf-8") as f:
-                for line in f:
-                    simc_hash = line.strip()
-        except FileNotFoundError:
-            logger.warning(
-                "Couldn't extract SimulationCraft git hash. Result files won't contain a sane hash."
-            )
-        except Exception as e:
-            logger.error(e)
-            raise e
-    except Exception as e:
-        logger.error(e)
-        raise e
+            simc_hash = f.read().strip()
+    except FileNotFoundError as e:
+        logger.warning()(e)
 
     return simc_hash
 
