@@ -188,7 +188,11 @@ def legendary_simulation(settings) -> None:
                 tmp_list.append((legendary, wanted_data["data"][legendary]))
             logger.debug("tmp_list: {}".format(tmp_list))
 
-            tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
+            filtered_tmp_list = [
+                element for element in tmp_list if "baseline" not in element[0]
+            ]
+
+            tmp_list = sorted(filtered_tmp_list, key=lambda item: item[1], reverse=True)
             logger.debug("Sorted tmp_list: {}".format(tmp_list))
             logger.info(
                 "Legendary {} won with {} dps.".format(tmp_list[0][0], tmp_list[0][1])
