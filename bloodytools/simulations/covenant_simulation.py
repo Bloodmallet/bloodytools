@@ -190,7 +190,9 @@ def covenant_simulation(settings: object) -> None:
                 tmp_list.append((covenant, wanted_data["data"][covenant]))
             logger.debug("tmp_list: {}".format(tmp_list))
 
-            tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
+            filtered_tmp_list = [data for data in tmp_list if "baseline" != data[0]]
+
+            tmp_list = sorted(filtered_tmp_list, key=lambda item: item[1], reverse=True)
             logger.debug("Sorted tmp_list: {}".format(tmp_list))
             logger.info(
                 "Covenant '{}' won with {} dps.".format(tmp_list[0][0], tmp_list[0][1])
