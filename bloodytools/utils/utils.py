@@ -171,6 +171,9 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
                     profile["items"] = {}
 
                 matches = pattern_slots[slot].search(line)
+                slot_name = slot
+                if slot in official_name:
+                    slot_name = official_name[slot]
                 # slot line found
                 slot_name = slot
                 if slot_name in unified_slot_names:

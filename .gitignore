@@ -1,5 +1,10 @@
 # directories
 __pycache__/
+# local editor
+.vscode/
+# local type checks
+.mypy_cache/
+results/*
 # sphinx autodoc documentation creation
 _static/
 # local type checks
