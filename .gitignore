@@ -1,27 +1,29 @@
-# locald ev env
-env/
-env38/
-env_shadowlands/
+# directories
+__pycache__/
 # local editor
 .vscode/
 # local type checks
 .mypy_cache/
 results/*
 # sphinx autodoc documentation creation
-source/
 _static/
+# local type checks
+.mypy_cache/
+# local editor
+.vscode/
 build/
-__pycache__/
+# local dev env
+env*/
+source/
+results/
 
-*.pyc
-
+# files
 # local coverage results
 .coverage
-
+*.pyc
 *.simc
-log.txt
-error.log
 apikey.py
-
+error.log
+log.txt
 make.bat
 Makefile

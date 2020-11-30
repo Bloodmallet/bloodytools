@@ -1,8 +1,9 @@
+wheel
 # mypy
-autopep8
+black
 # necessary for coverage check
 coveralls
--e git+https://github.com/Bloodmallet/bloodytests.git@develop#egg=bloodytests
+#-e git+https://github.com/Bloodmallet/bloodytests.git@develop#egg=bloodytests
 
 pylint
 
