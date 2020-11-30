@@ -531,7 +531,6 @@ class Simulation_Data:
             simc_arguments=list(self.simc_arguments),
             target_error=self.target_error,
             threads=self.threads,
-            logger=logger,
         )
 
         new_sim_data.so_creation_time = self.so_creation_time

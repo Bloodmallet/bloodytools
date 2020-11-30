@@ -210,6 +210,18 @@ def trinket_simulation(settings: object) -> None:
 
             # get main-trinkets
             trinket_list = get_trinkets_for_spec(wow_spec)
+            # filter trinket list by available itemlevels:
+            trinket_list = list(
+                filter(
+                    lambda trinket: any(
+                        map(
+                            lambda ilevel: _is_valid_itemlevel(ilevel, settings),
+                            trinket.itemlevels,
+                        )
+                    ),
+                    trinket_list,
+                )
+            )
             # get secondary-trinket (standard stat stick)
             second_trinket = get_versatility_trinket(wow_spec.stat)
 
@@ -235,6 +247,23 @@ def trinket_simulation(settings: object) -> None:
                 json_export["data_sources"][trinket.name] = trinket.source.value
                 json_export["item_ids"][trinket.name] = trinket.item_id
 
+                # unbound changeling
+                # TODO: restructure function slightly to loop only once through all trinkets...
+                if trinket.item_id == "178708":
+                    for stat in ["crit", "haste", "mastery"]:
+                        tmp_name = f"{trinket.name} {stat}"
+                        json_export["translations"][
+                            tmp_name
+                        ] = trinket.translations.get_dict()
+                        for key in json_export["translations"][tmp_name]:
+                            json_export["translations"][tmp_name][key] = (
+                                json_export["translations"][tmp_name][key] + f" {stat}"
+                            )
+                        json_export["data"][tmp_name] = {}
+                        json_export["data_active"][tmp_name] = trinket.on_use
+                        json_export["data_sources"][tmp_name] = trinket.source.value
+                        json_export["item_ids"][tmp_name] = trinket.item_id
+
             if not wow_spec.wow_class.simc_name in simulation_results:
                 simulation_results[wow_spec.wow_class.simc_name] = {}
 
@@ -245,40 +274,39 @@ def trinket_simulation(settings: object) -> None:
                 executable=settings.executable,
             )
 
+            simulation_data = Simulation_Data(
+                name="baseline {}".format(settings.min_ilevel),
+                fight_style=fight_style,
+                iterations=settings.iterations,
+                target_error=settings.target_error.get(fight_style, "0.1"),
+                profile=json_export["profile"],
+                simc_arguments=[
+                    "trinket1=",
+                ],
+                ptr=settings.ptr,
+                default_actions=settings.default_actions,
+                executable=settings.executable,
+            )
+
+            custom_apl = None
+            if settings.custom_apl:
+                with open("custom_apl.txt") as f:
+                    custom_apl = f.read()
+            if custom_apl:
+                simulation_data.simc_arguments.append("# custom_apl")
+                simulation_data.simc_arguments.append(custom_apl)
+
+            custom_fight_style = None
+            if settings.custom_fight_style:
+                with open("custom_fight_style.txt") as f:
+                    custom_fight_style = f.read()
+            if custom_fight_style:
+                simulation_data.simc_arguments.append("# custom_fight_style")
+                simulation_data.simc_arguments.append(custom_fight_style)
+
+            simulation_group.add(simulation_data)
+
             for trinket in trinket_list:
-
-                if trinket == trinket_list[0]:
-                    simulation_data = Simulation_Data(
-                        name="baseline {}".format(settings.min_ilevel),
-                        fight_style=fight_style,
-                        iterations=settings.iterations,
-                        target_error=settings.target_error.get(fight_style, "0.1"),
-                        profile=json_export["profile"],
-                        simc_arguments=[
-                            "trinket1=",
-                        ],
-                        ptr=settings.ptr,
-                        default_actions=settings.default_actions,
-                        executable=settings.executable,
-                    )
-
-                    custom_apl = None
-                    if settings.custom_apl:
-                        with open("custom_apl.txt") as f:
-                            custom_apl = f.read()
-                    if custom_apl:
-                        simulation_data.simc_arguments.append("# custom_apl")
-                        simulation_data.simc_arguments.append(custom_apl)
-
-                    custom_fight_style = None
-                    if settings.custom_fight_style:
-                        with open("custom_fight_style.txt") as f:
-                            custom_fight_style = f.read()
-                    if custom_fight_style:
-                        simulation_data.simc_arguments.append("# custom_fight_style")
-                        simulation_data.simc_arguments.append(custom_fight_style)
-
-                    simulation_group.add(simulation_data)
 
                 # for each available itemlevel of the trinket
                 for itemlevel in filter(
@@ -300,6 +328,17 @@ def trinket_simulation(settings: object) -> None:
                         executable=settings.executable,
                     )
                     simulation_group.add(simulation_data)
+
+                    # unbound changeling
+                    if trinket.item_id == "178708":
+                        option = "shadowlands.unbound_changeling_stat_type"
+                        simulation_data.simc_arguments.append(f"{option}=all")
+                        for stat in ["crit", "haste", "mastery"]:
+                            new_data = simulation_data.copy()
+                            new_data.simc_arguments.append(f"{option}={stat}")
+                            new_data.name = f"{trinket.name} {stat} {itemlevel}"
+
+                            simulation_group.add(new_data)
 
             # create and simulate baseline profile
             logger.info(
