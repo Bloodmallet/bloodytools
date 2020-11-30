@@ -15,9 +15,7 @@ from typing import List
 logger = logging.getLogger(__name__)
 
 CONDUITMAXRANK = 7
-ranks = [
-    7,
-]  # list(range(1, CONDUITMAXRANK + 1))
+ranks = list(range(1, CONDUITMAXRANK + 1))
 
 
 def soul_bind_simulation(settings: object) -> None:
@@ -253,9 +251,7 @@ def soul_bind_simulation(settings: object) -> None:
                                 )
                             )
             logger.info(
-                "Start {} soul bind node simulation for {}.".format(
-                    fight_style, wow_spec
-                )
+                "Start {} soul_binds simulation for {}.".format(fight_style, wow_spec)
             )
             try:
                 if settings.use_raidbots and settings.apikey:
@@ -266,14 +262,14 @@ def soul_bind_simulation(settings: object) -> None:
                     simulation_group.simulate()
             except Exception as e:
                 logger.error(
-                    "{} soul bind node simulation for {} failed. {}".format(
+                    "{} soul_binds simulation for {} failed. {}".format(
                         fight_style.title(), wow_spec, e
                     )
                 )
                 continue
             else:
                 logger.info(
-                    "{} soul bind node simulation for {} ended successfully. Cleaning up.".format(
+                    "{} soul_binds simulation for {} ended successfully. Cleaning up.".format(
                         fight_style.title(), wow_spec
                     )
                 )
