@@ -14,6 +14,24 @@ from simc_support.game_data.WowSpec import WowSpec
 
 logger = logging.getLogger(__name__)
 
+# special cases
+bonus_ids = {
+    # Mistcaller Ocarina
+    "178715": {
+        "crit": 6920,
+        "haste": 6921,
+        "mastery": 6922,
+        "versatility": 6923,
+    },
+    # Unbound Changeling
+    "178708": {
+        "crit": 6916,
+        "haste": 6917,
+        "mastery": 6918,
+        "all": 6915,
+    },
+}
+
 
 def _get_translation(trinkets: List[Trinket], name: str) -> dict:
     for trinket in trinkets:
@@ -247,11 +265,10 @@ def trinket_simulation(settings: object) -> None:
                 json_export["data_sources"][trinket.name] = trinket.source.value
                 json_export["item_ids"][trinket.name] = trinket.item_id
 
-                # unbound changeling
                 # TODO: restructure function slightly to loop only once through all trinkets...
-                if trinket.item_id == "178708":
-                    for stat in ["crit", "haste", "mastery"]:
-                        tmp_name = f"{trinket.name} {stat}"
+                if trinket.item_id in bonus_ids:
+                    for stat in bonus_ids[trinket.item_id].keys():
+                        tmp_name = f"{trinket.name} [{stat.title()}]"
                         json_export["translations"][
                             tmp_name
                         ] = trinket.translations.get_dict()
@@ -329,14 +346,17 @@ def trinket_simulation(settings: object) -> None:
                     )
                     simulation_group.add(simulation_data)
 
-                    # unbound changeling
-                    if trinket.item_id == "178708":
-                        option = "shadowlands.unbound_changeling_stat_type"
-                        simulation_data.simc_arguments.append(f"{option}=all")
-                        for stat in ["crit", "haste", "mastery"]:
+                    # special cases
+                    if trinket.item_id in bonus_ids:
+                        for stat in bonus_ids[trinket.item_id]:
                             new_data = simulation_data.copy()
-                            new_data.simc_arguments.append(f"{option}={stat}")
-                            new_data.name = f"{trinket.name} {stat} {itemlevel}"
+                            new_data.simc_arguments[-1] = (
+                                new_data.simc_arguments[-1]
+                                + f",bonus_id={bonus_ids[trinket.item_id][stat]}"
+                            )
+                            new_data.name = (
+                                f"{trinket.name} [{stat.title()}] {itemlevel}"
+                            )
 
                             simulation_group.add(new_data)
 
