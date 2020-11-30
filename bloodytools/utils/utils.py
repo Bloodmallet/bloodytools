@@ -116,7 +116,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
         "main_hand",
         "off_hand",
     ]
-    unified_slot_names = {"shoulder": "shoulders", "wrist": "wrists"}
+    official_name = {"shoulder": "shoulders", "wrist": "wrists"}
     pattern_slots = {}
     for element in item_slots:
         pattern_slots[element] = re.compile(
@@ -174,10 +174,6 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
                 slot_name = slot
                 if slot in official_name:
                     slot_name = official_name[slot]
-                # slot line found
-                slot_name = slot
-                if slot_name in unified_slot_names:
-                    slot_name = unified_slot_names[slot_name]
                 if matches:
                     new_line = matches.group(1)
                     if not slot_name in profile:
