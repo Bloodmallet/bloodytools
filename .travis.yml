@@ -34,7 +34,7 @@ install:
   - python --version
   # Install project requirements and test requirements
   - pip install -r ./requirements.txt
-  - pip install -r ./requirements-test.txt
+  - pip install -r ./requirements-dev.txt
   # Load SimulationCraft
   - git clone --depth 1 https://github.com/simulationcraft/simc.git SimulationCraft
   - cd SimulationCraft/engine
