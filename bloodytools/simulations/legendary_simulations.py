@@ -11,6 +11,7 @@ from simc_support.game_data.WowSpec import WowSpec
 
 logger = logging.getLogger(__name__)
 
+# spell ids
 UNWANTED_LEGENDARIES = [
     339340,  # Norgannon's Sagacity
     339351,  # Stable Phantasma Lure
