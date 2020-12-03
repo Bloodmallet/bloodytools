@@ -11,6 +11,12 @@ from simc_support.game_data.WowSpec import WowSpec
 
 logger = logging.getLogger(__name__)
 
+UNWANTED_LEGENDARIES = [
+    339340,  # Norgannon's Sagacity
+    339351,  # Stable Phantasma Lure
+    338743,  # Vitality Sacrifice
+]
+
 
 def legendary_simulation(settings) -> None:
     """Simulates all available legendaries for all given specs.
@@ -35,6 +41,14 @@ def legendary_simulation(settings) -> None:
             )
 
             legendaries = get_legendaries_for_spec(wow_spec=wow_spec)
+
+            legendaries = list(
+                [
+                    legendary
+                    for legendary in legendaries
+                    if legendary.spell_id not in UNWANTED_LEGENDARIES
+                ]
+            )
 
             bonus_ids = list([legendary.bonus_id for legendary in legendaries])
 
