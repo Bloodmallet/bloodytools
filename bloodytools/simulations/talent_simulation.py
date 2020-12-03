@@ -4,7 +4,8 @@ import os
 
 from bloodytools.utils.utils import create_basic_profile_string, create_base_json_dict
 from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Data
-from simc_support.game_data.WowSpec import WowSpec
+from simc_support.game_data.WowSpec import WowSpec, get_wow_spec
+from simc_support.game_data.Talent import get_talents_for_spec
 from typing import List, Tuple
 
 logger = logging.getLogger(__name__)
@@ -92,11 +93,48 @@ def talent_simulation(settings) -> None:
                                             continue
 
                                         talent_combinations.append(talent_combination)
+
+            # filter talent combinations from non-dps talents
+            if wow_spec == get_wow_spec("demon_hunter", "vengeance"):
+
+                def _is_not_dps_neutral_talent(talent_combination: str) -> bool:
+                    position_denied_talent = (
+                        (1, 1),
+                        (3, 1),
+                        (3, 2),
+                        (4, 3),
+                        (5, 1),
+                        (5, 3),
+                        (6, 1),
+                        (6, 2),
+                    )
+                    return not any(
+                        [
+                            True
+                            if (row, int(column)) in position_denied_talent
+                            else False
+                            for row, column in enumerate(talent_combination)
+                        ]
+                    )
+
+                talent_combinations = list(
+                    [
+                        talent_combination
+                        for talent_combination in talent_combinations
+                        if _is_not_dps_neutral_talent(talent_combination)
+                    ]
+                )
+
             logger.debug(
                 "Creating talent combinations: Done. Created {}.".format(
                     len(talent_combinations)
                 )
             )
+
+            for talent in get_talents_for_spec(wow_spec):
+                export_json["translations"][
+                    talent.name
+                ] = talent.translations.get_dict()
 
             # no talents profile
             base_profile = Simulation_Data(
