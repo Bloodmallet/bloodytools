@@ -3,13 +3,27 @@ import logging
 import os
 
 from simc_support.game_data.Legendary import Legendary, get_legendaries_for_spec
+from simc_support.game_data.WowSpec import get_wow_spec, WowSpec
 
-from bloodytools.utils.utils import create_basic_profile_string, create_base_json_dict
+try:
+    from bloodytools.simulations.legendary_special_cases import (
+        SPECIAL_CASES as LOADED_SPECIAL_CASES,
+    )
+except ImportError:
+    LOADED_SPECIAL_CASES = {}
+from bloodytools.utils.utils import create_base_json_dict
 from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Data
 from typing import List
-from simc_support.game_data.WowSpec import WowSpec
 
 logger = logging.getLogger(__name__)
+
+# TODO: python import or yaml?
+SPECIAL_CASES = {}
+for wow_class in LOADED_SPECIAL_CASES.keys():
+    for wow_spec in LOADED_SPECIAL_CASES[wow_class].keys():
+        SPECIAL_CASES[get_wow_spec(wow_class, wow_spec)] = LOADED_SPECIAL_CASES[
+            wow_class
+        ][wow_spec]
 
 # spell ids
 UNWANTED_LEGENDARIES = [
@@ -151,6 +165,23 @@ def legendary_simulation(settings) -> None:
                         )
                     )
                 )
+
+                if wow_spec in SPECIAL_CASES:
+                    for special_case in SPECIAL_CASES[wow_spec]:
+                        if special_case["name"] == legendary.full_name:
+                            new_profile = simulation_data.copy()
+                            new_name = (
+                                new_profile.name
+                                + " +"
+                                + "+".join(special_case["name_additions"])
+                            )
+                            new_profile.name = new_name
+                            new_profile.simc_arguments += special_case["overrides"]
+                            simulation_group.add(new_profile)
+                            wanted_data["translations"][
+                                new_name
+                            ] = legendary.translations.get_dict()
+                            wanted_data["spell_ids"][new_name] = legendary.spell_id
 
             logger.info(
                 "Start {} legendary simulation for {}.".format(fight_style, wow_spec)
