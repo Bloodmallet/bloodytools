@@ -1,29 +1,39 @@
+from bloodytools.simulations.legendary_special_cases import SPECIAL_CASES
 import json
 import logging
 import os
+import pkg_resources
+import yaml
 
 from simc_support.game_data.Legendary import Legendary, get_legendaries_for_spec
 from simc_support.game_data.WowSpec import get_wow_spec, WowSpec
 
-try:
-    from bloodytools.simulations.legendary_special_cases import (
-        SPECIAL_CASES as LOADED_SPECIAL_CASES,
-    )
-except ImportError:
-    LOADED_SPECIAL_CASES = {}
 from bloodytools.utils.utils import create_base_json_dict
 from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Data
 from typing import List
 
 logger = logging.getLogger(__name__)
 
-# TODO: python import or yaml?
-SPECIAL_CASES = {}
-for wow_class in LOADED_SPECIAL_CASES.keys():
-    for wow_spec in LOADED_SPECIAL_CASES[wow_class].keys():
-        SPECIAL_CASES[get_wow_spec(wow_class, wow_spec)] = LOADED_SPECIAL_CASES[
-            wow_class
-        ][wow_spec]
+
+def _load_special_cases():
+    try:
+        with pkg_resources.resource_stream(
+            __name__, "/".join(("legendary_special_cases.yml",))
+        ) as f:
+            LOADED_SPECIAL_CASES = yaml.safe_load(f)
+    except FileNotFoundError as e:
+        logger.warning(e)
+        LOADED_SPECIAL_CASES = {}
+
+    SPECIAL_CASES = {}
+    for wow_class in LOADED_SPECIAL_CASES.keys():
+        for wow_spec in LOADED_SPECIAL_CASES[wow_class].keys():
+            SPECIAL_CASES[get_wow_spec(wow_class, wow_spec)] = LOADED_SPECIAL_CASES[
+                wow_class
+            ][wow_spec]
+
+    return SPECIAL_CASES
+
 
 # spell ids
 UNWANTED_LEGENDARIES = [
@@ -43,6 +53,8 @@ def legendary_simulation(settings) -> None:
         None --
     """
     logger.debug("legendary_simulation start")
+
+    SPECIAL_CASES = _load_special_cases()
 
     specs: List[WowSpec] = settings.wow_class_spec_list
 
@@ -170,10 +182,10 @@ def legendary_simulation(settings) -> None:
                     for special_case in SPECIAL_CASES[wow_spec]:
                         if special_case["name"] == legendary.full_name:
                             new_profile = simulation_data.copy()
-                            name_addition = " +" + "+".join(
-                                special_case["name_additions"]
+                            name_addition = (
+                                "[" + "+".join(special_case["name_additions"]) + "] "
                             )
-                            new_name = new_profile.name + name_addition
+                            new_name = name_addition + new_profile.name
                             new_profile.name = new_name
                             new_profile.simc_arguments += special_case["overrides"]
                             simulation_group.add(new_profile)
@@ -183,9 +195,10 @@ def legendary_simulation(settings) -> None:
                             for language in wanted_data["translations"][
                                 new_name
                             ].keys():
-                                wanted_data["translations"][new_name][
-                                    language
-                                ] += name_addition
+                                wanted_data["translations"][new_name][language] = (
+                                    name_addition
+                                    + wanted_data["translations"][new_name][language]
+                                )
                             wanted_data["spell_ids"][new_name] = legendary.spell_id
 
             logger.info(

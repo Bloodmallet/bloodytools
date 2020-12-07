@@ -1,0 +1,23 @@
+shaman:
+  enhancement:
+    - name: Doom Winds
+      name_additions:
+        - FW
+        - UW
+        - Asc
+      overrides:
+        - talents=2111133
+        - soulbind=niya,grove_invigoration/unruly_winds:7/niyas_tools_burrs
+    - name: Witch Doctor's Wolf Bones
+      name_additions:
+        - Asc
+      overrides:
+        - talents=3111133
+        - soulbind=niya,grove_invigoration/focused_lightning:7/niyas_tools_burrs
+    - name: Primal Lava Actuators
+      name_additions:
+        - HH
+        - MF
+      overrides:
+        - talents=3211131
+        - soulbind=niya,grove_invigoration/magma_fist:7/niyas_tools_burrs
