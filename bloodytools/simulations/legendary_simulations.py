@@ -170,17 +170,22 @@ def legendary_simulation(settings) -> None:
                     for special_case in SPECIAL_CASES[wow_spec]:
                         if special_case["name"] == legendary.full_name:
                             new_profile = simulation_data.copy()
-                            new_name = (
-                                new_profile.name
-                                + " +"
-                                + "+".join(special_case["name_additions"])
+                            name_addition = " +" + "+".join(
+                                special_case["name_additions"]
                             )
+                            new_name = new_profile.name + name_addition
                             new_profile.name = new_name
                             new_profile.simc_arguments += special_case["overrides"]
                             simulation_group.add(new_profile)
                             wanted_data["translations"][
                                 new_name
                             ] = legendary.translations.get_dict()
+                            for language in wanted_data["translations"][
+                                new_name
+                            ].keys():
+                                wanted_data["translations"][new_name][
+                                    language
+                                ] += name_addition
                             wanted_data["spell_ids"][new_name] = legendary.spell_id
 
             logger.info(
