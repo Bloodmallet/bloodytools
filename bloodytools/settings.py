@@ -6,7 +6,7 @@ import simc_support.game_data.WowSpec as WowSpec
 
 ##
 # General setttings
-tier = "PR"  # number or PR (PreRaid)
+tier = "26"  # number or PR (PreRaid)
 wow_class_spec_list = [
     spec
     for spec in WowSpec.WOWSPECS
