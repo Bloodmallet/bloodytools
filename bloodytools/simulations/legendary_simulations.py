@@ -1,15 +1,16 @@
-from bloodytools.simulations.legendary_special_cases import SPECIAL_CASES
 import json
 import logging
 import os
 import pkg_resources
 import yaml
 
+
+from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Data
+from bloodytools.utils.utils import create_base_json_dict
+
 from simc_support.game_data.Legendary import Legendary, get_legendaries_for_spec
 from simc_support.game_data.WowSpec import get_wow_spec, WowSpec
 
-from bloodytools.utils.utils import create_base_json_dict
-from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Data
 from typing import List
 
 logger = logging.getLogger(__name__)
