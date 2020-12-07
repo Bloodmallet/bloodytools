@@ -51,13 +51,11 @@ enable_race_simulations = False
 ###############################################################################
 # Trinket simulations
 enable_trinket_simulations = False
-# ilevel_step is used to determine the size of each itemlevel step taken to max_ilevel
-# ilevel_step = 13
-max_ilevel = 200  # max_itemlevel determines the upper border of steps taken
+# max_itemlevel determines the upper border
+max_ilevel = 235
 # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
-min_ilevel = 155
-# example: min 300, max 325, step 10, resulting simulated ilevels: 300, 310, 320
-lua_trinket_export = True
+min_ilevel = 200
+lua_trinket_export = False
 
 ###############################################################################
 # Secondary distributions
