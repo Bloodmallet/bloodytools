@@ -23,6 +23,11 @@ SPECIAL_CASES = {
                 "name_additions": ["ES"],
                 "overrides": ["talents=3111131"],
             },
+            {
+                "name": "Primal Lava Actuators",
+                "name_additions": ["HH"],
+                "overrides": ["talents=3211131"],
+            },
         ]
     }
 }
