@@ -240,7 +240,10 @@ def talent_simulation(settings) -> None:
                 logger.debug("Print talents json.")
                 f.write(
                     json.dumps(
-                        export_json, sort_keys=True, indent=4, ensure_ascii=False
+                        export_json,
+                        sort_keys=True,
+                        indent=4 if settings.pretty else None,
+                        ensure_ascii=False,
                     )
                 )
                 logger.debug("Printed talents json.")

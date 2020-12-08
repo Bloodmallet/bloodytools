@@ -230,6 +230,8 @@ def gear_path_simulation(specs: List[Tuple[str, str]], settings) -> None:
                 ),
                 "w",
             ) as f:
-                json.dump(result, f, indent=4, sort_keys=True)
+                json.dump(
+                    result, f, indent=4 if settings.pretty else None, sort_keys=True
+                )
 
     logger.debug("race_simulations ended")

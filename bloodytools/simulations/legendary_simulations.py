@@ -284,7 +284,10 @@ def legendary_simulation(settings) -> None:
                 logger.debug("Print legendary json.")
                 f.write(
                     json.dumps(
-                        wanted_data, sort_keys=True, indent=4, ensure_ascii=False
+                        wanted_data,
+                        sort_keys=True,
+                        indent=4 if settings.pretty else None,
+                        ensure_ascii=False,
                     )
                 )
                 logger.debug("Printed legendary json.")

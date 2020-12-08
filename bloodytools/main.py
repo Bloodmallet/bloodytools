@@ -143,6 +143,9 @@ def _update_settings(args: object, logger: logging.Logger) -> None:
     if args.raidbots:
         settings.use_raidbots = True
 
+    settings.keep_files = args.keep_files
+    settings.pretty = args.pretty
+
 
 def main(args=None):
     if not args:

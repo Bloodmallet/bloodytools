@@ -548,6 +548,20 @@ def arg_parse_config():
         help="Overwrites target_error for all simulations. Default: whatever is in setting.py",
     )
     parser.add_argument(
+        "--keep_files",
+        action="store_const",
+        const=True,
+        default=False,
+        help="Keep generated simc input and output files.",
+    )
+    parser.add_argument(
+        "--pretty",
+        action="store_const",
+        const=True,
+        default=False,
+        help="Indent result files to make them mor ehuman readable.",
+    )
+    parser.add_argument(
         "--raidbots",
         action="store_const",
         const=True,

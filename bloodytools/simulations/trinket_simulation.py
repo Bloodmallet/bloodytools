@@ -482,7 +482,10 @@ def trinket_simulation(settings: object) -> None:
                 logger.debug("Print trinket json.")
                 f.write(
                     json.dumps(
-                        json_export, sort_keys=True, indent=4, ensure_ascii=False
+                        json_export,
+                        sort_keys=True,
+                        indent=4 if settings.pretty else None,
+                        ensure_ascii=False,
                     )
                 )
                 logger.debug("Printed trinket json.")

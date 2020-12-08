@@ -234,7 +234,7 @@ def conduit_simulation(settings: object) -> None:
                     json.dumps(
                         wanted_data,
                         sort_keys=True,
-                        indent=4,
+                        indent=4 if settings.pretty else None,
                         ensure_ascii=False,
                     )
                 )

@@ -40,6 +40,7 @@ def race_simulation(settings) -> None:
                 threads=settings.threads,
                 profileset_work_threads=settings.profileset_work_threads,
                 executable=settings.executable,
+                remove_files=not settings.keep_files,
             )
 
             for race in races:
@@ -58,6 +59,7 @@ def race_simulation(settings) -> None:
                         default_actions=settings.default_actions,
                         executable=settings.executable,
                         iterations=settings.iterations,
+                        remove_files=not settings.keep_files,
                     )
                     custom_apl = None
                     if settings.custom_apl:
@@ -84,6 +86,7 @@ def race_simulation(settings) -> None:
                         default_actions=settings.default_actions,
                         executable=settings.executable,
                         iterations=settings.iterations,
+                        remove_files=not settings.keep_files,
                     )
 
                     # adding argument for zandalari trolls
@@ -116,6 +119,7 @@ def race_simulation(settings) -> None:
                             default_actions=settings.default_actions,
                             executable=settings.executable,
                             iterations=settings.iterations,
+                            remove_files=not settings.keep_files,
                         )
                         simulation_group.add(simulation_data)
                         logger.debug(
@@ -222,7 +226,10 @@ def race_simulation(settings) -> None:
                 logger.debug("Print race json.")
                 f.write(
                     json.dumps(
-                        wanted_data, sort_keys=True, indent=4, ensure_ascii=False
+                        wanted_data,
+                        sort_keys=True,
+                        indent=4 if settings.pretty else None,
+                        ensure_ascii=False,
                     )
                 )
                 logger.debug("Printed race json.")

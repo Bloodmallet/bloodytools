@@ -380,7 +380,13 @@ def secondary_distribution_simulation(settings: object) -> None:
                 "w",
             ) as f:
                 logger.debug("Print secondary distribution json.")
-                f.write(json.dumps(result_dict, sort_keys=True, indent=4))
+                f.write(
+                    json.dumps(
+                        result_dict,
+                        sort_keys=True,
+                        indent=4 if settings.pretty else None,
+                    )
+                )
                 logger.debug("Printed secondary distribution json.")
 
     logger.debug("secondary_distribution_simulations ended")
