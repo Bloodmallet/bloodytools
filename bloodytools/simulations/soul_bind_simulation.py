@@ -83,6 +83,7 @@ def soul_bind_simulation(settings: object) -> None:
                     node.soul_bind.covenant.id
                 ]
 
+            wanted_data["conduits"] = []
             conduits = get_conduits_for_spec(wow_spec)
             for conduit in conduits:
                 wanted_data["translations"][
@@ -92,12 +93,31 @@ def soul_bind_simulation(settings: object) -> None:
                 wanted_data["covenant_mapping"][conduit.full_name] = list(
                     [conduit.id for conduit in conduit.covenants]
                 )
+                wanted_data["conduits"].append(conduit.full_name)
+
+            wanted_data["paths"] = {}
+            for soulbind in SOULBINDS:
+                wanted_data["paths"][soulbind.full_name] = [
+                    [
+                        # setting our own name because Emenis Potency Conduit has a different name
+                        "Potency Conduit" if talent.is_potency else talent.full_name
+                        for talent in path
+                    ]
+                    for path in soulbind.talent_paths
+                ]
+
+            wanted_data["renowns"] = {}
+            for soulbind in SOULBINDS:
+                path = soulbind.talent_paths[0]
+                renowns = list([node.renown for node in path])
+                wanted_data["renowns"][soulbind.full_name] = renowns
 
             simulation_group = Simulation_Group(
                 name="soul_bind_simulation",
                 threads=settings.threads,
                 profileset_work_threads=settings.profileset_work_threads,
                 executable=settings.executable,
+                remove_files=not settings.keep_files,
             )
 
             for covenant in COVENANTS:
@@ -306,6 +326,7 @@ def soul_bind_simulation(settings: object) -> None:
 
             # finding the best paths:
             wanted_data["soul_bind_paths"] = {}
+            wanted_data["sorted_data_keys"] = {}
             for rank in ranks:
                 wanted_data["soul_bind_paths"][rank] = {}
                 soul_bind_dps = []
@@ -417,7 +438,6 @@ def soul_bind_simulation(settings: object) -> None:
                 ordered_soul_binds = sorted(
                     soul_bind_dps, key=lambda e: e[1], reverse=True
                 )
-                wanted_data["sorted_data_keys"] = {}
                 wanted_data["sorted_data_keys"][rank] = [
                     soul_bind[0] for soul_bind in ordered_soul_binds
                 ]
@@ -498,7 +518,7 @@ def soul_bind_simulation(settings: object) -> None:
                     json.dumps(
                         wanted_data,
                         sort_keys=True,
-                        indent=4,
+                        indent=4 if settings.pretty else None,
                         ensure_ascii=False,
                     )
                 )
