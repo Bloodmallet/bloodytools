@@ -120,7 +120,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     pattern_slots = {}
     for element in item_slots:
         pattern_slots[element] = re.compile(
-            '^{}="?([a-z0-9_=,/:\'.-]*)"?'.format(element)
+            '^{}="?([a-zA-Z0-9_=,/:\'.-]*)"?'.format(element)
         )
 
     # prepare regex for item defining attributes
@@ -137,7 +137,9 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     pattern_element = {}
     # don't recompile this for each slot
     for element in item_elements:
-        pattern_element[element] = re.compile(',{}="?([a-z0-9_/:]*)"?'.format(element))
+        pattern_element[element] = re.compile(
+            ',{}="?([a-zA-Z0-9_/:]*)"?'.format(element)
+        )
 
     # prepare regex for character defining information. like spec
     character_specifics = [
@@ -154,7 +156,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     pattern_specifics = {}
     for element in character_specifics:
         pattern_specifics[element] = re.compile(
-            '^{}="?([a-z0-9_./:\',-]*)"?'.format(element)
+            '^{}="?([a-zA-Z0-9_./:\',-]*)"?'.format(element)
         )
 
     with open(path, "r") as f:
