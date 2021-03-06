@@ -151,13 +151,15 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
         "spec",
         "azerite_essences",
         "covenant",
-        "soulbind",
     ]
     pattern_specifics = {}
     for element in character_specifics:
         pattern_specifics[element] = re.compile(
             '^{}="?([a-zA-Z0-9_./:\',-]*)"?'.format(element)
         )
+    pattern_specifics["soulbind"] = re.compile(
+        r'^soulbind="?(.*:)?([0-9],[a-zA-Z0-9_./:]*)"?$'
+    )
 
     with open(path, "r") as f:
         for line in f:
