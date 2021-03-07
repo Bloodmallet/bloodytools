@@ -120,7 +120,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     pattern_slots = {}
     for element in item_slots:
         pattern_slots[element] = re.compile(
-            r'^{}="?.*(,id[a-zA-Z0-9_=,/:\'.-]*)"?$'.format(element)
+            r'^{}="?.*(?P<information>,id[a-zA-Z0-9_=,/:\'.-]*)"?$'.format(element)
         )
 
     # prepare regex for item defining attributes
@@ -138,7 +138,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     # don't recompile this for each slot
     for element in item_elements:
         pattern_element[element] = re.compile(
-            r',{}="?([a-zA-Z0-9_/:]*)"?'.format(element)
+            r',{}="?(?P<information>[a-zA-Z0-9_/:]*)"?'.format(element)
         )
 
     # prepare regex for character defining information. like spec
@@ -155,10 +155,12 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     pattern_specifics = {}
     for element in character_specifics:
         pattern_specifics[element] = re.compile(
-            r'^{}="?([a-zA-Z0-9_./:\',-]*)"?'.format(element)
+            r'^{}="?(?P<information>[a-zA-Z0-9_./:\',-]*)"?'.format(element)
         )
-    pattern_specifics["soulbind"] = re.compile(
-        r'^soulbind="?(.*:)?([0-9],[a-zA-Z0-9_./:]*)"?$'
+    soulbind = "soulbind"
+    character_specifics.append(soulbind)
+    pattern_specifics[soulbind] = re.compile(
+        r'^{}="?(.*:)?(?P<information>[0-9],[a-zA-Z0-9_./:]*)"?$'.format(soulbind)
     )
 
     with open(path, "r") as f:
@@ -167,7 +169,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
 
                 matches = pattern_specifics[specific].search(line)
                 if matches:
-                    profile["character"][specific] = matches.group(1)
+                    profile["character"][specific] = matches.group("information")
 
             for slot in item_slots:
 
@@ -179,7 +181,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
                 if slot in official_name:
                     slot_name = official_name[slot]
                 if matches:
-                    new_line = matches.group(1)
+                    new_line = matches.group("information")
                     if not slot_name in profile:
                         profile["items"][slot_name] = {}
 
@@ -192,7 +194,9 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
                     for element in item_elements:
                         new_matches = pattern_element[element].search(new_line)
                         if new_matches:
-                            profile["items"][slot_name][element] = new_matches.group(1)
+                            profile["items"][slot_name][element] = new_matches.group(
+                                "information"
+                            )
 
     logger.debug(f"extracted profile: {profile}")
 
