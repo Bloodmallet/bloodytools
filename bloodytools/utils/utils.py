@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import requests
+import subprocess
 import time
 import urllib3
 
@@ -251,6 +252,16 @@ def create_base_json_dict(
             simc_hash=settings.simc_hash, simc_hash_short=settings.simc_hash[0:7]
         )
 
+    try:
+        bloodytools_hash = (
+            subprocess.check_output(["git", "log", "-1", "--format=oneline"])
+            .strip()
+            .decode()
+            .split(" ")[0]
+        )
+    except Exception:
+        bloodytools_hash = None
+
     return {
         "data_type": "{}".format(data_type.lower().replace(" ", "_")),
         "timestamp": timestamp,
@@ -268,6 +279,11 @@ def create_base_json_dict(
             "target_error": settings.target_error.get(fight_style, "0.1"),
             "ptr": settings.ptr,
             "simc_hash": settings.simc_hash,
+        },
+        "metadata": {
+            "bloodytools": bloodytools_hash,
+            "SimulationCraft": settings.simc_hash,
+            "timestamp": str(datetime.datetime.utcnow()),
         },
         "data": {},
         "translations": {},
