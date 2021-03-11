@@ -121,7 +121,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     pattern_slots = {}
     for element in item_slots:
         pattern_slots[element] = re.compile(
-            r'^{}="?.*(?P<information>,id[a-zA-Z0-9_=,/:\'.-]*)"?$'.format(element)
+            r'^{}="?(?P<information>.*)"?$'.format(element)
         )
 
     # prepare regex for item defining attributes
@@ -156,12 +156,12 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     pattern_specifics = {}
     for element in character_specifics:
         pattern_specifics[element] = re.compile(
-            r'^{}="?(?P<information>[a-zA-Z0-9_./:\',-]*)"?'.format(element)
+            r'^{}="?(?P<information>.*)"?'.format(element)
         )
     soulbind = "soulbind"
     character_specifics.append(soulbind)
     pattern_specifics[soulbind] = re.compile(
-        r'^{}="?(.*:)?(?P<information>[0-9],[a-zA-Z0-9_./:]*)"?$'.format(soulbind)
+        r'^{}="?(?P<information>.*)"?$'.format(soulbind)
     )
 
     with open(path, "r") as f:
