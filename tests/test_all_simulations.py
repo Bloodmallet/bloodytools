@@ -9,7 +9,7 @@ class TestAll(unittest.TestCase):
         self.specs = WowSpec.WOWSPECS
         self.args = Args()
         self.args.target_error = "1.0"
-        self.args.executable = "../shadowlands_simulationcraft/engine/simc"
+        self.args.executable = "../SimulationCraft/simc.exe"
 
     def test_conduits(self):
         for spec in self.specs:
