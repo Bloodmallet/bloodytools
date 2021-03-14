@@ -345,7 +345,7 @@ def get_simc_hash(path) -> str:
         with open(new_path, "r", encoding="utf-8") as f:
             simc_hash = f.read().strip()
     except FileNotFoundError as e:
-        logger.warning()(e)
+        logger.warning(e)
 
     return simc_hash
 
@@ -446,6 +446,8 @@ class Args(object):
         self.target_error = ""
         self.threads = settings.threads
         self.wow_class_spec_list = []
+        self.keep_files = False
+        self.pretty = False
 
 
 def logger_config(logger: logging.Logger, debug=False):
