@@ -3,10 +3,18 @@ from bloodytools.main import main
 from bloodytools.utils.utils import Args
 import unittest
 
+DONT_TEST = (
+    WowSpec.RESTORATION_DRUID,
+    WowSpec.HOLY_PRIEST,
+)
+
 
 class TestAll(unittest.TestCase):
     def setUp(self) -> None:
         self.specs = WowSpec.WOWSPECS
+        # remove unsupported specs
+        self.specs = [spec for spec in self.specs if spec not in DONT_TEST]
+
         self.args = Args()
         self.args.target_error = "1.0"
         self.args.executable = "../SimulationCraft/simc.exe"
