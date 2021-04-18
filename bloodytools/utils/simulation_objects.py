@@ -661,6 +661,7 @@ class Simulation_Group:
 
             print_line = line.strip()
             print_line = print_line[:output_length]
+            logger.debug(print_line)
             # save line for later use
             self.simulation_output += print_line + "\n"
             # remove previously printed line
