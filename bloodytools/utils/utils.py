@@ -234,7 +234,7 @@ def create_base_json_dict(
         try:
             profile = extract_profile("custom_profile.txt", wow_spec.wow_class, profile)
         except ValueError:
-            profile = None
+            pass
 
     if not profile:
         raise FileNotFoundError("No profile found or provided.")
