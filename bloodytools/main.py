@@ -47,6 +47,8 @@ from bloodytools.utils.utils import get_simc_hash
 from bloodytools.utils.utils import logger_config
 from simc_support.game_data.WowSpec import WOWSPECS, get_wow_spec
 
+logger = logging.getLogger(__name__)
+
 
 def _update_settings(args: object, logger: logging.Logger) -> None:
     if args.single_sim:
@@ -148,14 +150,6 @@ def _update_settings(args: object, logger: logging.Logger) -> None:
 
 
 def main(args=None):
-    if not args:
-        args = arg_parse_config()
-
-    # activate debug mode as early as possible
-    if args.debug:
-        settings.debug = args.debug
-
-    logger = logger_config(logging.getLogger("bloodytools"), args.debug)
 
     logger.debug("main start")
     logger.info("Bloodytools at your service.")
