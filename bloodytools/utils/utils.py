@@ -152,6 +152,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
         "spec",
         "azerite_essences",
         "covenant",
+        "default_pet",
     ]
     pattern_specifics = {}
     for element in character_specifics:
