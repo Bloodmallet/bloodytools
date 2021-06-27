@@ -52,9 +52,9 @@ enable_race_simulations = False
 # Trinket simulations
 enable_trinket_simulations = False
 # max_itemlevel determines the upper border
-max_ilevel = 235
+max_ilevel = 252
 # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
-min_ilevel = 200
+min_ilevel = 210
 lua_trinket_export = False
 
 ###############################################################################
@@ -104,6 +104,10 @@ enable_conduit_simulations = False
 ###############################################################################
 # Legendary simulations
 enable_legendary_simulations = False
+
+###############################################################################
+# Legendary simulations
+enable_domination_shards = False
 
 ###############################################################################
 # Development setting - you usually don't want to touch these

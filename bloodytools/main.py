@@ -42,9 +42,10 @@ from bloodytools.simulations.soul_bind_simulation import soul_bind_simulation
 from bloodytools.simulations.soul_bind_node_simulation import soul_bind_node_simulation
 from bloodytools.simulations.talent_simulation import talent_simulation
 from bloodytools.simulations.trinket_simulation import trinket_simulation
-from bloodytools.utils.utils import arg_parse_config
+from bloodytools.simulations.domination_shard_simulation import (
+    domination_shard_simulation,
+)
 from bloodytools.utils.utils import get_simc_hash
-from bloodytools.utils.utils import logger_config
 from simc_support.game_data.WowSpec import WOWSPECS, get_wow_spec
 
 logger = logging.getLogger(__name__)
@@ -82,6 +83,7 @@ def _update_settings(args: object, logger: logging.Logger) -> None:
         settings.enable_soul_bind_node_simulations = False
         settings.enable_conduit_simulations = False
         settings.enable_covenant_simulations = False
+        settings.enable_domination_shards = False
 
         # set dev options
         settings.use_own_threading = False
@@ -105,6 +107,8 @@ def _update_settings(args: object, logger: logging.Logger) -> None:
             settings.enable_talent_simulations = True
         elif simulation_type == "covenants":
             settings.enable_covenant_simulations = True
+        elif simulation_type == "domination_shards":
+            settings.enable_domination_shards = True
         else:
             raise ValueError("Unknown simulation type entered.")
 
@@ -300,27 +304,6 @@ def main(args=None):
         if not settings.use_own_threading:
             logger.info("Secondary Distribution simulations finished.")
 
-    # TODO: re-enable other simulation types
-    # trigger gear path simulations
-    # if settings.enable_gear_path:
-    #     if not settings.use_own_threading:
-    #         logger.info("Gear Path simulations start.")
-
-    #     if settings.use_own_threading:
-    #         gearing_path_thread = threading.Thread(
-    #             name="Gear Path Thread",
-    #             target=gear_path_simulation,
-    #             args=(settings.wow_class_spec_list, settings)
-    #         )
-    #         thread_list.append(gearing_path_thread)
-    #         gearing_path_thread.start()
-    #     else:
-    #         gear_path_simulation(settings.wow_class_spec_list, settings)
-
-    #     if not settings.use_own_threading:
-    #         logger.info("Gear Path simulations end.")
-
-    # TODO: re-enable other simulation types
     # trigger talent simulations
     if settings.enable_talent_simulations:
         if not settings.use_own_threading:
@@ -358,6 +341,25 @@ def main(args=None):
 
         if not settings.use_own_threading:
             logger.info("Covenant simulations end.")
+
+    # trigger domination shard simulations
+    if settings.enable_domination_shards:
+        if not settings.use_own_threading:
+            logger.info("Domination Shard simulations start.")
+
+        if settings.use_own_threading:
+            domiation_shard_thread = threading.Thread(
+                name="Domination Shard Thread",
+                target=domination_shard_simulation,
+                args=(settings,),
+            )
+            thread_list.append(domiation_shard_thread)
+            domiation_shard_thread.start()
+        else:
+            domination_shard_simulation(settings)
+
+        if not settings.use_own_threading:
+            logger.info("Domination Shard simulations end.")
 
     while thread_list:
         time.sleep(1)
