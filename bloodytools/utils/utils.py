@@ -171,7 +171,9 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
 
                 matches = pattern_specifics[specific].search(line)
                 if matches:
-                    profile["character"][specific] = matches.group("information")
+                    profile["character"][specific] = matches.group(
+                        "information"
+                    ).replace('"', "")
 
             for slot in item_slots:
 
@@ -183,7 +185,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
                 if slot in official_name:
                     slot_name = official_name[slot]
                 if matches:
-                    new_line = matches.group("information")
+                    new_line = matches.group("information").replace('"', "")
                     if not slot_name in profile:
                         profile["items"][slot_name] = {}
 
@@ -198,7 +200,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
                         if new_matches:
                             profile["items"][slot_name][element] = new_matches.group(
                                 "information"
-                            )
+                            ).replace('"', "")
 
     logger.debug(f"extracted profile: {profile}")
 
@@ -496,7 +498,7 @@ def arg_parse_config():
         action="store_const",
         const=True,
         default=False,
-        help="Simulate races, trinkets, secondary distributions, and azerite traits for all specs and all talent combinations.",
+        help="Simulate everything for all specs and all talent combinations.",
     )
     parser.add_argument(
         "--executable",
@@ -539,7 +541,7 @@ def arg_parse_config():
         dest="single_sim",
         metavar="STRING",
         type=str,
-        help="Activate a single simulation on the local machine. <simulation_types> are races, secondary_distributions, talents, trinkets, covenants, soul_binds, soul_bind_nodes, conduits, and legendaries. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk",
+        help="Activate a single simulation on the local machine. <simulation_types> are races, secondary_distributions, talents, trinkets, covenants, soul_binds, soul_bind_nodes, conduits, legendaries, and domination_shards. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk",
     )
     parser.add_argument(
         "--custom_profile",
