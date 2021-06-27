@@ -14,8 +14,8 @@ from typing import List
 
 logger = logging.getLogger(__name__)
 
-CONDUITMAXRANK = 7
-ranks = list(range(1, CONDUITMAXRANK + 1))
+CONDUITMAXRANK = 11
+ranks = list(range(5, CONDUITMAXRANK + 1))
 
 
 def soul_bind_simulation(settings: object) -> None:
