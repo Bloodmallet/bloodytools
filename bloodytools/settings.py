@@ -1,110 +1,79 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Settings for bloodytools
 
   Look for the matching paragraphs of what you want to do. Change settings responsibly. If anything breaks too hard, just reload the settings-file from the repository.
 """
+import simc_support.game_data.WowSpec as WowSpec
 
 ##
 # General setttings
-tier = "25"     # number or PR (PreRaid)
-wow_class_spec_list = []     # leave empty to simulate all
-# wow_class_spec_list = [("shaman", "elemental"), ("mage", "frost")] # example for a specific list
+tier = "26"  # number or PR (PreRaid)
 wow_class_spec_list = [
-  ("death_knight", "blood"),
-  ("death_knight", "frost"),
-  ("death_knight", "unholy"),
-  ("demon_hunter", "havoc"),
-  ("demon_hunter", "vengeance"),
-  ("druid", "balance"),
-  ("druid", "feral"),
-  ("druid", "guardian"),
-  ("hunter", "beast_mastery"),
-  ("hunter", "marksmanship"),
-  ("hunter", "survival"),
-  ("mage", "arcane"),
-  ("mage", "fire"),
-  ("mage", "frost"),
-  ("monk", "brewmaster"),
-  ("monk", "windwalker"),
-  ("paladin", "protection"),
-  ("paladin", "retribution"),
-  ("priest", "discipline"),
-  ("priest", "holy"),
-  ("priest", "shadow"),
-  ("rogue", "assassination"),
-  ("rogue", "outlaw"),
-  ("rogue", "subtlety"),
-  ("shaman", "elemental"),
-  ("shaman", "enhancement"),
-  ("shaman", "restoration"),
-  ("warlock", "affliction"),
-  ("warlock", "demonology"),
-  ("warlock", "destruction"),
-  ("warrior", "arms"),
-  ("warrior", "fury"),
-  ("warrior", "protection"),
+    spec
+    for spec in WowSpec.WOWSPECS
+    if spec
+    not in [
+        WowSpec.DISCIPLINE,
+        WowSpec.HOLY_PRIEST,
+        WowSpec.RESTORATION_DRUID,
+        WowSpec.RESTORATION_SHAMAN,
+    ]
 ]
+
 
 ###############################################################################
 # SimulationCraft
-executable = "../../SimulationCraft/simc.exe"
+executable = "../SimulationCraft/simc.exe"
 fight_styles = [
-  "patchwerk",
-  "hecticaddcleave",
-     #"beastlord"
+    "patchwerk",
+    "hecticaddcleave",
+    # "beastlord"
 ]
-iterations = "20000"     # sane value, should be enough for 0.2
+iterations = "20000"  # sane value, should be enough for 0.2
 profileset_work_threads = "2"
 ptr = "0"
 default_actions = "1"
 target_error = {
-  "patchwerk": "0.1",
-  "hecticaddcleave": "0.2",
-  "beastlord": "0.2",
+    "patchwerk": "0.1",
+    "hecticaddcleave": "0.2",
+    "beastlord": "0.2",
 }
 threads = "8"
 
 custom_apl = False
 custom_fight_style = False
-custom_profile = False     # custom profile overrides standard profile, standard profile is still used as baseline
+# custom profile overrides standard profile, standard profile is still used as baseline
+custom_profile = False
 
 ###############################################################################
 # Race simulations
-enable_race_simulations = True
+enable_race_simulations = False
 
 ###############################################################################
 # Trinket simulations
-enable_trinket_simulations = True
-ilevel_step = 15     # ilevel_step is used to determine the size of each itemlevel step taken to max_ilevel
-max_ilevel = 475     # max_itemlevel determines the upper border of steps taken
-min_ilevel = 430     # min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
-# example: min 300, max 325, step 10, resulting simulated ilevels: 300, 310, 320
-lua_trinket_export = True
+enable_trinket_simulations = False
+# max_itemlevel determines the upper border
+max_ilevel = 252
+# min_ilevel is used to determine the first simulated itemlevel and second trinket (vers stat stick)
+min_ilevel = 210
+lua_trinket_export = False
 
 ###############################################################################
 # Secondary distributions
-enable_secondary_distributions_simulations = True
-secondary_distributions_step_size = 10     # in percent of full available secondary sum
-talent_list = {
-}     # if no list is provided for a class-spec, all dps talent combinations will be run. If you want to only sim the base profiles, set 'talent_permutations' to False
+enable_secondary_distributions_simulations = False
+# in percent of full available secondary sum
+secondary_distributions_step_size = 10
+talent_list = (
+    {}
+)  # if no list is provided for a class-spec, all dps talent combinations will be run. If you want to only sim the base profiles, set 'talent_permutations' to False
 # talent_list = {
-#   ("shaman", "elemental"): [
+#   WowSpec.ELEMENTAL: [
 #     "2301022",
 #   ],
 # }  # example for a talent list for Elemental Shamans
-talent_permutations = False     # set to False, to sim only the base profile talent combinations
+# set to False, to sim only the base profile talent combinations
+talent_permutations = False
 write_humanreadable_secondary_distribution_file = False
 
-###############################################################################
-# Azerite traits
-enable_azerite_trait_simulations = True
-azerite_trait_ilevels = [ # determines the itemlevel used to sim the traits
-  "430",
-  "445",
-  "460",
-  "475",
-] # ascending order required
 
 ###############################################################################
 # Gear path
@@ -113,29 +82,42 @@ step_size = 50
 start_value = 50
 
 ###############################################################################
-# Talent worth
-enable_talent_worth_simulations = False
+# Talent
+enable_talent_simulations = False
 
 ###############################################################################
-# Azerite Essences (necklace)
-enable_azerite_essence_simulations = True
+# Covenant
+enable_covenant_simulations = False
 
 ###############################################################################
-# Azerite Essences Combinations (necklace)
-enable_azerite_essence_combination_simulations = True
+# Soul Bind
+enable_soul_bind_simulations = False
 
 ###############################################################################
-# Corruptions
-enable_corruption_simulations = True
+# Soul Bind Node
+enable_soul_bind_node_simulations = False
+
+###############################################################################
+# Conduit
+enable_conduit_simulations = False
+
+###############################################################################
+# Legendary simulations
+enable_legendary_simulations = False
+
+###############################################################################
+# Legendary simulations
+enable_domination_shards = False
 
 ###############################################################################
 # Development setting - you usually don't want to touch these
 debug = False
 use_own_threading = False
 use_raidbots = False
+remove_files = False
 try:
-  from apikey import apikey
+    from bloodytools.apikey import apikey
 except Exception:
-  if use_raidbots:
-    exit("Error: apikey required! Add your apikey to apikey.py")
-  pass
+    if use_raidbots:
+        exit("Error: apikey required! Add your apikey to apikey.py")
+    pass

@@ -34,7 +34,7 @@ install:
   - python --version
   # Install project requirements and test requirements
   - pip install -r ./requirements.txt
-  - pip install -r ./requirements-test.txt
+  - pip install -r ./requirements-dev.txt
   # Load SimulationCraft
   - git clone --depth 1 https://github.com/simulationcraft/simc.git SimulationCraft
   - cd SimulationCraft/engine
@@ -47,7 +47,7 @@ install:
 
 script:
   # Test simulation_objects and collect coverage information at the same time
-  - coverage run --source=bloodytools/simulation_objects --omit=*_tests.py ./bloodytools/simulation_objects/simulation_objects_tests.py
+  - coverage run --source=bloodytools/simulation_objects --omit=*_tests.py ./tests/test_simulation_objects_simulation_objects.py
 
 before_script:
   # Save values for discord notifactions
