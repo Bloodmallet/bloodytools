@@ -143,7 +143,7 @@ def race_simulation(settings) -> None:
                 else:
                     simulation_group.simulate()
             except Exception as e:
-                logger.error(
+                logger.exception(
                     "{} race simulation for {} {} failed. {}".format(
                         fight_style.title(), wow_class, wow_spec, e
                     )
