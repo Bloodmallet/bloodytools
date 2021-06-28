@@ -74,9 +74,11 @@ def domination_shard_simulation(settings: object) -> None:
                     item["gem_id"] = "/".join(filtered_gem_parts)
 
             json_export["shard_type"] = {}
+            json_export["item_ids"] = {}
             for shard in shard_list:
                 json_export["translations"][shard.name] = shard.translations.get_dict()
-                json_export["shard_type"][shard.name] = str(shard.school_type)
+                json_export["shard_type"][shard.name] = shard.school_type.value
+                json_export["item_ids"][shard.name] = shard.gem_id
 
             simulation_group = Simulation_Group(
                 name="{} {}".format(wow_spec.wow_class.simc_name, wow_spec.simc_name),
