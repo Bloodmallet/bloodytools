@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def _is_dps_shard(shard: DominationShard) -> bool:
     dps_name_parts = (
         "of Bek",
-        "of Tel",
+        "of Cor",
         "of Dyz",
     )
     for part in dps_name_parts:
