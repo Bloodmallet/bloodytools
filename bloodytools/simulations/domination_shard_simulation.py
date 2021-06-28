@@ -125,7 +125,7 @@ def domination_shard_simulation(settings: object) -> None:
                     for key, value in head.items()
                     if key != "gem_id"
                 )
-                if head["gem_id"]:
+                if "gem_id" in head.keys():
                     head_string += ",gem_id=" + "/".join(
                         [head["gem_id"]] + [str(shard.gem_id)]
                     )
