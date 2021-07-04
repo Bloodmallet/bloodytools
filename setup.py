@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="bloodytools",
-    version="9.0.2.0",
+    version="9.1.0.1",
     author="Bloodmallet(EU)",
     author_email="bloodmalleteu@gmail.com",
     description="Allows multiple ways of automated data generation via SimulationCraft for World of Warcraft.",
@@ -16,6 +16,7 @@ setup(
     package_data={
         "": [
             "*.md",
+            "fallback_profiles/*/*/*.simc",
         ],
     },
     python_requires=">3.6",

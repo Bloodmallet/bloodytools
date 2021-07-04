@@ -6,19 +6,21 @@ import re
 import requests
 import subprocess
 import time
+import typing
 import urllib3
 
 from bloodytools import settings
 from simc_support.game_data.Talent import get_talent_dict
 from simc_support.game_data.WowSpec import WowSpec
 from simc_support.game_data.WowClass import WowClass
+from simc_support.game_data.Covenant import COVENANTS
 
 logger = logging.getLogger(__name__)
 
 SIMC_BRANCH = "shadowlands"
 
 
-def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: object):
+def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: object) -> str:
     """Create basic profile string to get the standard profile of a spec. Use this function to get the necessary string for your first argument of a simulation_data object.
 
     Arguments:
@@ -61,6 +63,64 @@ def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: object):
     logger.debug("Created basis_profile_string '{}'.".format(basis_profile_string))
     logger.debug("create_basic_profile_string ended")
     return basis_profile_string
+
+
+def get_fallback_profile_path(tier: str, fight_style: str) -> str:
+    tmp_tier = "PR" if "PR" in str(tier) else f"Tier{tier}"
+    self_file_path = os.path.dirname(os.path.abspath(__file__))
+    base_path = os.path.dirname(os.path.dirname(self_file_path))
+    return os.path.join(base_path, "fallback_profiles", fight_style, tmp_tier)
+
+
+def get_fallback_covenant_profile_strings(
+    wow_spec: WowSpec, tier: str, fight_style: str
+) -> typing.List[str]:
+
+    if fight_style.lower() == "castingpatchwerk":
+        fight_style = "patchwerk"
+
+    base_path = get_fallback_profile_path(tier, fight_style.lower())
+    tmp_tier = "PR" if "PR" in str(tier) else f"T{tier}"
+    paths = []
+    for covenant in COVENANTS:
+        file_name = f"{tmp_tier}_{wow_spec.wow_class.full_name.title()}_{wow_spec.full_name.title()}_{covenant.simc_name.title()}.simc"
+        cov_path = os.path.join(base_path, file_name)
+        if os.path.isfile(cov_path):
+            paths += [cov_path]
+    return paths
+
+
+def get_fallback_profile_string(wow_spec: WowSpec, tier: str, fight_style: str) -> str:
+    base_path = get_fallback_profile_path(tier, fight_style)
+    tmp_tier = "PR" if "PR" in str(tier) else f"T{tier}"
+    name = f"{tmp_tier}_{wow_spec.wow_class.full_name.title()}_{wow_spec.full_name.title()}.simc"
+    return os.path.join(base_path, name)
+
+
+def get_simc_covenant_profile_strings(
+    wow_spec: WowSpec, tier: str, settings: object
+) -> typing.List[str]:
+    """Get paths to existing covenant profiles.
+
+    Args:
+        wow_spec (WowSpec): [description]
+        tier (str): [description]
+        settings (object): [description]
+
+    Returns:
+        Iterable[Str]: profile strings of covenant profiles
+    """
+
+    strings = []
+    for covenant in COVENANTS:
+        string = create_basic_profile_string(wow_spec, tier, settings)
+
+        string = string[:-5] + f"_{covenant.simc_name.title()}.simc"
+
+        if os.path.isfile(string):
+            strings += [string]
+
+    return strings
 
 
 def pretty_timestamp() -> str:
@@ -226,12 +286,42 @@ def create_base_json_dict(
 
     timestamp = pretty_timestamp()
 
-    profile_location = create_basic_profile_string(wow_spec, settings.tier, settings)
+    # loading covenant profiles in the following order:
+    # 1. fallback
+    # 2. simc
+    internal_covenant_profiles = get_fallback_covenant_profile_strings(
+        wow_spec, settings.tier, fight_style
+    )
+    simulationcraft_covenant_profiles = get_simc_covenant_profile_strings(
+        wow_spec, settings.tier, settings
+    )
+    covenant_profiles = {}
+    for profile_path in internal_covenant_profiles + simulationcraft_covenant_profiles:
+        try:
+            cov_profile = extract_profile(profile_path, wow_spec.wow_class)
+        except FileNotFoundError:
+            continue
+        else:
+            covenant_profiles[cov_profile["character"]["covenant"]] = cov_profile
 
+    # load fallback profile
+    fallback_profile_location = get_fallback_profile_string(
+        wow_spec, settings.tier, fight_style
+    )
     try:
-        profile = extract_profile(profile_location, wow_spec.wow_class)
+        profile = extract_profile(fallback_profile_location, wow_spec.wow_class)
     except FileNotFoundError:
         profile = None
+
+    # load base profile for patchwerk or fallback doesn't exist
+    if profile is None or "patchwerk" in fight_style.lower():
+        profile_location = create_basic_profile_string(
+            wow_spec, settings.tier, settings
+        )
+        try:
+            profile = extract_profile(profile_location, wow_spec.wow_class)
+        except FileNotFoundError:
+            profile = None
 
     if settings.custom_profile:
         try:
@@ -241,6 +331,9 @@ def create_base_json_dict(
 
     if not profile:
         raise FileNotFoundError("No profile found or provided.")
+
+    # base profile has a higher priority than covenant specific overrides
+    covenant_profiles[profile["character"]["covenant"]] = profile
 
     # spike the export data with talent data
     talent_data = get_talent_dict(wow_spec, settings.ptr == "1")
@@ -291,6 +384,7 @@ def create_base_json_dict(
         "data": {},
         "translations": {},
         "profile": profile,
+        "covenant_profiles": covenant_profiles,
         "talent_data": talent_data,
         "class_id": class_id,
         "spec_id": spec_id,

@@ -21,9 +21,10 @@ results/
 # local coverage results
 .coverage
 *.pyc
-*.simc
 apikey.py
 error.log
 log.txt
 make.bat
 Makefile
+# files at root
+/*.simc
