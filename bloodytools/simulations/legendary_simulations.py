@@ -12,6 +12,7 @@ from simc_support.game_data.Legendary import Legendary, get_legendaries_for_spec
 from simc_support.game_data.WowSpec import get_wow_spec, WowSpec
 
 from typing import List
+import typing
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,28 @@ def _load_special_cases():
             ][wow_spec]
 
     return SPECIAL_CASES
+
+
+def remove_legendary_bonus_ids(
+    profile: dict, unwanted_ids: typing.Iterable[int]
+) -> dict:
+    for item in profile["items"]:
+        item_bonus_ids: List[str] = []
+        try:
+            tmp_item_bonus_ids = profile["items"][item]["bonus_id"].split("/")
+        except KeyError:
+            continue
+        for element in tmp_item_bonus_ids:
+            for b_id in element.split(":"):
+                item_bonus_ids.append(b_id)
+
+        filtered_item_bonus_ids = [
+            b_id for b_id in item_bonus_ids if not int(b_id) in unwanted_ids
+        ]
+
+        profile["items"][item]["bonus_id"] = "/".join(filtered_item_bonus_ids)
+
+    return profile
 
 
 # spell ids
@@ -80,25 +103,12 @@ def legendary_simulation(settings) -> None:
 
             bonus_ids = list([legendary.bonus_id for legendary in legendaries])
 
-            # remove any existing legendary effects
-            for item in wanted_data["profile"]["items"]:
-                item_bonus_ids: List[str] = []
-                try:
-                    tmp_item_bonus_ids = wanted_data["profile"]["items"][item][
-                        "bonus_id"
-                    ].split("/")
-                except KeyError:
-                    continue
-                for element in tmp_item_bonus_ids:
-                    for b_id in element.split(":"):
-                        item_bonus_ids.append(b_id)
-
-                filtered_item_bonus_ids = [
-                    b_id for b_id in item_bonus_ids if not int(b_id) in bonus_ids
-                ]
-
-                wanted_data["profile"]["items"][item]["bonus_id"] = "/".join(
-                    filtered_item_bonus_ids
+            wanted_data["profile"] = remove_legendary_bonus_ids(
+                wanted_data["profile"], bonus_ids
+            )
+            for profile in wanted_data["covenant_profiles"]:
+                wanted_data["covenant_profiles"][profile] = remove_legendary_bonus_ids(
+                    wanted_data["covenant_profiles"][profile], bonus_ids
                 )
 
             wanted_data["spell_ids"] = {}
@@ -155,12 +165,40 @@ def legendary_simulation(settings) -> None:
 
             simulation_group.add(simulation_data)
 
+            for covenant in wanted_data["covenant_profiles"]:
+                simulation_data = Simulation_Data(
+                    name=f"{{{covenant}}}",
+                    fight_style=fight_style,
+                    profile=wanted_data["covenant_profiles"][covenant],
+                    simc_arguments=[f"{constructed_item}"],
+                    target_error=settings.target_error.get(fight_style, "0.1"),
+                    ptr=settings.ptr,
+                    default_actions=settings.default_actions,
+                    executable=settings.executable,
+                    iterations=settings.iterations,
+                )
+                simulation_group.add(simulation_data)
+
             for legendary in legendaries:
 
                 simulation_data = None
 
+                profile = {}
+                profile_name = legendary.full_name
+                if (
+                    len(legendary.covenants) == 1
+                    and legendary.covenants[0].simc_name
+                    in wanted_data["covenant_profiles"]
+                ):
+                    profile_name = (
+                        f"{{{legendary.covenants[0].simc_name}}} {legendary.full_name}"
+                    )
+                    profile = wanted_data["covenant_profiles"][
+                        legendary.covenants[0].simc_name
+                    ]
+
                 simulation_data = Simulation_Data(
-                    name=legendary.full_name,
+                    name=profile_name,
                     fight_style=fight_style,
                     simc_arguments=[f"{constructed_item}/{legendary.bonus_id}"],
                     target_error=settings.target_error.get(fight_style, "0.1"),
@@ -168,6 +206,7 @@ def legendary_simulation(settings) -> None:
                     default_actions=settings.default_actions,
                     executable=settings.executable,
                     iterations=settings.iterations,
+                    profile=profile,
                 )
 
                 simulation_group.add(simulation_data)
@@ -242,19 +281,17 @@ def legendary_simulation(settings) -> None:
                     )
                 )
 
-                legendary: Legendary = None
-                for element in legendaries:
-                    if element.full_name == profile.name:
-                        legendary = element
-
             # create ordered legendary name list
             tmp_list = []
             for legendary in wanted_data["data"]:
                 tmp_list.append((legendary, wanted_data["data"][legendary]))
             logger.debug("tmp_list: {}".format(tmp_list))
 
+            # remove baseline and covenant profiles
             filtered_tmp_list = [
-                element for element in tmp_list if "baseline" not in element[0]
+                element
+                for element in tmp_list
+                if "baseline" not in element[0] and "}" != element[0][-1]
             ]
 
             tmp_list = sorted(filtered_tmp_list, key=lambda item: item[1], reverse=True)
