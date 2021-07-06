@@ -127,20 +127,22 @@ def legendary_simulation(settings) -> None:
 
             item_information = wanted_data["profile"]["items"]["head"]
             constructed_item = f"head=,id={item_information['id']}"
-            if "enchant" in item_information:
-                constructed_item += f",enchant={item_information['enchant']}"
-            if "ilevel" in item_information:
-                constructed_item += f",ilevel={item_information['ilevel']}"
+            for key in item_information.keys():
+                if key not in ("id", "bonus_id"):
+                    constructed_item += f",{key}={item_information[key]}"
+
             try:
-                constructed_item += f",bonus_id={item_information['bonus_id']}"
+                baseline_item = (
+                    constructed_item + f",bonus_id={item_information['bonus_id']}"
+                )
             except KeyError:
-                constructed_item += f",bonus_id="
+                baseline_item = constructed_item + f",bonus_id="
 
             simulation_data = Simulation_Data(
                 name="baseline",
                 fight_style=fight_style,
                 profile=wanted_data["profile"],
-                simc_arguments=[f"{constructed_item}"],
+                simc_arguments=[f"{baseline_item}"],
                 target_error=settings.target_error.get(fight_style, "0.1"),
                 ptr=settings.ptr,
                 default_actions=settings.default_actions,
@@ -170,7 +172,7 @@ def legendary_simulation(settings) -> None:
                     name=f"{{{covenant}}}",
                     fight_style=fight_style,
                     profile=wanted_data["covenant_profiles"][covenant],
-                    simc_arguments=[f"{constructed_item}"],
+                    simc_arguments=[f"{baseline_item}"],
                     target_error=settings.target_error.get(fight_style, "0.1"),
                     ptr=settings.ptr,
                     default_actions=settings.default_actions,
@@ -197,10 +199,18 @@ def legendary_simulation(settings) -> None:
                         legendary.covenants[0].simc_name
                     ]
 
+                try:
+                    baseline_item = (
+                        constructed_item
+                        + f",bonus_id={item_information['bonus_id']}/{legendary.bonus_id}"
+                    )
+                except KeyError:
+                    baseline_item = constructed_item + f",bonus_id={legendary.bonus_id}"
+
                 simulation_data = Simulation_Data(
                     name=profile_name,
                     fight_style=fight_style,
-                    simc_arguments=[f"{constructed_item}/{legendary.bonus_id}"],
+                    simc_arguments=[f"{baseline_item}"],
                     target_error=settings.target_error.get(fight_style, "0.1"),
                     ptr=settings.ptr,
                     default_actions=settings.default_actions,
