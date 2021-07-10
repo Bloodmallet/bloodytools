@@ -7,10 +7,5 @@ shaman:
         - Asc
       overrides:
         - talents=2111133
-        - soulbind=niya,grove_invigoration/unruly_winds:7/niyas_tools_burrs
-    - name: Witch Doctor's Wolf Bones
-      name_additions:
-        - Asc
-      overrides:
-        - talents=3111133
-        - soulbind=niya,grove_invigoration/focused_lightning:7/niyas_tools_burrs
+        - covenant=night_fae
+        - soulbind=niya,grove_invigoration/unruly_winds:9:1/niyas_tools_burrs/essential_extraction:9:1/bonded_hearts
