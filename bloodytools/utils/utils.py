@@ -75,6 +75,16 @@ def get_fallback_profile_path(tier: str, fight_style: str) -> str:
 def get_fallback_covenant_profile_strings(
     wow_spec: WowSpec, tier: str, fight_style: str
 ) -> typing.List[str]:
+    """Get a curated list of covenant profiles.
+
+    Args:
+        wow_spec (WowSpec): [description]
+        tier (str): [description]
+        fight_style (str): [description]
+
+    Returns:
+        typing.List[str]: [description]
+    """
 
     if fight_style.lower() == "castingpatchwerk":
         fight_style = "patchwerk"
@@ -292,9 +302,16 @@ def create_base_json_dict(
     internal_covenant_profiles = get_fallback_covenant_profile_strings(
         wow_spec, settings.tier, fight_style
     )
-    simulationcraft_covenant_profiles = get_simc_covenant_profile_strings(
-        wow_spec, settings.tier, settings
-    )
+    if (
+        "patchwerk" in fight_style.lower()
+        or "patchwerk" not in fight_style.lower()
+        and len(internal_covenant_profiles) == 0
+    ):
+        simulationcraft_covenant_profiles = get_simc_covenant_profile_strings(
+            wow_spec, settings.tier, settings
+        )
+    else:
+        simulationcraft_covenant_profiles = []
     covenant_profiles = {}
     for profile_path in internal_covenant_profiles + simulationcraft_covenant_profiles:
         try:
