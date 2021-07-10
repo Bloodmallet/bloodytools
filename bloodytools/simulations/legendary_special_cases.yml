@@ -14,17 +14,3 @@ shaman:
       overrides:
         - talents=3111133
         - soulbind=niya,grove_invigoration/focused_lightning:7/niyas_tools_burrs
-hunter:
-  survival:
-    - name: Nessingwary's Trapping Apparatus
-      name_additions:
-        - BoP
-      overrides:
-        - talents=1102021
-        - soulbind=niya,grove_invigoration/stinging_strike:7/niyas_tools_burrs
-    - name: Nessingwary's Trapping Apparatus
-      name_additions:
-        - WFI
-      overrides:
-        - talents=3102022
-        - soulbind=niya,grove_invigoration/strength_of_the_pack:7/niyas_tools_burrs
