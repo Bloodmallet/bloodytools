@@ -302,6 +302,10 @@ def create_base_json_dict(
     internal_covenant_profiles = get_fallback_covenant_profile_strings(
         wow_spec, settings.tier, fight_style
     )
+    if len(internal_covenant_profiles) == 0:
+        internal_covenant_profiles = get_fallback_covenant_profile_strings(
+            wow_spec, settings.tier, "patchwerk"
+        )
     if (
         "patchwerk" in fight_style.lower()
         or "patchwerk" not in fight_style.lower()
