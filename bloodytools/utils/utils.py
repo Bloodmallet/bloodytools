@@ -306,6 +306,8 @@ def create_base_json_dict(
         internal_covenant_profiles = get_fallback_covenant_profile_strings(
             wow_spec, settings.tier, "patchwerk"
         )
+    # trust simc for patchwerk
+    # don't trust simc for any other fight styles IF we have fight style specific profiles
     if (
         "patchwerk" in fight_style.lower()
         or "patchwerk" not in fight_style.lower()
