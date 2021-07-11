@@ -50,11 +50,12 @@ def remove_legendary_bonus_ids(
             for b_id in element.split(":"):
                 item_bonus_ids.append(b_id)
 
-        filtered_item_bonus_ids = [
-            b_id for b_id in item_bonus_ids if not int(b_id) in unwanted_ids
-        ]
+        if item_bonus_ids and any(item_bonus_ids):
+            filtered_item_bonus_ids = [
+                b_id for b_id in item_bonus_ids if not int(b_id) in unwanted_ids
+            ]
 
-        profile["items"][item]["bonus_id"] = "/".join(filtered_item_bonus_ids)
+            profile["items"][item]["bonus_id"] = "/".join(filtered_item_bonus_ids)
 
     return profile
 
