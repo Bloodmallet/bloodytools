@@ -123,10 +123,14 @@ def soul_bind_simulation(settings: object) -> None:
             for covenant in COVENANTS:
                 simulation_data = None
 
+                profile = wanted_data["covenant_profiles"].get(
+                    covenant.simc_name, wanted_data["profile"]
+                )
+
                 simulation_data = Simulation_Data(
                     name=f"baseline_{covenant.id}",
                     fight_style=fight_style,
-                    profile=wanted_data["profile"],
+                    profile=profile,
                     simc_arguments=[
                         f"covenant={covenant.simc_name}",
                         "soulbind=",
