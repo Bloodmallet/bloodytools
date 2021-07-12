@@ -5,9 +5,9 @@ level=60
 race=troll
 role=attack
 position=back
-talents=2113131
+talents=3211131
 covenant=venthyr
-soulbind=general_draven,service_in_stone/unruly_winds:9:1/built_for_war/focused_lightning:9:1/battlefield_presence
+soulbind=nadjia_the_mistblade,thrill_seeker/magma_fist:9:1/dauntless_duelist/focused_lightning:9:1/fatal_flaw
 renown=80
 
 head=crest_of_the_fallen,id=186304,bonus_id=7187/1498/6935,gem_id=187073/173128
