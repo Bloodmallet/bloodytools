@@ -4,10 +4,12 @@ import os
 
 from bloodytools.utils.utils import create_base_json_dict
 from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Data
+from bloodytools.simulations.legendary_simulations import remove_legendary_bonus_ids
 
 from simc_support.game_data.Conduit import get_conduits_for_spec
 from simc_support.game_data.Covenant import COVENANTS, get_covenant
 from simc_support.game_data.SoulBind import SOULBINDS, SoulBindTalent
+from simc_support.game_data.Legendary import get_legendaries_for_spec
 
 from simc_support.game_data.WowSpec import WowSpec
 from typing import List
@@ -119,6 +121,17 @@ def soul_bind_simulation(settings: object) -> None:
                 executable=settings.executable,
                 remove_files=not settings.keep_files,
             )
+
+            # remove covenant legendary if no covenant profiles were found
+            if len(wanted_data["covenant_profiles"].keys()) != 4:
+                covenant_legendary_ids = [
+                    legendary.bonus_id
+                    for legendary in get_legendaries_for_spec(wow_spec)
+                    if len(legendary.covenants) == 1
+                ]
+                wanted_data["profile"] = remove_legendary_bonus_ids(
+                    wanted_data["profile"], covenant_legendary_ids
+                )
 
             for covenant in COVENANTS:
                 simulation_data = None
