@@ -20,6 +20,10 @@ CONDUITMAXRANK = 11
 ranks = list(range(5, CONDUITMAXRANK + 1))
 
 
+def _are_all_covenants_present(profiles: dict) -> bool:
+    return len(profiles.keys()) == 4
+
+
 def soul_bind_simulation(settings: object) -> None:
     """Simulates all options (nodes and conduits) of all soul binds.
 
@@ -123,7 +127,7 @@ def soul_bind_simulation(settings: object) -> None:
             )
 
             # remove covenant legendary if no covenant profiles were found
-            if len(wanted_data["covenant_profiles"].keys()) != 4:
+            if not _are_all_covenants_present(wanted_data["covenant_profiles"]):
                 covenant_legendary_ids = [
                     legendary.bonus_id
                     for legendary in get_legendaries_for_spec(wow_spec)
@@ -136,9 +140,11 @@ def soul_bind_simulation(settings: object) -> None:
             for covenant in COVENANTS:
                 simulation_data = None
 
-                profile = wanted_data["covenant_profiles"].get(
-                    covenant.simc_name, wanted_data["profile"]
-                )
+                profile = wanted_data["profile"]
+                if _are_all_covenants_present(wanted_data["covenant_profiles"]):
+                    profile = wanted_data["covenant_profiles"].get(
+                        covenant.simc_name, wanted_data["profile"]
+                    )
 
                 simulation_data = Simulation_Data(
                     name=f"baseline_{covenant.id}",
