@@ -8,11 +8,16 @@ from bloodytools.simulations.legendary_simulations import remove_legendary_bonus
 
 from simc_support.game_data.Conduit import get_conduits_for_spec
 from simc_support.game_data.Covenant import COVENANTS, get_covenant
-from simc_support.game_data.SoulBind import SOULBINDS, SoulBindTalent
+from simc_support.game_data.SoulBind import (
+    SOULBINDS,
+    SoulBind,
+    SoulBindTalent,
+    get_soul_bind,
+)
 from simc_support.game_data.Legendary import get_legendaries_for_spec
 
 from simc_support.game_data.WowSpec import WowSpec
-from typing import List
+from typing import List, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +43,7 @@ def soul_bind_simulation(settings: object) -> None:
     specs: List[WowSpec] = settings.wow_class_spec_list
 
     # prepare nodes
-    nodes = []
+    nodes: List[SoulBindTalent] = []
     for soul_bind in SOULBINDS:
         for talent in soul_bind.soul_bind_talents:
             talent.soul_bind = soul_bind
@@ -191,9 +196,17 @@ def soul_bind_simulation(settings: object) -> None:
 
                 simulation_data = None
 
+                profile = wanted_data["profile"]
+                if _are_all_covenants_present(wanted_data["covenant_profiles"]):
+                    profile = wanted_data["covenant_profiles"].get(
+                        get_soul_bind(id=node.soulbind_id).covenant.simc_name,
+                        wanted_data["profile"],
+                    )
+
                 simulation_data = Simulation_Data(
                     name=f"{node.full_name}_{node.soul_bind.covenant.id}",
                     fight_style=fight_style,
+                    profile=profile,
                     simc_arguments=[
                         f"covenant={node.soul_bind.covenant.simc_name}",
                         f"soulbind={node.spell_id}",
@@ -230,9 +243,17 @@ def soul_bind_simulation(settings: object) -> None:
 
                         simulation_data = None
 
+                        profile = wanted_data["profile"]
+                        if _are_all_covenants_present(wanted_data["covenant_profiles"]):
+                            profile = wanted_data["covenant_profiles"].get(
+                                covenant.simc_name,
+                                wanted_data["profile"],
+                            )
+
                         simulation_data = Simulation_Data(
                             name=f"{conduit.full_name}_{covenant.id}_{rank}",
                             fight_style=fight_style,
+                            profile=profile,
                             simc_arguments=[
                                 f"covenant={covenant.simc_name}",
                                 f"soulbind={conduit.id}:{rank}",
@@ -268,6 +289,7 @@ def soul_bind_simulation(settings: object) -> None:
                             simulation_data = Simulation_Data(
                                 name=f"{conduit.full_name}+{secondary_conduit.full_name}_{covenant.id}_{rank}",
                                 fight_style=fight_style,
+                                profile=profile,
                                 simc_arguments=[
                                     f"covenant={covenant.simc_name}",
                                     f"soulbind={conduit.id}:{rank}/{secondary_conduit.id}:{rank}",
@@ -352,9 +374,9 @@ def soul_bind_simulation(settings: object) -> None:
             wanted_data["sorted_data_keys"] = {}
             for rank in ranks:
                 wanted_data["soul_bind_paths"][rank] = {}
-                soul_bind_dps = []
+                soul_bind_dps: List[SoulBind] = []
                 for soul_bind in SOULBINDS:
-                    dps_paths = []
+                    dps_paths: List[Tuple[List[SoulBindTalent], float, List[str]]] = []
                     for path in soul_bind.talent_paths:
                         filtered_path = [
                             talent for talent in path if talent.is_dps_increase
