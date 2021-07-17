@@ -26,6 +26,21 @@ def _is_dps_shard(shard: DominationShard) -> bool:
     return False
 
 
+def _get_set_shards(shard: DominationShard) -> typing.Iterable[DominationShard]:
+    set_enabler = []
+    for domination_shard in DOMINATION_SHARDS:
+        if shard == domination_shard:
+            continue
+        elif shard.school_type != domination_shard.school_type:
+            continue
+        elif shard.full_name.split()[-1] == domination_shard.full_name.split()[-1]:
+            continue
+        elif shard.full_name.split()[0] == domination_shard.full_name.split()[0]:
+            set_enabler += [domination_shard]
+    assert len(set_enabler) == 2
+    return set_enabler
+
+
 def _is_shard(id: str) -> bool:
     for shard in DOMINATION_SHARDS:
         if int(id) == shard.gem_id:
@@ -44,7 +59,7 @@ def domination_shard_simulation(settings: object) -> None:
     """
     specs: typing.List[WowSpec] = settings.wow_class_spec_list
 
-    logger.debug("damnation_shard_simulation start")
+    logger.debug("domination_shard_simulation start")
     for fight_style in settings.fight_styles:
         for wow_spec in specs:
 
@@ -53,11 +68,13 @@ def domination_shard_simulation(settings: object) -> None:
                 "domination_shards", wow_spec, fight_style, settings
             )
 
+            del json_export["covenant_profiles"]
+
             shards = DOMINATION_SHARDS
             # filter shard list by dps relevance:
             shard_list = list(filter(_is_dps_shard, shards))
 
-            # remove all damnation gems from profile
+            # remove all domination gems from profile
             for slot_name in json_export["profile"]["items"]:
                 item = json_export["profile"]["items"][slot_name]
                 if "gem_id" in item.keys():
@@ -144,6 +161,21 @@ def domination_shard_simulation(settings: object) -> None:
                 )
                 simulation_group.add(simulation_data)
 
+                # add set bonus simulation
+                set_shards = _get_set_shards(shard)
+                head_string += f"/{set_shards[0].gem_id}/{set_shards[0].gem_id}"
+                simulation_data = Simulation_Data(
+                    name=f"{shard.name} +Set",
+                    fight_style=fight_style,
+                    iterations=settings.iterations,
+                    target_error=settings.target_error.get(fight_style, "0.1"),
+                    simc_arguments=[head_string],
+                    ptr=settings.ptr,
+                    default_actions=settings.default_actions,
+                    executable=settings.executable,
+                )
+                simulation_group.add(simulation_data)
+
             # create and simulate baseline profile
             logger.info(
                 "Start {} domination_shards simulation for {}.".format(
@@ -200,7 +232,7 @@ def domination_shard_simulation(settings: object) -> None:
             # create ordered shard name list
             tmp_list = []
             for shard in json_export["data"]:
-                if shard != "baseline":
+                if shard != "baseline" and "+" in shard:
                     tmp_list.append((shard, json_export["data"][shard]))
             logger.debug("tmp_list: {}".format(tmp_list))
 
