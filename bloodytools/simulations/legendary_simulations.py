@@ -82,6 +82,7 @@ def legendary_simulation(settings) -> None:
     SPECIAL_CASES = _load_special_cases()
 
     specs: List[WowSpec] = settings.wow_class_spec_list
+    fight_style: str
 
     for fight_style in settings.fight_styles:
         for wow_spec in specs:
@@ -232,6 +233,14 @@ def legendary_simulation(settings) -> None:
                 if wow_spec in SPECIAL_CASES:
                     for special_case in SPECIAL_CASES[wow_spec]:
                         if special_case["name"] == legendary.full_name:
+
+                            if (
+                                "fight_styles" in special_case
+                                and fight_style.lower()
+                                not in [f.lower() for f in special_case["fight_styles"]]
+                            ):
+                                continue
+
                             new_profile = simulation_data.copy()
                             name_addition = (
                                 "[" + "+".join(special_case["name_additions"]) + "] "

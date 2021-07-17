@@ -9,3 +9,6 @@ shaman:
         - talents=2111133
         - covenant=night_fae
         - soulbind=niya,grove_invigoration/unruly_winds:9:1/niyas_tools_burrs/essential_extraction:9:1/bonded_hearts
+      fight_styles:
+        - patchwerk
+        - castingpatchwerk
