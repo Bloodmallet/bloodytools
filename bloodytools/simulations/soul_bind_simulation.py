@@ -21,12 +21,23 @@ from typing import List, Tuple
 
 logger = logging.getLogger(__name__)
 
+MAX_SOULBINDTALENT_TIER = 11
 CONDUITMAXRANK = 11
 ranks = list(range(5, CONDUITMAXRANK + 1))
 
 
 def _are_all_covenants_present(profiles: dict) -> bool:
     return len(profiles.keys()) == 4
+
+
+def _get_first_row_soulbindtalent(soulbind: SoulBind) -> SoulBindTalent:
+    for talent in soulbind.soul_bind_talents:
+        if talent.tier == 0:
+            return talent
+
+
+def _is_last_row_soulbindtalent(soulbindtalent: SoulBindTalent) -> bool:
+    return soulbindtalent.tier == MAX_SOULBINDTALENT_TIER
 
 
 def soul_bind_simulation(settings: object) -> None:
@@ -203,13 +214,22 @@ def soul_bind_simulation(settings: object) -> None:
                         wanted_data["profile"],
                     )
 
+                # last row nodes ususally need their first row to function properly
+                soulbind_string = f"{node.spell_id}"
+                if _is_last_row_soulbindtalent(node):
+                    soulbind_string += "/" + str(
+                        _get_first_row_soulbindtalent(
+                            get_soul_bind(id=node.soulbind_id)
+                        ).spell_id
+                    )
+
                 simulation_data = Simulation_Data(
                     name=f"{node.full_name}_{node.soul_bind.covenant.id}",
                     fight_style=fight_style,
                     profile=profile,
                     simc_arguments=[
                         f"covenant={node.soul_bind.covenant.simc_name}",
-                        f"soulbind={node.spell_id}",
+                        f"soulbind={soulbind_string}",
                     ],
                     target_error=settings.target_error.get(fight_style, "0.1"),
                     ptr=settings.ptr,
@@ -366,6 +386,22 @@ def soul_bind_simulation(settings: object) -> None:
                         profile.name, profile.get_dps()
                     )
                 )
+
+            # remove first row dps from last row simulations
+            for node in nodes:
+                if _is_last_row_soulbindtalent(node):
+                    soulbind = get_soul_bind(id=node.soulbind_id)
+                    covenant = soulbind.covenant
+                    baseline_dps = wanted_data["data"]["baseline"][covenant.full_name]
+                    first_row_dps = wanted_data["data"].get(
+                        _get_first_row_soulbindtalent(soulbind).full_name,
+                        {covenant.full_name: baseline_dps},
+                    )[covenant.full_name]
+                    last_row_dps = wanted_data["data"][node.full_name][
+                        covenant.full_name
+                    ]
+                    actual_dps = max(last_row_dps - first_row_dps, 0) + baseline_dps
+                    wanted_data["data"][node.full_name][covenant.full_name] = actual_dps
 
             logger.debug(wanted_data)
 
