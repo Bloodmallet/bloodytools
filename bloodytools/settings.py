@@ -2,6 +2,7 @@
 
   Look for the matching paragraphs of what you want to do. Change settings responsibly. If anything breaks too hard, just reload the settings-file from the repository.
 """
+from bloodytools.utils.data_type import DataType
 import simc_support.game_data.WowSpec as WowSpec
 
 ##
@@ -18,7 +19,7 @@ wow_class_spec_list = [
         WowSpec.RESTORATION_SHAMAN,
     ]
 ]
-
+data_type = DataType.DPS
 
 ###############################################################################
 # SimulationCraft
