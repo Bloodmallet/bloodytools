@@ -1,4 +1,5 @@
 import argparse
+import dataclasses
 import datetime
 import logging
 import os
@@ -10,10 +11,11 @@ import typing
 import urllib3
 
 from bloodytools import settings
-from simc_support.game_data.Talent import get_talent_dict
-from simc_support.game_data.WowSpec import WowSpec
-from simc_support.game_data.WowClass import WowClass
+from bloodytools.utils.data_type import DataType
 from simc_support.game_data.Covenant import COVENANTS
+from simc_support.game_data.Talent import get_talent_dict
+from simc_support.game_data.WowClass import WowClass
+from simc_support.game_data.WowSpec import WowSpec
 
 logger = logging.getLogger(__name__)
 
@@ -546,28 +548,31 @@ def request(
     return response.json()
 
 
-class Args(object):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.custom_profile = False
-        self.custom_apl = False
-        self.custom_fight_style = False
-        self.debug = False
-        self.executable = settings.executable
-        self.fight_styles = [
+@dataclasses.dataclass
+class Args:
+    custom_profile: bool = False
+    custom_apl: bool = False
+    custom_fight_style: bool = False
+    debug: bool = False
+    executable: str = settings.executable
+    fight_styles: typing.Iterable[str] = dataclasses.field(
+        default_factory=[
             "patchwerk",
         ]
-        self.profileset_work_threads = settings.profileset_work_threads
-        self.ptr = False
-        self.raidbots = False
-        self.single_sim = ""
-        self.sim_all = False
-        self.target_error = ""
-        self.threads = settings.threads
-        self.wow_class_spec_list = []
-        self.keep_files = False
-        self.pretty = False
+    )
+    profileset_work_threads: str = settings.profileset_work_threads
+    ptr: bool = False
+    raidbots: bool = False
+    single_sim: str = ""
+    sim_all: bool = False
+    target_error: str = ""
+    threads: str = settings.threads
+    wow_class_spec_list: typing.Iterable[typing.Optional[WowSpec]] = dataclasses.field(
+        default_factory=[]
+    )
+    keep_files: bool = False
+    pretty: bool = False
+    data_type: DataType = DataType.DPS
 
 
 def logger_config(logger: logging.Logger, debug=False):
