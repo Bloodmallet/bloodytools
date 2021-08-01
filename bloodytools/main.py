@@ -23,30 +23,32 @@ May 2018
 """
 
 import datetime
+import logging
 import sys
 import threading
 import time
-import logging
+
+from simc_support.game_data.WowSpec import WOWSPECS, get_wow_spec
 
 from bloodytools import settings
 
 # from bloodytools.simulations.gear_path_simulation import gear_path_simulation
 from bloodytools.simulations.conduit_simulation import conduit_simulation
 from bloodytools.simulations.covenant_simulation import covenant_simulation
-from bloodytools.simulations.legendary_simulations import legendary_simulation
-from bloodytools.simulations.race_simulation import race_simulation
-from bloodytools.simulations.secondary_distribution_simulation import (
-    secondary_distribution_simulation,
-)
-from bloodytools.simulations.soul_bind_simulation import soul_bind_simulation
-from bloodytools.simulations.soul_bind_node_simulation import soul_bind_node_simulation
-from bloodytools.simulations.talent_simulation import talent_simulation
-from bloodytools.simulations.trinket_simulation import trinket_simulation
 from bloodytools.simulations.domination_shard_simulation import (
     domination_shard_simulation,
 )
+from bloodytools.simulations.legendary_simulations import legendary_simulation
+from bloodytools.simulations import simulation_factory
+from bloodytools.simulations.simulation import simulation_wrapper
+from bloodytools.simulations.secondary_distribution_simulation import (
+    secondary_distribution_simulation,
+)
+from bloodytools.simulations.soul_bind_node_simulation import soul_bind_node_simulation
+from bloodytools.simulations.soul_bind_simulation import soul_bind_simulation
+from bloodytools.simulations.talent_simulation import talent_simulation
+from bloodytools.simulations.trinket_simulation import trinket_simulation
 from bloodytools.utils.utils import get_simc_hash
-from simc_support.game_data.WowSpec import WOWSPECS, get_wow_spec
 
 logger = logging.getLogger(__name__)
 
@@ -178,19 +180,25 @@ def main(args=None):
 
     # trigger race simulations
     if settings.enable_race_simulations:
+
+        kwargs = {
+            "simulation_type": "races",
+            "simulation_factory": simulation_factory,
+            "settings": settings,
+        }
         if not settings.use_own_threading:
             logger.info("Starting Race simulations.")
 
         if settings.use_own_threading:
             race_thread = threading.Thread(
                 name="Race Thread",
-                target=race_simulation,
-                args=(settings),
+                target=simulation_wrapper,
+                kwargs=kwargs,
             )
             thread_list.append(race_thread)
             race_thread.start()
         else:
-            race_simulation(settings)
+            simulation_wrapper(**kwargs)
 
         if not settings.use_own_threading:
             logger.info("Race simulations finished.")
