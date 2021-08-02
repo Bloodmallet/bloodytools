@@ -19,6 +19,7 @@ def _is_dps_shard(shard: DominationShard) -> bool:
         "of Bek",
         "of Cor",
         "of Dyz",
+        "of Zed",
     )
     for part in dps_name_parts:
         if part in shard.name:
