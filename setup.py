@@ -19,6 +19,6 @@ setup(
             "fallback_profiles/*/*/*.simc",
         ],
     },
-    python_requires=">3.6",
+    python_requires=">3.7",
     url="https://github.com/Bloodmallet/bloodytools",
 )
