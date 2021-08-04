@@ -2,6 +2,7 @@ import json
 import logging
 import os
 
+from bloodytools.utils.config import Config
 from bloodytools.utils.utils import create_basic_profile_string, create_base_json_dict
 from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Data
 from typing import List, Tuple
@@ -9,7 +10,7 @@ from typing import List, Tuple
 logger = logging.getLogger(__name__)
 
 
-def gear_path_simulation(specs: List[Tuple[str, str]], settings) -> None:
+def gear_path_simulation(specs: List[Tuple[str, str]], settings: Config) -> None:
 
     logger.debug("race_simulations start")
 

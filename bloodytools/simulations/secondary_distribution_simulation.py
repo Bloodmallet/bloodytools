@@ -1,3 +1,4 @@
+from bloodytools.utils.config import Config
 import json
 import logging
 import os
@@ -12,7 +13,7 @@ from bloodytools.utils.utils import create_basic_profile_string
 logger = logging.getLogger(__name__)
 
 
-def secondary_distribution_simulation(settings: object) -> None:
+def secondary_distribution_simulation(settings: Config) -> None:
     """Simulates several secondary distributions for the baseline profile.
 
     Arguments:
@@ -287,12 +288,9 @@ def secondary_distribution_simulation(settings: object) -> None:
                         )
                     )
 
-                if settings.debug:
-                    logger.debug("Talent combination: " + talent_combination)
-                    for profile in simulation_group.profiles:
-                        logger.debug(
-                            "  {}   {}".format(profile.name, profile.get_dps())
-                        )
+                logger.debug("Talent combination: " + talent_combination)
+                for profile in simulation_group.profiles:
+                    logger.debug("  {}   {}".format(profile.name, profile.get_dps()))
 
                 # create sorted list and add data to the result_dict
                 stat_dps_list = []

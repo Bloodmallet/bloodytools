@@ -48,12 +48,16 @@ from bloodytools.simulations.soul_bind_node_simulation import soul_bind_node_sim
 from bloodytools.simulations.soul_bind_simulation import soul_bind_simulation
 from bloodytools.simulations.talent_simulation import talent_simulation
 from bloodytools.simulations.trinket_simulation import trinket_simulation
-from bloodytools.utils.utils import get_simc_hash
+from bloodytools.utils.utils import get_simc_hash, arg_parse_config
+from bloodytools.utils.config import Config
 
 logger = logging.getLogger(__name__)
 
 
-def _update_settings(args: object, logger: logging.Logger) -> None:
+def _update_settings(args: object, logger: logging.Logger) -> Config:
+
+    config = Config().update(settings)
+
     if args.single_sim:
         logger.debug("-s / --single_sim detected")
         try:
@@ -65,94 +69,96 @@ def _update_settings(args: object, logger: logging.Logger) -> None:
             sys.exit("Input error. Bloodytools terminates.")
 
         # single sim will always use all cores unless --threads is defined
-        settings.threads = ""
-        settings.wow_class_spec_list = [
+        config.threads = ""
+        config.wow_class_spec_list = [
             get_wow_spec(wow_class, wow_spec),
         ]
-        settings.fight_styles = [
+        config.fight_styles = [
             fight_style,
         ]
         if args.target_error:
-            settings.target_error[fight_style] = args.target_error
-        settings.iterations = "20000"
+            config.target_error[fight_style] = args.target_error
+        config.iterations = "20000"
         # disable all simulation types
-        settings.enable_race_simulations = False
-        settings.enable_trinket_simulations = False
-        settings.enable_secondary_distributions_simulations = False
-        settings.enable_gear_path = False
-        settings.enable_talent_simulations = False
-        settings.enable_soul_bind_simulations = False
-        settings.enable_soul_bind_node_simulations = False
-        settings.enable_conduit_simulations = False
-        settings.enable_covenant_simulations = False
-        settings.enable_domination_shards = False
+        config.enable_race_simulations = False
+        config.enable_trinket_simulations = False
+        config.enable_secondary_distributions_simulations = False
+        config.enable_gear_path = False
+        config.enable_talent_simulations = False
+        config.enable_soul_bind_simulations = False
+        config.enable_soul_bind_node_simulations = False
+        config.enable_conduit_simulations = False
+        config.enable_covenant_simulations = False
+        config.enable_domination_shards = False
 
         # set dev options
-        settings.use_own_threading = False
-        settings.use_raidbots = False
+        config.use_own_threading = False
+        config.use_raidbots = False
 
         if simulation_type == "races":
-            settings.enable_race_simulations = True
+            config.enable_race_simulations = True
         elif simulation_type == "trinkets":
-            settings.enable_trinket_simulations = True
+            config.enable_trinket_simulations = True
         elif simulation_type == "soul_binds":
-            settings.enable_soul_bind_simulations = True
+            config.enable_soul_bind_simulations = True
         elif simulation_type == "soul_bind_nodes":
-            settings.enable_soul_bind_node_simulations = True
+            config.enable_soul_bind_node_simulations = True
         elif simulation_type == "conduits":
-            settings.enable_conduit_simulations = True
+            config.enable_conduit_simulations = True
         elif simulation_type == "secondary_distributions":
-            settings.enable_secondary_distributions_simulations = True
+            config.enable_secondary_distributions_simulations = True
         elif simulation_type == "legendaries":
-            settings.enable_legendary_simulations = True
+            config.enable_legendary_simulations = True
         elif simulation_type == "talents":
-            settings.enable_talent_simulations = True
+            config.enable_talent_simulations = True
         elif simulation_type == "covenants":
-            settings.enable_covenant_simulations = True
+            config.enable_covenant_simulations = True
         elif simulation_type == "domination_shards":
-            settings.enable_domination_shards = True
+            config.enable_domination_shards = True
         else:
             raise ValueError("Unknown simulation type entered.")
 
     # set new executable path if provided
     if args.executable:
-        settings.executable = args.executable
-        logger.debug("Set executable to {}".format(settings.executable))
+        config.executable = args.executable
+        logger.debug("Set executable to {}".format(config.executable))
 
     # set new threads if provided
     if args.threads:
-        settings.threads = args.threads
-        logger.debug("Set threads to {}".format(settings.threads))
+        config.threads = args.threads
+        logger.debug("Set threads to {}".format(config.threads))
 
     # set new profileset_work_threads if provided
     if args.profileset_work_threads:
-        settings.profileset_work_threads = args.profileset_work_threads
+        config.profileset_work_threads = args.profileset_work_threads
         logger.debug(
-            "Set profileset_work_threads to {}".format(settings.profileset_work_threads)
+            "Set profileset_work_threads to {}".format(config.profileset_work_threads)
         )
 
     if args.ptr:
-        settings.ptr = "1"
+        config.ptr = "1"
 
     if args.custom_profile:
-        settings.custom_profile = args.custom_profile
+        config.custom_profile = args.custom_profile
 
     if args.custom_apl:
-        settings.custom_apl = args.custom_apl
-        settings.default_actions = "0"
+        config.custom_apl = args.custom_apl
+        config.default_actions = "0"
 
     if args.custom_fight_style:
-        settings.custom_fight_style = args.custom_fight_style
+        config.custom_fight_style = args.custom_fight_style
 
     if args.target_error:
-        for fight_style in settings.target_error:
-            settings.target_error[fight_style] = args.target_error
+        for fight_style in config.target_error:
+            config.target_error[fight_style] = args.target_error
 
     if args.raidbots:
-        settings.use_raidbots = True
+        config.use_raidbots = True
 
-    settings.keep_files = args.keep_files
-    settings.pretty = args.pretty
+    config.keep_files = args.keep_files
+    config.pretty = args.pretty
+
+    return config
 
 
 def main(args=None):
@@ -160,36 +166,36 @@ def main(args=None):
     logger.debug("main start")
     logger.info("Bloodytools at your service.")
 
-    _update_settings(args, logger)
+    config = _update_settings(args, logger)
 
     # only
-    new_hash = get_simc_hash(settings.executable)
+    new_hash = get_simc_hash(config.executable)
     if new_hash:
-        settings.simc_hash = new_hash
-    if not hasattr(settings, "simc_hash"):
-        settings.simc_hash = None
+        config.simc_hash = new_hash
+    if not hasattr(config, "simc_hash"):
+        config.simc_hash = None
 
     bloodytools_start_time = datetime.datetime.utcnow()
 
     # empty class-spec list? great, we'll run all class-spec combinations
-    if not hasattr(settings, "wow_class_spec_list"):
-        settings.wow_class_spec_list = WOWSPECS
+    if not hasattr(config, "wow_class_spec_list"):
+        config.wow_class_spec_list = WOWSPECS
 
     # list of all active threads. when empty, terminate tool
     thread_list = []
 
     # trigger race simulations
-    if settings.enable_race_simulations:
+    if config.enable_race_simulations:
 
         kwargs = {
             "simulation_type": "races",
             "simulation_factory": simulation_factory,
-            "settings": settings,
+            "settings": config,
         }
-        if not settings.use_own_threading:
+        if not config.use_own_threading:
             logger.info("Starting Race simulations.")
 
-        if settings.use_own_threading:
+        if config.use_own_threading:
             race_thread = threading.Thread(
                 name="Race Thread",
                 target=simulation_wrapper,
@@ -200,173 +206,173 @@ def main(args=None):
         else:
             simulation_wrapper(**kwargs)
 
-        if not settings.use_own_threading:
+        if not config.use_own_threading:
             logger.info("Race simulations finished.")
 
     # trigger trinket simulations
-    if settings.enable_trinket_simulations:
-        if not settings.use_own_threading:
+    if config.enable_trinket_simulations:
+        if not config.use_own_threading:
             logger.info("Starting Trinket simulations.")
 
-        if settings.use_own_threading:
+        if config.use_own_threading:
             trinket_thread = threading.Thread(
-                name="Trinket Thread", target=trinket_simulation, args=(settings,)
+                name="Trinket Thread", target=trinket_simulation, args=(config,)
             )
             thread_list.append(trinket_thread)
             trinket_thread.start()
         else:
-            trinket_simulation(settings)
+            trinket_simulation(config)
 
-        if not settings.use_own_threading:
+        if not config.use_own_threading:
             logger.info("Trinket simulations finished.")
 
     # trigger soul bind (nodes) simulations
-    if settings.enable_soul_bind_node_simulations:
-        if not settings.use_own_threading:
+    if config.enable_soul_bind_node_simulations:
+        if not config.use_own_threading:
             logger.info("Starting Soul Bind Node simulations.")
 
-        if settings.use_own_threading:
+        if config.use_own_threading:
             soul_bind_node_thread = threading.Thread(
                 name="Soul Bind Node Thread",
                 target=soul_bind_node_simulation,
-                args=(settings,),
+                args=(config,),
             )
             thread_list.append(soul_bind_node_thread)
             soul_bind_node_thread.start()
         else:
-            soul_bind_node_simulation(settings)
+            soul_bind_node_simulation(config)
 
-        if not settings.use_own_threading:
+        if not config.use_own_threading:
             logger.info("Soul Bind Node simulations finished.")
 
     # trigger soul bind (nodes+conduits) simulations
-    if settings.enable_soul_bind_simulations:
-        if not settings.use_own_threading:
+    if config.enable_soul_bind_simulations:
+        if not config.use_own_threading:
             logger.info("Starting Soul Bind simulations.")
 
-        if settings.use_own_threading:
+        if config.use_own_threading:
             soul_bind_thread = threading.Thread(
                 name="Soul Bind Thread",
                 target=soul_bind_simulation,
-                args=(settings,),
+                args=(config,),
             )
             thread_list.append(soul_bind_thread)
             soul_bind_thread.start()
         else:
-            soul_bind_simulation(settings)
+            soul_bind_simulation(config)
 
-        if not settings.use_own_threading:
+        if not config.use_own_threading:
             logger.info("Soul Bind simulations finished.")
 
     # trigger conduit simulations
-    if settings.enable_conduit_simulations:
-        if not settings.use_own_threading:
+    if config.enable_conduit_simulations:
+        if not config.use_own_threading:
             logger.info("Starting Conduit simulations.")
 
-        if settings.use_own_threading:
+        if config.use_own_threading:
             conduit_thread = threading.Thread(
-                name="Conduit Thread", target=conduit_simulation, args=(settings,)
+                name="Conduit Thread", target=conduit_simulation, args=(config,)
             )
             thread_list.append(conduit_thread)
             conduit_thread.start()
         else:
-            conduit_simulation(settings)
+            conduit_simulation(config)
 
-        if not settings.use_own_threading:
+        if not config.use_own_threading:
             logger.info("Conduit simulations finished.")
 
     # trigger legendary simulations
-    if settings.enable_legendary_simulations:
-        if not settings.use_own_threading:
+    if config.enable_legendary_simulations:
+        if not config.use_own_threading:
             logger.info("Starting Legendary simulations.")
 
-        if settings.use_own_threading:
+        if config.use_own_threading:
             legendary_thread = threading.Thread(
-                name="Legendary Thread", target=legendary_simulation, args=(settings,)
+                name="Legendary Thread", target=legendary_simulation, args=(config,)
             )
             thread_list.append(legendary_thread)
             legendary_thread.start()
         else:
-            legendary_simulation(settings)
+            legendary_simulation(config)
 
-        if not settings.use_own_threading:
+        if not config.use_own_threading:
             logger.info("Legendary simulations finished.")
 
     # trigger secondary distributions
-    if settings.enable_secondary_distributions_simulations:
+    if config.enable_secondary_distributions_simulations:
 
-        if not settings.use_own_threading:
+        if not config.use_own_threading:
             logger.info("Starting Secondary Distribtion simulations.")
 
-        if settings.use_own_threading:
+        if config.use_own_threading:
             secondary_distribution_thread = threading.Thread(
                 name="Secondary Distribution Thread",
                 target=secondary_distribution_simulation,
-                args=(settings,),
+                args=(config,),
             )
             thread_list.append(secondary_distribution_thread)
             secondary_distribution_thread.start()
         else:
-            secondary_distribution_simulation(settings)
+            secondary_distribution_simulation(config)
 
-        if not settings.use_own_threading:
+        if not config.use_own_threading:
             logger.info("Secondary Distribution simulations finished.")
 
     # trigger talent simulations
-    if settings.enable_talent_simulations:
-        if not settings.use_own_threading:
+    if config.enable_talent_simulations:
+        if not config.use_own_threading:
             logger.info("Talent simulations start.")
 
-        if settings.use_own_threading:
+        if config.use_own_threading:
             talent_thread = threading.Thread(
                 name="Talent Thread",
                 target=talent_simulation,
-                args=(settings,),
+                args=(config,),
             )
             thread_list.append(talent_thread)
             talent_thread.start()
         else:
-            talent_simulation(settings)
+            talent_simulation(config)
 
-        if not settings.use_own_threading:
+        if not config.use_own_threading:
             logger.info("Talent simulations end.")
 
     # trigger covenant simulations
-    if settings.enable_covenant_simulations:
-        if not settings.use_own_threading:
+    if config.enable_covenant_simulations:
+        if not config.use_own_threading:
             logger.info("Covenant simulations start.")
 
-        if settings.use_own_threading:
+        if config.use_own_threading:
             covenant_thread = threading.Thread(
                 name="Covenant Thread",
                 target=covenant_simulation,
-                args=(settings,),
+                args=(config,),
             )
             thread_list.append(covenant_thread)
             covenant_thread.start()
         else:
-            covenant_simulation(settings)
+            covenant_simulation(config)
 
-        if not settings.use_own_threading:
+        if not config.use_own_threading:
             logger.info("Covenant simulations end.")
 
     # trigger domination shard simulations
-    if settings.enable_domination_shards:
-        if not settings.use_own_threading:
+    if config.enable_domination_shards:
+        if not config.use_own_threading:
             logger.info("Domination Shard simulations start.")
 
-        if settings.use_own_threading:
+        if config.use_own_threading:
             domiation_shard_thread = threading.Thread(
                 name="Domination Shard Thread",
                 target=domination_shard_simulation,
-                args=(settings,),
+                args=(config,),
             )
             thread_list.append(domiation_shard_thread)
             domiation_shard_thread.start()
         else:
-            domination_shard_simulation(settings)
+            domination_shard_simulation(config)
 
-        if not settings.use_own_threading:
+        if not config.use_own_threading:
             logger.info("Domination Shard simulations end.")
 
     while thread_list:
@@ -387,4 +393,5 @@ def main(args=None):
 
 
 if __name__ == "__main__":
-    main()
+    args = arg_parse_config()
+    main(args)

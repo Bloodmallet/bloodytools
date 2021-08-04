@@ -5,6 +5,7 @@ import pkg_resources
 import yaml
 
 
+from bloodytools.utils.config import Config
 from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Data
 from bloodytools.utils.utils import create_base_json_dict
 
@@ -68,11 +69,11 @@ UNWANTED_LEGENDARIES = [
 ]
 
 
-def legendary_simulation(settings) -> None:
+def legendary_simulation(settings: Config) -> None:
     """Simulates all available legendaries for all given specs.
 
     Arguments:
-        settings {object} -- see settings.py
+        settings {Config} --
 
     Returns:
         None --

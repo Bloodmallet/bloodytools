@@ -3,8 +3,9 @@ import logging
 import os
 import typing
 
-from bloodytools.utils.utils import create_base_json_dict
 from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Data
+from bloodytools.utils.config import Config
+from bloodytools.utils.utils import create_base_json_dict
 
 from simc_support.game_data.Covenant import COVENANTS, Covenant
 from simc_support.game_data.Conduit import Conduit, get_conduits_for_spec
@@ -24,11 +25,11 @@ def _get_covenant_specific_conduits(
     return conduits
 
 
-def covenant_simulation(settings: object) -> None:
+def covenant_simulation(settings: Config) -> None:
     """Simulates dps nodes of all covenant abilities and their specific conduits.
 
     Arguments:
-        settings {object} --
+        settings {Config} --
 
     Returns:
         None --

@@ -6,9 +6,9 @@ import logging
 import os
 import typing
 
-from bloodytools import settings
 from bloodytools.utils.simulation_objects import Simulation_Group
-from bloodytools.utils.utils import Args, create_base_json_dict
+from bloodytools.utils.utils import create_base_json_dict
+from bloodytools.utils.config import Config
 from bloodytools.utils.data_type import DataType
 from simc_support.game_data.WowSpec import WowSpec
 
@@ -35,7 +35,7 @@ class Simulation(abc.ABC):
     snake_case_name: str
     wow_spec: WowSpec
     fight_style: str
-    settings: Args
+    settings: Config
 
     def run(self) -> None:
         """Manages the simulation flow. You can adjust by overwriting the provided methods."""
@@ -45,10 +45,10 @@ class Simulation(abc.ABC):
         )
         simulation_group = Simulation_Group(
             name="simulation_group",
-            threads=settings.threads,
-            profileset_work_threads=settings.profileset_work_threads,
-            executable=settings.executable,
-            remove_files=not settings.keep_files,
+            threads=self.settings.threads,
+            profileset_work_threads=self.settings.profileset_work_threads,
+            executable=self.settings.executable,
+            remove_files=not self.settings.keep_files,
         )
         self.add_simulation_data(
             simulation_group, data_dict["profile"], data_dict.get("covenant_profiles")
@@ -65,9 +65,9 @@ class Simulation(abc.ABC):
         self._write(data_dict)
 
     def _simulate(self, simulation_group: Simulation_Group) -> None:
-        if settings.use_raidbots and settings.apikey:
-            settings.simc_hash = simulation_group.simulate_with_raidbots(
-                settings.apikey
+        if self.settings.use_raidbots and self.settings.apikey:
+            self.settings.simc_hash = simulation_group.simulate_with_raidbots(
+                self.settings.apikey
             )
         else:
             simulation_group.simulate()
@@ -185,7 +185,7 @@ class Simulation(abc.ABC):
                 json.dumps(
                     data_dict,
                     sort_keys=True,
-                    indent=4 if settings.pretty else None,
+                    indent=4 if self.settings.pretty else None,
                     ensure_ascii=False,
                 )
             )
@@ -210,7 +210,7 @@ class SimulationFactory:
 def simulation_wrapper(
     simulation_type: str,
     simulation_factory: SimulationFactory,
-    settings: Args,
+    settings: Config,
 ):
     """Iterate over all WowSpecs and FightStyles in settings and run their
     appropriate Simulator flow.
@@ -219,7 +219,7 @@ def simulation_wrapper(
         name (str): [description]
         simulation_type (str): [description]
         simulation_factory (SimulationFactory): [description]
-        settings (Args): [description]
+        settings (Config): [description]
     """
     for wow_spec, fight_style in itertools.product(
         settings.wow_class_spec_list, settings.fight_styles

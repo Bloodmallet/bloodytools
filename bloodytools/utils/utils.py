@@ -1,5 +1,4 @@
 import argparse
-import dataclasses
 import datetime
 import logging
 import os
@@ -11,7 +10,6 @@ import typing
 import urllib3
 
 from bloodytools import settings
-from bloodytools.utils.data_type import DataType
 from simc_support.game_data.Covenant import COVENANTS
 from simc_support.game_data.Talent import get_talent_dict
 from simc_support.game_data.WowClass import WowClass
@@ -548,33 +546,6 @@ def request(
     return response.json()
 
 
-@dataclasses.dataclass
-class Args:
-    custom_profile: bool = False
-    custom_apl: bool = False
-    custom_fight_style: bool = False
-    debug: bool = False
-    executable: str = settings.executable
-    fight_styles: typing.Iterable[str] = dataclasses.field(
-        default_factory=[
-            "patchwerk",
-        ]
-    )
-    profileset_work_threads: str = settings.profileset_work_threads
-    ptr: bool = False
-    raidbots: bool = False
-    single_sim: str = ""
-    sim_all: bool = False
-    target_error: str = ""
-    threads: str = settings.threads
-    wow_class_spec_list: typing.Iterable[typing.Optional[WowSpec]] = dataclasses.field(
-        default_factory=[]
-    )
-    keep_files: bool = False
-    pretty: bool = False
-    data_type: DataType = DataType.DPS
-
-
 def logger_config(logger: logging.Logger, debug=False):
     # logging to file and console
     logger.setLevel(logging.DEBUG)
@@ -671,7 +642,7 @@ def arg_parse_config():
         const=True,
         default=False,
         help="Enables usage of 'custom_profile.txt' in addition to the base profile. Default: '{}'".format(
-            settings.debug
+            settings.custom_profile
         ),
     )
     parser.add_argument(
@@ -680,7 +651,7 @@ def arg_parse_config():
         const=True,
         default=False,
         help="Enables usage of 'custom_apl.txt' in addition to the base profile. Default: '{}'".format(
-            settings.debug
+            settings.custom_apl
         ),
     )
     parser.add_argument(
@@ -689,7 +660,7 @@ def arg_parse_config():
         const=True,
         default=False,
         help="Enables usage of 'custom_fight_style.txt' in addition to the base profile. Default: '{}'".format(
-            settings.debug
+            settings.custom_fight_style
         ),
     )
     parser.add_argument(

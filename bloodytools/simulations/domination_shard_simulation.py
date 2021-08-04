@@ -2,6 +2,7 @@ import json
 import logging
 import os
 
+from bloodytools.utils.config import Config
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from bloodytools.utils.utils import create_base_json_dict
 from simc_support.game_data.DominationShard import (
@@ -49,11 +50,11 @@ def _is_shard(id: str) -> bool:
     return False
 
 
-def domination_shard_simulation(settings: object) -> None:
+def domination_shard_simulation(settings: Config) -> None:
     """Simulates all dps relevant Domination Shards for given wow_classes and wow_specs.
 
     Arguments:
-      settings {object} - loaded settings
+      settings {Config} - loaded settings
 
     Raises:
       NotImplementedError -- [description]

@@ -2,8 +2,9 @@ import json
 import logging
 import os
 
-from bloodytools.utils.utils import create_basic_profile_string, create_base_json_dict
+from bloodytools.utils.config import Config
 from bloodytools.utils.simulation_objects import Simulation_Group, Simulation_Data
+from bloodytools.utils.utils import create_base_json_dict
 
 from simc_support.game_data.Covenant import COVENANTS
 from simc_support.game_data.Conduit import get_conduits_for_spec
@@ -13,11 +14,11 @@ from typing import List
 logger = logging.getLogger(__name__)
 
 
-def conduit_simulation(settings: object) -> None:
+def conduit_simulation(settings: Config) -> None:
     """Simulates dps nodes of all dps conduits.
 
     Arguments:
-        specs {List[Tuple[str, str]]} -- List of all wanted wow_specs
+        settings {Config} --
 
     Returns:
         None --
