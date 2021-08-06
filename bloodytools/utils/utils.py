@@ -93,7 +93,7 @@ def get_fallback_covenant_profile_strings(
     tmp_tier = "PR" if "PR" in str(tier) else f"T{tier}"
     paths = []
     for covenant in COVENANTS:
-        file_name = f"{tmp_tier}_{wow_spec.wow_class.full_name.title()}_{wow_spec.full_name.title()}_{covenant.simc_name.title()}.simc"
+        file_name = f"{tmp_tier}_{wow_spec.wow_class.simc_name.title()}_{wow_spec.simc_name.title()}_{covenant.simc_name.title()}.simc"
         cov_path = os.path.join(base_path, file_name)
         if os.path.isfile(cov_path):
             paths += [cov_path]
