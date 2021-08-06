@@ -1,7 +1,7 @@
 import logging
 import typing
 
-from bloodytools.simulations.simulation import Simulation
+from bloodytools.simulations.simulator import Simulator
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from bloodytools.utils.config import Config
 from simc_support.game_data.WowSpec import WowSpec
@@ -9,7 +9,7 @@ from simc_support.game_data.WowSpec import WowSpec
 logger = logging.getLogger(__name__)
 
 
-class RaceSimulation(Simulation):
+class RaceSimulator(Simulator):
     def __init__(self, wow_spec: WowSpec, fight_style: str, settings: Config):
         super().__init__(
             name="Races",

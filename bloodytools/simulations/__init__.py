@@ -1,6 +1,6 @@
-from bloodytools.simulations.simulation import SimulationFactory
-from bloodytools.simulations.race_simulation import RaceSimulation
+from bloodytools.simulations.simulator import SimulatorFactory
+from bloodytools.simulations.race_simulation import RaceSimulator
 
-simulation_factory = SimulationFactory()
+simulator_factory = SimulatorFactory()
 
-simulation_factory.register_simulation("races", RaceSimulation)
+simulator_factory.register_simulation("races", RaceSimulator)

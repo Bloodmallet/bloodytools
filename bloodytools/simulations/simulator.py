@@ -20,7 +20,7 @@ class UnknownFightStyleError(Exception):
 
 
 @dataclasses.dataclass
-class Simulation(abc.ABC):
+class Simulator(abc.ABC):
     """Abstract baseclass for chart related simulations.
     Children will usually be used by invoking the run() method.
 
@@ -191,25 +191,25 @@ class Simulation(abc.ABC):
             )
 
 
-class SimulationFactory:
+class SimulatorFactory:
     def __init__(self) -> None:
-        self._simulations: typing.Dict[str, typing.Type[Simulation]] = {}
+        self._simulations: typing.Dict[str, typing.Type[Simulator]] = {}
 
-    def register_simulation(self, simulation_type: str, klass: typing.Type[Simulation]):
+    def register_simulation(self, simulation_type: str, klass: typing.Type[Simulator]):
         self._simulations[simulation_type] = klass
 
     def get_simulation(
         self,
         simulation_type: str,
-    ) -> typing.Type[Simulation]:
+    ) -> typing.Type[Simulator]:
         """Get an appropriate Simulation class for the provided simulation_type."""
 
         return self._simulations[simulation_type]
 
 
-def simulation_wrapper(
+def simulator_wrapper(
     simulation_type: str,
-    simulation_factory: SimulationFactory,
+    simulation_factory: SimulatorFactory,
     settings: Config,
 ):
     """Iterate over all WowSpecs and FightStyles in settings and run their

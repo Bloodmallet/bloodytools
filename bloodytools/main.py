@@ -39,8 +39,8 @@ from bloodytools.simulations.domination_shard_simulation import (
     domination_shard_simulation,
 )
 from bloodytools.simulations.legendary_simulations import legendary_simulation
-from bloodytools.simulations import simulation_factory
-from bloodytools.simulations.simulation import simulation_wrapper
+from bloodytools.simulations import simulator_factory
+from bloodytools.simulations.simulator import simulator_wrapper
 from bloodytools.simulations.secondary_distribution_simulation import (
     secondary_distribution_simulation,
 )
@@ -189,7 +189,7 @@ def main(args=None):
 
         kwargs = {
             "simulation_type": "races",
-            "simulation_factory": simulation_factory,
+            "simulation_factory": simulator_factory,
             "settings": config,
         }
         if not config.use_own_threading:
@@ -198,13 +198,13 @@ def main(args=None):
         if config.use_own_threading:
             race_thread = threading.Thread(
                 name="Race Thread",
-                target=simulation_wrapper,
+                target=simulator_wrapper,
                 kwargs=kwargs,
             )
             thread_list.append(race_thread)
             race_thread.start()
         else:
-            simulation_wrapper(**kwargs)
+            simulator_wrapper(**kwargs)
 
         if not config.use_own_threading:
             logger.info("Race simulations finished.")
