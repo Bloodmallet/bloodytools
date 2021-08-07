@@ -209,7 +209,7 @@ class SimulatorFactory:
 
 def simulator_wrapper(
     simulation_type: str,
-    simulation_factory: SimulatorFactory,
+    simulator_factory: SimulatorFactory,
     settings: Config,
 ):
     """Iterate over all WowSpecs and FightStyles in settings and run their
@@ -218,13 +218,13 @@ def simulator_wrapper(
     Args:
         name (str): [description]
         simulation_type (str): [description]
-        simulation_factory (SimulationFactory): [description]
+        simulator_factory (SimulatorFactory): [description]
         settings (Config): [description]
     """
     for wow_spec, fight_style in itertools.product(
         settings.wow_class_spec_list, settings.fight_styles
     ):
-        simulator = simulation_factory.get_simulation(simulation_type)
+        simulator = simulator_factory.get_simulation(simulation_type)
         simulator(
             wow_spec=wow_spec,
             fight_style=fight_style,

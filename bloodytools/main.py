@@ -189,7 +189,7 @@ def main(args=None):
 
         kwargs = {
             "simulation_type": "races",
-            "simulation_factory": simulator_factory,
+            "simulator_factory": simulator_factory,
             "settings": config,
         }
         if not config.use_own_threading:
