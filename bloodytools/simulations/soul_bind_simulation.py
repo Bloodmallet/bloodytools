@@ -62,8 +62,10 @@ def soul_bind_simulation(settings: object) -> None:
 
     # filter conduits and non-dps nodes
     def is_relevant_node(talent: SoulBindTalent) -> bool:
-        return talent.is_dps_increase and not (
-            talent.is_endurance or talent.is_finesse or talent.is_potency
+        return (
+            talent.is_dps_increase
+            and not (talent.is_endurance or talent.is_finesse or talent.is_potency)
+            or talent.full_name == "Party Favors"
         )
 
     nodes = list(filter(is_relevant_node, nodes))
@@ -237,6 +239,11 @@ def soul_bind_simulation(settings: object) -> None:
                     executable=settings.executable,
                     iterations=settings.iterations,
                 )
+
+                if node.full_name == "Party Favors":
+                    simulation_data.simc_arguments += [
+                        "shadowlands.party_favor_type=random"
+                    ]
 
                 simulation_group.add(simulation_data)
                 logger.debug(
