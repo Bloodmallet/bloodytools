@@ -13,12 +13,12 @@ renown=80
 head=valorous_visage_of_krexus,id=186350,bonus_id=7187/1498/6935,gem_id=187312
 neck=interplanar_keystone,id=186379,bonus_id=7187/1498/6935,gem_id=173128
 shoulders=spires_of_broken_hope,id=186349,bonus_id=7187/1498,gem_id=187315
-back=grimveiled_cape,id=173242,bonus_id=6716/6952/6649/6648/1559,enchant=soul_vitality
+back=cloak_of_enveloping_manifestations,id=178851,bonus_id=6536/1566/6646,enchant=soul_vitality
 chest=ancient_colossus_chassis,id=186347,bonus_id=7187/1498,gem_id=187318,enchant=eternal_stats
-wrists=vyrazs_parade_cuffs,id=186351,bonus_id=7187/1498/6935,gem_id=187319,enchant=60runspeed
+wrists=vyrazs_parade_cuffs,id=186351,bonus_id=7187/1498/6935,gem_id=187319
 hands=cavalier_oathbreakers_grasps,id=186311,bonus_id=7187/1498,gem_id=187320,enchant=eternal_strength
 waist=fused_bone_greatbelt,id=178734,bonus_id=6536/1566/6646/6935,gem_id=173127
-legs=gormshell_greaves,id=178701,bonus_id=6536/1566/6646
+legs=shadowghast_greaves,id=171416,bonus_id=6647/6648/6950/7451/1559
 feet=greaves_of_haunting_ruination,id=186353,bonus_id=7187/1498
 finger1=fleshfused_circle,id=178869,bonus_id=6536/1566/6646/6935,gem_id=173127,enchant=tenet_of_mastery
 finger2=tarnished_insignia_of_quelthalas,id=186377,bonus_id=7187/1498/6935,gem_id=173127,enchant=tenet_of_mastery
