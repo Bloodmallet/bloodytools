@@ -1,12 +1,12 @@
-deathknight="T27_Death_Knight_Frost_Night_Fae"
+deathknight="T27_Death_Knight_Frost"
 spec=frost
 level=60
 race=blood_elf
 role=attack
 position=back
 talents=1303013
-covenant=night_fae
-soulbind=niya,grove_invigoration/accelerated_cold:9:1/everfrost:9:1/niyas_tools_poison/unleashed_frenzy:9:1/bonded_hearts
+covenant=necrolord
+soulbind=bonesmith_heirmir,forgeborne_reveries/accelerated_cold:9:1/heirmirs_arsenal_marrowed_gemstone/everfrost:9:1/carvers_eye/mnemonic_equipment
 renown=80
 
 head=valorous_visage_of_krexus,id=186350,bonus_id=7187/1498/6935,gem_id=187312

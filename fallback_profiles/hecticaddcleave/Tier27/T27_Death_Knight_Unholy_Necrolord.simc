@@ -1,12 +1,13 @@
-deathknight="T27_Death_Knight_Unholy_Kyrian"
+deathknight="T27_Death_Knight_Unholy_Necrolord"
+source=default
 spec=unholy
 level=60
 race=troll
 role=attack
 position=back
-talents=1103023
-covenant=kyrian
-soulbind=forgelite_prime_mikanikos,brons_call_to_action/eternal_hunger:9:1/convocation_of_the_dead:9:1/adaptive_armor_fragment:9:1/soulglow_spectrometer/effusive_anima_accelerator
+talents=1101023
+covenant=necrolord
+soulbind=bonesmith_heirmir,forgeborne_reveries/eternal_hunger:9:1/convocation_of_the_dead:9:1/heirmirs_arsenal_marrowed_gemstone/carvers_eye/mnemonic_equipment
 renown=80
 
 head=valorous_visage_of_krexus,id=186350,bonus_id=7187/1498/6935,gem_id=187312
