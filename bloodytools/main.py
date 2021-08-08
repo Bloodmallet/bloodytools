@@ -1,16 +1,11 @@
 """Welcome to bloodytools - a SimulationCraft automator/wrapper
 
-Generate your data more easily without having to create each and every needed profile to do so by hand:
-  - races
-  - trinkets
-  - azerite traits
-  - secondary distributions
-  - gear path
+Generate your data more easily without having to create each and every needed profile to do so by hand.
 
 Output is usually saved as .json. But you can add different ways to output the data yourself.
 
 Contact:
-  - https://discord.gg/tFR2uvK Bloodmallet(EU)#8246
+  - https://discord.gg/PKT2PWGB6w Bloodmallet(EU)#8246
 
 Github:
   - https://github.com/Bloodmallet/bloodytools
