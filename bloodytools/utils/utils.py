@@ -560,7 +560,7 @@ def logger_config(logger: logging.Logger, debug=False):
     logger.addHandler(console_handler)
 
     # file handler
-    file_handler = logging.FileHandler("log.txt", "w", encoding="utf-8")
+    file_handler = logging.FileHandler("debug.log", "w", encoding="utf-8")
     file_handler.setLevel(logging.DEBUG)
     file_formatter = logging.Formatter(
         "%(asctime)s - %(filename)s / %(funcName)s:%(lineno)s - %(levelname)s - %(message)s"
