@@ -60,6 +60,7 @@ class Simulator(abc.ABC):
             simulation_group, self.settings.data_type
         )
 
+        logger.debug("Starting post processing")
         data_dict = self.post_processing(data_dict)
 
         self._write(data_dict)
@@ -105,7 +106,7 @@ class Simulator(abc.ABC):
 
         Args:
             simulation_group (Simulation_Group): an already simulated Simulation_Group instance
-            data_dict (dict): dictionary without simulated data
+            data_type (DataType): declares what data should be extracted, e.g. DPS
 
         Returns:
             dict: dictionary with simulated data
@@ -193,18 +194,18 @@ class Simulator(abc.ABC):
 
 class SimulatorFactory:
     def __init__(self) -> None:
-        self._simulations: typing.Dict[str, typing.Type[Simulator]] = {}
+        self._simulators: typing.Dict[str, typing.Type[Simulator]] = {}
 
-    def register_simulation(self, simulation_type: str, klass: typing.Type[Simulator]):
-        self._simulations[simulation_type] = klass
+    def register_simulator(self, simulation_type: str, klass: typing.Type[Simulator]):
+        self._simulators[simulation_type] = klass
 
-    def get_simulation(
+    def get_simulator(
         self,
         simulation_type: str,
     ) -> typing.Type[Simulator]:
-        """Get an appropriate Simulation class for the provided simulation_type."""
+        """Get an appropriate Simulator class for the provided simulation_type."""
 
-        return self._simulations[simulation_type]
+        return self._simulators[simulation_type]
 
 
 def simulator_wrapper(
@@ -224,7 +225,7 @@ def simulator_wrapper(
     for wow_spec, fight_style in itertools.product(
         settings.wow_class_spec_list, settings.fight_styles
     ):
-        simulator = simulator_factory.get_simulation(simulation_type)
+        simulator = simulator_factory.get_simulator(simulation_type)
         simulator(
             wow_spec=wow_spec,
             fight_style=fight_style,

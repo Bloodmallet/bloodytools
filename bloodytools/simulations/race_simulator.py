@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class RaceSimulator(Simulator):
-    def __init__(self, wow_spec: WowSpec, fight_style: str, settings: Config):
+    def __init__(self, wow_spec: WowSpec, fight_style: str, settings: Config) -> None:
         super().__init__(
             name="Races",
             snake_case_name="races",

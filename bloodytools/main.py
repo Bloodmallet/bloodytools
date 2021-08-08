@@ -40,7 +40,6 @@ from bloodytools.simulations.secondary_distribution_simulation import (
     secondary_distribution_simulation,
 )
 from bloodytools.simulations.soul_bind_node_simulation import soul_bind_node_simulation
-from bloodytools.simulations.soul_bind_simulation import soul_bind_simulation
 from bloodytools.simulations.talent_simulation import talent_simulation
 from bloodytools.simulations.trinket_simulation import trinket_simulation
 from bloodytools.utils.utils import get_simc_hash, arg_parse_config
@@ -242,19 +241,25 @@ def main(args=None):
 
     # trigger soul bind (nodes+conduits) simulations
     if config.enable_soul_bind_simulations:
+
+        kwargs = {
+            "simulation_type": "soulbinds",
+            "simulator_factory": simulator_factory,
+            "settings": config,
+        }
         if not config.use_own_threading:
             logger.info("Starting Soul Bind simulations.")
 
         if config.use_own_threading:
             soul_bind_thread = threading.Thread(
                 name="Soul Bind Thread",
-                target=soul_bind_simulation,
-                args=(config,),
+                target=simulator_wrapper,
+                kwargs=kwargs,
             )
             thread_list.append(soul_bind_thread)
             soul_bind_thread.start()
         else:
-            soul_bind_simulation(config)
+            simulator_wrapper(**kwargs)
 
         if not config.use_own_threading:
             logger.info("Soul Bind simulations finished.")
