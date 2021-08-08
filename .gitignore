@@ -28,3 +28,4 @@ make.bat
 Makefile
 # files at root
 /*.simc
+*.log
