@@ -1,5 +1,5 @@
 from bloodytools.simulations.simulator import SimulatorFactory
-from bloodytools.simulations.race_simulation import RaceSimulator
+from bloodytools.simulations.race_simulator import RaceSimulator
 
 simulator_factory = SimulatorFactory()
 
