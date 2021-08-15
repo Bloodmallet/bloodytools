@@ -75,9 +75,12 @@ def get_fallback_profile_path(tier: str, fight_style: str) -> str:
 def _get_simc_spec_file_name(
     tier: str, wow_spec: WowSpec, covenant: Covenant = None
 ) -> str:
+    name_start = (
+        f"{tier}_{wow_spec.wow_class.simc_name.title()}_{wow_spec.simc_name.title()}"
+    )
     if covenant:
-        return f"{tier}_{wow_spec.wow_class.simc_name.title()}_{wow_spec.simc_name.title()}_{covenant.simc_name.title()}.simc"
-    return f"{tier}_{wow_spec.wow_class.simc_name.title()}_{wow_spec.simc_name.title()}.simc"
+        name_start += f"_{covenant.simc_name.title()}"
+    return f"{name_start}.simc"
 
 
 def _get_tier_file_name_part(tier: str) -> str:
