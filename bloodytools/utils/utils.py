@@ -10,7 +10,7 @@ import typing
 import urllib3
 
 from bloodytools import settings
-from simc_support.game_data.Covenant import COVENANTS
+from simc_support.game_data.Covenant import COVENANTS, Covenant
 from simc_support.game_data.Talent import get_talent_dict
 from simc_support.game_data.WowClass import WowClass
 from simc_support.game_data.WowSpec import WowSpec
@@ -72,6 +72,18 @@ def get_fallback_profile_path(tier: str, fight_style: str) -> str:
     return os.path.join(base_path, "fallback_profiles", fight_style, tmp_tier)
 
 
+def _get_simc_spec_file_name(
+    tier: str, wow_spec: WowSpec, covenant: Covenant = None
+) -> str:
+    if covenant:
+        return f"{tier}_{wow_spec.wow_class.simc_name.title()}_{wow_spec.simc_name.title()}_{covenant.simc_name.title()}.simc"
+    return f"{tier}_{wow_spec.wow_class.simc_name.title()}_{wow_spec.simc_name.title()}.simc"
+
+
+def _get_tier_file_name_part(tier: str) -> str:
+    return "PR" if "PR" in str(tier) else f"T{tier}"
+
+
 def get_fallback_covenant_profile_strings(
     wow_spec: WowSpec, tier: str, fight_style: str
 ) -> typing.List[str]:
@@ -90,10 +102,10 @@ def get_fallback_covenant_profile_strings(
         fight_style = "patchwerk"
 
     base_path = get_fallback_profile_path(tier, fight_style.lower())
-    tmp_tier = "PR" if "PR" in str(tier) else f"T{tier}"
+    tmp_tier = _get_tier_file_name_part(tier)
     paths = []
     for covenant in COVENANTS:
-        file_name = f"{tmp_tier}_{wow_spec.wow_class.simc_name.title()}_{wow_spec.simc_name.title()}_{covenant.simc_name.title()}.simc"
+        file_name = _get_simc_spec_file_name(tmp_tier, wow_spec, covenant)
         cov_path = os.path.join(base_path, file_name)
         if os.path.isfile(cov_path):
             paths += [cov_path]
@@ -102,8 +114,8 @@ def get_fallback_covenant_profile_strings(
 
 def get_fallback_profile_string(wow_spec: WowSpec, tier: str, fight_style: str) -> str:
     base_path = get_fallback_profile_path(tier, fight_style)
-    tmp_tier = "PR" if "PR" in str(tier) else f"T{tier}"
-    name = f"{tmp_tier}_{wow_spec.wow_class.full_name.title()}_{wow_spec.full_name.title()}.simc"
+    tmp_tier = _get_tier_file_name_part(tier)
+    name = _get_simc_spec_file_name(tmp_tier, wow_spec)
     return os.path.join(base_path, name)
 
 
