@@ -43,6 +43,10 @@ class Simulator(abc.ABC):
         data_dict = create_base_json_dict(
             self.name, self.wow_spec, self.fight_style, self.settings
         )
+
+        logger.debug("Starting pre processing")
+        data_dict = self.pre_processing(data_dict)
+
         simulation_group = Simulation_Group(
             name="simulation_group",
             threads=self.settings.threads,
@@ -72,6 +76,18 @@ class Simulator(abc.ABC):
             )
         else:
             simulation_group.simulate()
+
+    def pre_processing(self, data_dict: dict) -> dict:
+        """Adjusts data_dict before simulations are done. Use this update profile information.
+
+        Args:
+            data_dict (dict): all data of the simulation, information will be used by the frontend to power charts
+
+        Returns:
+            dict: updated data_dict after pre_processing is done
+        """
+        logger.debug(f"data_dict {json.dumps(data_dict)}")
+        return data_dict
 
     @abc.abstractmethod
     def add_simulation_data(
