@@ -350,6 +350,8 @@ def create_base_json_dict(
         profile = extract_profile(fallback_profile_location, wow_spec.wow_class)
     except FileNotFoundError:
         profile = None
+    else:
+        covenant_profiles[profile["character"]["covenant"]] = profile
 
     # load base profile for patchwerk or fallback doesn't exist
     if profile is None or "patchwerk" in fight_style.lower():
@@ -360,6 +362,8 @@ def create_base_json_dict(
             profile = extract_profile(profile_location, wow_spec.wow_class)
         except FileNotFoundError:
             profile = None
+        else:
+            covenant_profiles[profile["character"]["covenant"]] = profile
 
     if settings.custom_profile:
         try:
