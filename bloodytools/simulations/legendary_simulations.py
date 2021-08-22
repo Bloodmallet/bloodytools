@@ -82,6 +82,41 @@ def remove_legendary_bonus_ids(
     return profile
 
 
+def _adjust_covenant_profiles_itemlevels(
+    profile: dict, covenant_profiles: dict, settings: Config, fight_style
+) -> dict:
+
+    simulation = Simulation_Data(
+        name="Grab dem average itemlevel",
+        fight_style=fight_style,
+        target_error="0.1",
+        iterations="1",
+        profile=profile,
+        ptr=settings.ptr,
+        default_actions=settings.default_actions,
+        executable=settings.executable,
+    )
+    simulation.simulate()
+
+    logger.debug("Mini simulation is done")
+
+    ilevels = [
+        slot["ilevel"]
+        for slot in simulation.json_data["sim"]["players"][0]["gear"].values()
+        if slot["ilevel"] > 0
+    ]
+    average_itemlevel = sum(ilevels) / len(ilevels)
+    logger.debug(f"Calculated average itemlevel to be: {average_itemlevel}")
+
+    for covenant_profile in covenant_profiles.values():
+        for slot in covenant_profile["items"].values():
+            slot["ilevel"] = str(int(average_itemlevel))
+
+    logger.debug("Adjusted covenant profiles to new average itemlevel")
+
+    return covenant_profiles
+
+
 # spell ids
 UNWANTED_LEGENDARIES = [
     339340,  # Norgannon's Sagacity
@@ -141,6 +176,14 @@ def legendary_simulation(settings: Config) -> None:
                     legendary.full_name
                 ] = legendary.translations.get_dict()
                 wanted_data["spell_ids"][legendary.full_name] = legendary.spell_id
+
+            if settings.custom_profile:
+                wanted_data["covenant_profiles"] = _adjust_covenant_profiles_itemlevels(
+                    wanted_data["profile"],
+                    wanted_data["covenant_profiles"],
+                    settings,
+                    fight_style,
+                )
 
             simulation_group = Simulation_Group(
                 name="legendary_simulations",
