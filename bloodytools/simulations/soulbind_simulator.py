@@ -1,5 +1,8 @@
 from simc_support.game_data.Covenant import Covenant
-from bloodytools.simulations.legendary_simulations import remove_legendary_bonus_ids
+from bloodytools.simulations.legendary_simulations import (
+    remove_legendary_bonus_ids,
+    find_legendary_bonus_id,
+)
 from simc_support.game_data.Covenant import COVENANTS
 from simc_support.game_data.Legendary import get_legendaries_for_spec
 from bloodytools.utils.config import Config
@@ -72,22 +75,63 @@ class SoulbindSimulator(Simulator):
 
         self.conduits: typing.Iterable[Conduit] = get_conduits_for_spec(self.wow_spec)
 
+    def pre_processing(self, data_dict: dict) -> dict:
+        data_dict = super().pre_processing(data_dict)
+        if not _are_all_covenants_present(data_dict["covenant_profiles"]):
+            logger.debug("Purging spec legendaries from base profile")
+            covenant_legendary_ids = [
+                legendary.bonus_id
+                for legendary in get_legendaries_for_spec(self.wow_spec)
+                if len(legendary.covenants) == 1
+            ]
+            data_dict["profile"] = remove_legendary_bonus_ids(
+                data_dict["profile"], covenant_legendary_ids
+            )
+
+        if self.settings.custom_profile:
+            # replace legendaries if custom profile contained a non-covenant one
+            legendaries = [
+                legendary for legendary in get_legendaries_for_spec(self.wow_spec)
+            ]
+            all_legendary_ids = [legendary.bonus_id for legendary in legendaries]
+            non_covenant_legendary_ids = [
+                legendary.bonus_id
+                for legendary in legendaries
+                if len(legendary.covenants) > 1
+            ]
+            legendary_id: int = find_legendary_bonus_id(
+                data_dict["profile"], all_legendary_ids
+            )
+            if legendary_id:
+                is_non_covenant_legendary = legendary_id in non_covenant_legendary_ids
+                if is_non_covenant_legendary:
+                    for covenant_profile in data_dict["covenant_profiles"].values():
+                        remove_legendary_bonus_ids(covenant_profile, all_legendary_ids)
+                        covenant_profile["items"]["head"]["bonus_id"] = "/".join(
+                            [
+                                covenant_profile["items"]["head"]["bonus_id"],
+                                str(legendary_id),
+                            ]
+                        )
+
+        if self.settings.custom_profile:
+            data_dict["covenant_profiles"] = self._adjust_covenant_profiles_itemlevels(
+                data_dict["profile"], data_dict["covenant_profiles"]
+            )
+
+        # remove soulbind information
+        data_dict["profile"]["character"]["soulbind"] = ""
+        for profile in data_dict["covenant_profiles"].values():
+            profile["character"]["soulbind"] = ""
+
+        return data_dict
+
     def add_simulation_data(
         self,
         simulation_group: Simulation_Group,
         profile: dict,
         additional_profiles: typing.Optional[dict],
     ) -> None:
-
-        # cleanse covenant legendary from sole baseprofile
-        if not _are_all_covenants_present(additional_profiles):
-            covenant_legendary_ids = [
-                legendary.bonus_id
-                for legendary in get_legendaries_for_spec(self.wow_spec)
-                if len(legendary.covenants) == 1
-            ]
-            profile = remove_legendary_bonus_ids(profile, covenant_legendary_ids)
-
         # baseline profiles
         covenant_simulations = self._create_covenant_simulations(
             profile, additional_profiles
@@ -546,3 +590,37 @@ class SoulbindSimulator(Simulator):
 
         logger.debug(f"Created {len(simulations)} Simulations.")
         return simulations
+
+    def _adjust_covenant_profiles_itemlevels(
+        self, profile: dict, covenant_profiles: dict
+    ) -> dict:
+
+        simulation = Simulation_Data(
+            name="Grab dem average itemlevel",
+            fight_style=self.fight_style,
+            target_error="0.1",
+            iterations="1",
+            profile=profile,
+            ptr=self.settings.ptr,
+            default_actions=self.settings.default_actions,
+            executable=self.settings.executable,
+        )
+        simulation.simulate()
+
+        logger.debug("Mini simulation is done")
+
+        ilevels = [
+            slot["ilevel"]
+            for slot in simulation.json_data["sim"]["players"][0]["gear"].values()
+            if slot["ilevel"] > 0
+        ]
+        average_itemlevel = sum(ilevels) / len(ilevels)
+        logger.debug(f"Calculated average itemlevel to be: {average_itemlevel}")
+
+        for covenant_profile in covenant_profiles.values():
+            for slot in covenant_profile["items"].values():
+                slot["ilevel"] = str(int(average_itemlevel))
+
+        logger.debug("Adjusted covenant profiles to new average itemlevel")
+
+        return covenant_profiles
