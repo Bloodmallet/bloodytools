@@ -107,12 +107,17 @@ class SoulbindSimulator(Simulator):
                 if is_non_covenant_legendary:
                     for covenant_profile in data_dict["covenant_profiles"].values():
                         remove_legendary_bonus_ids(covenant_profile, all_legendary_ids)
-                        covenant_profile["items"]["head"]["bonus_id"] = "/".join(
-                            [
-                                covenant_profile["items"]["head"]["bonus_id"],
-                                str(legendary_id),
-                            ]
-                        )
+                        if "bonus_id" in covenant_profile["items"]["head"]:
+                            covenant_profile["items"]["head"]["bonus_id"] = "/".join(
+                                [
+                                    covenant_profile["items"]["head"]["bonus_id"],
+                                    str(legendary_id),
+                                ]
+                            )
+                        else:
+                            covenant_profile["items"]["head"]["bonus_id"] = str(
+                                legendary_id
+                            )
 
         if self.settings.custom_profile:
             data_dict["covenant_profiles"] = self._adjust_covenant_profiles_itemlevels(
