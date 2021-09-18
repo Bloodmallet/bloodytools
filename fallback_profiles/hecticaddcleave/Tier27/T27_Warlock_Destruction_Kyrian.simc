@@ -7,7 +7,7 @@ role=spell
 talents=3101021
 position=ranged_back
 covenant=kyrian
-soulbind=kleia,valiat_strikes/pointed_courage/spear_of_the_archon/light_the_path/combusting_engine:11/infernal_brand:11
+soulbind=kleia,valiant_strikes/pointed_courage/spear_of_the_archon/light_the_path/combusting_engine:11/infernal_brand:11
 renown=80
 
 head=veil_of_the_banshee_queen,id=186325,bonus_id=1498/7187/6935,gem_id=173128/187312

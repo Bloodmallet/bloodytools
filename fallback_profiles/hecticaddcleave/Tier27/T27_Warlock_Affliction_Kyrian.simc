@@ -7,7 +7,7 @@ role=spell
 position=ranged_back
 talents=2101023
 covenant=kyrian
-soulbind=kleia,valiat_strikes/pointed_courage/spear_of_the_archon/light_the_path/corrupting_leer:11/rolling_agony:11
+soulbind=kleia,valiant_strikes/pointed_courage/spear_of_the_archon/light_the_path/corrupting_leer:11/rolling_agony:11
 renown=80
 
 head=hood_of_vengeful_possession,id=186287,bonus_id=1498/7187/6935,gem_id=173130/187312
