@@ -7,7 +7,7 @@ role=attack
 position=back
 talents=1103033
 covenant=night_fae
-soulbind=korayn,wild_hunt_tactics/eternal_hunger:9:1/convocation_of_the_dead:9:1/first_strike/wild_hunt_strategem
+soulbind=korayn,wild_hunt_tactics/eternal_hunger:9:1/withering_ground:9:1/first_strike/wild_hunt_strategem
 renown=80
 
 head=valorous_visage_of_krexus,id=186350,bonus_id=7187/1498/6935,gem_id=187312
