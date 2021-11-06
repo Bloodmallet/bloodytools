@@ -7,7 +7,7 @@ role=attack
 position=back
 talents=1101023
 covenant=necrolord
-soulbind=bonesmith_heirmir,forgeborne_reveries/eternal_hunger:9:1/convocation_of_the_dead:9:1/heirmirs_arsenal_marrowed_gemstone/carvers_eye/mnemonic_equipment
+soulbind=bonesmith_heirmir,forgeborne_reveries/eternal_hunger:9:1/brutal_grasp:9:1/heirmirs_arsenal_marrowed_gemstone/carvers_eye/mnemonic_equipment
 renown=80
 
 head=valorous_visage_of_krexus,id=186350,bonus_id=7187/1498/6935,gem_id=187312
