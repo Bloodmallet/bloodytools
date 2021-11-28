@@ -1,6 +1,6 @@
 from simc_support.game_data import WowSpec
 from bloodytools.main import main
-from bloodytools.utils.utils import Args
+from bloodytools.utils.config import Config
 import unittest
 
 DONT_TEST = (
@@ -15,9 +15,11 @@ class TestAll(unittest.TestCase):
         # remove unsupported specs
         self.specs = [spec for spec in self.specs if spec not in DONT_TEST]
 
-        self.args = Args()
-        self.args.target_error = "1.0"
+        self.args = Config()
+        for key in self.args.target_error.keys():
+            self.args.target_error[key] = "1.0"
         self.args.executable = "../SimulationCraft/simc.exe"
+        self.args.ptr = True
 
     def test_conduits(self):
         for spec in self.specs:
