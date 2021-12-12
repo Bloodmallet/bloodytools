@@ -292,6 +292,55 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     return profile if profile["items"] else provided_profile
 
 
+def get_profile(wow_spec: WowSpec, fight_style: str, settings: object) -> dict:
+    """Get the compiled profile based on Fallback profiles, Simulationcraft, and custom input.
+
+    Args:
+        wow_spec (WowSpec): [description]
+        fight_style (str): [description]
+        settings (object): [description]
+
+    Raises:
+        FileNotFoundError: [description]
+
+    Returns:
+        dict: [description]
+    """
+    # loading covenant profiles in the following order:
+    # 1. fallback
+    # 2. simc
+
+    # load fallback profile
+    fallback_profile_location = get_fallback_profile_string(
+        wow_spec, settings.tier, fight_style
+    )
+    try:
+        profile = extract_profile(fallback_profile_location, wow_spec.wow_class)
+    except FileNotFoundError:
+        profile = None
+
+    # load base profile for patchwerk or fallback doesn't exist
+    if profile is None or "patchwerk" in fight_style.lower():
+        profile_location = create_basic_profile_string(
+            wow_spec, settings.tier, settings
+        )
+        try:
+            profile = extract_profile(profile_location, wow_spec.wow_class)
+        except FileNotFoundError:
+            profile = None
+
+    if settings.custom_profile:
+        try:
+            profile = extract_profile("custom_profile.txt", wow_spec.wow_class, profile)
+        except ValueError:
+            pass
+
+    if not profile:
+        raise FileNotFoundError("No profile found or provided.")
+
+    return profile
+
+
 def create_base_json_dict(
     data_type: str, wow_spec: WowSpec, fight_style: str, settings: object
 ):
@@ -342,37 +391,7 @@ def create_base_json_dict(
         else:
             covenant_profiles[cov_profile["character"]["covenant"]] = cov_profile
 
-    # load fallback profile
-    fallback_profile_location = get_fallback_profile_string(
-        wow_spec, settings.tier, fight_style
-    )
-    try:
-        profile = extract_profile(fallback_profile_location, wow_spec.wow_class)
-    except FileNotFoundError:
-        profile = None
-    else:
-        covenant_profiles[profile["character"]["covenant"]] = profile
-
-    # load base profile for patchwerk or fallback doesn't exist
-    if profile is None or "patchwerk" in fight_style.lower():
-        profile_location = create_basic_profile_string(
-            wow_spec, settings.tier, settings
-        )
-        try:
-            profile = extract_profile(profile_location, wow_spec.wow_class)
-        except FileNotFoundError:
-            profile = None
-        else:
-            covenant_profiles[profile["character"]["covenant"]] = profile
-
-    if settings.custom_profile:
-        try:
-            profile = extract_profile("custom_profile.txt", wow_spec.wow_class, profile)
-        except ValueError:
-            pass
-
-    if not profile:
-        raise FileNotFoundError("No profile found or provided.")
+    profile = get_profile(wow_spec=wow_spec, fight_style=fight_style, settings=settings)
 
     # base profile has a higher priority than covenant specific overrides
     covenant_profiles[profile["character"]["covenant"]] = profile
@@ -653,7 +672,7 @@ def arg_parse_config():
         dest="single_sim",
         metavar="STRING",
         type=str,
-        help="Activate a single simulation on the local machine. <simulation_types> are races, secondary_distributions, talents, trinkets, covenants, soul_binds, soul_bind_nodes, conduits, legendaries, and domination_shards. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk",
+        help="Activate a single simulation on the local machine. <simulation_types> are races, secondary_distributions, talents, trinkets, covenants, soul_binds, soul_bind_nodes, conduits, legendaries, domination_shards, and tier_sets. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk",
     )
     parser.add_argument(
         "--custom_profile",
