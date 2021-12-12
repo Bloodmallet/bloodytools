@@ -43,7 +43,7 @@ class Config:
     remove_files = False
     secondary_distributions_step_size: int = 10
     sim_all: bool = False
-    simc_hash: typing.Optional[str] = None
+    simc_hash: typing.Union[bool, str] = False
     single_sim: str = ""
     talent_list: typing.Dict[WowSpec, typing.Iterable[str]] = dataclasses.field(
         default_factory=dict
@@ -56,6 +56,7 @@ class Config:
     write_humanreadable_secondary_distribution_file: bool = False
     fight_styles: typing.List[str] = dataclasses.field(default_factory=list)
     wow_class_spec_list: typing.List[WowSpec] = dataclasses.field(default_factory=list)
+    apikey: str = ""
 
     def __post_init__(self, *args, **kwargs) -> None:
         self.fight_styles.append("patchwerk")

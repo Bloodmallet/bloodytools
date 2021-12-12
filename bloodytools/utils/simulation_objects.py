@@ -6,6 +6,7 @@ import os
 import requests
 import subprocess
 import sys
+import typing
 import threading
 import time
 import uuid
@@ -923,7 +924,7 @@ class Simulation_Group:
 
         return True
 
-    def simulate_with_raidbots(self, apikey) -> bool:
+    def simulate_with_raidbots(self, apikey) -> typing.Union[bool, str]:
         """Triggers the simulation of all profiles using Raidbots.com API.
 
         Raises:
@@ -931,7 +932,7 @@ class Simulation_Group:
             NotSetYetError -- No data available to simulate.
 
         Returns:
-            bool -- True if simulations ended successfully.
+            bool, str -- Returns the git hash as a string if simulations ended successfully, otherwise False.
         """
         simc_hash = False
 
