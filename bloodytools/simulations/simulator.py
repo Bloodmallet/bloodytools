@@ -28,6 +28,7 @@ class Simulator(abc.ABC):
         - add_simulation_data
 
     Extendable:
+        - pre_processing
         - post_processing
     """
 
@@ -55,7 +56,8 @@ class Simulator(abc.ABC):
             remove_files=not self.settings.keep_files,
         )
         self.add_simulation_data(
-            simulation_group, data_dict["profile"], data_dict.get("covenant_profiles")
+            simulation_group,
+            data_dict,
         )
 
         self._simulate(simulation_group)
@@ -78,7 +80,7 @@ class Simulator(abc.ABC):
             simulation_group.simulate()
 
     def pre_processing(self, data_dict: dict) -> dict:
-        """Adjusts data_dict before simulations are done. Use this update profile information.
+        """Adjusts data_dict before simulations are done. Use this to update profile information.
 
         Args:
             data_dict (dict): all data of the simulation, information will be used by the frontend to power charts
@@ -93,8 +95,7 @@ class Simulator(abc.ABC):
     def add_simulation_data(
         self,
         simulation_group: Simulation_Group,
-        profile: dict,
-        additional_profiles: typing.Optional[dict] = None,
+        data_dict: dict,
     ) -> None:
         """Add SimulationData instances to simulation_group
 

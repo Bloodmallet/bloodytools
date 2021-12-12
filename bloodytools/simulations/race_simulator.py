@@ -22,9 +22,9 @@ class RaceSimulator(Simulator):
     def add_simulation_data(
         self,
         simulation_group: Simulation_Group,
-        profile: dict,
-        additional_profiles: typing.Optional[dict],
+        data_dict: dict,
     ) -> None:
+        profile = data_dict["profile"]
 
         for race in self.wow_spec.wow_class.races:
             simulation_data = Simulation_Data(

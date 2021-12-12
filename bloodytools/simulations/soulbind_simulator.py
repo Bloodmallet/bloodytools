@@ -134,9 +134,11 @@ class SoulbindSimulator(Simulator):
     def add_simulation_data(
         self,
         simulation_group: Simulation_Group,
-        profile: dict,
-        additional_profiles: typing.Optional[dict],
+        data_dict: dict,
     ) -> None:
+        profile = data_dict["profile"]
+        additional_profiles = data_dict["covenant_profiles"]
+
         # baseline profiles
         covenant_simulations = self._create_covenant_simulations(
             profile, additional_profiles
@@ -401,7 +403,7 @@ class SoulbindSimulator(Simulator):
 
     def _create_covenant_simulations(
         self, profile: dict, additional_profiles: dict
-    ) -> typing.Iterable[Simulation_Data]:
+    ) -> typing.List[Simulation_Data]:
         simulations: typing.List[Simulation_Data] = []
 
         for covenant in COVENANTS:
@@ -457,7 +459,7 @@ class SoulbindSimulator(Simulator):
 
     def _create_node_simulations(
         self, profile: dict, additional_profiles: dict
-    ) -> typing.Iterable[Simulation_Data]:
+    ) -> typing.List[Simulation_Data]:
         simulations: typing.List[Simulation_Data] = []
 
         for node in self.nodes:
@@ -509,7 +511,7 @@ class SoulbindSimulator(Simulator):
 
     def _create_conduit_simulations(
         self, profile: dict, additional_profiles: dict
-    ) -> typing.Iterable[Simulation_Data]:
+    ) -> typing.List[Simulation_Data]:
         simulations: typing.List[Simulation_Data] = []
 
         # single conduits
