@@ -107,13 +107,16 @@ enable_conduit_simulations = False
 enable_legendary_simulations = False
 
 ###############################################################################
-# Legendary simulations
+# Domination Shard simulations
 enable_domination_shards = False
+
+###############################################################################
+# Tier Set simulations
+enable_tier_sets = False
 
 ###############################################################################
 # Development setting - you usually don't want to touch these
 debug = False
-use_own_threading = False
 use_raidbots = False
 remove_files = False
 try:
