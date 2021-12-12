@@ -55,9 +55,7 @@ class Config:
     use_raidbots: bool = False
     write_humanreadable_secondary_distribution_file: bool = False
     fight_styles: typing.List[str] = dataclasses.field(default_factory=list)
-    wow_class_spec_list: typing.List[typing.Optional[WowSpec]] = dataclasses.field(
-        default_factory=list
-    )
+    wow_class_spec_list: typing.List[WowSpec] = dataclasses.field(default_factory=list)
 
     def __post_init__(self, *args, **kwargs) -> None:
         self.fight_styles.append("patchwerk")
