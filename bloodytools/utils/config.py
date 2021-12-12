@@ -30,6 +30,7 @@ class Config:
     enable_soul_bind_simulations: bool = False
     enable_talent_simulations: bool = False
     enable_trinket_simulations: bool = False
+    enable_tier_set_simulations: bool = False
     executable: str = "../SimulationCraft/simc"
     iterations: str = "20000"
     keep_files: bool = False
@@ -37,12 +38,12 @@ class Config:
     min_ilevel: int = 210
     pretty: bool = False
     profileset_work_threads: str = "2"
-    ptr: bool = False
+    ptr: str = "0"
     raidbots: bool = False
     remove_files = False
     secondary_distributions_step_size: int = 10
     sim_all: bool = False
-    simc_hash: str = None
+    simc_hash: typing.Optional[str] = None
     single_sim: str = ""
     talent_list: typing.Dict[WowSpec, typing.Iterable[str]] = dataclasses.field(
         default_factory=dict
@@ -51,11 +52,10 @@ class Config:
     target_error: typing.Dict[str, str] = dataclasses.field(default_factory=dict)
     threads: str = "8"
     tier: str = "27"
-    use_own_threading: bool = False
     use_raidbots: bool = False
     write_humanreadable_secondary_distribution_file: bool = False
-    fight_styles: typing.Iterable[str] = dataclasses.field(default_factory=list)
-    wow_class_spec_list: typing.Iterable[typing.Optional[WowSpec]] = dataclasses.field(
+    fight_styles: typing.List[str] = dataclasses.field(default_factory=list)
+    wow_class_spec_list: typing.List[typing.Optional[WowSpec]] = dataclasses.field(
         default_factory=list
     )
 
