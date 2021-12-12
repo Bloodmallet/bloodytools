@@ -20,7 +20,6 @@ May 2018
 import datetime
 import logging
 import sys
-import threading
 import time
 
 from simc_support.game_data.WowSpec import WOWSPECS, get_wow_spec
@@ -84,9 +83,9 @@ def _update_settings(args: object, logger: logging.Logger) -> Config:
         config.enable_conduit_simulations = False
         config.enable_covenant_simulations = False
         config.enable_domination_shards = False
+        config.enable_tier_set_simulations = False
 
         # set dev options
-        config.use_own_threading = False
         config.use_raidbots = False
 
         if simulation_type == "races":
@@ -109,6 +108,8 @@ def _update_settings(args: object, logger: logging.Logger) -> Config:
             config.enable_covenant_simulations = True
         elif simulation_type == "domination_shards":
             config.enable_domination_shards = True
+        elif simulation_type == "tier_set":
+            config.enable_tier_set_simulations = True
         else:
             raise ValueError("Unknown simulation type entered.")
 
@@ -175,214 +176,86 @@ def main(args=None):
     if not hasattr(config, "wow_class_spec_list"):
         config.wow_class_spec_list = WOWSPECS
 
-    # list of all active threads. when empty, terminate tool
-    thread_list = []
-
     # trigger race simulations
     if config.enable_race_simulations:
-
         kwargs = {
             "simulation_type": "races",
             "simulator_factory": simulator_factory,
             "settings": config,
         }
-        if not config.use_own_threading:
-            logger.info("Starting Race simulations.")
-
-        if config.use_own_threading:
-            race_thread = threading.Thread(
-                name="Race Thread",
-                target=simulator_wrapper,
-                kwargs=kwargs,
-            )
-            thread_list.append(race_thread)
-            race_thread.start()
-        else:
-            simulator_wrapper(**kwargs)
-
-        if not config.use_own_threading:
-            logger.info("Race simulations finished.")
+        logger.info("Starting Race simulations.")
+        simulator_wrapper(**kwargs)
+        logger.info("Race simulations finished.")
 
     # trigger trinket simulations
     if config.enable_trinket_simulations:
-        if not config.use_own_threading:
-            logger.info("Starting Trinket simulations.")
-
-        if config.use_own_threading:
-            trinket_thread = threading.Thread(
-                name="Trinket Thread", target=trinket_simulation, args=(config,)
-            )
-            thread_list.append(trinket_thread)
-            trinket_thread.start()
-        else:
-            trinket_simulation(config)
-
-        if not config.use_own_threading:
-            logger.info("Trinket simulations finished.")
+        logger.info("Starting Trinket simulations.")
+        trinket_simulation(config)
+        logger.info("Trinket simulations finished.")
 
     # trigger soul bind (nodes) simulations
     if config.enable_soul_bind_node_simulations:
-        if not config.use_own_threading:
-            logger.info("Starting Soul Bind Node simulations.")
-
-        if config.use_own_threading:
-            soul_bind_node_thread = threading.Thread(
-                name="Soul Bind Node Thread",
-                target=soul_bind_node_simulation,
-                args=(config,),
-            )
-            thread_list.append(soul_bind_node_thread)
-            soul_bind_node_thread.start()
-        else:
-            soul_bind_node_simulation(config)
-
-        if not config.use_own_threading:
-            logger.info("Soul Bind Node simulations finished.")
+        logger.info("Starting Soul Bind Node simulations.")
+        soul_bind_node_simulation(config)
+        logger.info("Soul Bind Node simulations finished.")
 
     # trigger soul bind (nodes+conduits) simulations
     if config.enable_soul_bind_simulations:
-
         kwargs = {
             "simulation_type": "soulbinds",
             "simulator_factory": simulator_factory,
             "settings": config,
         }
-        if not config.use_own_threading:
-            logger.info("Starting Soul Bind simulations.")
-
-        if config.use_own_threading:
-            soul_bind_thread = threading.Thread(
-                name="Soul Bind Thread",
-                target=simulator_wrapper,
-                kwargs=kwargs,
-            )
-            thread_list.append(soul_bind_thread)
-            soul_bind_thread.start()
-        else:
-            simulator_wrapper(**kwargs)
-
-        if not config.use_own_threading:
-            logger.info("Soul Bind simulations finished.")
+        logger.info("Starting Soul Bind simulations.")
+        simulator_wrapper(**kwargs)
+        logger.info("Soul Bind simulations finished.")
 
     # trigger conduit simulations
     if config.enable_conduit_simulations:
-        if not config.use_own_threading:
-            logger.info("Starting Conduit simulations.")
-
-        if config.use_own_threading:
-            conduit_thread = threading.Thread(
-                name="Conduit Thread", target=conduit_simulation, args=(config,)
-            )
-            thread_list.append(conduit_thread)
-            conduit_thread.start()
-        else:
-            conduit_simulation(config)
-
-        if not config.use_own_threading:
-            logger.info("Conduit simulations finished.")
+        logger.info("Starting Conduit simulations.")
+        conduit_simulation(config)
+        logger.info("Conduit simulations finished.")
 
     # trigger legendary simulations
     if config.enable_legendary_simulations:
-        if not config.use_own_threading:
-            logger.info("Starting Legendary simulations.")
-
-        if config.use_own_threading:
-            legendary_thread = threading.Thread(
-                name="Legendary Thread", target=legendary_simulation, args=(config,)
-            )
-            thread_list.append(legendary_thread)
-            legendary_thread.start()
-        else:
-            legendary_simulation(config)
-
-        if not config.use_own_threading:
-            logger.info("Legendary simulations finished.")
+        logger.info("Starting Legendary simulations.")
+        legendary_simulation(config)
+        logger.info("Legendary simulations finished.")
 
     # trigger secondary distributions
     if config.enable_secondary_distributions_simulations:
-
-        if not config.use_own_threading:
-            logger.info("Starting Secondary Distribtion simulations.")
-
-        if config.use_own_threading:
-            secondary_distribution_thread = threading.Thread(
-                name="Secondary Distribution Thread",
-                target=secondary_distribution_simulation,
-                args=(config,),
-            )
-            thread_list.append(secondary_distribution_thread)
-            secondary_distribution_thread.start()
-        else:
-            secondary_distribution_simulation(config)
-
-        if not config.use_own_threading:
-            logger.info("Secondary Distribution simulations finished.")
+        logger.info("Starting Secondary Distribtion simulations.")
+        secondary_distribution_simulation(config)
+        logger.info("Secondary Distribution simulations finished.")
 
     # trigger talent simulations
     if config.enable_talent_simulations:
-        if not config.use_own_threading:
-            logger.info("Talent simulations start.")
-
-        if config.use_own_threading:
-            talent_thread = threading.Thread(
-                name="Talent Thread",
-                target=talent_simulation,
-                args=(config,),
-            )
-            thread_list.append(talent_thread)
-            talent_thread.start()
-        else:
-            talent_simulation(config)
-
-        if not config.use_own_threading:
-            logger.info("Talent simulations end.")
+        logger.info("Talent simulations start.")
+        talent_simulation(config)
+        logger.info("Talent simulations end.")
 
     # trigger covenant simulations
     if config.enable_covenant_simulations:
-        if not config.use_own_threading:
-            logger.info("Covenant simulations start.")
-
-        if config.use_own_threading:
-            covenant_thread = threading.Thread(
-                name="Covenant Thread",
-                target=covenant_simulation,
-                args=(config,),
-            )
-            thread_list.append(covenant_thread)
-            covenant_thread.start()
-        else:
-            covenant_simulation(config)
-
-        if not config.use_own_threading:
-            logger.info("Covenant simulations end.")
+        logger.info("Covenant simulations start.")
+        covenant_simulation(config)
+        logger.info("Covenant simulations end.")
 
     # trigger domination shard simulations
     if config.enable_domination_shards:
-        if not config.use_own_threading:
-            logger.info("Domination Shard simulations start.")
+        logger.info("Domination Shard simulations start.")
+        domination_shard_simulation(config)
+        logger.info("Domination Shard simulations end.")
 
-        if config.use_own_threading:
-            domiation_shard_thread = threading.Thread(
-                name="Domination Shard Thread",
-                target=domination_shard_simulation,
-                args=(config,),
-            )
-            thread_list.append(domiation_shard_thread)
-            domiation_shard_thread.start()
-        else:
-            domination_shard_simulation(config)
-
-        if not config.use_own_threading:
-            logger.info("Domination Shard simulations end.")
-
-    while thread_list:
-        time.sleep(1)
-        for thread in thread_list:
-            if thread.is_alive():
-                logger.debug("{} is still in progress.".format(thread.getName()))
-            else:
-                logger.info("{} finished.".format(thread.getName()))
-                thread_list.remove(thread)
+    # trigger tier set simulations
+    if config.enable_tier_set_simulations:
+        kwargs = {
+            "simulation_type": "tier_set",
+            "simulator_factory": simulator_factory,
+            "settings": config,
+        }
+        logger.info("Starting Tier Set simulations.")
+        simulator_wrapper(**kwargs)
+        logger.info("Tier Set simulations finished.")
 
     logger.info(
         "Bloodytools took {} to finish.".format(
