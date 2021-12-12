@@ -172,7 +172,7 @@ class Simulation_Data:
             self.ready_trigger = "1"
         # specific data to be run, like talent combinations, specific gear or
         #   traits
-        if type(simc_arguments) == list or simc_arguments == []:
+        if isinstance(simc_arguments, list):
             self.simc_arguments = simc_arguments
         else:
             self.simc_arguments = [simc_arguments]
@@ -780,11 +780,22 @@ class Simulation_Group:
                                 )
 
                             else:
-                                for special_argument in profile.simc_arguments:
+                                from simc_support.game_data.WowClass import WOWCLASSES
+
+                                simc_wow_class_names = [
+                                    wow_class.simc_name.replace("_", "")
+                                    for wow_class in WOWCLASSES
+                                ]
+                                filtered_arguments = [
+                                    arg
+                                    for arg in profile.simc_arguments
+                                    if arg.split("=")[0] not in simc_wow_class_names
+                                ]
+                                for argument in filtered_arguments:
                                     f.write(
                                         'profileset."{profile_name}"+={argument}\n'.format(
                                             profile_name=profile.name,
-                                            argument=special_argument,
+                                            argument=argument,
                                         )
                                     )
 
