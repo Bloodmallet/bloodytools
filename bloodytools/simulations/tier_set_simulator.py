@@ -1,22 +1,12 @@
-import typing
-from simc_support.game_data.WowSpec import WowSpec
-from simc_support.game_data.WowSpec import WOWSPECS
-from bloodytools.utils.config import Config
-
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from .simulator import Simulator
-from bloodytools.utils.utils import get_profile
 
 
 class TierSetSimulator(Simulator):
-    def __init__(self, wow_spec: WowSpec, fight_style: str, settings: Config) -> None:
-        super().__init__(
-            name="Tier Set",
-            snake_case_name="tier_set",
-            wow_spec=wow_spec,
-            fight_style=fight_style,
-            settings=settings,
-        )
+    @classmethod
+    @property
+    def name(cls) -> str:
+        return "Tier Set"
 
     def add_simulation_data(
         self, simulation_group: Simulation_Group, data_dict: dict

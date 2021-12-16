@@ -32,11 +32,30 @@ class Simulator(abc.ABC):
         - post_processing
     """
 
-    name: str
-    snake_case_name: str
     wow_spec: WowSpec
     fight_style: str
     settings: Config
+
+    @classmethod
+    @property
+    @abc.abstractmethod
+    def name(cls) -> str:
+        """Upper case human readable name.
+
+        Returns:
+            str: name of the simulation done by this simulator
+        """
+        ...
+
+    @classmethod
+    @property
+    def snake_case_name(cls) -> str:
+        """CLI terminonology
+
+        Returns:
+            str: cli name of the simulation done by this simulator
+        """
+        return str(cls.name).lower().replace(" ", "_")
 
     def run(self) -> None:
         """Manages the simulation flow. You can adjust by overwriting the provided methods."""
@@ -210,19 +229,34 @@ class Simulator(abc.ABC):
 
 
 class SimulatorFactory:
+    """Factory to make Simulators available by snake_case_names."""
+
     def __init__(self) -> None:
         self._simulators: typing.Dict[str, typing.Type[Simulator]] = {}
 
-    def register_simulator(self, simulation_type: str, klass: typing.Type[Simulator]):
-        self._simulators[simulation_type] = klass
+    def register_simulator(self, klass: typing.Type[Simulator]):
+        """Register an implemented Simulator.
+
+        Args:
+            klass (typing.Type[Simulator]): [description]
+        """
+        self._simulators[klass.snake_case_name] = klass
 
     def get_simulator(
         self,
-        simulation_type: str,
+        simulator_name: str,
     ) -> typing.Type[Simulator]:
-        """Get an appropriate Simulator class for the provided simulation_type."""
+        """Get an appropriate Simulator class for the provided simulator_name (snake_case_name)."""
 
-        return self._simulators[simulation_type]
+        return self._simulators[simulator_name]
+
+    def list_simulators(self) -> typing.List[typing.Type[Simulator]]:
+        """List available Simulators.
+
+        Returns:
+            typing.List[typing.Type[Simulator]]: [description]
+        """
+        return list(self._simulators.values())
 
 
 def simulator_wrapper(

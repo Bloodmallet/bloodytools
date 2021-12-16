@@ -1,25 +1,23 @@
-from simc_support.game_data.Covenant import Covenant
-from bloodytools.simulations.legendary_simulations import (
-    remove_legendary_bonus_ids,
-    find_legendary_bonus_id,
-)
-from simc_support.game_data.Covenant import COVENANTS
-from simc_support.game_data.Legendary import get_legendaries_for_spec
-from bloodytools.utils.config import Config
-from simc_support.game_data.WowSpec import WowSpec
-from bloodytools.simulations.simulator import Simulator
-import typing
-from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
+import dataclasses
+import itertools
 import logging
+import typing
+
+from bloodytools.simulations.legendary_simulations import (
+    find_legendary_bonus_id,
+    remove_legendary_bonus_ids,
+)
+from bloodytools.simulations.simulator import Simulator
+from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
+from simc_support.game_data.Conduit import Conduit, get_conduits_for_spec
+from simc_support.game_data.Covenant import COVENANTS, Covenant
+from simc_support.game_data.Legendary import get_legendaries_for_spec
 from simc_support.game_data.SoulBind import (
     SOULBINDS,
     SoulBind,
     SoulBindTalent,
     get_soul_bind,
 )
-from simc_support.game_data.Covenant import COVENANTS
-from simc_support.game_data.Conduit import get_conduits_for_spec, Conduit
-import itertools
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +49,7 @@ def _is_dps_node(talent: SoulBindTalent) -> bool:
     )
 
 
+@dataclasses.dataclass
 class SoulbindSimulator(Simulator):
     """Simulator deals with all Nodes and Conduits of all Soulbinds
     individually. If a Node requires another active Node that additional Node
@@ -58,14 +57,9 @@ class SoulbindSimulator(Simulator):
     done.
     """
 
-    def __init__(self, wow_spec: WowSpec, fight_style: str, settings: Config) -> None:
-        super().__init__(
-            name="Soulbinds",
-            snake_case_name="soul_binds",
-            wow_spec=wow_spec,
-            fight_style=fight_style,
-            settings=settings,
-        )
+    def __post_init__(
+        self,
+    ) -> None:
 
         self.nodes: typing.Iterable[SoulBindTalent] = []
         for soul_bind in SOULBINDS:
@@ -74,6 +68,11 @@ class SoulbindSimulator(Simulator):
                     self.nodes.append(talent)
 
         self.conduits: typing.Iterable[Conduit] = get_conduits_for_spec(self.wow_spec)
+
+    @classmethod
+    @property
+    def name(cls) -> str:
+        return "Soulbinds"
 
     def pre_processing(self, data_dict: dict) -> dict:
         data_dict = super().pre_processing(data_dict)

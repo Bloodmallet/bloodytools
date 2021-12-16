@@ -5,6 +5,6 @@ from bloodytools.simulations.tier_set_simulator import TierSetSimulator
 
 simulator_factory = SimulatorFactory()
 
-simulator_factory.register_simulator("races", RaceSimulator)
-simulator_factory.register_simulator("soulbinds", SoulbindSimulator)
-simulator_factory.register_simulator("tier_set", TierSetSimulator)
+simulator_factory.register_simulator(RaceSimulator)
+simulator_factory.register_simulator(SoulbindSimulator)
+simulator_factory.register_simulator(TierSetSimulator)
