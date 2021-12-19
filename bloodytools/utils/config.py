@@ -4,7 +4,7 @@ import sys
 import typing
 
 from bloodytools.utils.data_type import DataType
-from simc_support.game_data.WowSpec import WowSpec
+from simc_support.game_data.WowSpec import WowSpec, get_wow_spec
 
 from bloodytools.utils.simc import get_simc_hash
 
@@ -74,6 +74,10 @@ class Config:
         new_hash = get_simc_hash(self.executable)
         if new_hash:
             self.simc_hash = new_hash
+
+    @property
+    def wow_specs(self) -> typing.List[WowSpec]:
+        return [get_wow_spec(*name_tuple) for name_tuple in self.wow_class_spec_names]
 
     @classmethod
     def create_config_from_args(cls, args: object) -> "Config":
