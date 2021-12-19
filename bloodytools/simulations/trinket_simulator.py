@@ -1,18 +1,15 @@
-import json
 import logging
-import os
-from bloodytools.utils.config import Config
+import typing
 
+from bloodytools.simulations.simulator import Simulator
+from bloodytools.utils.config import Config
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
-from bloodytools.utils.utils import create_base_json_dict, create_basic_profile_string
 from simc_support.game_data.Trinket import (
     Trinket,
     get_trinkets_for_spec,
     get_versatility_trinket,
 )
-from typing import List, Tuple
 from simc_support.game_data.WowSpec import WowSpec
-from bloodytools.simulations.simulator import Simulator
 
 logger = logging.getLogger(__name__)
 
@@ -35,25 +32,11 @@ SPECIAL_CASE_BONUS_IDS = {
 }
 
 
-def _get_translation(trinkets: List[Trinket], name: str) -> dict:
-    for trinket in trinkets:
-        if trinket.translations.US == name:
-            return trinket.translations.get_dict()
-    return {}
-
-
-def _get_trinket(trinkets: List[Trinket], name: str) -> Trinket:
-    for trinket in trinkets:
-        if trinket.translations.US == name:
-            return trinket
-    raise ValueError(f"No trinket found with name '{name}'.")
-
-
 def _is_valid_itemlevel(itemlevel: int, settings: Config) -> bool:
     return itemlevel >= settings.min_ilevel and itemlevel <= settings.max_ilevel
 
 
-def _get_trinkets(wow_spec: WowSpec, settings: Config) -> List[Trinket]:
+def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     # get main-trinkets
     trinket_list = get_trinkets_for_spec(wow_spec)
     # filter trinket list by available itemlevels:
