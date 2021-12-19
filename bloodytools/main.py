@@ -40,8 +40,7 @@ def main(args=None):
 
     bloodytools_start_time = datetime.datetime.utcnow()
 
-    for wow_class_spec_name in config.wow_class_spec_names:
-        wow_spec = get_wow_spec(*wow_class_spec_name)
+    for wow_spec in config.wow_specs:
         for simulator_name in config.simulator_type_names:
             simulator = simulator_factory.get_simulator(simulator_name)
             for fight_style in config.fight_styles:
