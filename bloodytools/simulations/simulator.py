@@ -248,7 +248,15 @@ class SimulatorFactory:
     ) -> typing.Type[Simulator]:
         """Get an appropriate Simulator class for the provided simulator_name (snake_case_name)."""
 
-        return self._simulators[simulator_name]
+        try:
+            simulator = self._simulators[simulator_name]
+        except KeyError:
+            names = [s.snake_case_name for s in self.list_simulators()]
+            raise KeyError(
+                f"No Simulator found matching '{simulator_name}'. Available options: {names}"
+            )
+
+        return simulator
 
     def list_simulators(self) -> typing.List[typing.Type[Simulator]]:
         """List available Simulators.
