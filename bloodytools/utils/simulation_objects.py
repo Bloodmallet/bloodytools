@@ -232,11 +232,11 @@ class Simulation_Data:
         # flag to know whether data was generated with external simulation function
         self.external_simulation = False
         # simulation full report (command line print out)
-        self.full_report: str = None
+        self.full_report: str = ""
         # simulation end time
-        self.so_simulation_end_time: datetime.datetime = None
+        self.so_simulation_end_time: typing.Optional[datetime.datetime] = None
         # simulation start time
-        self.so_simulation_start_time: datetime.datetime = None
+        self.so_simulation_start_time: typing.Optional[datetime.datetime] = None
 
     def is_equal(self, simulation_instance: "Simulation_Data") -> bool:
         """Determines if the current and given simulation_data share the
@@ -252,41 +252,35 @@ class Simulation_Data:
             bool -- True if equallity between mentioned data is guaranteed.
         """
 
-        try:
-            if (
-                self.calculate_scale_factors
-                != simulation_instance.calculate_scale_factors
-            ):
-                return False
-            if self.default_actions != simulation_instance.default_actions:
-                return False
-            if self.default_skill != simulation_instance.default_skill:
-                return False
-            if self.executable != simulation_instance.executable:
-                return False
-            if self.fight_style != simulation_instance.fight_style:
-                return False
-            if self.fixed_time != simulation_instance.fixed_time:
-                return False
-            if self.html != simulation_instance.html:
-                return False
-            if self.iterations != simulation_instance.iterations:
-                return False
-            if self.log != simulation_instance.log:
-                return False
-            if self.optimize_expressions != simulation_instance.optimize_expressions:
-                return False
-            if self.ptr != simulation_instance.ptr:
-                return False
-            if self.ready_trigger != simulation_instance.ready_trigger:
-                return False
-            if self.target_error != simulation_instance.target_error:
-                return False
-            if self.threads != simulation_instance.threads:
-                return False
-            return True
-        except Exception:
+        if self.calculate_scale_factors != simulation_instance.calculate_scale_factors:
             return False
+        if self.default_actions != simulation_instance.default_actions:
+            return False
+        if self.default_skill != simulation_instance.default_skill:
+            return False
+        if self.executable != simulation_instance.executable:
+            return False
+        if self.fight_style != simulation_instance.fight_style:
+            return False
+        if self.fixed_time != simulation_instance.fixed_time:
+            return False
+        if self.html != simulation_instance.html:
+            return False
+        if self.iterations != simulation_instance.iterations:
+            return False
+        if self.log != simulation_instance.log:
+            return False
+        if self.optimize_expressions != simulation_instance.optimize_expressions:
+            return False
+        if self.ptr != simulation_instance.ptr:
+            return False
+        if self.ready_trigger != simulation_instance.ready_trigger:
+            return False
+        if self.target_error != simulation_instance.target_error:
+            return False
+        if self.threads != simulation_instance.threads:
+            return False
+        return True
 
     def get_dps(self) -> int:
         """Get the dps of the simulation_instance.
@@ -332,25 +326,6 @@ class Simulation_Data:
         except Exception as e:
             raise e
         logger.debug("Set DPS of profile '{}' to {}.".format(self.name, self.get_dps()))
-
-    def get_avg(self, simulation_instance: "Simulation_Data") -> int:
-        """Get the average between to the parent and given simulation_instance.
-
-        Arguments:
-            simulation_instance {simulation_data} -- A finished simulation_data instance.
-
-        Returns:
-            int -- Average of parent and simulation_instance.
-        """
-        if (
-            self.get_dps()
-            and self.get_dps() != -1
-            and simulation_instance.get_dps()
-            and simulation_instance.get_dps() != -1
-        ):
-            return int((self.get_dps() + simulation_instance.get_dps()) / 2)
-        else:
-            return None
 
     def get_simulation_duration(self) -> datetime.timedelta:
         """Return the simulation duration.
@@ -442,7 +417,7 @@ class Simulation_Data:
         argument.append("ready_trigger=" + self.ready_trigger)
 
         fail_counter = 0
-        simulation_output: subprocess.CompletedProcess = None
+        simulation_output: subprocess.CompletedProcess
         # should prevent additional empty windows popping up...on win32 systems without breaking different OS
         if sys.platform == "win32":
             # call simulationcraft in the background. Save output for processing
@@ -451,16 +426,13 @@ class Simulation_Data:
 
             while not hasattr(self, "success") and fail_counter < 5:
 
-                try:
-                    simulation_output = subprocess.run(
-                        argument,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT,
-                        universal_newlines=True,
-                        startupinfo=startupinfo,
-                    )
-                except FileNotFoundError as e:
-                    raise e
+                simulation_output = subprocess.run(
+                    argument,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True,
+                    startupinfo=startupinfo,
+                )
 
                 if simulation_output.returncode != 0:
                     fail_counter += 1
@@ -471,15 +443,12 @@ class Simulation_Data:
 
             while not hasattr(self, "success") and fail_counter < 5:
 
-                try:
-                    simulation_output = subprocess.run(
-                        argument,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT,
-                        universal_newlines=True,
-                    )
-                except FileNotFoundError as e:
-                    raise e
+                simulation_output = subprocess.run(
+                    argument,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True,
+                )
 
                 if simulation_output.returncode != 0:
                     fail_counter += 1
@@ -572,15 +541,15 @@ class Simulation_Group:
 
         self.name = name
         self.filename: str = ""
-        self.json_filename: str = None
+        self.json_filename: str = ""
         self.threads = threads
         self.remove_files = remove_files
         # simulationcrafts own multithreading
         self.profileset_work_threads = profileset_work_threads
         self.executable = executable
         self.profiles: List[Simulation_Data]
-        self.sg_simulation_start_time: datetime.datetime = None
-        self.sg_simulation_end_time: datetime.datetime = None
+        self.sg_simulation_start_time: typing.Optional[datetime.datetime] = None
+        self.sg_simulation_end_time: typing.Optional[datetime.datetime] = None
 
         # check input types
         if not simulation_instance:
@@ -804,7 +773,7 @@ class Simulation_Group:
                         logger.debug(f.read())
                     # counter of failed simulation attempts
                     fail_counter = 0
-                    simulation_output: subprocess.CompletedProcess = None
+                    simulation_output: subprocess.Popen
                     # should prevent additional empty windows popping up...on win32 systems without breaking different OS
                     if sys.platform == "win32":
                         # call simulationcraft in the background. Save output for processing
@@ -814,7 +783,6 @@ class Simulation_Group:
                         while not hasattr(self, "success") and fail_counter < 5:
 
                             try:
-                                # do stuff here
                                 simulation_output = subprocess.Popen(
                                     [self.executable, self.filename],
                                     stdout=subprocess.PIPE,
@@ -889,7 +857,7 @@ class Simulation_Group:
                     elif self.remove_files:
                         # remove profilesets file
                         os.remove(self.filename)
-                        self.filename = None
+                        self.filename = ""
 
                     logger.debug(self.simulation_output)
 
@@ -913,11 +881,12 @@ class Simulation_Group:
 
             self.set_simulation_end_time()
 
-            logger.debug(
-                "Simulation time: {}.".format(
-                    self.sg_simulation_end_time - self.sg_simulation_start_time
+            if self.sg_simulation_end_time and self.sg_simulation_start_time:
+                logger.debug(
+                    "Simulation time: {}.".format(
+                        self.sg_simulation_end_time - self.sg_simulation_start_time
+                    )
                 )
-            )
 
         else:
             return False
@@ -1178,7 +1147,7 @@ class Simulation_Group:
 
                     # remove profilesets file
                     os.remove(self.filename)
-                    self.filename = None
+                    self.filename = ""
 
                     try:
                         simc_hash = raidbots_data["git_revision"]
@@ -1196,11 +1165,12 @@ class Simulation_Group:
 
             self.set_simulation_end_time()
 
-            logger.debug(
-                "Simulation time: {}.".format(
-                    self.sg_simulation_end_time - self.sg_simulation_start_time
+            if self.sg_simulation_end_time and self.sg_simulation_start_time:
+                logger.debug(
+                    "Simulation time: {}.".format(
+                        self.sg_simulation_end_time - self.sg_simulation_start_time
+                    )
                 )
-            )
 
         else:
             return ""

@@ -258,14 +258,6 @@ class TestSimulationDataMethods(unittest.TestCase):
             self.sd.set_dps("Bonjour", external=False)
         self.assertEqual(self.sd.get_dps(), -1)
 
-    def test_get_avg(self):
-        sd = simulation_objects.Simulation_Data()
-        sd.set_dps(100)
-        self.sd.set_dps(50)
-        self.assertEqual(sd.get_avg(self.sd), 75)
-        sd_empty = simulation_objects.Simulation_Data()
-        self.assertEqual(self.sd.get_avg(sd_empty), None)
-
     def test_get_simulation_duration(self):
         with self.assertRaises(simulation_objects.NotStartedYetError):
             self.assertEqual(self.sd.get_simulation_duration(), None)

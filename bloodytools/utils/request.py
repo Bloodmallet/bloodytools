@@ -9,7 +9,7 @@ def request(
     url: str,
     *,
     apikey: str = "",
-    data: dict = None,
+    data: str = "",
     retries=6,
     session=None,
     timeout=30,
@@ -20,7 +20,7 @@ def request(
     Args:
         url (str): [description]
         apikey (str, optional): apikey to talk with url. Defaults to ''.
-        data (dict, optional): [description]. Defaults to None.
+        data (str, optional): [description]. Defaults to None.
         retries (int, optional): [description]. Defaults to 6 tries.
         session ([type], optional): [description]. Defaults to None.
         timeout (int, optional): [description]. Defaults to 7 seconds.
