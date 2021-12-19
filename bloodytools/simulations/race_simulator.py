@@ -65,35 +65,37 @@ class RaceSimulator(Simulator):
             simulation_group.add(simulation_data)
 
     def post_processing(self, data_dict: dict) -> dict:
-        data = super().post_processing(data_dict)
+        data_dict = super().post_processing(data_dict)
 
         # add translations
         for race in self.wow_spec.wow_class.races:
-            data["translations"][race.full_name] = race.translations.get_dict()
+            data_dict["translations"][race.full_name] = race.translations.get_dict()
 
             if "Zandalari" in race.full_name:
 
-                loas = filter(lambda name: race.full_name in name, data["data"].keys())
+                loas = filter(
+                    lambda name: race.full_name in name, data_dict["data"].keys()
+                )
 
                 for full_name in loas:
                     loa = full_name.split(" ")[-1]
-                    data["translations"][full_name] = race.translations.get_dict()
-                    for lang in data["translations"][full_name]:
-                        data["translations"][full_name][lang] = " ".join(
+                    data_dict["translations"][full_name] = race.translations.get_dict()
+                    for lang in data_dict["translations"][full_name]:
+                        data_dict["translations"][full_name][lang] = " ".join(
                             [
-                                data["translations"][full_name][lang],
+                                data_dict["translations"][full_name][lang],
                                 loa,
                             ]
                         )
 
         # create sorted list
-        tmp_list = [(race, data["data"][race]) for race in data["data"]]
+        tmp_list = [(race, data_dict["data"][race]) for race in data_dict["data"]]
         logger.debug("tmp_list: {}".format(tmp_list))
 
         tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
         logger.debug("Sorted tmp_list: {}".format(tmp_list))
         logger.info("Race {} won with {} dps.".format(tmp_list[0][0], tmp_list[0][1]))
 
-        data["sorted_data_keys"] = [race for race, _ in tmp_list]
+        data_dict["sorted_data_keys"] = [race for race, _ in tmp_list]
 
-        return data
+        return data_dict
