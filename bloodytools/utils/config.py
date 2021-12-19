@@ -6,7 +6,7 @@ import typing
 from bloodytools.utils.data_type import DataType
 from simc_support.game_data.WowSpec import WowSpec
 
-from bloodytools.utils.utils import get_simc_hash
+from bloodytools.utils.simc import get_simc_hash
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ class Config:
     raidbots: bool = False
     remove_files: bool = False
     secondary_distributions_step_size: int = 10
-    simc_hash: typing.Union[bool, str] = False
+    simc_hash: str = ""
     single_sim: str = ""
     # Affects secondary distribution simulations
     # if no list is provided for a class-spec, all dps talent combinations will be run. If you want to only sim the base profiles, set 'talent_permutations' to False

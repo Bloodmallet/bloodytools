@@ -924,7 +924,7 @@ class Simulation_Group:
 
         return True
 
-    def simulate_with_raidbots(self, apikey) -> typing.Union[bool, str]:
+    def simulate_with_raidbots(self, apikey) -> str:
         """Triggers the simulation of all profiles using Raidbots.com API.
 
         Raises:
@@ -934,7 +934,7 @@ class Simulation_Group:
         Returns:
             bool, str -- Returns the git hash as a string if simulations ended successfully, otherwise False.
         """
-        simc_hash = False
+        simc_hash = ""
 
         if not hasattr(self, "session"):
             self.session = requests.Session()
@@ -1184,7 +1184,7 @@ class Simulation_Group:
                         simc_hash = raidbots_data["git_revision"]
                     except Exception:
                         logger.error("'git_revision' not found in raidbots answer.")
-                        simc_hash = False
+                        simc_hash = ""
 
                     # set basic profile dps
                     self.set_json_data(raidbots_data)
@@ -1203,7 +1203,7 @@ class Simulation_Group:
             )
 
         else:
-            return False
+            return ""
 
         return simc_hash
 

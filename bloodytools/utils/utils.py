@@ -5,6 +5,7 @@ import re
 import subprocess
 import typing
 
+from bloodytools.utils.config import Config
 from simc_support.game_data.Covenant import COVENANTS, Covenant
 from simc_support.game_data.Talent import get_talent_dict
 from simc_support.game_data.WowClass import WowClass
@@ -12,16 +13,14 @@ from simc_support.game_data.WowSpec import WowSpec
 
 logger = logging.getLogger(__name__)
 
-SIMC_BRANCH = "shadowlands"
 
-
-def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: object) -> str:
+def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: Config) -> str:
     """Create basic profile string to get the standard profile of a spec. Use this function to get the necessary string for your first argument of a simulation_data object.
 
     Arguments:
       wow_spec {WowSpec} -- wow spec, e.g. elemental shaman
       tier {str} -- profile tier, e.g. 21 or PR
-      settings {object}
+      settings {Config}
 
     Returns:
       str -- relative link to the standard simc profile
@@ -118,14 +117,14 @@ def get_fallback_profile_string(wow_spec: WowSpec, tier: str, fight_style: str) 
 
 
 def get_simc_covenant_profile_strings(
-    wow_spec: WowSpec, tier: str, settings: object
+    wow_spec: WowSpec, tier: str, settings: Config
 ) -> typing.List[str]:
     """Get paths to existing covenant profiles.
 
     Args:
         wow_spec (WowSpec): [description]
         tier (str): [description]
-        settings (object): [description]
+        settings (Config): [description]
 
     Returns:
         Iterable[Str]: profile strings of covenant profiles
@@ -166,6 +165,9 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
 
     if os.stat(path).st_size == 0:
         raise ValueError("Empty file")
+
+    if profile is None:
+        profile = {}
 
     provided_profile = profile
 
@@ -287,13 +289,13 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     return profile if profile["items"] else provided_profile
 
 
-def get_profile(wow_spec: WowSpec, fight_style: str, settings: object) -> dict:
+def get_profile(wow_spec: WowSpec, fight_style: str, settings: Config) -> dict:
     """Get the compiled profile based on Fallback profiles, Simulationcraft, and custom input.
 
     Args:
         wow_spec (WowSpec): [description]
         fight_style (str): [description]
-        settings (object): [description]
+        settings (Config): [description]
 
     Raises:
         FileNotFoundError: [description]
@@ -337,15 +339,15 @@ def get_profile(wow_spec: WowSpec, fight_style: str, settings: object) -> dict:
 
 
 def create_base_json_dict(
-    data_type: str, wow_spec: WowSpec, fight_style: str, settings: object
+    data_type: str, wow_spec: WowSpec, fight_style: str, settings: Config
 ):
     """Creates as basic json dictionary. You'll need to add your data into 'data'. Can be extended.
 
     Arguments:
       data_type {str} -- e.g. Races, Trinkets, Azerite Traits (str is used in the title)
-      wow_class {str} -- [description]
-      wow_spec {str} -- [description]
+      wow_spec {WowSpec} -- [description]
       fight_style {str} -- [description]
+      settings {Config} -- [description]
 
     Returns:
       dict -- [description]
@@ -475,31 +477,6 @@ def tokenize_str(string: str) -> str:
         )
 
     return string
-
-
-def get_simc_hash(path: str) -> str:
-    """Get the FETCH_HEAD or shallow simc git hash.
-
-    Returns:
-      str -- [description]
-    """
-    if path.endswith(".exe"):
-        new_path = path.split("simc.exe")[0]
-    else:
-        new_path = path[:-4]  # cut "simc" from unix path
-        if "engine" in new_path[-7:]:
-            new_path = new_path[:-7]
-
-    # add path to file to variable
-    new_path += f".git/refs/heads/{SIMC_BRANCH}"
-    simc_hash: str = ""
-    try:
-        with open(new_path, "r", encoding="utf-8") as f:
-            simc_hash = f.read().strip()
-    except FileNotFoundError as e:
-        logger.warning(e)
-
-    return simc_hash
 
 
 def logger_config(logger: logging.Logger, debug=False):
