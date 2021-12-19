@@ -1,15 +1,10 @@
-import argparse
 import datetime
 import logging
 import os
 import re
-import requests
 import subprocess
-import time
 import typing
-import urllib3
 
-from bloodytools import settings
 from simc_support.game_data.Covenant import COVENANTS, Covenant
 from simc_support.game_data.Talent import get_talent_dict
 from simc_support.game_data.WowClass import WowClass
@@ -482,23 +477,22 @@ def tokenize_str(string: str) -> str:
     return string
 
 
-def get_simc_hash(path) -> str:
+def get_simc_hash(path: str) -> str:
     """Get the FETCH_HEAD or shallow simc git hash.
 
     Returns:
       str -- [description]
     """
-
-    if ".exe" in path:
+    if path.endswith(".exe"):
         new_path = path.split("simc.exe")[0]
     else:
-        new_path = path[:-5]  # cut "/simc" from unix path
-        if "engine" in new_path[-6:]:
-            new_path = new_path[:-6]
+        new_path = path[:-4]  # cut "simc" from unix path
+        if "engine" in new_path[-7:]:
+            new_path = new_path[:-7]
 
     # add path to file to variable
     new_path += f".git/refs/heads/{SIMC_BRANCH}"
-    simc_hash: str = None
+    simc_hash: str = ""
     try:
         with open(new_path, "r", encoding="utf-8") as f:
             simc_hash = f.read().strip()
@@ -506,82 +500,6 @@ def get_simc_hash(path) -> str:
         logger.warning(e)
 
     return simc_hash
-
-
-def request(
-    url: str,
-    *,
-    apikey: str = "",
-    data: dict = None,
-    retries=6,
-    session=None,
-    timeout=30,
-) -> dict:
-    """Communicate with url and return response json dict. Handled
-    retries, timeouts, and sticks to session if one is provided.
-
-    Args:
-        url (str): [description]
-        apikey (str, optional): apikey to talk with url. Defaults to ''.
-        data (dict, optional): [description]. Defaults to None.
-        retries (int, optional): [description]. Defaults to 6 tries.
-        session ([type], optional): [description]. Defaults to None.
-        timeout (int, optional): [description]. Defaults to 7 seconds.
-
-    Raises:
-        ValueError: Connection could not be established, check your
-            values or internet connection to the target.
-
-    Returns:
-        dict: Response dictionary from url
-    """
-
-    if session:
-        s = session
-    else:
-        s = requests.Session()
-        # https://stackoverflow.com/a/35504626/8002464
-        retries_adapter = urllib3.util.retry.Retry(
-            total=retries,
-            read=retries,
-            connect=retries,
-            backoff_factor=1,
-            status_forcelist=[429, 500, 502, 503, 504],
-        )
-        adapter = requests.adapters.HTTPAdapter(max_retries=retries_adapter)
-        # register adapter for target
-        s.mount("https://www.raidbots.com/", adapter)
-
-    headers = {
-        "Content-Type": "application/json",
-        "User-Agent": "Bloodmallet's shitty tool",
-    }
-
-    # post
-    if data:
-        body = {
-            "advancedInput": data,
-            "apiKey": apikey,
-            "iterations": 100000,
-            "reportName": "Bloodmallet's shitty tool",
-            "simcVersion": "nightly",
-            "type": "advanced",
-        }
-
-        response = s.post(url, json=body, headers=headers, timeout=timeout)
-
-        while response.status_code == 429:
-            time.sleep(10)
-            response = s.post(url, json=body, headers=headers, timeout=timeout)
-
-    # get
-    else:
-        response = s.get(url, headers=headers, timeout=timeout)
-
-    # if unexpected status code returned, raise error
-    response.raise_for_status()
-
-    return response.json()
 
 
 def logger_config(logger: logging.Logger, debug=False):
@@ -616,117 +534,3 @@ def logger_config(logger: logging.Logger, debug=False):
     logger.addHandler(error_handler)
 
     return logger
-
-
-def arg_parse_config():
-    parser = argparse.ArgumentParser(
-        description="Simulate different aspects of World of Warcraft data."
-    )
-    parser.add_argument(
-        "-a",
-        "--all",
-        dest="sim_all",
-        action="store_const",
-        const=True,
-        default=False,
-        help="Simulate everything for all specs and all talent combinations.",
-    )
-    parser.add_argument(
-        "--executable",
-        metavar="PATH",
-        type=str,
-        help="Relative path to SimulationCrafts executable. Default: '{}'".format(
-            settings.executable
-        ),
-    )
-    parser.add_argument(
-        "--profileset_work_threads",
-        metavar="NUMBER",
-        type=str,
-        help="Number of threads used per profileset by SimulationCraft. Default: '{}'".format(
-            settings.profileset_work_threads
-        ),
-    )
-    parser.add_argument(
-        "--threads",
-        metavar="NUMBER",
-        type=str,
-        help="Number of threads used by SimulationCraft. Default: '{}'".format(
-            settings.threads
-        ),
-    )
-    parser.add_argument(
-        "--debug",
-        action="store_const",
-        const=True,
-        default=settings.debug,
-        help="Enables debug modus. Default: '{}'".format(settings.debug),
-    )
-    parser.add_argument(
-        "-ptr", action="store_const", const=True, default=False, help="Enables ptr."
-    )
-    # sim only one type of data generation for one spec
-    parser.add_argument(
-        "-s",
-        "--single_sim",
-        dest="single_sim",
-        metavar="STRING",
-        type=str,
-        help="Activate a single simulation on the local machine. <simulation_types> are races, secondary_distributions, talents, trinkets, covenants, soul_binds, soul_bind_nodes, conduits, legendaries, domination_shards, and tier_sets. Input structure: <simulation_type>,<wow_class>,<wow_spec>,<fight_style> e.g. -s races,shaman,elemental,patchwerk",
-    )
-    parser.add_argument(
-        "--custom_profile",
-        action="store_const",
-        const=True,
-        default=False,
-        help="Enables usage of 'custom_profile.txt' in addition to the base profile. Default: '{}'".format(
-            settings.custom_profile
-        ),
-    )
-    parser.add_argument(
-        "--custom_apl",
-        action="store_const",
-        const=True,
-        default=False,
-        help="Enables usage of 'custom_apl.txt' in addition to the base profile. Default: '{}'".format(
-            settings.custom_apl
-        ),
-    )
-    parser.add_argument(
-        "--custom_fight_style",
-        action="store_const",
-        const=True,
-        default=False,
-        help="Enables usage of 'custom_fight_style.txt' in addition to the base profile. Default: '{}'".format(
-            settings.custom_fight_style
-        ),
-    )
-    parser.add_argument(
-        "--target_error",
-        metavar="STRING",
-        type=str,
-        help="Overwrites target_error for all simulations. Default: whatever is in setting.py",
-    )
-    parser.add_argument(
-        "--keep_files",
-        action="store_const",
-        const=True,
-        default=False,
-        help="Keep generated simc input and output files.",
-    )
-    parser.add_argument(
-        "--pretty",
-        action="store_const",
-        const=True,
-        default=False,
-        help="Indent result files to make them mor ehuman readable.",
-    )
-    parser.add_argument(
-        "--raidbots",
-        action="store_const",
-        const=True,
-        default=False,
-        help="Don't try this at home",
-    )
-
-    return parser.parse_args()

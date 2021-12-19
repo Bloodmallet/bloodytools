@@ -1,9 +1,14 @@
 import dataclasses
+import logging
+import sys
 import typing
 
 from bloodytools.utils.data_type import DataType
 from simc_support.game_data.WowSpec import WowSpec
 
+from bloodytools.utils.utils import get_simc_hash
+
+logger = logging.getLogger(__name__)
 
 # ! Hier sitz ich nun ich armer Tor. Bin so klug als wie zuvor.
 # ! Schrieb Module und Klassen gar. Doch wozu ich sie gebar?
@@ -20,54 +25,125 @@ class Config:
     data_type: DataType = DataType.DPS
     debug: bool = False
     default_actions: str = "1"
-    enable_conduit_simulations: bool = False
-    enable_covenant_simulations: bool = False
-    enable_domination_shards: bool = False
-    enable_legendary_simulations: bool = False
-    enable_race_simulations: bool = False
-    enable_secondary_distributions_simulations: bool = False
-    enable_soul_bind_node_simulations: bool = False
-    enable_soul_bind_simulations: bool = False
-    enable_talent_simulations: bool = False
-    enable_trinket_simulations: bool = False
-    enable_tier_set_simulations: bool = False
     executable: str = "../SimulationCraft/simc"
     iterations: str = "20000"
     keep_files: bool = False
+    # affects trinkets
     max_ilevel: int = 259
+    # affects trinkets
     min_ilevel: int = 210
     pretty: bool = False
     profileset_work_threads: str = "2"
     ptr: str = "0"
     raidbots: bool = False
-    remove_files = False
+    remove_files: bool = False
     secondary_distributions_step_size: int = 10
-    sim_all: bool = False
     simc_hash: typing.Union[bool, str] = False
     single_sim: str = ""
+    # Affects secondary distribution simulations
+    # if no list is provided for a class-spec, all dps talent combinations will be run. If you want to only sim the base profiles, set 'talent_permutations' to False
+    # talent_list = {
+    #   WowSpec.ELEMENTAL: [
+    #     "2301022",
+    #   ],
+    # }  # example for a talent list for Elemental Shamans
+    # set to False, to sim only the base profile talent combinations
     talent_list: typing.Dict[WowSpec, typing.Iterable[str]] = dataclasses.field(
         default_factory=dict
     )
     talent_permutations: bool = False
     target_error: typing.Dict[str, str] = dataclasses.field(default_factory=dict)
-    threads: str = "8"
+    threads: str = ""
     tier: str = "27"
     use_raidbots: bool = False
     write_humanreadable_secondary_distribution_file: bool = False
-    fight_styles: typing.List[str] = dataclasses.field(default_factory=list)
-    wow_class_spec_list: typing.List[WowSpec] = dataclasses.field(default_factory=list)
     apikey: str = ""
+    simulator_type_names: typing.List[str] = dataclasses.field(default_factory=list)
+    wow_class_spec_names: typing.List[typing.Tuple[str, str]] = dataclasses.field(
+        default_factory=list
+    )
+    fight_styles: typing.List[str] = dataclasses.field(default_factory=list)
 
     def __post_init__(self, *args, **kwargs) -> None:
-        self.fight_styles.append("patchwerk")
         self.target_error["patchwerk"] = "0.1"
+        self.target_error["hecticaddcleave"] = "0.2"
+        self.target_error["beastlord"] = "0.2"
+        self.set_simc_hash()
 
-    def update(self, obj: object) -> "Config":
-        """Update the Configuration using the provided object.
+    def set_simc_hash(self) -> None:
+        new_hash = get_simc_hash(self.executable)
+        if new_hash:
+            self.simc_hash = new_hash
 
-        Args:
-            obj (object): configuration object, e.g. a module or a different class instance
-        """
-        vars(self).update(vars(obj))
+    @classmethod
+    def create_config_from_args(cls, args: object) -> "Config":
 
-        return self
+        config = cls()
+
+        if args.single_sim:  # type: ignore
+            logger.debug("-s / --single_sim detected")
+            try:
+                (
+                    simulation_type,
+                    wow_class,
+                    wow_spec,
+                    fight_style,
+                ) = args.single_sim.split(  # type: ignore
+                    ","
+                )
+            except ValueError:
+                logger.error("-s / --single_sim arg is missing parameters. Read -h.")
+                sys.exit("Input error. Bloodytools terminates.")
+
+            config.wow_class_spec_names = [
+                (wow_class, wow_spec),
+            ]
+
+            config.fight_styles = [
+                fight_style,
+            ]
+            if fight_style not in config.target_error:
+                config.target_error[fight_style] = "0.1"
+
+            config.simulator_type_names = [
+                simulation_type,
+            ]
+
+        if args.executable:  # type: ignore
+            config.executable = args.executable  # type: ignore
+            logger.debug("Set executable to {}".format(config.executable))
+
+        if args.threads:  # type: ignore
+            config.threads = args.threads  # type: ignore
+            logger.debug("Set threads to {}".format(config.threads))
+
+        if args.profileset_work_threads:  # type: ignore
+            config.profileset_work_threads = args.profileset_work_threads  # type: ignore
+            logger.debug(
+                "Set profileset_work_threads to {}".format(
+                    config.profileset_work_threads
+                )
+            )
+
+        if args.ptr:  # type: ignore
+            config.ptr = "1"
+        else:
+            config.ptr = "0"
+
+        config.custom_profile = args.custom_profile  # type: ignore
+        config.custom_fight_style = args.custom_fight_style  # type: ignore
+        config.custom_apl = args.custom_apl  # type: ignore
+        if args.custom_apl:  # type: ignore
+            config.default_actions = "0"
+
+        if args.target_error:  # type: ignore
+            for fight_style in config.target_error.keys():
+                config.target_error[fight_style] = args.target_error  # type: ignore
+
+        config.use_raidbots = args.raidbots  # type: ignore
+        config.keep_files = args.keep_files  # type: ignore
+        config.pretty = args.pretty  # type: ignore
+
+        config.set_simc_hash()
+
+        return config

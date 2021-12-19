@@ -14,7 +14,7 @@ import uuid
 # wow game data and simc input checks
 from simc_support.simc_data.FightStyle import FIGHTSTYLES
 from typing import List, Union
-from bloodytools.utils.utils import request as r
+from bloodytools.utils.request import request as r
 
 logger = logging.getLogger(__name__)
 

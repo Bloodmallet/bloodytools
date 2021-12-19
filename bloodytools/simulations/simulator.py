@@ -257,28 +257,3 @@ class SimulatorFactory:
             typing.List[typing.Type[Simulator]]: [description]
         """
         return list(self._simulators.values())
-
-
-def simulator_wrapper(
-    simulation_type: str,
-    simulator_factory: SimulatorFactory,
-    settings: Config,
-):
-    """Iterate over all WowSpecs and FightStyles in settings and run their
-    appropriate Simulator flow.
-
-    Args:
-        name (str): [description]
-        simulation_type (str): [description]
-        simulator_factory (SimulatorFactory): [description]
-        settings (Config): [description]
-    """
-    for wow_spec, fight_style in itertools.product(
-        settings.wow_class_spec_list, settings.fight_styles
-    ):
-        simulator = simulator_factory.get_simulator(simulation_type)
-        simulator(
-            wow_spec=wow_spec,
-            fight_style=fight_style,
-            settings=settings,
-        ).run()
