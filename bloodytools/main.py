@@ -20,8 +20,6 @@ May 2018
 import datetime
 import logging
 
-from simc_support.game_data.WowSpec import get_wow_spec
-
 from bloodytools.simulations import simulator_factory
 from bloodytools.utils.args import arg_parse_config
 from bloodytools.utils.config import Config
