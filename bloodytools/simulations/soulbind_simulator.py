@@ -35,6 +35,7 @@ def _get_first_row_soulbindtalent(soulbind: SoulBind) -> SoulBindTalent:
     for talent in soulbind.soul_bind_talents:
         if talent.tier == 0:
             return talent
+    raise ValueError("No first row soulbindtalent found.")
 
 
 def _is_last_row_soulbindtalent(soulbindtalent: SoulBindTalent) -> bool:
@@ -70,7 +71,6 @@ class SoulbindSimulator(Simulator):
         self.conduits: typing.Iterable[Conduit] = get_conduits_for_spec(self.wow_spec)
 
     @classmethod
-    @property
     def name(cls) -> str:
         return "Soulbinds"
 
@@ -98,7 +98,7 @@ class SoulbindSimulator(Simulator):
                 for legendary in legendaries
                 if len(legendary.covenants) > 1
             ]
-            legendary_id: int = find_legendary_bonus_id(
+            legendary_id = find_legendary_bonus_id(
                 data_dict["profile"], all_legendary_ids
             )
             if legendary_id:
@@ -233,7 +233,7 @@ class SoulbindSimulator(Simulator):
         data_dict["sorted_data_keys"] = {}
         for rank in CONDUIT_RANKS:
             data_dict["soul_bind_paths"][str(rank)] = {}
-            soul_bind_dps: typing.List[SoulBind] = []
+            soul_bind_dps: typing.List[typing.Tuple[str, int]] = []
             for soul_bind in SOULBINDS:
                 dps_paths: typing.List[
                     typing.Tuple[typing.List[SoulBindTalent], float, typing.List[str]]
@@ -514,12 +514,12 @@ class SoulbindSimulator(Simulator):
         simulations: typing.List[Simulation_Data] = []
 
         # single conduits
-        combinations = []
-        for conduit in self.conduits:
-            for covenant in conduit.covenants:
-                for rank in CONDUIT_RANKS:
-                    combinations.append((rank, covenant, conduit))
-        for rank, covenant, conduit in combinations:
+        single_conduits = itertools.product(CONDUIT_RANKS, COVENANTS, self.conduits)
+        single_conduits = filter(
+            lambda rank_cov_con: rank_cov_con[1] in rank_cov_con[2].covenants,
+            single_conduits,
+        )
+        for rank, covenant, conduit in single_conduits:
             covenant_profile = self._get_covenant_profile(
                 profile=profile,
                 additional_profiles=additional_profiles,
@@ -544,33 +544,33 @@ class SoulbindSimulator(Simulator):
             simulations.append(simulation)
 
         # double conduits
-        conduit_combinations: typing.Iterable[
-            typing.Tuple[Conduit, Conduit]
-        ] = itertools.combinations(self.conduits, 2)
-        conduit_combinations = filter(
-            lambda c: len(c[0].covenants) + len(c[1].covenants) > 2,
-            conduit_combinations,
+        def is_valid_combination(
+            rank: int, covenant: Covenant, conduit1: Conduit, conduit2: Conduit
+        ) -> bool:
+            def are_generic_conduits(conduit1: Conduit, conduit2: Conduit) -> bool:
+                len1 = len(conduit1.covenants)
+                len2 = len(conduit2.covenants)
+                return len1 == len2 and len1 + len2 > 2
+
+            def covenant_specific_conduit_matches_covenant(
+                conduit: Conduit, covenant: Covenant
+            ) -> bool:
+                return len(conduit.covenants) == 1 and covenant in conduit.covenants
+
+            return (
+                are_generic_conduits(conduit1, conduit2)
+                or covenant_specific_conduit_matches_covenant(conduit1, covenant)
+                or covenant_specific_conduit_matches_covenant(conduit2, covenant)
+            ) and conduit1 != conduit2
+
+        double_conduits = itertools.product(
+            CONDUIT_RANKS, COVENANTS, self.conduits, self.conduits
+        )
+        double_conduits = filter(
+            lambda combination: is_valid_combination(*combination), double_conduits
         )
 
-        covenant_combinations = itertools.product(
-            COVENANTS, conduit_combinations, repeat=1
-        )
-        covenant_combinations = [
-            (combination[0], *combination[1])
-            for combination in covenant_combinations
-            if len(combination[1][0].covenants) == len(combination[1][1].covenants)
-            or len(combination[1][0].covenants) == 1
-            and combination[1][0].covenants[0] == combination[0]
-            or len(combination[1][1].covenants) == 1
-            and combination[1][1].covenants[0] == combination[0]
-        ]
-
-        combinations = itertools.product(CONDUIT_RANKS, covenant_combinations)
-        combinations = [
-            (combination[0], *combination[1]) for combination in combinations
-        ]
-
-        for rank, covenant, conduit1, conduit2 in combinations:
+        for rank, covenant, conduit1, conduit2 in double_conduits:
             covenant_profile = self._get_covenant_profile(
                 profile=profile,
                 additional_profiles=additional_profiles,
