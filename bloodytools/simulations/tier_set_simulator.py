@@ -4,7 +4,6 @@ from .simulator import Simulator
 
 class TierSetSimulator(Simulator):
     @classmethod
-    @property
     def name(cls) -> str:
         return "Tier Set"
 

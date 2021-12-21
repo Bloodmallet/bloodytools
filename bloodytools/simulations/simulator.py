@@ -37,7 +37,6 @@ class Simulator(abc.ABC):
     settings: Config
 
     @classmethod
-    @property
     @abc.abstractmethod
     def name(cls) -> str:
         """Upper case human readable name.
@@ -55,7 +54,7 @@ class Simulator(abc.ABC):
         Returns:
             str: cli name of the simulation done by this simulator
         """
-        return str(cls.name).lower().replace(" ", "_")
+        return str(cls.name()).lower().replace(" ", "_")
 
     def run(self) -> None:
         """Manages the simulation flow. You can adjust by overwriting the provided methods."""

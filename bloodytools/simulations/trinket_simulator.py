@@ -60,7 +60,6 @@ def _get_second_trinket(wow_spec: WowSpec) -> Trinket:
 
 class TrinketSimulator(Simulator):
     @classmethod
-    @property
     def name(cls) -> str:
         return "Trinkets"
 

@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 class TalentSimulator(Simulator):
     @classmethod
-    @property
     def name(cls) -> str:
         return "Talents"
 
