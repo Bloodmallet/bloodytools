@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 
 class RaceSimulator(Simulator):
     @classmethod
-    @property
     def name(cls) -> str:
         return "Races"
 
