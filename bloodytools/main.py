@@ -42,13 +42,13 @@ def main(args=None):
         for simulator_name in config.simulator_type_names:
             simulator = simulator_factory.get_simulator(simulator_name)
             for fight_style in config.fight_styles:
-                logger.info(f"Starting {simulator.name} simulations.")
+                logger.info(f"Starting {simulator.name()} simulations.")
                 simulator(
                     wow_spec=wow_spec,
                     fight_style=fight_style,
                     settings=config,
                 ).run()
-                logger.info(f"{simulator.name} simulations finished.")
+                logger.info(f"{simulator.name()} simulations finished.")
 
     logger.info(
         "Bloodytools took {} to finish.".format(

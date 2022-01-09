@@ -24,7 +24,10 @@ class Simulator(abc.ABC):
     """Abstract baseclass for chart related simulations.
     Children will usually be used by invoking the run() method.
 
-    Required to implement:
+    Required class methods to implement:
+        - name
+
+    Required methods to implement:
         - add_simulation_data
 
     Extendable:
@@ -58,9 +61,9 @@ class Simulator(abc.ABC):
 
     def run(self) -> None:
         """Manages the simulation flow. You can adjust by overwriting the provided methods."""
-        logger.debug(f"Start pipeline for {self.name} of {self.wow_spec}")
+        logger.debug(f"Start pipeline for {self.name()} of {self.wow_spec}")
         data_dict = create_base_json_dict(
-            self.name, self.wow_spec, self.fight_style, self.settings
+            self.name(), self.wow_spec, self.fight_style, self.settings
         )
 
         logger.debug("Starting pre processing")
