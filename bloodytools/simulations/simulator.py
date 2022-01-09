@@ -1,15 +1,14 @@
 import abc
 import dataclasses
-import itertools
 import json
 import logging
 import os
 import typing
 
-from bloodytools.utils.simulation_objects import Simulation_Group
-from bloodytools.utils.utils import create_base_json_dict
 from bloodytools.utils.config import Config
 from bloodytools.utils.data_type import DataType
+from bloodytools.utils.simulation_objects import Simulation_Group
+from bloodytools.utils.utils import create_base_json_dict
 from simc_support.game_data.WowSpec import WowSpec
 
 logger = logging.getLogger(__name__)
