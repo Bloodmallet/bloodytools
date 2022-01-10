@@ -87,14 +87,6 @@ class RaceSimulator(Simulator):
                             ]
                         )
 
-        # create sorted list
-        tmp_list = [(race, data_dict["data"][race]) for race in data_dict["data"]]
-        logger.debug("tmp_list: {}".format(tmp_list))
-
-        tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
-        logger.debug("Sorted tmp_list: {}".format(tmp_list))
-        logger.info("Race {} won with {} dps.".format(tmp_list[0][0], tmp_list[0][1]))
-
-        data_dict["sorted_data_keys"] = [race for race, _ in tmp_list]
+        data_dict = self.create_sorted_key_value_data(data_dict)
 
         return data_dict

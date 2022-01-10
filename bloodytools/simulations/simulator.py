@@ -124,6 +124,9 @@ class Simulator(abc.ABC):
         """
         pass
 
+    def profile_split_character(self) -> str:
+        return "/"
+
     def _collect_data(
         self, simulation_group: Simulation_Group, data_type: DataType
     ) -> dict:
@@ -155,7 +158,7 @@ class Simulator(abc.ABC):
                 wanted_value = profile.get_dps()
             logger.debug(f"Profile '{profile.name}' {data_type.value}: {wanted_value}")
 
-            name_parts = profile.name.split("_")
+            name_parts = profile.name.split(self.profile_split_character())
             name = name_parts[0]
             try:
                 nested_keys = name_parts[1:]
@@ -227,6 +230,80 @@ class Simulator(abc.ABC):
                     ensure_ascii=False,
                 )
             )
+
+    def create_sorted_key_value_data(
+        self, data_dict: dict, result_key: str = "sorted_data_keys"
+    ) -> dict:
+        """Sort data if it's organized as direct key-value pairs. E.g.
+        {
+            "data": {
+                "key a": 200,
+                "key b": 300
+            }
+        }
+
+        Args:
+            data_dict (dict): [description]
+
+        Returns:
+            dict: initial dictionary but with the added key <result_key> containing the sorting result
+        """
+        # create ordered data name list
+        tmp_list: typing.List[str] = list(data_dict["data"].keys())
+        logger.debug("tmp_list: {}".format(tmp_list))
+
+        sorted_list = sorted(
+            tmp_list,
+            key=lambda name: data_dict["data"][name],
+            reverse=True,
+        )
+        logger.debug("Sorted tmp_list: {}".format(sorted_list))
+        winner = sorted_list[0]
+        logger.info("'{}' won with {} dps.".format(winner, data_dict["data"][winner]))
+
+        data_dict[result_key] = sorted_list
+
+        return data_dict
+
+    def create_sorted_key_key_value_data(
+        self, data_dict: dict, result_key: str = "sorted_data_keys"
+    ) -> dict:
+        """Sort data if it's organized as key-key-value pairs. E.g.
+        {
+            "data": {
+                "key a": {
+                    "key a a": 200,
+                    "key a b": 220
+                },
+                "key b": {
+                    "key b a": 300,
+                    "key b a": 320
+                }
+            }
+        }
+
+        Args:
+            data_dict (dict): [description]
+
+        Returns:
+            dict: initial dictionary but with the added key <result_key> containing the sorting result
+        """
+        # create ordered trinket name list
+        tmp_list = data_dict["data"].keys()
+        logger.debug("tmp_list: {}".format(tmp_list))
+
+        sorted_list = sorted(
+            tmp_list,
+            key=lambda name: max(data_dict["data"][name].values()),
+            reverse=True,
+        )
+        logger.debug("Sorted tmp_list: {}".format(tmp_list))
+        winner = sorted_list[0]
+        logger.info("'{}' won with {} dps.".format(winner, data_dict["data"][winner]))
+
+        data_dict[result_key] = sorted_list
+
+        return data_dict
 
 
 class SimulatorFactory:

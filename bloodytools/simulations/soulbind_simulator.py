@@ -414,7 +414,9 @@ class SoulbindSimulator(Simulator):
             )
 
             simulation_data = Simulation_Data(
-                name=f"baseline_{covenant.full_name}",
+                name=self.profile_split_character().join(
+                    ["baseline", covenant.full_name]
+                ),
                 fight_style=self.fight_style,
                 profile=covenant_profile,
                 simc_arguments=[
@@ -478,7 +480,9 @@ class SoulbindSimulator(Simulator):
                 )
 
             simulation_data = Simulation_Data(
-                name=f"{node.full_name}_{soulbind.covenant.full_name}",
+                name=self.profile_split_character().join(
+                    [node.full_name, soulbind.covenant.full_name]
+                ),
                 fight_style=self.fight_style,
                 profile=covenant_profile,
                 simc_arguments=[
@@ -527,7 +531,9 @@ class SoulbindSimulator(Simulator):
             )
 
             simulation = Simulation_Data(
-                name=f"{conduit.full_name}_{covenant.full_name}_{rank}",
+                name=self.profile_split_character().join(
+                    [conduit.full_name, covenant.full_name, str(rank)]
+                ),
                 fight_style=self.fight_style,
                 profile=covenant_profile,
                 simc_arguments=[
@@ -578,7 +584,13 @@ class SoulbindSimulator(Simulator):
             )
 
             simulation = Simulation_Data(
-                name=f"{conduit1.full_name}+{conduit2.full_name}_{covenant.full_name}_{rank}",
+                name=self.profile_split_character().join(
+                    [
+                        f"{conduit1.full_name}+{conduit2.full_name}",
+                        covenant.full_name,
+                        str(rank),
+                    ]
+                ),
                 fight_style=self.fight_style,
                 profile=covenant_profile,
                 simc_arguments=[

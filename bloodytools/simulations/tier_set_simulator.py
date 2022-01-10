@@ -28,7 +28,7 @@ class TierSetSimulator(Simulator):
         for tier, simc_input in tier_mapping.items():
             spec = str(self.wow_spec).replace("_", " ")
             data = Simulation_Data(
-                name=f"{spec}_{tier}",
+                name=self.profile_split_character().join([spec, tier]),
                 simc_arguments=simc_input,
                 fight_style=self.fight_style,
                 profile=data_dict["profile"],

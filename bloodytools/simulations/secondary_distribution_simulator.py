@@ -116,8 +116,9 @@ class SecondaryDistributionSimulator(Simulator):
             for crit, haste, mastery, vers in distribution_multipliers:
 
                 s_o = Simulation_Data(
-                    name="{}_{}-{}-{}-{}".format(
+                    name="{}{}{}_{}_{}_{}".format(
                         talent_combination,
+                        self.profile_split_character(),
                         crit,
                         haste,
                         mastery,
@@ -168,13 +169,6 @@ class SecondaryDistributionSimulator(Simulator):
         data_dict = super().post_processing(data_dict)
 
         data_dict.pop("covenant_profiles")
-
-        # fix spelling
-        for talent_combination in data_dict["data"]:
-            for secondaries in list(data_dict["data"][talent_combination].keys()):
-                data_dict["data"][talent_combination][
-                    secondaries.replace("-", "_")
-                ] = data_dict["data"][talent_combination].pop(secondaries)
 
         # create ordered name list
         data_dict["sorted_data_keys"] = {}

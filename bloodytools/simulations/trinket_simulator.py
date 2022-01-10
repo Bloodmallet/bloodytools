@@ -126,7 +126,9 @@ class TrinketSimulator(Simulator):
     ) -> None:
 
         simulation_data = Simulation_Data(
-            name="baseline_{}".format(self.settings.min_ilevel),
+            name=self.profile_split_character().join(
+                ["baseline", str(self.settings.min_ilevel)]
+            ),
             fight_style=self.fight_style,
             iterations=self.settings.iterations,
             target_error=self.settings.target_error.get(self.fight_style, "0.1"),
@@ -161,7 +163,9 @@ class TrinketSimulator(Simulator):
                 lambda x: _is_valid_itemlevel(x, self.settings), trinket.itemlevels
             ):
                 simulation_data = Simulation_Data(
-                    name="{}_{}".format(trinket.name, itemlevel),
+                    name=self.profile_split_character().join(
+                        [trinket.name, str(itemlevel)]
+                    ),
                     fight_style=self.fight_style,
                     iterations=self.settings.iterations,
                     target_error=self.settings.target_error.get(

@@ -121,7 +121,7 @@ class TalentSimulator(Simulator):
 
         # no talents profile
         base_profile = Simulation_Data(
-            name="{}".format(talent_combinations[0]),
+            name=talent_combinations[0],
             fight_style=self.fight_style,
             profile=data_dict["profile"],
             simc_arguments=[
@@ -151,7 +151,7 @@ class TalentSimulator(Simulator):
         # add all talent combinations to the simulation_group
         for talent_combination in talent_combinations[1:]:
             simulation_data = Simulation_Data(
-                name="{}".format(talent_combination),
+                name=talent_combination,
                 fight_style=self.fight_style,
                 simc_arguments=["talents={}".format(talent_combination)],
                 target_error=self.settings.target_error.get(self.fight_style, "0.1"),
