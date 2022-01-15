@@ -252,6 +252,11 @@ class Simulation_Data:
             bool -- True if equallity between mentioned data is guaranteed.
         """
 
+        if not isinstance(simulation_instance, Simulation_Data):
+            raise TypeError(
+                f"Expected Simulation_Data, got <{type(simulation_instance)}> instead."
+            )
+
         if self.calculate_scale_factors != simulation_instance.calculate_scale_factors:
             return False
         if self.default_actions != simulation_instance.default_actions:
