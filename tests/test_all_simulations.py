@@ -38,14 +38,6 @@ class TestAll(unittest.TestCase):
             target_error="1.0", executable="../SimulationCraft/simc.exe"
         )
 
-    def test_conduits(self):
-        for spec in self.specs:
-            with self.subTest(spec=spec):
-                self.args.single_sim = (
-                    f"conduits,{spec.wow_class.simc_name},{spec.simc_name},patchwerk"
-                )
-                self.assertIsNone(main(self.args))
-
     def test_legendaries(self):
         for spec in self.specs:
             with self.subTest(spec=spec):
