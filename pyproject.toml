@@ -1,0 +1,30 @@
+[build-system]
+requires = [
+    "setuptools>=45",
+    "wheel",
+    "setuptools-git-versioning",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools-git-versioning]
+# schema: <wow_version, e.g. 9.0.1>.<own_version_per_wow_version>
+starting_version = "0.0.0.1"
+template = "{tag}"
+dev_template = "{tag}.dev1+{branch}.{ccount}.{sha}"
+dirty_template = "{tag}.dev1+{branch}.{ccount}.{sha}.dirty"
+count_commits_from_version_file = false
+
+[tool.mypy]
+warn_return_any = true
+exclude = [
+    '^env/',
+    '^.*simulation[s]?\.py$',
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "pkg_resources",
+    "requests.packages.urllib3",
+    "yaml",
+]
+ignore_missing_imports = true

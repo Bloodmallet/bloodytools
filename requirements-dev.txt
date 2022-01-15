@@ -5,7 +5,8 @@ black
 # necessary for coverage check
 coveralls
 #-e git+https://github.com/Bloodmallet/bloodytests.git@develop#egg=bloodytests
-
+mypy
 pylint
+types-requests
 
 -r requirements.txt
