@@ -1,4 +1,5 @@
 Bloody( tools )
+![CI](https://github.com/Bloodmallet/bloodytools/actions/workflows/CI.yaml/badge.svg)
 ===========
 <!-- These service no longer exist [![Build Status](https://travis-ci.org/Bloodmallet/bloodytools.svg?branch=dev)](https://travis-ci.org/Bloodmallet/bloodytools) [![Coverage Status](https://coveralls.io/repos/github/Bloodmallet/bloodytools/badge.svg?branch=dev)](https://coveralls.io/github/Bloodmallet/bloodytools?branch=dev) -->
 
