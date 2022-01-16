@@ -3,7 +3,7 @@ import itertools
 import logging
 import typing
 
-from bloodytools.simulations.legendary_simulations import (
+from bloodytools.simulations.legendary_simulator import (
     find_legendary_bonus_id,
     remove_legendary_bonus_ids,
 )
@@ -231,40 +231,41 @@ class SoulbindSimulator(Simulator):
         logger.debug("Finding best paths")
         data_dict["soul_bind_paths"] = {}
         data_dict["sorted_data_keys"] = {}
+
         for rank in CONDUIT_RANKS:
             data_dict["soul_bind_paths"][str(rank)] = {}
             soul_bind_dps: typing.List[typing.Tuple[str, int]] = []
             for soul_bind in SOULBINDS:
                 dps_paths: typing.List[
-                    typing.Tuple[typing.List[SoulBindTalent], float, typing.List[str]]
+                    typing.Tuple[typing.List[SoulBindTalent], int, typing.List[str]]
                 ] = []
                 for path in soul_bind.talent_paths:
                     filtered_path = [
                         talent for talent in path if talent.is_dps_increase
                     ]
                     purged_path = []
-                    dps_values = []
+                    dps_values: typing.List[int] = []
                     cnt_potency = 0
-                    for talent in filtered_path:
-                        if talent.is_potency:
+                    for soulbind_talent in filtered_path:
+                        if soulbind_talent.is_potency:
                             # search through all double-potency conduits, if it's available twice
                             # search through all potency conduits
                             # add dps
                             cnt_potency += 1
                         elif not (
-                            talent.is_potency
-                            or talent.is_finesse
-                            or talent.is_endurance
+                            soulbind_talent.is_potency
+                            or soulbind_talent.is_finesse
+                            or soulbind_talent.is_endurance
                         ):
                             dps_values.append(
-                                data_dict["data"][talent.full_name][
+                                data_dict["data"][soulbind_talent.full_name][
                                     soul_bind.covenant.full_name
                                 ]
                             )
-                            purged_path.append(talent.full_name)
+                            purged_path.append(soulbind_talent.full_name)
                     # add potency dps values
                     if cnt_potency == 2:
-                        double_potencies = [
+                        double_potencies: typing.List[typing.Tuple[str, int]] = [
                             (
                                 name,
                                 data_dict["data"][name][soul_bind.covenant.full_name][
@@ -275,17 +276,17 @@ class SoulbindSimulator(Simulator):
                             if "+" in name
                             and soul_bind.covenant.full_name in data_dict["data"][name]
                         ]
-                        winner = max(
+                        winner_2 = max(
                             double_potencies, key=lambda key_value: key_value[1]
                         )
                         dps_values.append(
-                            data_dict["data"][winner[0]][soul_bind.covenant.full_name][
-                                str(rank)
-                            ]
+                            data_dict["data"][winner_2[0]][
+                                soul_bind.covenant.full_name
+                            ][str(rank)]
                         )
-                        purged_path += winner[0].split("+")
+                        purged_path += winner_2[0].split("+")
                     elif cnt_potency == 1:
-                        potencies = [
+                        potencies: typing.List[typing.Tuple[Conduit, int]] = [
                             (
                                 conduit,
                                 data_dict["data"][conduit.full_name][
@@ -296,27 +297,31 @@ class SoulbindSimulator(Simulator):
                             if conduit.is_potency
                             and soul_bind.covenant in conduit.covenants
                         ]
-                        winner = max(potencies, key=lambda key_value: key_value[1])
+                        winner_1 = max(potencies, key=lambda key_value: key_value[1])
                         dps_values.append(
-                            data_dict["data"][winner[0].full_name][
+                            data_dict["data"][winner_1[0].full_name][
                                 soul_bind.covenant.full_name
                             ][str(rank)]
                         )
-                        purged_path.append(winner[0].full_name)
+                        purged_path.append(winner_1[0].full_name)
+
+                    def get_path_sum(
+                        soulbind: SoulBind, dps_values: typing.List[int]
+                    ) -> int:
+                        result = 0
+                        covenant_name: str = soulbind.covenant.full_name
+                        for value in dps_values:
+                            result += max(
+                                value - data_dict["data"]["baseline"][covenant_name],
+                                0,
+                            )
+                        return result
 
                     # compare only dps gains, without baseline dps
                     dps_paths.append(
                         (
                             path,
-                            sum(
-                                map(
-                                    lambda value: value
-                                    - data_dict["data"]["baseline"][
-                                        soul_bind.covenant.full_name
-                                    ],
-                                    dps_values,
-                                )
-                            ),
+                            get_path_sum(soul_bind, dps_values),
                             purged_path,
                         )
                     )
@@ -349,7 +354,7 @@ class SoulbindSimulator(Simulator):
         for rank in CONDUIT_RANKS:
             for covenant in COVENANTS:
 
-                tmp_list = []
+                tmp_list: typing.List[typing.Tuple[str, int]] = []
                 for talent in data_dict["data"]:
                     if "baseline" in talent:
                         continue
@@ -518,10 +523,12 @@ class SoulbindSimulator(Simulator):
         simulations: typing.List[Simulation_Data] = []
 
         # single conduits
-        single_conduits = itertools.product(CONDUIT_RANKS, COVENANTS, self.conduits)
+        single_conduits_product = itertools.product(
+            CONDUIT_RANKS, COVENANTS, self.conduits
+        )
         single_conduits = filter(
             lambda rank_cov_con: rank_cov_con[1] in rank_cov_con[2].covenants,
-            single_conduits,
+            single_conduits_product,
         )
         for rank, covenant, conduit in single_conduits:
             covenant_profile = self._get_covenant_profile(
@@ -569,11 +576,12 @@ class SoulbindSimulator(Simulator):
                 or covenant_specific_conduit_matches_covenant(conduit2, covenant)
             ) and conduit1 != conduit2
 
-        double_conduits = itertools.product(
+        double_conduits_product = itertools.product(
             CONDUIT_RANKS, COVENANTS, self.conduits, self.conduits
         )
         double_conduits = filter(
-            lambda combination: is_valid_combination(*combination), double_conduits
+            lambda combination: is_valid_combination(*combination),
+            double_conduits_product,
         )
 
         for rank, covenant, conduit1, conduit2 in double_conduits:

@@ -1,6 +1,7 @@
 import itertools
 import logging
 import os
+import typing
 
 from bloodytools.simulations.simulator import Simulator
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
@@ -173,7 +174,7 @@ class SecondaryDistributionSimulator(Simulator):
         # create ordered name list
         data_dict["sorted_data_keys"] = {}
         for talent_combination in data_dict["data"].keys():
-            tmp_list = []
+            tmp_list: typing.List[typing.Tuple[str, int]] = []
             for distribution in data_dict["data"][talent_combination]:
                 tmp_list.append(
                     (
@@ -189,10 +190,10 @@ class SecondaryDistributionSimulator(Simulator):
             ]
 
         if self.settings.write_humanreadable_secondary_distribution_file:
-            human_text = []
+            human_text: typing.List[str] = []
             for talent_combination in data_dict["data"]:
                 dps_dict = data_dict["data"][talent_combination]
-                ordered_dps = sorted(
+                ordered_dps: typing.List[typing.Tuple[str, int]] = sorted(
                     list(dps_dict.items()), key=lambda pair: pair[1], reverse=True
                 )
                 human_text += [

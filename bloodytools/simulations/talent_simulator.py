@@ -172,22 +172,27 @@ class TalentSimulator(Simulator):
             if talent_combination.count("0") == self.wow_spec.talents_blueprint.count(
                 "0"
             ):
-                tmp_1.append(
-                    (
-                        talent_combination,
-                        data_dict["data"][talent_combination],
-                    )
-                )
+                tmp_1.append(talent_combination)
             else:
-                tmp_2.append(
-                    (
-                        talent_combination,
-                        data_dict["data"][talent_combination],
-                    )
-                )
+                tmp_2.append(talent_combination)
 
-        tmp_1 = sorted(tmp_1, key=lambda item: item[1], reverse=True)
-        tmp_2 = sorted(tmp_2, key=lambda item: item[1], reverse=True)
+        def get_value(data, key: str) -> int:
+            """This function exists to make mypy happy."""
+            value: int = data[key]
+            return value
+
+        tmp_1 = sorted(
+            tmp_1,
+            key=lambda name: get_value(data_dict["data"], name),
+            # key=lambda name: max(data_dict["data"][name].values()),
+            reverse=True,
+        )
+        tmp_2 = sorted(
+            tmp_2,
+            key=lambda name: get_value(data_dict["data"], name),
+            # key=lambda name: max(data_dict["data"][name].values()),
+            reverse=True,
+        )
 
         # add sorted key lists
         # 1 all usual talent combinations

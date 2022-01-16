@@ -38,7 +38,7 @@ def _is_valid_itemlevel(itemlevel: int, settings: Config) -> bool:
 
 def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     # get main-trinkets
-    trinket_list = get_trinkets_for_spec(wow_spec)
+    trinket_list = list(get_trinkets_for_spec(wow_spec))
     # filter trinket list by available itemlevels:
     trinket_list = list(
         filter(
@@ -196,19 +196,6 @@ class TrinketSimulator(Simulator):
         data_dict = super().post_processing(data_dict)
 
         # create ordered trinket name list
-        tmp_list = []
-        for trinket in data_dict["data"]:
-            if trinket != "baseline":
-                tmp_list.append((trinket, max(data_dict["data"][trinket].values())))
-        logger.debug("tmp_list: {}".format(tmp_list))
-
-        tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
-        logger.debug("Sorted tmp_list: {}".format(tmp_list))
-
-        logger.info(
-            "Trinket {} won with {} dps.".format(tmp_list[0][0], tmp_list[0][1])
-        )
-
-        data_dict["sorted_data_keys"] = [trinket for trinket, _ in tmp_list]
+        self.create_sorted_key_key_value_data(data_dict)
 
         return data_dict

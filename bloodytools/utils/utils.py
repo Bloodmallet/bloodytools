@@ -29,11 +29,12 @@ def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: Config) 
     logger.debug("create_basic_profile_string start")
     # create the basis profile string
     split_path: list = settings.executable.split("simc")
+    basis_profile_string: str
     if len(split_path) > 2:
         # the path contains multiple "simc"
-        basis_profile_string: str = "simc".join(split_path[:-1])
+        basis_profile_string = "simc".join(split_path[:-1])
     else:
-        basis_profile_string: str = split_path[0]
+        basis_profile_string = split_path[0]
 
     # fix path for linux users
     if basis_profile_string.endswith("/engine/"):

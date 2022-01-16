@@ -248,8 +248,6 @@ class LegendarySimulator(Simulator):
 
         for legendary in self.legendaries:
 
-            simulation_data = None
-
             profile = {}
             profile_name = legendary.full_name
             if (

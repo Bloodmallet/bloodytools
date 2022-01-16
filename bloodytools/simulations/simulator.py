@@ -7,6 +7,7 @@ import typing
 
 from bloodytools.utils.config import Config
 from bloodytools.utils.data_type import DataType
+from bloodytools.utils.output import OutputJson, SimulatedData
 from bloodytools.utils.simulation_objects import Simulation_Group
 from bloodytools.utils.utils import create_base_json_dict
 from simc_support.game_data.WowSpec import WowSpec
@@ -18,7 +19,7 @@ class UnknownFightStyleError(Exception):
     pass
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass  # type: ignore # known mypy issue (abstract class + dataclass)
 class Simulator(abc.ABC):
     """Abstract baseclass for chart related simulations.
     Children will usually be used by invoking the run() method.
@@ -151,7 +152,7 @@ class Simulator(abc.ABC):
         Returns:
             dict: dictionary with simulated data
         """
-        data = {}
+        data: typing.Dict[str, typing.Any] = {}
         for profile in simulation_group.profiles:
             wanted_value = -1
             if data_type == DataType.DPS:
@@ -232,7 +233,9 @@ class Simulator(abc.ABC):
             )
 
     def create_sorted_key_value_data(
-        self, data_dict: dict, result_key: str = "sorted_data_keys"
+        self,
+        data_dict: dict,
+        result_key: str = "sorted_data_keys",
     ) -> dict:
         """Sort data if it's organized as direct key-value pairs. E.g.
         {
@@ -252,9 +255,14 @@ class Simulator(abc.ABC):
         tmp_list: typing.List[str] = list(data_dict["data"].keys())
         logger.debug("tmp_list: {}".format(tmp_list))
 
+        def get_value(data: dict, key: str) -> int:
+            """This function exists to make mypy happy."""
+            value: int = data[key]
+            return value
+
         sorted_list = sorted(
             tmp_list,
-            key=lambda name: data_dict["data"][name],
+            key=lambda name: get_value(data_dict["data"], name),
             reverse=True,
         )
         logger.debug("Sorted tmp_list: {}".format(sorted_list))
@@ -292,9 +300,15 @@ class Simulator(abc.ABC):
         tmp_list = data_dict["data"].keys()
         logger.debug("tmp_list: {}".format(tmp_list))
 
+        def get_max_value(data: dict, key: str) -> int:
+            """This function exists to make mypy happy."""
+            values: typing.List[int] = list(data[key].values())
+            return max(values)
+
         sorted_list = sorted(
             tmp_list,
-            key=lambda name: max(data_dict["data"][name].values()),
+            key=lambda name: get_max_value(data_dict["data"], name),
+            # key=lambda name: max(data_dict["data"][name].values()),
             reverse=True,
         )
         logger.debug("Sorted tmp_list: {}".format(tmp_list))
@@ -318,7 +332,8 @@ class SimulatorFactory:
         Args:
             klass (typing.Type[Simulator]): [description]
         """
-        self._simulators[klass.snake_case_name] = klass
+        # str call makes mypy happy
+        self._simulators[str(klass.snake_case_name)] = klass
 
     def get_simulator(
         self,
