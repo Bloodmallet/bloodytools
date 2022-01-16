@@ -33,9 +33,9 @@ jobs:
     - name: Type checking with mypy
       run: |
         mypy .
-    - name: Test with pytest
-      run: |
-        pytest --doctest-modules --junitxml=junit/test-results.xml --cov=simc_support --cov-report=xml --cov-report=html tests/test_utils_simulation_objects.py
+    # - name: Test with pytest
+    #   run: |
+    #     pytest --doctest-modules --junitxml=junit/test-results.xml --cov=simc_support --cov-report=xml --cov-report=html tests/test_utils_simulation_objects.py
 
   merge:
     needs: [publish]
