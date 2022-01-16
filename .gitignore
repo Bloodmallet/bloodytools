@@ -16,6 +16,8 @@ build/
 env*/
 source/
 results/
+junit/
+htmlcov/
 
 # files
 # local coverage results
@@ -29,3 +31,4 @@ Makefile
 # files at root
 /*.simc
 *.log
+coverage.xml
