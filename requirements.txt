@@ -3,3 +3,5 @@ simc-support
 requests
 # load special cases
 pyyaml
+dataclasses; python_version<'3.7'
+types-dataclasses; python_version<'3.7'
