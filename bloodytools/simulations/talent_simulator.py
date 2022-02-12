@@ -165,30 +165,30 @@ class TalentSimulator(Simulator):
     def post_processing(self, data_dict: dict) -> dict:
         data_dict = super().post_processing(data_dict)
 
-        tmp_1 = []
-        tmp_2 = []
+        all_dps_talents = []
+        nulled_comparison_talents = []
 
         for talent_combination in data_dict["data"]:
             if talent_combination.count("0") == self.wow_spec.talents_blueprint.count(
                 "0"
             ):
-                tmp_1.append(talent_combination)
+                all_dps_talents.append(talent_combination)
             else:
-                tmp_2.append(talent_combination)
+                nulled_comparison_talents.append(talent_combination)
 
         def get_value(data, key: str) -> int:
             """This function exists to make mypy happy."""
             value: int = data[key]
             return value
 
-        tmp_1 = sorted(
-            tmp_1,
+        all_dps_talents = sorted(
+            all_dps_talents,
             key=lambda name: get_value(data_dict["data"], name),
             # key=lambda name: max(data_dict["data"][name].values()),
             reverse=True,
         )
-        tmp_2 = sorted(
-            tmp_2,
+        nulled_comparison_talents = sorted(
+            nulled_comparison_talents,
             key=lambda name: get_value(data_dict["data"], name),
             # key=lambda name: max(data_dict["data"][name].values()),
             reverse=True,
@@ -197,13 +197,8 @@ class TalentSimulator(Simulator):
         # add sorted key lists
         # 1 all usual talent combinations
         # 2 all talent combinations with one empty dps row
-        data_dict["sorted_data_keys"] = []
-        data_dict["sorted_data_keys_2"] = []
-
-        for item in tmp_1:
-            data_dict["sorted_data_keys"].append(item[0])
-        for item in tmp_2:
-            data_dict["sorted_data_keys_2"].append(item[0])
+        data_dict["sorted_data_keys"] = all_dps_talents
+        data_dict["sorted_data_keys_2"] = nulled_comparison_talents
 
         logger.debug("talent_simulations end")
         return data_dict
