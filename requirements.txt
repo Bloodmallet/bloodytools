@@ -1,5 +1,5 @@
 # Lib with World of Warcraft game data for simulations and some input checks for SimulationCraft.
-simc-support
+simc-support~=9.1.5.1
 requests
 # load special cases
 pyyaml
