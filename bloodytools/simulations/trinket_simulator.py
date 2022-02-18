@@ -30,6 +30,18 @@ SPECIAL_CASE_BONUS_IDS = {
         "all": 6915,
     },
 }
+SOLEAHS_SPECIAL_CASES = {
+    "190958": {
+        "crit": "shadowlands.soleahs_secret_technique_type_override=crit",
+        "haste": "shadowlands.soleahs_secret_technique_type_override=haste",
+        "mastery": "shadowlands.soleahs_secret_technique_type_override=mastery",
+        "versatility": "shadowlands.soleahs_secret_technique_type_override=versatility",
+    }
+}
+
+OBSOLETE = [
+    "185818",  # So'leah's Secret Technique pre 9.2 version
+]
 
 
 def _is_valid_itemlevel(itemlevel: int, settings: Config) -> bool:
@@ -51,6 +63,9 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
             trinket_list,
         )
     )
+    trinket_list = [
+        trinket for trinket in trinket_list if trinket.item_id not in OBSOLETE
+    ]
     return trinket_list
 
 
@@ -188,8 +203,22 @@ class TrinketSimulator(Simulator):
                             new_data.simc_arguments[-1]
                             + f",bonus_id={SPECIAL_CASE_BONUS_IDS[trinket.item_id][stat]}"
                         )
-                        new_data.name = f"{trinket.name} [{stat.title()}] {itemlevel}"
+                        new_data.name = self.profile_split_character().join(
+                            [f"{trinket.name} [{stat.title()}]", str(itemlevel)]
+                        )
 
+                        simulation_group.add(new_data)
+
+                if trinket.item_id in SOLEAHS_SPECIAL_CASES.keys():
+                    raw_profile = simulation_group.profiles.pop(-1)
+                    for stat in SOLEAHS_SPECIAL_CASES[trinket.item_id]:
+                        new_data = raw_profile.copy()
+                        new_data.simc_arguments.append(
+                            SOLEAHS_SPECIAL_CASES[trinket.item_id][stat]
+                        )
+                        new_data.name = self.profile_split_character().join(
+                            [f"{trinket.name} [{stat.title()}]", str(itemlevel)]
+                        )
                         simulation_group.add(new_data)
 
     def post_processing(self, data_dict: dict) -> dict:
