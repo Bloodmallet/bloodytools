@@ -6,8 +6,13 @@ import yaml
 from bloodytools.simulations.simulator import Simulator
 from bloodytools.utils.config import Config
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
-from simc_support.game_data.Legendary import get_legendaries_for_spec
+from simc_support.game_data.Legendary import (
+    get_legendaries_for_spec,
+    Legendary,
+    LEGENDARIES,
+)
 from simc_support.game_data.WowSpec import WowSpec, get_wow_spec
+from simc_support.game_data.Covenant import Covenant
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +21,7 @@ UNWANTED_LEGENDARIES = [
     339340,  # Norgannon's Sagacity
     339351,  # Stable Phantasma Lure
     338743,  # Vitality Sacrifice
+    364738,  # Unity
 ]
 
 
@@ -27,6 +33,9 @@ def _load_special_cases() -> typing.Dict[WowSpec, typing.List[dict]]:
             LOADED_SPECIAL_CASES = yaml.safe_load(f)
     except FileNotFoundError as e:
         logger.warning(e)
+        LOADED_SPECIAL_CASES = {}
+
+    if LOADED_SPECIAL_CASES is None:
         LOADED_SPECIAL_CASES = {}
 
     SPECIAL_CASES = {}
@@ -69,7 +78,9 @@ def remove_legendary_bonus_ids(
             tmp_item_bonus_ids = profile["items"][item]["bonus_id"].split("/")
         except KeyError:
             continue
+
         for element in tmp_item_bonus_ids:
+            # the user could also use : to split bonus ids >.>
             for b_id in element.split(":"):
                 item_bonus_ids.append(b_id)
 
@@ -124,6 +135,25 @@ def get_legendary_special_case_name(
     return "[" + "+".join(name_additions) + "] " + base_name
 
 
+def _get_covenant_legendary(
+    covenant_name: str, legendaries: typing.List[Legendary]
+) -> typing.Optional[Legendary]:
+    for legendary in legendaries:
+        if (
+            len(legendary.covenants) == 1
+            and legendary.covenants[0].simc_name == covenant_name
+        ):
+            return legendary
+    return None
+
+
+def _get_legendary(full_name: str) -> typing.Optional[Legendary]:
+    for legendary in LEGENDARIES:
+        if legendary.full_name == full_name:
+            return legendary
+    return None
+
+
 class LegendarySimulator(Simulator):
     @classmethod
     def name(cls) -> str:
@@ -132,27 +162,37 @@ class LegendarySimulator(Simulator):
     def pre_processing(self, data_dict: dict) -> dict:
         data_dict = super().pre_processing(data_dict)
 
-        legendaries = get_legendaries_for_spec(wow_spec=self.wow_spec)
+        legendaries = list(get_legendaries_for_spec(wow_spec=self.wow_spec))
+
+        if self.wow_spec == get_wow_spec("shaman", "enhancement"):
+            skybreakers_fiery_demise = _get_legendary("Skybreaker's Fiery Demise")
+            if skybreakers_fiery_demise:
+                legendaries.append(skybreakers_fiery_demise)
+
         filtered_legendaries = [
             legendary
             for legendary in legendaries
             if legendary.spell_id not in UNWANTED_LEGENDARIES
         ]
         self.legendaries = filtered_legendaries
-        bonus_ids = [legendary.bonus_id for legendary in filtered_legendaries]
+
+        all_legendary_bonus_ids = [legendary.bonus_id for legendary in legendaries]
         data_dict["profile"] = remove_legendary_bonus_ids(
-            data_dict["profile"], bonus_ids
+            data_dict["profile"], all_legendary_bonus_ids
         )
+
         for profile in data_dict["covenant_profiles"]:
             data_dict["covenant_profiles"][profile] = remove_legendary_bonus_ids(
-                data_dict["covenant_profiles"][profile], bonus_ids
+                data_dict["covenant_profiles"][profile], all_legendary_bonus_ids
             )
+
         data_dict["spell_ids"] = {}
         for legendary in legendaries:
             data_dict["translations"][
                 legendary.full_name
             ] = legendary.translations.get_dict()
             data_dict["spell_ids"][legendary.full_name] = legendary.spell_id
+
         if self.settings.custom_profile:
             data_dict["covenant_profiles"] = _adjust_covenant_profiles_itemlevels(
                 data_dict["profile"],
@@ -198,11 +238,23 @@ class LegendarySimulator(Simulator):
         except KeyError:
             baseline_item = constructed_item + f",bonus_id="
 
+        covenant_item = baseline_item
+        covenant_simc_name = data_dict["profile"]["character"]["covenant"]
+        covenant_legendary = _get_covenant_legendary(
+            covenant_simc_name, self.legendaries
+        )
+        if covenant_legendary:
+            covenant_item += f"/{covenant_legendary.bonus_id}"
+
+        logger.debug(
+            f"Baseline profile is '{covenant_simc_name}', legendary is '{covenant_legendary}'"
+        )
+
         simulation_data = Simulation_Data(
             name="baseline",
             fight_style=self.fight_style,
             profile=data_dict["profile"],
-            simc_arguments=[f"{baseline_item}"],
+            simc_arguments=[f"{covenant_item}"],
             target_error=self.settings.target_error.get(self.fight_style, "0.1"),
             ptr=self.settings.ptr,
             default_actions=self.settings.default_actions,
@@ -229,12 +281,24 @@ class LegendarySimulator(Simulator):
 
         SPECIAL_CASES = _load_special_cases()
 
-        for covenant in data_dict["covenant_profiles"]:
+        for covenant_name in data_dict["covenant_profiles"]:
+            covenant_item = baseline_item
+            covenant_simc_name = covenant_name
+            covenant_legendary = _get_covenant_legendary(
+                covenant_simc_name, self.legendaries
+            )
+            if covenant_legendary:
+                covenant_item += f"/{covenant_legendary.bonus_id}"
+
+            logger.debug(
+                f"{covenant_name} profile is '{covenant_simc_name}', legendary is '{covenant_legendary}'"
+            )
+
             simulation_data = Simulation_Data(
-                name=f"{{{covenant}}}",
+                name=f"{{{covenant_name}}}",
                 fight_style=self.fight_style,
-                profile=data_dict["covenant_profiles"][covenant],
-                simc_arguments=[f"{baseline_item}"],
+                profile=data_dict["covenant_profiles"][covenant_name],
+                simc_arguments=[f"{covenant_item}"],
                 target_error=self.settings.target_error.get(self.fight_style, "0.1"),
                 ptr=self.settings.ptr,
                 default_actions=self.settings.default_actions,
@@ -245,65 +309,73 @@ class LegendarySimulator(Simulator):
 
         for legendary in self.legendaries:
 
-            profile = {}
-            profile_name = legendary.full_name
-            if (
-                len(legendary.covenants) == 1
-                and legendary.covenants[0].simc_name in data_dict["covenant_profiles"]
-            ):
-                profile_name = (
-                    f"{{{legendary.covenants[0].simc_name}}} {legendary.full_name}"
+            if len(legendary.covenants) == 1:
+                # single covenant legendary simulations aren't necessary
+                continue
+            covenant: Covenant
+            for covenant in legendary.covenants:
+                if (
+                    covenant.simc_name not in data_dict["covenant_profiles"]
+                    and covenant.simc_name
+                    != data_dict["profile"]["character"]["covenant"]
+                ):
+                    continue
+
+                profile = {}
+                if covenant.simc_name == data_dict["profile"]["character"]["covenant"]:
+                    profile = data_dict["profile"]
+                elif covenant.simc_name in data_dict["covenant_profiles"]:
+                    profile = data_dict["covenant_profiles"][covenant.simc_name]
+
+                covenant_item = baseline_item
+                covenant_simc_name = covenant.simc_name
+                covenant_legendary = _get_covenant_legendary(
+                    covenant_simc_name, self.legendaries
                 )
-                profile = data_dict["covenant_profiles"][
-                    legendary.covenants[0].simc_name
-                ]
+                if covenant_legendary:
+                    covenant_item += f"/{covenant_legendary.bonus_id}"
+                covenant_item += f"/{legendary.bonus_id}"
 
-            try:
-                baseline_item = (
-                    constructed_item
-                    + f",bonus_id={item_information['bonus_id']}/{legendary.bonus_id}"
+                simulation_data = Simulation_Data(
+                    name=f"{{{covenant.simc_name}}} {legendary.full_name}",
+                    fight_style=self.fight_style,
+                    simc_arguments=[f"{covenant_item}"],
+                    target_error=self.settings.target_error.get(
+                        self.fight_style, "0.1"
+                    ),
+                    ptr=self.settings.ptr,
+                    default_actions=self.settings.default_actions,
+                    executable=self.settings.executable,
+                    iterations=self.settings.iterations,
+                    profile=profile,
                 )
-            except KeyError:
-                baseline_item = constructed_item + f",bonus_id={legendary.bonus_id}"
 
-            simulation_data = Simulation_Data(
-                name=profile_name,
-                fight_style=self.fight_style,
-                simc_arguments=[f"{baseline_item}"],
-                target_error=self.settings.target_error.get(self.fight_style, "0.1"),
-                ptr=self.settings.ptr,
-                default_actions=self.settings.default_actions,
-                executable=self.settings.executable,
-                iterations=self.settings.iterations,
-                profile=profile,
-            )
-
-            simulation_group.add(simulation_data)
-            logger.debug(
-                (
-                    "Added legendary '{}' in profile '{}' to simulation_group.".format(
-                        legendary.full_name, simulation_data.name
+                simulation_group.add(simulation_data)
+                logger.debug(
+                    (
+                        "Added legendary '{}' in profile '{}' to simulation_group.".format(
+                            legendary.full_name, simulation_data.name
+                        )
                     )
                 )
-            )
 
-            for special_case in SPECIAL_CASES.get(self.wow_spec, []):
-                if special_case["name"] == legendary.full_name:
+                for special_case in SPECIAL_CASES.get(self.wow_spec, []):
+                    if special_case["name"] == legendary.full_name:
 
-                    if (
-                        "fight_styles" in special_case
-                        and self.fight_style.lower()
-                        not in [f.lower() for f in special_case["fight_styles"]]
-                    ):
-                        continue
+                        if (
+                            "fight_styles" in special_case
+                            and self.fight_style.lower()
+                            not in [f.lower() for f in special_case["fight_styles"]]
+                        ):
+                            continue
 
-                    new_simulation_data = simulation_data.copy()
+                        new_simulation_data = simulation_data.copy()
 
-                    new_simulation_data.name = get_legendary_special_case_name(
-                        new_simulation_data.name, special_case["name_additions"]
-                    )
-                    new_simulation_data.simc_arguments += special_case["overrides"]
-                    simulation_group.add(new_simulation_data)
+                        new_simulation_data.name = get_legendary_special_case_name(
+                            new_simulation_data.name, special_case["name_additions"]
+                        )
+                        new_simulation_data.simc_arguments += special_case["overrides"]
+                        simulation_group.add(new_simulation_data)
 
     def post_processing(self, data_dict: dict) -> dict:
         data_dict = super().post_processing(data_dict)

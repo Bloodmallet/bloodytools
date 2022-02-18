@@ -1,4 +1,3 @@
-from bloodytools.simulations.dual_legendary_simulator import DualLegendarySimulator
 from bloodytools.simulations.legendary_simulator import LegendarySimulator
 from bloodytools.simulations.race_simulator import RaceSimulator
 from bloodytools.simulations.secondary_distribution_simulator import (
@@ -12,7 +11,6 @@ from bloodytools.simulations.trinket_simulator import TrinketSimulator
 
 simulator_factory = SimulatorFactory()
 
-simulator_factory.register_simulator(DualLegendarySimulator)
 simulator_factory.register_simulator(LegendarySimulator)
 simulator_factory.register_simulator(RaceSimulator)
 simulator_factory.register_simulator(SecondaryDistributionSimulator)
