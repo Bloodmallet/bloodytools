@@ -34,7 +34,8 @@ class Config:
     min_ilevel: int = 236
     pretty: bool = False
     profileset_work_threads: str = "2"
-    ptr: str = "0"
+    # TODO: set me to 0 after 9.2 launches
+    ptr: str = "1"
     raidbots: bool = False
     remove_files: bool = False
     secondary_distributions_step_size: int = 10
