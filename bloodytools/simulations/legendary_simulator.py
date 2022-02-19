@@ -48,27 +48,6 @@ def _load_special_cases() -> typing.Dict[WowSpec, typing.List[dict]]:
     return SPECIAL_CASES
 
 
-def find_legendary_bonus_id(
-    profile: dict, lookup_ids: typing.Iterable[int]
-) -> typing.Optional[int]:
-    for item in profile["items"]:
-        item_bonus_ids: typing.List[str] = []
-        try:
-            tmp_item_bonus_ids = profile["items"][item]["bonus_id"].split("/")
-        except KeyError:
-            continue
-
-        for element in tmp_item_bonus_ids:
-            for b_id in element.split(":"):
-                item_bonus_ids.append(b_id)
-
-        if item_bonus_ids and any(item_bonus_ids):
-            for b_id in item_bonus_ids:
-                if int(b_id) in lookup_ids:
-                    return int(b_id)
-    return None
-
-
 def remove_legendary_bonus_ids(
     profile: dict, unwanted_ids: typing.Iterable[int]
 ) -> dict:

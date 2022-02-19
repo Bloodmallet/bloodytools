@@ -1,29 +1,30 @@
 import dataclasses
 import itertools
 import logging
+from math import gamma
 import typing
 
 from bloodytools.simulations.legendary_simulator import (
-    find_legendary_bonus_id,
     remove_legendary_bonus_ids,
 )
 from bloodytools.simulations.simulator import Simulator
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from simc_support.game_data.Conduit import Conduit, get_conduits_for_spec
 from simc_support.game_data.Covenant import COVENANTS, Covenant
-from simc_support.game_data.Legendary import get_legendaries_for_spec
+from simc_support.game_data.Legendary import get_legendaries_for_spec, Legendary
 from simc_support.game_data.SoulBind import (
     SOULBINDS,
     SoulBind,
     SoulBindTalent,
     get_soul_bind,
 )
+from simc_support.game_data.WowSpec import WowSpec
 
 logger = logging.getLogger(__name__)
 
 MAX_SOULBINDTALENT_TIER = 11
 CONDUIT_MAX_RANK = 11
-CONDUIT_MIN_RANK = 5
+CONDUIT_MIN_RANK = 9
 CONDUIT_RANKS = list(range(CONDUIT_MIN_RANK, CONDUIT_MAX_RANK + 1))
 
 
@@ -50,6 +51,55 @@ def _is_dps_node(talent: SoulBindTalent) -> bool:
     )
 
 
+def find_legendary_bonus_ids(
+    profile: dict, lookup_ids: typing.Iterable[int]
+) -> typing.List[int]:
+    ids_found: typing.List[int] = []
+    for item in profile["items"]:
+        item_bonus_ids: typing.List[str] = []
+        try:
+            tmp_item_bonus_ids = profile["items"][item]["bonus_id"].split("/")
+        except KeyError:
+            continue
+
+        for element in tmp_item_bonus_ids:
+            for b_id in element.split(":"):
+                item_bonus_ids.append(b_id)
+
+        if item_bonus_ids and any(item_bonus_ids):
+            for b_id in item_bonus_ids:
+                if int(b_id) in lookup_ids:
+                    ids_found.append(int(b_id))
+    return ids_found
+
+
+def inject_bonus_id(profile: dict, legendary_id: int) -> None:
+    """bonus_id is injected into the helmet. Thus a helmet needs to be present.
+
+    Args:
+        profile (dict): _description_
+        legendary_id (int): _description_
+    """
+    if not "head" in profile["items"]:
+        raise ValueError("'head' item slot is required.")
+    if "bonus_id" in profile["items"]["head"]:
+        profile["items"]["head"]["bonus_id"] = "/".join(
+            [
+                profile["items"]["head"]["bonus_id"],
+                str(legendary_id),
+            ]
+        )
+    else:
+        profile["items"]["head"]["bonus_id"] = str(legendary_id)
+
+
+def _get_unity(legendaries: typing.List[Legendary], wow_spec: WowSpec) -> Legendary:
+    for legendary in legendaries:
+        if wow_spec in legendary.wow_specs and legendary.full_name == "Unity":
+            return legendary
+    raise ValueError("'Unity' Legendary not found in provided list.")
+
+
 @dataclasses.dataclass
 class SoulbindSimulator(Simulator):
     """Simulator deals with all Nodes and Conduits of all Soulbinds
@@ -74,51 +124,56 @@ class SoulbindSimulator(Simulator):
     def name(cls) -> str:
         return "Soulbinds"
 
+    @classmethod
+    @property
+    def snake_case_name(cls) -> str:
+        """Function is provided to keep downwards-compatibility to 9.1.0 spelling error - damn"""
+        return "soul_binds"
+
     def pre_processing(self, data_dict: dict) -> dict:
         data_dict = super().pre_processing(data_dict)
-        if not _are_all_covenants_present(data_dict["covenant_profiles"]):
-            logger.debug("Purging spec legendaries from base profile")
-            covenant_legendary_ids = [
-                legendary.bonus_id
-                for legendary in get_legendaries_for_spec(self.wow_spec)
-                if len(legendary.covenants) == 1
-            ]
-            data_dict["profile"] = remove_legendary_bonus_ids(
-                data_dict["profile"], covenant_legendary_ids
+
+        legendaries = get_legendaries_for_spec(self.wow_spec)
+
+        # we're assuming here that all profiles will always have a covenant legendary
+        # replace covenant specific bonus ids and use unity instead
+        unity = _get_unity(list(legendaries), self.wow_spec)
+        covenant_legendary_ids = [
+            legendary.bonus_id
+            for legendary in legendaries
+            if len(legendary.covenants) == 1
+        ]
+        remove_legendary_bonus_ids(
+            data_dict["profile"], covenant_legendary_ids + [unity.bonus_id]
+        )
+        inject_bonus_id(data_dict["profile"], unity.bonus_id)
+        for covenant_profile in data_dict["covenant_profiles"].values():
+            remove_legendary_bonus_ids(
+                covenant_profile, covenant_legendary_ids + [unity.bonus_id]
             )
+            inject_bonus_id(covenant_profile, unity.bonus_id)
 
         if self.settings.custom_profile:
-            # replace legendaries if custom profile contained a non-covenant one
-            legendaries = [
-                legendary for legendary in get_legendaries_for_spec(self.wow_spec)
-            ]
-            all_legendary_ids = [legendary.bonus_id for legendary in legendaries]
-            non_covenant_legendary_ids = [
+            # make sure custom profiles non-covenant legendary is used by all covenants
+            # replace non-covenant legendaries by custom profile input
+            non_covenant_legendary_ids: typing.List[int] = [
                 legendary.bonus_id
                 for legendary in legendaries
-                if len(legendary.covenants) > 1
+                if len(legendary.covenants) > 1 and legendary.full_name != "Unity"
             ]
-            legendary_id = find_legendary_bonus_id(
-                data_dict["profile"], all_legendary_ids
-            )
-            if legendary_id:
-                is_non_covenant_legendary = legendary_id in non_covenant_legendary_ids
-                if is_non_covenant_legendary:
-                    for covenant_profile in data_dict["covenant_profiles"].values():
-                        remove_legendary_bonus_ids(covenant_profile, all_legendary_ids)
-                        if "bonus_id" in covenant_profile["items"]["head"]:
-                            covenant_profile["items"]["head"]["bonus_id"] = "/".join(
-                                [
-                                    covenant_profile["items"]["head"]["bonus_id"],
-                                    str(legendary_id),
-                                ]
-                            )
-                        else:
-                            covenant_profile["items"]["head"]["bonus_id"] = str(
-                                legendary_id
-                            )
 
-        if self.settings.custom_profile:
+            legendary_ids = find_legendary_bonus_ids(
+                data_dict["profile"], non_covenant_legendary_ids
+            )
+
+            if legendary_ids:
+                for covenant_profile in data_dict["covenant_profiles"].values():
+                    remove_legendary_bonus_ids(
+                        covenant_profile, non_covenant_legendary_ids
+                    )
+                    for bonus_id in legendary_ids:
+                        inject_bonus_id(covenant_profile, bonus_id)
+
             data_dict["covenant_profiles"] = self._adjust_covenant_profiles_itemlevels(
                 data_dict["profile"], data_dict["covenant_profiles"]
             )
@@ -570,11 +625,21 @@ class SoulbindSimulator(Simulator):
             ) -> bool:
                 return len(conduit.covenants) == 1 and covenant in conduit.covenants
 
+            def max_one_covenant_conduit(conduit1: Conduit, conduit2: Conduit) -> bool:
+                len1 = len(conduit1.covenants)
+                len2 = len(conduit2.covenants)
+                return len1 + len2 > 2
+
             return (
-                are_generic_conduits(conduit1, conduit2)
-                or covenant_specific_conduit_matches_covenant(conduit1, covenant)
-                or covenant_specific_conduit_matches_covenant(conduit2, covenant)
-            ) and conduit1 != conduit2
+                (
+                    are_generic_conduits(conduit1, conduit2)
+                    or covenant_specific_conduit_matches_covenant(conduit1, covenant)
+                    or covenant_specific_conduit_matches_covenant(conduit2, covenant)
+                )
+                and max_one_covenant_conduit(conduit1, conduit2)
+                and conduit1 != conduit2
+                and conduit1.spell_id < conduit2.spell_id
+            )
 
         double_conduits_product = itertools.product(
             CONDUIT_RANKS, COVENANTS, self.conduits, self.conduits
