@@ -235,6 +235,7 @@ class Simulator(abc.ABC):
         self,
         data_dict: dict,
         result_key: str = "sorted_data_keys",
+        ignore_key: str = "",
     ) -> dict:
         """Sort data if it's organized as direct key-value pairs. E.g.
         {
@@ -246,12 +247,16 @@ class Simulator(abc.ABC):
 
         Args:
             data_dict (dict): [description]
+            result_key (str, optional): name of the key added to data_dict. Defaults to "sorted_data_keys"
+            ignore_key (str, optional): entry of data_dict["data"] to be ignored when creating sorted key value data. Defaults to "", thus nothing being filtered
 
         Returns:
             dict: initial dictionary but with the added key <result_key> containing the sorting result
         """
         # create ordered data name list
-        tmp_list: typing.List[str] = list(data_dict["data"].keys())
+        tmp_list: typing.List[str] = [
+            name for name in data_dict["data"].keys() if name != ignore_key
+        ]
         logger.debug("tmp_list: {}".format(tmp_list))
 
         def get_value(data: dict, key: str) -> int:
@@ -273,7 +278,10 @@ class Simulator(abc.ABC):
         return data_dict
 
     def create_sorted_key_key_value_data(
-        self, data_dict: dict, result_key: str = "sorted_data_keys"
+        self,
+        data_dict: dict,
+        result_key: str = "sorted_data_keys",
+        ignore_key: str = "",
     ) -> dict:
         """Sort data if it's organized as key-key-value pairs. E.g.
         {
@@ -291,12 +299,14 @@ class Simulator(abc.ABC):
 
         Args:
             data_dict (dict): [description]
+            result_key (str, optional): name of the key added to data_dict. Defaults to "sorted_data_keys"
+            ignore_key (str, optional): entry of data_dict["data"] to be ignored when creating sorted key value data. Defaults to "", thus nothing being filtered
 
         Returns:
             dict: initial dictionary but with the added key <result_key> containing the sorting result
         """
         # create ordered trinket name list
-        tmp_list = data_dict["data"].keys()
+        tmp_list = [name for name in data_dict["data"].keys() if name != ignore_key]
         logger.debug("tmp_list: {}".format(tmp_list))
 
         def get_max_value(data: dict, key: str) -> int:
