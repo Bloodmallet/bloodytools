@@ -160,6 +160,16 @@ LEGION_AGI_TRINKET_IDS = [
 
 OBSOLETE = [
     "185818",  # So'leah's Secret Technique pre 9.2 version
+    "178850",
+    "180119",
+    "178810",
+    "178783",
+    "184056",
+    "186429",
+    "186435",
+    "186425",
+    "186436",
+    "178770",
 ]
 
 
@@ -183,7 +193,7 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
         )
     )
     trinket_list = [
-        t for t in trinket_list if t.item_id not in OBSOLETE + NON_DPS_TRINKET_IDS
+        t for t in trinket_list if str(t.item_id) not in OBSOLETE + NON_DPS_TRINKET_IDS
     ]
     if wow_spec.stat == Stat.INTELLECT:
         trinket_list = [
@@ -249,20 +259,29 @@ class TrinketSimulator(Simulator):
             data_dict["data_sources"][trinket.name] = trinket.source.value
             data_dict["item_ids"][trinket.name] = trinket.item_id
 
-            if trinket.item_id in SPECIAL_CASE_BONUS_IDS:
-                for stat in SPECIAL_CASE_BONUS_IDS[trinket.item_id].keys():
-                    tmp_name = f"{trinket.name} [{stat.title()}]"
-                    data_dict["translations"][
-                        tmp_name
-                    ] = trinket.translations.get_dict()
-                    for key in data_dict["translations"][tmp_name]:
-                        data_dict["translations"][tmp_name][key] = (
-                            data_dict["translations"][tmp_name][key] + f" {stat}"
-                        )
-                    data_dict["data"][tmp_name] = {}
-                    data_dict["data_active"][tmp_name] = trinket.on_use
-                    data_dict["data_sources"][tmp_name] = trinket.source.value
-                    data_dict["item_ids"][tmp_name] = trinket.item_id
+            for stat in SPECIAL_CASE_BONUS_IDS.get(trinket.item_id, {}).keys():
+                tmp_name = f"{trinket.name} [{stat.title()}]"
+                data_dict["translations"][tmp_name] = trinket.translations.get_dict()
+                for key in data_dict["translations"][tmp_name]:
+                    data_dict["translations"][tmp_name][key] = (
+                        data_dict["translations"][tmp_name][key] + f" [{stat.title()}]"
+                    )
+                data_dict["data"][tmp_name] = {}
+                data_dict["data_active"][tmp_name] = trinket.on_use
+                data_dict["data_sources"][tmp_name] = trinket.source.value
+                data_dict["item_ids"][tmp_name] = trinket.item_id
+
+            for stat in SOLEAHS_SPECIAL_CASES.get(trinket.item_id, {}).keys():
+                tmp_name = f"{trinket.name} [{stat.title()}]"
+                data_dict["translations"][tmp_name] = trinket.translations.get_dict()
+                for key in data_dict["translations"][tmp_name]:
+                    data_dict["translations"][tmp_name][key] = (
+                        data_dict["translations"][tmp_name][key] + f" [{stat.title()}]"
+                    )
+                data_dict["data"][tmp_name] = {}
+                data_dict["data_active"][tmp_name] = trinket.on_use
+                data_dict["data_sources"][tmp_name] = trinket.source.value
+                data_dict["item_ids"][tmp_name] = trinket.item_id
 
         # add itemlevel list
         data_dict["simulated_steps"] = []
@@ -368,6 +387,6 @@ class TrinketSimulator(Simulator):
         data_dict = super().post_processing(data_dict)
 
         # create ordered trinket name list
-        self.create_sorted_key_key_value_data(data_dict)
+        self.create_sorted_key_key_value_data(data_dict, ignore_key="baseline")
 
         return data_dict
