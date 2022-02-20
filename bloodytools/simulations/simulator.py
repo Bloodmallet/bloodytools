@@ -49,7 +49,6 @@ class Simulator(abc.ABC):
         ...
 
     @classmethod
-    @property
     def snake_case_name(cls) -> str:
         """CLI terminonology
 
@@ -213,7 +212,7 @@ class Simulator(abc.ABC):
         Args:
             data_dict (dict): [description]
         """
-        path = os.path.join("results", self.snake_case_name)
+        path = os.path.join("results", self.snake_case_name())
         if not os.path.isdir(path):
             os.makedirs(path)
 
@@ -330,7 +329,7 @@ class Simulator(abc.ABC):
 
 
 class SimulatorFactory:
-    """Factory to make Simulators available by snake_case_names."""
+    """Factory to make Simulators available by snake_case_names()."""
 
     def __init__(self) -> None:
         self._simulators: typing.Dict[str, typing.Type[Simulator]] = {}
@@ -342,18 +341,18 @@ class SimulatorFactory:
             klass (typing.Type[Simulator]): [description]
         """
         # str call makes mypy happy
-        self._simulators[str(klass.snake_case_name)] = klass
+        self._simulators[str(klass.snake_case_name())] = klass
 
     def get_simulator(
         self,
         simulator_name: str,
     ) -> typing.Type[Simulator]:
-        """Get an appropriate Simulator class for the provided simulator_name (snake_case_name)."""
+        """Get an appropriate Simulator class for the provided simulator_name (snake_case_name())."""
 
         try:
             simulator = self._simulators[simulator_name]
         except KeyError:
-            names = [s.snake_case_name for s in self.list_simulators()]
+            names = [s.snake_case_name() for s in self.list_simulators()]
             raise KeyError(
                 f"No Simulator found matching '{simulator_name}'. Available options: {names}"
             )

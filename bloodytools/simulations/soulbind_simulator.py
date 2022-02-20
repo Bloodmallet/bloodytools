@@ -125,7 +125,6 @@ class SoulbindSimulator(Simulator):
         return "Soulbinds"
 
     @classmethod
-    @property
     def snake_case_name(cls) -> str:
         """Function is provided to keep downwards-compatibility to 9.1.0 spelling error - damn"""
         return "soul_binds"

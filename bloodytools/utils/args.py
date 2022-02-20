@@ -49,7 +49,10 @@ def arg_parse_config():
         help="Enables ptr.",
     )
     names = ", ".join(
-        [simulator.snake_case_name for simulator in simulator_factory.list_simulators()]
+        [
+            simulator.snake_case_name()
+            for simulator in simulator_factory.list_simulators()
+        ]
     )
     # sim only one type of data generation for one spec
     parser.add_argument(
