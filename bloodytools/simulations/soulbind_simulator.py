@@ -1,7 +1,6 @@
 import dataclasses
 import itertools
 import logging
-from math import gamma
 import typing
 
 from bloodytools.simulations.legendary_simulator import (
@@ -14,7 +13,6 @@ from simc_support.game_data.Covenant import COVENANTS, Covenant
 from simc_support.game_data.Legendary import get_legendaries_for_spec, Legendary
 from simc_support.game_data.SoulBind import (
     SOULBINDS,
-    SoulBind,
     SoulBindTalent,
     get_soul_bind,
 )
@@ -22,25 +20,11 @@ from simc_support.game_data.WowSpec import WowSpec
 
 logger = logging.getLogger(__name__)
 
-MAX_SOULBINDTALENT_TIER = 11
 CONDUIT_MAX_RANK = 11
-CONDUIT_MIN_RANK = 9
-CONDUIT_RANKS = list(range(CONDUIT_MIN_RANK, CONDUIT_MAX_RANK + 1))
 
 
 def _are_all_covenants_present(profiles: dict) -> bool:
     return len(profiles.keys()) == 4
-
-
-def _get_first_row_soulbindtalent(soulbind: SoulBind) -> SoulBindTalent:
-    for talent in soulbind.soul_bind_talents:
-        if talent.tier == 0:
-            return talent
-    raise ValueError("No first row soulbindtalent found.")
-
-
-def _is_last_row_soulbindtalent(soulbindtalent: SoulBindTalent) -> bool:
-    return soulbindtalent.tier == MAX_SOULBINDTALENT_TIER
 
 
 def _is_dps_node(talent: SoulBindTalent) -> bool:
@@ -192,18 +176,11 @@ class SoulbindSimulator(Simulator):
         profile = data_dict["profile"]
         additional_profiles = data_dict["covenant_profiles"]
 
-        # baseline profiles
-        covenant_simulations = self._create_covenant_simulations(
+        full_path_simulations = self._create_full_path_simulations(
             profile, additional_profiles
         )
 
-        node_simulations = self._create_node_simulations(profile, additional_profiles)
-
-        conduit_simulations = self._create_conduit_simulations(
-            profile, additional_profiles
-        )
-
-        for simulation in covenant_simulations + node_simulations + conduit_simulations:
+        for simulation in full_path_simulations:
             simulation_group.add(simulation)
 
     def post_processing(self, data_dict: dict) -> dict:
@@ -245,210 +222,12 @@ class SoulbindSimulator(Simulator):
             )
             data_dict["conduits"].append(conduit.full_name)
 
-        logger.debug("Setting paths")
-        data_dict["paths"] = {}
-        for soulbind in SOULBINDS:
-            data_dict["paths"][soulbind.full_name] = [
-                [
-                    # setting our own name because Emenis Potency Conduit has a different name
-                    "Potency Conduit" if talent.is_potency else talent.full_name
-                    for talent in path
-                ]
-                for path in soulbind.talent_paths
-            ]
-
-        logger.debug("Setting renowns")
-        data_dict["renowns"] = {}
-        for soulbind in SOULBINDS:
-            path = soulbind.talent_paths[0]
-            renowns = list([node.renown for node in path])
-            data_dict["renowns"][soulbind.full_name] = renowns
-
         logger.debug("Setting simulated_steps")
-        data_dict["simulated_steps"] = sorted(CONDUIT_RANKS, reverse=True)
+        data_dict["simulated_steps"] = [CONDUIT_MAX_RANK]
 
-        logger.debug("Removing first row dps values from last row dps values")
-        for node in self.nodes:
-            if _is_last_row_soulbindtalent(node):
-                soulbind = get_soul_bind(id=node.soulbind_id)
-                covenant = soulbind.covenant
-
-                baseline_dps = data_dict["data"]["baseline"][covenant.full_name]
-                first_row_dps = data_dict["data"].get(
-                    _get_first_row_soulbindtalent(soulbind).full_name,
-                    {covenant.full_name: baseline_dps},
-                )[covenant.full_name]
-                last_row_dps = data_dict["data"][node.full_name][covenant.full_name]
-                actual_dps = max(last_row_dps - first_row_dps, 0) + baseline_dps
-                data_dict["data"][node.full_name][covenant.full_name] = actual_dps
-
-        logger.debug("Finding best paths")
-        data_dict["soul_bind_paths"] = {}
-        data_dict["sorted_data_keys"] = {}
-
-        for rank in CONDUIT_RANKS:
-            data_dict["soul_bind_paths"][str(rank)] = {}
-            soul_bind_dps: typing.List[typing.Tuple[str, int]] = []
-            for soul_bind in SOULBINDS:
-                dps_paths: typing.List[
-                    typing.Tuple[typing.List[SoulBindTalent], int, typing.List[str]]
-                ] = []
-                for path in soul_bind.talent_paths:
-                    filtered_path = [
-                        talent for talent in path if talent.is_dps_increase
-                    ]
-                    purged_path = []
-                    dps_values: typing.List[int] = []
-                    cnt_potency = 0
-                    for soulbind_talent in filtered_path:
-                        if soulbind_talent.is_potency:
-                            # search through all double-potency conduits, if it's available twice
-                            # search through all potency conduits
-                            # add dps
-                            cnt_potency += 1
-                        elif not (
-                            soulbind_talent.is_potency
-                            or soulbind_talent.is_finesse
-                            or soulbind_talent.is_endurance
-                        ):
-                            dps_values.append(
-                                data_dict["data"][soulbind_talent.full_name][
-                                    soul_bind.covenant.full_name
-                                ]
-                            )
-                            purged_path.append(soulbind_talent.full_name)
-                    # add potency dps values
-                    if cnt_potency == 2:
-                        double_potencies: typing.List[typing.Tuple[str, int]] = [
-                            (
-                                name,
-                                data_dict["data"][name][soul_bind.covenant.full_name][
-                                    str(rank)
-                                ],
-                            )
-                            for name in data_dict["data"].keys()
-                            if "+" in name
-                            and soul_bind.covenant.full_name in data_dict["data"][name]
-                        ]
-                        winner_2 = max(
-                            double_potencies, key=lambda key_value: key_value[1]
-                        )
-                        dps_values.append(
-                            data_dict["data"][winner_2[0]][
-                                soul_bind.covenant.full_name
-                            ][str(rank)]
-                        )
-                        purged_path += winner_2[0].split("+")
-                    elif cnt_potency == 1:
-                        potencies: typing.List[typing.Tuple[Conduit, int]] = [
-                            (
-                                conduit,
-                                data_dict["data"][conduit.full_name][
-                                    soul_bind.covenant.full_name
-                                ][str(rank)],
-                            )
-                            for conduit in self.conduits
-                            if conduit.is_potency
-                            and soul_bind.covenant in conduit.covenants
-                        ]
-                        winner_1 = max(potencies, key=lambda key_value: key_value[1])
-                        dps_values.append(
-                            data_dict["data"][winner_1[0].full_name][
-                                soul_bind.covenant.full_name
-                            ][str(rank)]
-                        )
-                        purged_path.append(winner_1[0].full_name)
-
-                    def get_path_sum(
-                        soulbind: SoulBind, dps_values: typing.List[int]
-                    ) -> int:
-                        result = 0
-                        covenant_name: str = soulbind.covenant.full_name
-                        for value in dps_values:
-                            result += max(
-                                value - data_dict["data"]["baseline"][covenant_name],
-                                0,
-                            )
-                        return result
-
-                    # compare only dps gains, without baseline dps
-                    dps_paths.append(
-                        (
-                            path,
-                            get_path_sum(soul_bind, dps_values),
-                            purged_path,
-                        )
-                    )
-
-                winner = max(dps_paths, key=lambda key_value: key_value[1])
-
-                data_dict["soul_bind_paths"][str(rank)][soul_bind.full_name] = winner[2]
-                # add soul bind dps to "data"
-                if soul_bind.full_name not in data_dict["data"]:
-                    data_dict["data"][soul_bind.full_name] = {}
-                data_dict["data"][soul_bind.full_name][str(rank)] = (
-                    winner[1]
-                    + data_dict["data"]["baseline"][soul_bind.covenant.full_name]
-                )
-
-                soul_bind_dps.append(
-                    (
-                        soul_bind.full_name,
-                        data_dict["data"][soul_bind.full_name][str(rank)],
-                    )
-                )
-            ordered_soul_binds = sorted(soul_bind_dps, key=lambda e: e[1], reverse=True)
-
-            data_dict["sorted_data_keys"][str(rank)] = [
-                soul_bind[0] for soul_bind in ordered_soul_binds
-            ]
-
-        logger.debug("Finding best paths for each covenant per rank")
-        # create ordered soul bind name list
-        for rank in CONDUIT_RANKS:
-            for covenant in COVENANTS:
-
-                tmp_list: typing.List[typing.Tuple[str, int]] = []
-                for talent in data_dict["data"]:
-                    if "baseline" in talent:
-                        continue
-
-                    if "+" in talent:
-                        continue
-
-                    try:
-                        tmp_list.append(
-                            (
-                                talent,
-                                data_dict["data"][talent][covenant.full_name][str(rank)]
-                                - data_dict["data"]["baseline"][covenant.full_name],
-                            )
-                        )
-                    except TypeError:
-                        tmp_list.append(
-                            (
-                                talent,
-                                data_dict["data"][talent][covenant.full_name]
-                                - data_dict["data"][f"baseline"][covenant.full_name],
-                            )
-                        )
-                    except KeyError:
-                        continue
-                logger.debug(
-                    "tmp_list for covenant {}: {}".format(covenant.full_name, tmp_list)
-                )
-
-                tmp_list = sorted(tmp_list, key=lambda item: item[1], reverse=True)
-                logger.debug("Sorted tmp_list: {}".format(tmp_list))
-                logger.debug(
-                    "Soul Bind Talent '{}' ({}) won with {} dps.".format(
-                        tmp_list[0][0], covenant.full_name, tmp_list[0][1]
-                    )
-                )
-
-                data_dict[f"sorted_data_keys_{covenant.simc_name}_{rank}"] = [
-                    soul_bind for soul_bind, _ in tmp_list
-                ]
+        data_dict = self.create_sorted_key_key_value_data(
+            data_dict, ignore_key="baseline"
+        )
 
         return data_dict
 
@@ -459,227 +238,133 @@ class SoulbindSimulator(Simulator):
             return additional_profiles.get(covenant.simc_name, profile)
         return profile
 
-    def _create_covenant_simulations(
+    def _create_full_path_simulations(
         self, profile: dict, additional_profiles: dict
     ) -> typing.List[Simulation_Data]:
-        simulations: typing.List[Simulation_Data] = []
 
-        for covenant in COVENANTS:
+        profiles: typing.List[Simulation_Data] = []
 
-            covenant_profile = self._get_covenant_profile(
-                profile=profile,
-                additional_profiles=additional_profiles,
-                covenant=covenant,
-            )
+        def purge_non_dps_elements(
+            path: typing.List[SoulBindTalent],
+        ) -> typing.List[SoulBindTalent]:
+            return [element for element in path if element.is_dps_increase]
 
-            simulation_data = Simulation_Data(
-                name=self.profile_split_character().join(
-                    ["baseline", covenant.full_name]
-                ),
-                fight_style=self.fight_style,
-                profile=covenant_profile,
-                simc_arguments=[
-                    f"covenant={covenant.simc_name}",
-                    "soulbind=",
-                ],
-                target_error=self.settings.target_error.get(self.fight_style, "0.1"),
-                ptr=self.settings.ptr,
-                default_actions=self.settings.default_actions,
-                executable=self.settings.executable,
-                iterations=self.settings.iterations,
-            )
+        def get_unique_dps_paths(
+            paths: typing.List[typing.List[SoulBindTalent]],
+        ) -> typing.List[typing.List[SoulBindTalent]]:
+            unique_dps_paths: typing.Dict[str, typing.List[SoulBindTalent]] = {}
+            for path in paths:
+                dps_path = purge_non_dps_elements(path)
+                dps_path_name = "".join([e.full_name for e in dps_path])
+                unique_dps_paths[dps_path_name] = dps_path
+            return list(unique_dps_paths.values())
 
-            if covenant == COVENANTS[0]:
-                custom_apl = None
-                if self.settings.custom_apl:
-                    with open("custom_apl.txt") as f:
-                        custom_apl = f.read()
-                if custom_apl:
-                    simulation_data.simc_arguments.append("# custom_apl")
-                    simulation_data.simc_arguments.append(custom_apl)
+        def get_longest_unique_paths(
+            paths: typing.List[typing.List[SoulBindTalent]],
+        ) -> typing.List[typing.List[SoulBindTalent]]:
 
-                custom_fight_style = None
-                if self.settings.custom_fight_style:
-                    with open("custom_fight_style.txt") as f:
-                        custom_fight_style = f.read()
-                if custom_fight_style:
-                    simulation_data.simc_arguments.append("# custom_fight_style")
-                    simulation_data.simc_arguments.append(custom_fight_style)
+            unique_paths: typing.List[typing.List[SoulBindTalent]] = []
 
-            simulations.append(simulation_data)
-            logger.debug(
-                (
-                    "Created covenant base profile '{}' in profile '{}'.".format(
-                        covenant.full_name, simulation_data.name
+            sorted_paths = sorted(paths, key=lambda path: len(path), reverse=True)
+
+            # reduce paths to only the longest unique ones
+            for path in sorted_paths:
+                is_path_in_unique_paths = []
+                for unique_path in unique_paths:
+                    simc_names = [e.simc_name for e in unique_path]
+                    is_path_in_unique_path = all(
+                        [element.simc_name in simc_names for element in path]
                     )
-                )
-            )
+                    is_path_in_unique_paths.append(is_path_in_unique_path)
 
-        return simulations
+                if not any(is_path_in_unique_paths):
+                    unique_paths.append(path)
 
-    def _create_node_simulations(
-        self, profile: dict, additional_profiles: dict
-    ) -> typing.List[Simulation_Data]:
-        simulations: typing.List[Simulation_Data] = []
+            return unique_paths
 
-        for node in self.nodes:
-            soulbind = get_soul_bind(id=node.soulbind_id)
+        def count_potency_conduits(path: typing.List[SoulBindTalent]) -> int:
+            return sum([1 if e.is_potency else 0 for e in path])
 
+        def get_potency_combinations(
+            potency_count: int, covenant: Covenant, conduits: typing.Iterable[Conduit]
+        ) -> typing.List[typing.Tuple[Conduit, ...]]:
+            appropriate_conduits = [
+                c
+                for c in conduits
+                if len(c.covenants) > 1
+                or len(c.covenants) == 1
+                and c.covenants[0] == covenant
+            ]
+
+            return list(itertools.combinations(appropriate_conduits, r=potency_count))
+
+        counter = 0
+        for soulbind in SOULBINDS:
             covenant_profile = self._get_covenant_profile(
                 profile=profile,
                 additional_profiles=additional_profiles,
                 covenant=soulbind.covenant,
             )
 
-            # last row nodes ususally need their first row to function properly
-            soulbind_string = str(node.spell_id)
-            if _is_last_row_soulbindtalent(node):
-                soulbind_string += "/" + str(
-                    _get_first_row_soulbindtalent(soulbind).spell_id
+            # print(soulbind.full_name)
+            unique_paths = get_unique_dps_paths(soulbind.talent_paths)
+            paths = get_longest_unique_paths(unique_paths)
+            for path in paths:
+                # print(f"  {count_potency_conduits(path)} {path}")
+                potency_count = count_potency_conduits(path)
+                potency_combinations = get_potency_combinations(
+                    potency_count, soulbind.covenant, self.conduits
                 )
 
-            simulation_data = Simulation_Data(
-                name=self.profile_split_character().join(
-                    [node.full_name, soulbind.covenant.full_name]
-                ),
-                fight_style=self.fight_style,
-                profile=covenant_profile,
-                simc_arguments=[
-                    f"covenant={soulbind.covenant.simc_name}",
-                    f"soulbind={soulbind_string}",
-                ],
-                target_error=self.settings.target_error.get(self.fight_style, "0.1"),
-                ptr=self.settings.ptr,
-                default_actions=self.settings.default_actions,
-                executable=self.settings.executable,
-                iterations=self.settings.iterations,
-            )
-
-            if node.full_name == "Party Favors":
-                simulation_data.simc_arguments += [
-                    "shadowlands.party_favor_type=random"
+                no_potency_path = [
+                    element for element in path if not element.is_potency
                 ]
 
-            simulations.append(simulation_data)
-            logger.debug(
-                (
-                    "Created soulbind node '{}' in profile '{}'.".format(
-                        node.full_name, simulation_data.name
+                for potency_combination in potency_combinations:
+                    # print(f"{no_potency_path} {potency_combination}")
+                    counter += 1
+
+                    path_name = "+".join(
+                        [element.full_name for element in no_potency_path]
+                        + [c.full_name for c in potency_combination]
                     )
-                )
-            )
 
-        return simulations
+                    name = self.profile_split_character().join(
+                        [
+                            soulbind.full_name,
+                            path_name,
+                        ]
+                    )
+                    soulbind_string = "soulbind="
+                    soulbind_string += "/".join(
+                        [str(talent.spell_id) for talent in no_potency_path]
+                    )
+                    soulbind_string += "/" + "/".join(
+                        [
+                            f"{conduit.id}:{CONDUIT_MAX_RANK}:1"
+                            for conduit in potency_combination
+                        ]
+                    )
+                    simulation_data = Simulation_Data(
+                        name=name,
+                        fight_style=self.fight_style,
+                        profile=covenant_profile,
+                        simc_arguments=[
+                            f"covenant={soulbind.covenant.simc_name}",
+                            soulbind_string,
+                        ],
+                        target_error=self.settings.target_error.get(
+                            self.fight_style, "0.1"
+                        ),
+                        ptr=self.settings.ptr,
+                        default_actions=self.settings.default_actions,
+                        executable=self.settings.executable,
+                        iterations=self.settings.iterations,
+                    )
 
-    def _create_conduit_simulations(
-        self, profile: dict, additional_profiles: dict
-    ) -> typing.List[Simulation_Data]:
-        simulations: typing.List[Simulation_Data] = []
+                    profiles.append(simulation_data)
 
-        # single conduits
-        single_conduits_product = itertools.product(
-            CONDUIT_RANKS, COVENANTS, self.conduits
-        )
-        single_conduits = filter(
-            lambda rank_cov_con: rank_cov_con[1] in rank_cov_con[2].covenants,
-            single_conduits_product,
-        )
-        for rank, covenant, conduit in single_conduits:
-            covenant_profile = self._get_covenant_profile(
-                profile=profile,
-                additional_profiles=additional_profiles,
-                covenant=covenant,
-            )
-
-            simulation = Simulation_Data(
-                name=self.profile_split_character().join(
-                    [conduit.full_name, covenant.full_name, str(rank)]
-                ),
-                fight_style=self.fight_style,
-                profile=covenant_profile,
-                simc_arguments=[
-                    f"covenant={covenant.simc_name}",
-                    f"soulbind={conduit.id}:{rank}",
-                ],
-                target_error=self.settings.target_error.get(self.fight_style, "0.1"),
-                ptr=self.settings.ptr,
-                default_actions=self.settings.default_actions,
-                executable=self.settings.executable,
-                iterations=self.settings.iterations,
-            )
-
-            simulations.append(simulation)
-
-        # double conduits
-        def is_valid_combination(
-            rank: int, covenant: Covenant, conduit1: Conduit, conduit2: Conduit
-        ) -> bool:
-            def are_generic_conduits(conduit1: Conduit, conduit2: Conduit) -> bool:
-                len1 = len(conduit1.covenants)
-                len2 = len(conduit2.covenants)
-                return len1 == len2 and len1 + len2 > 2
-
-            def covenant_specific_conduit_matches_covenant(
-                conduit: Conduit, covenant: Covenant
-            ) -> bool:
-                return len(conduit.covenants) == 1 and covenant in conduit.covenants
-
-            def max_one_covenant_conduit(conduit1: Conduit, conduit2: Conduit) -> bool:
-                len1 = len(conduit1.covenants)
-                len2 = len(conduit2.covenants)
-                return len1 + len2 > 2
-
-            return (
-                (
-                    are_generic_conduits(conduit1, conduit2)
-                    or covenant_specific_conduit_matches_covenant(conduit1, covenant)
-                    or covenant_specific_conduit_matches_covenant(conduit2, covenant)
-                )
-                and max_one_covenant_conduit(conduit1, conduit2)
-                and conduit1 != conduit2
-                and conduit1.spell_id < conduit2.spell_id
-            )
-
-        double_conduits_product = itertools.product(
-            CONDUIT_RANKS, COVENANTS, self.conduits, self.conduits
-        )
-        double_conduits = filter(
-            lambda combination: is_valid_combination(*combination),
-            double_conduits_product,
-        )
-
-        for rank, covenant, conduit1, conduit2 in double_conduits:
-            covenant_profile = self._get_covenant_profile(
-                profile=profile,
-                additional_profiles=additional_profiles,
-                covenant=covenant,
-            )
-
-            simulation = Simulation_Data(
-                name=self.profile_split_character().join(
-                    [
-                        f"{conduit1.full_name}+{conduit2.full_name}",
-                        covenant.full_name,
-                        str(rank),
-                    ]
-                ),
-                fight_style=self.fight_style,
-                profile=covenant_profile,
-                simc_arguments=[
-                    f"covenant={covenant.simc_name}",
-                    f"soulbind={conduit1.id}:{rank}/{conduit2.id}:{rank}",
-                ],
-                target_error=self.settings.target_error.get(self.fight_style, "0.1"),
-                ptr=self.settings.ptr,
-                default_actions=self.settings.default_actions,
-                executable=self.settings.executable,
-                iterations=self.settings.iterations,
-            )
-
-            simulations.append(simulation)
-
-        logger.debug(f"Created {len(simulations)} Simulations.")
-        return simulations
+        return profiles
 
     def _adjust_covenant_profiles_itemlevels(
         self, profile: dict, covenant_profiles: dict
