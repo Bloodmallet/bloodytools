@@ -339,22 +339,29 @@ class LegendarySimulator(Simulator):
                 )
 
                 for special_case in SPECIAL_CASES.get(self.wow_spec, []):
-                    if special_case["name"] == legendary.full_name:
+                    if (
+                        special_case["name"] != legendary.full_name
+                        or special_case["covenant"] != covenant.simc_name
+                    ):
+                        continue
 
-                        if (
-                            "fight_styles" in special_case
-                            and self.fight_style.lower()
-                            not in [f.lower() for f in special_case["fight_styles"]]
-                        ):
-                            continue
+                    if (
+                        "fight_styles" in special_case
+                        and self.fight_style.lower()
+                        not in [f.lower() for f in special_case["fight_styles"]]
+                    ):
+                        continue
 
-                        new_simulation_data = simulation_data.copy()
+                    new_simulation_data = simulation_data.copy()
 
-                        new_simulation_data.name = get_legendary_special_case_name(
-                            new_simulation_data.name, special_case["name_additions"]
+                    new_simulation_data.name = (
+                        f"{{{covenant.simc_name}}} "
+                        + get_legendary_special_case_name(
+                            legendary.full_name, special_case["name_additions"]
                         )
-                        new_simulation_data.simc_arguments += special_case["overrides"]
-                        simulation_group.add(new_simulation_data)
+                    )
+                    new_simulation_data.simc_arguments += special_case["overrides"]
+                    simulation_group.add(new_simulation_data)
 
     def post_processing(self, data_dict: dict) -> dict:
         data_dict = super().post_processing(data_dict)

@@ -1,14 +1,139 @@
 # shaman:
 #   enhancement:
 #     - name: Doom Winds
+#       covenant: night_fae
 #       name_additions:
 #         - FW
+#         - SF
 #         - UW
-#         - Asc
 #       overrides:
-#         - talents=2111133
-#         - covenant=night_fae
-#         - soulbind=niya,grove_invigoration/unruly_winds:9:1/niyas_tools_burrs/essential_extraction:9:1/bonded_hearts
+#         - talents=2121131
+#         - soulbind=dreamweaver,podtender/field_of_blossoms/focused_lightning:11:1/essential_extraction:11:1/unruly_winds:11:1/dream_delver
 #       fight_styles:
 #         - patchwerk
 #         - castingpatchwerk
+#     - name: Doom Winds
+#       covenant: kyrian
+#       name_additions:
+#         - FW
+#         - SF
+#         - UW
+#       overrides:
+#         - talents=2121131
+#         - soulbind=forgelite_prime_mikanikos,brons_call_to_action/unruly_winds:11:1/focused_lightning:11:1/elysian_dirge:11:1/soulglow_spectrometer/effusive_anima_accelerator
+#       fight_styles:
+#         - patchwerk
+#         - castingpatchwerk
+#     - name: Doom Winds
+#       covenant: necrolord
+#       name_additions:
+#         - FW
+#         - SF
+#         - UW
+#       overrides:
+#         - talents=2121131
+#         - soulbind=plague_deviser_marileth,volatile_solvent/unruly_winds:11:1/focused_lightning:11:1/tumbling_waves:11:1/kevins_oozeling
+#       fight_styles:
+#         - patchwerk
+#         - castingpatchwerk
+#     - name: Doom Winds
+#       covenant: venthyr
+#       name_additions:
+#         - FW
+#         - SF
+#         - UW
+#       overrides:
+#         - talents=2121131
+#         - soulbind=nadjia_the_mistblade,thrill_seeker/unruly_winds:11:1/focused_lightning:11:1/dauntless_duelist/fatal_flaw
+#       fight_styles:
+#         - patchwerk
+#         - castingpatchwerk
+
+#     - name: Doom Winds
+#       covenant: night_fae
+#       name_additions:
+#         - FW
+#         - SF
+#         - UW
+#       overrides:
+#         - talents=2123131
+#         - soulbind=dreamweaver,podtender/field_of_blossoms/focused_lightning:11:1/essential_extraction:11:1/unruly_winds:11:1/dream_delver
+#       fight_styles:
+#         - hecticaddcleave
+#     - name: Doom Winds
+#       covenant: kyrian
+#       name_additions:
+#         - FW
+#         - SF
+#         - UW
+#       overrides:
+#         - talents=2123131
+#         - soulbind=forgelite_prime_mikanikos,brons_call_to_action/unruly_winds:11:1/focused_lightning:11:1/elysian_dirge:11:1/soulglow_spectrometer/effusive_anima_accelerator
+#       fight_styles:
+#         - hecticaddcleave
+#     - name: Doom Winds
+#       covenant: necrolord
+#       name_additions:
+#         - FW
+#         - SF
+#         - UW
+#       overrides:
+#         - talents=2123131
+#         - soulbind=plague_deviser_marileth,volatile_solvent/unruly_winds:11:1/focused_lightning:11:1/tumbling_waves:11:1/kevins_oozeling
+#       fight_styles:
+#         - hecticaddcleave
+#     - name: Doom Winds
+#       covenant: venthyr
+#       name_additions:
+#         - FW
+#         - SF
+#         - UW
+#       overrides:
+#         - talents=2123131
+#         - soulbind=nadjia_the_mistblade,thrill_seeker/unruly_winds:11:1/focused_lightning:11:1/dauntless_duelist/fatal_flaw
+#       fight_styles:
+#         - hecticaddcleave
+#     - name: Deeply Rooted Elements
+#       covenant: night_fae
+#       name_additions:
+#         - FW
+#         - SF
+#         - UW
+#       overrides:
+#         - talents=2123131
+#         - soulbind=dreamweaver,podtender/field_of_blossoms/focused_lightning:11:1/essential_extraction:11:1/unruly_winds:11:1/dream_delver
+#       fight_styles:
+#         - hecticaddcleave
+#     - name: Deeply Rooted Elements
+#       covenant: kyrian
+#       name_additions:
+#         - FW
+#         - SF
+#         - UW
+#       overrides:
+#         - talents=2123131
+#         - soulbind=forgelite_prime_mikanikos,brons_call_to_action/unruly_winds:11:1/focused_lightning:11:1/elysian_dirge:11:1/soulglow_spectrometer/effusive_anima_accelerator
+#       fight_styles:
+#         - hecticaddcleave
+#     - name: Deeply Rooted Elements
+#       covenant: necrolord
+#       name_additions:
+#         - FW
+#         - SF
+#         - UW
+#       overrides:
+#         - talents=2123131
+#         - soulbind=plague_deviser_marileth,volatile_solvent/unruly_winds:11:1/focused_lightning:11:1/tumbling_waves:11:1/kevins_oozeling
+#       fight_styles:
+#         - hecticaddcleave
+#     - name: Deeply Rooted Elements
+#       covenant: venthyr
+#       name_additions:
+#         - FW
+#         - SF
+#         - UW
+#       overrides:
+#         - talents=2123131
+#         - soulbind=nadjia_the_mistblade,thrill_seeker/unruly_winds:11:1/focused_lightning:11:1/dauntless_duelist/fatal_flaw
+#       fight_styles:
+#         - hecticaddcleave
