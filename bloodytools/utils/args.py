@@ -43,9 +43,8 @@ def arg_parse_config():
         "-ptr",
         "--ptr",
         action="store_const",
-        # TODO: switch True and False after 9.2 goes live
         const=True,
-        default=True,
+        default=False,
         help="Enables ptr.",
     )
     names = ", ".join(
