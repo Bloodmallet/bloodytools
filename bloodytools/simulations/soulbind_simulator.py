@@ -274,6 +274,8 @@ class SoulbindSimulator(Simulator):
                     simc_names = [e.simc_name for e in unique_path]
                     is_path_in_unique_path = all(
                         [element.simc_name in simc_names for element in path]
+                    ) and count_potency_conduits(path) <= count_potency_conduits(
+                        unique_path
                     )
                     is_path_in_unique_paths.append(is_path_in_unique_path)
 
