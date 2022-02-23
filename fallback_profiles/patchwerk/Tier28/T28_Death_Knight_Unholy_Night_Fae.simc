@@ -6,7 +6,7 @@ role=attack
 position=back
 talents=2303031
 covenant=night_fae
-soulbind=dreamweaver,podtender/eternal_hunger:11:1/convocation_of_the_dead:11:1/brutal_grasp:11:1/field_of_blossoms/dream_delver
+soulbind=dreamweaver,podtender/eternal_hunger:11:1/convocation_of_the_dead:11:1/withering_ground:11:1/field_of_blossoms/dream_delver
 renown=80
 
 head=shadowghast_helm,id=171415,bonus_id=6716/6951/6649/6647/1588,gem_id=173128
