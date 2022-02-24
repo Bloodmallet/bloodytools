@@ -18,6 +18,8 @@ from simc_support.game_data.SoulBind import (
 )
 from simc_support.game_data.WowSpec import WowSpec
 
+from bloodytools.utils.utils import extract_profile
+
 logger = logging.getLogger(__name__)
 
 CONDUIT_MAX_RANK = 11
@@ -371,6 +373,21 @@ class SoulbindSimulator(Simulator):
     def _adjust_covenant_profiles_itemlevels(
         self, profile: dict, covenant_profiles: dict
     ) -> dict:
+        """Adjust itemlevel IF a custom profile was submitted. Otherwise more or less equal base profiles are assumed.
+
+        Args:
+            profile (dict): _description_
+            covenant_profiles (dict): _description_
+
+        Returns:
+            dict: _description_
+        """
+
+        try:
+            extract_profile("custom_profile.txt", self.wow_spec.wow_class)
+        except ValueError:
+            logger.info("Nothing to adjust. No custom profile found.")
+            return covenant_profiles
 
         simulation = Simulation_Data(
             name="Grab dem average itemlevel",
