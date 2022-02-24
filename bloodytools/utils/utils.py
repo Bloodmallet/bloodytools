@@ -336,7 +336,7 @@ def get_profile(wow_spec: WowSpec, fight_style: str, settings: Config) -> dict:
             pass
 
     if not profile:
-        raise FileNotFoundError("No profile found or provided.")
+        raise FileNotFoundError(f"No profile found or provided for {wow_spec}.")
 
     return profile
 
