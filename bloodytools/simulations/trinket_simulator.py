@@ -63,6 +63,7 @@ NON_DPS_TRINKET_IDS = [
     "142169",  # Raven Eidolon
     "142168",  # Majordomo's Dinner Bell
     "151340",  # Echo of L'ura
+    "186434",  # Weave of Warped Fates
 ]
 
 LEGION_INT_TRINKET_IDS = [
@@ -283,19 +284,6 @@ class TrinketSimulator(Simulator):
                 data_dict["data_sources"][tmp_name] = trinket.source.value
                 data_dict["item_ids"][tmp_name] = trinket.item_id
 
-        # add itemlevel list
-        data_dict["simulated_steps"] = []
-        for trinket in trinket_list:
-            for itemlevel in filter(
-                lambda x: _is_valid_itemlevel(x, self.settings), trinket.itemlevels
-            ):
-                data_dict["simulated_steps"].append(itemlevel)
-
-        data_dict["simulated_steps"] = sorted(list(set(data_dict["simulated_steps"])))
-
-        # change order from ascending to descending to keep the order of previous versions
-        data_dict["simulated_steps"].sort(reverse=True)
-
         return data_dict
 
     def add_simulation_data(
@@ -336,9 +324,30 @@ class TrinketSimulator(Simulator):
 
         for trinket in trinket_list:
             # for each available itemlevel of the trinket
-            for itemlevel in filter(
-                lambda x: _is_valid_itemlevel(x, self.settings), trinket.itemlevels
-            ):
+            itemlevels = list(
+                filter(
+                    lambda x: _is_valid_itemlevel(x, self.settings), trinket.itemlevels
+                )
+            )
+            # weed out every other itemlevel, except first and last
+            if len(itemlevels) > 10:
+                first = itemlevels[0]
+                last = itemlevels[-1]
+                filtered_itemlevels = [
+                    level for i, level in enumerate(itemlevels, 1) if i % 2
+                ]
+                if last not in filtered_itemlevels:
+                    filtered_itemlevels = [first] + [
+                        level for i, level in enumerate(itemlevels, 1) if (i + 1) % 2
+                    ]
+                if first not in filtered_itemlevels or last not in filtered_itemlevels:
+                    raise ValueError(
+                        "Somehow first or last valid itemlevel are missing the generated filtered_itemlevels."
+                    )
+            else:
+                filtered_itemlevels = itemlevels
+
+            for itemlevel in filtered_itemlevels:
                 simulation_data = Simulation_Data(
                     name=self.profile_split_character().join(
                         [trinket.name, str(itemlevel)]
@@ -385,6 +394,14 @@ class TrinketSimulator(Simulator):
 
     def post_processing(self, data_dict: dict) -> dict:
         data_dict = super().post_processing(data_dict)
+
+        # derive itemlevel list from simulated information
+        simulated_steps = set()
+        for values in data_dict["data"].values():
+            for step in values.keys():
+                # conversion to int to keep old behavior
+                simulated_steps.add(int(step))
+        data_dict["simulated_steps"] = sorted(list(simulated_steps), reverse=True)
 
         # create ordered trinket name list
         self.create_sorted_key_key_value_data(data_dict, ignore_key="baseline")
