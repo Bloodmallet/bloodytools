@@ -169,7 +169,9 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
         dict -- all known character data
     """
     # ! expansion specific
-    minimal_profile_keys = {
+    minimal_profile_keys: typing.Dict[
+        str, typing.Dict[str, typing.Union[str, typing.Dict[str, str]]]
+    ] = {
         "character": {
             "class": "",
             "covenant": "",
