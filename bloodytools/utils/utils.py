@@ -168,21 +168,51 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     Returns:
         dict -- all known character data
     """
+    # ! expansion specific
+    minimal_profile_keys = {
+        "character": {
+            "class": "",
+            "covenant": "",
+            "level": "",
+            "position": "",
+            "race": "",
+            "role": "",
+            "soulbind": "",
+            "spec": "",
+            "talents": "",
+        },
+        "items": {
+            "back": {},
+            "chest": {},
+            "feet": {},
+            "finger1": {},
+            "finger2": {},
+            "hands": {},
+            "head": {},
+            "legs": {},
+            "main_hand": {},
+            "neck": {},
+            "off_hand": {},
+            "shoulders": {},
+            "trinket1": {},
+            "trinket2": {},
+            "waist": {},
+            "wrists": {},
+        },
+    }
 
     if os.stat(path).st_size == 0:
         raise ValueError("Empty file")
 
     if profile is None:
-        profile = {}
+        provided_profile = {}
+    else:
+        provided_profile = profile
 
-    provided_profile = profile
-
-    profile = {}
-
-    if not "character" in profile:
-        profile["character"] = {}
-
-    profile["character"]["class"] = wow_class.simc_name
+    profile = {
+        "character": {"class": wow_class.simc_name},
+        "items": {},
+    }
 
     # prepare regex for each extractable slot
     item_slots = [
@@ -267,9 +297,6 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
 
             for slot in item_slots:
 
-                if not "items" in profile:
-                    profile["items"] = {}
-
                 matches = pattern_slots[slot].search(line)
                 slot_name = slot
                 if slot in official_name:
@@ -294,7 +321,20 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
 
     logger.debug(f"extracted profile from '{path}' : {profile}")
 
-    return profile if profile["items"] else provided_profile
+    # validate profile
+    missing_character_keys = []
+    for key in minimal_profile_keys["character"].keys():
+        if key not in profile["character"]:
+            missing_character_keys.append(key)
+    if missing_character_keys:
+        raise ValueError(
+            f"Not a complete profile. Missing keys: {missing_character_keys}"
+        )
+
+    return_profile = profile if profile["items"] else provided_profile
+    logger.debug(f"returning profile: {return_profile}")
+
+    return return_profile
 
 
 def get_profile(wow_spec: WowSpec, fight_style: str, settings: Config) -> dict:
