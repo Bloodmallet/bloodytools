@@ -23,7 +23,6 @@ UNWANTED_LEGENDARIES = [
     339340,  # Norgannon's Sagacity
     339351,  # Stable Phantasma Lure
     338743,  # Vitality Sacrifice
-    364738,  # Unity
 ]
 
 
@@ -134,6 +133,7 @@ class LegendarySimulator(Simulator):
             legendary
             for legendary in legendaries
             if legendary.spell_id not in UNWANTED_LEGENDARIES
+            and legendary.full_name != "Unity"
         ]
         self.legendaries = filtered_legendaries
 
