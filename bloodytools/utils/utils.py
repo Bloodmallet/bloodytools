@@ -64,7 +64,11 @@ def get_fallback_profile_path(tier: str, fight_style: str) -> str:
     tmp_tier = "PR" if "PR" in str(tier) else f"Tier{tier}"
     self_file_path = os.path.dirname(os.path.abspath(__file__))
     base_path = os.path.dirname(os.path.dirname(self_file_path))
-    return os.path.join(base_path, "fallback_profiles", fight_style, tmp_tier)
+    fall_back_profile_path = os.path.join(
+        base_path, "fallback_profiles", fight_style, tmp_tier
+    )
+    logger.debug(f"fall_back_profile_path for {tier} is '{fall_back_profile_path}'")
+    return fall_back_profile_path
 
 
 def _get_simc_spec_file_name(
@@ -107,6 +111,7 @@ def get_fallback_covenant_profile_strings(
         cov_path = os.path.join(base_path, file_name)
         if os.path.isfile(cov_path):
             paths += [cov_path]
+    logger.debug(paths)
     return paths
 
 
@@ -131,11 +136,11 @@ def get_simc_covenant_profile_strings(
         Iterable[Str]: profile strings of covenant profiles
     """
 
+    base_string = create_basic_profile_string(wow_spec, tier, settings)
     strings = []
     for covenant in COVENANTS:
-        string = create_basic_profile_string(wow_spec, tier, settings)
 
-        string = string[:-5] + f"_{covenant.simc_name.title()}.simc"
+        string = base_string[:-5] + f"_{covenant.simc_name.title()}.simc"
 
         if os.path.isfile(string):
             strings += [string]
@@ -287,7 +292,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
                                 "information"
                             ).replace('"', "")
 
-    logger.debug(f"extracted profile: {profile}")
+    logger.debug(f"extracted profile from '{path}' : {profile}")
 
     return profile if profile["items"] else provided_profile
 
