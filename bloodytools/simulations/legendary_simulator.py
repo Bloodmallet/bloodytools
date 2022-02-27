@@ -14,6 +14,8 @@ from simc_support.game_data.Legendary import (
 from simc_support.game_data.WowSpec import WowSpec, get_wow_spec
 from simc_support.game_data.Covenant import Covenant
 
+from bloodytools.utils.utils import extract_profile
+
 logger = logging.getLogger(__name__)
 
 # spell ids
@@ -73,41 +75,6 @@ def remove_legendary_bonus_ids(
     return profile
 
 
-def _adjust_covenant_profiles_itemlevels(
-    profile: dict, covenant_profiles: dict, settings: Config, fight_style
-) -> dict:
-
-    simulation = Simulation_Data(
-        name="Grab dem average itemlevel",
-        fight_style=fight_style,
-        target_error="0.1",
-        iterations="1",
-        profile=profile,
-        ptr=settings.ptr,
-        default_actions=settings.default_actions,
-        executable=settings.executable,
-    )
-    simulation.simulate()
-
-    logger.debug("Mini simulation is done")
-
-    ilevels = [
-        slot["ilevel"]
-        for slot in simulation.json_data["sim"]["players"][0]["gear"].values()
-        if slot["ilevel"] > 0
-    ]
-    average_itemlevel = sum(ilevels) / len(ilevels)
-    logger.debug(f"Calculated average itemlevel to be: {average_itemlevel}")
-
-    for covenant_profile in covenant_profiles.values():
-        for slot in covenant_profile["items"].values():
-            slot["ilevel"] = str(int(average_itemlevel))
-
-    logger.debug("Adjusted covenant profiles to new average itemlevel")
-
-    return covenant_profiles
-
-
 def get_legendary_special_case_name(
     base_name: str, name_additions: typing.List[str]
 ) -> str:
@@ -131,6 +98,21 @@ def _get_legendary(full_name: str) -> typing.Optional[Legendary]:
         if legendary.full_name == full_name:
             return legendary
     return None
+
+
+def _get_head_with_legendary(profile: dict) -> str:
+    item_information = profile["items"]["head"]
+    constructed_item = f"head=,id={item_information['id']}"
+    for key in item_information.keys():
+        if key not in ("id", "bonus_id"):
+            constructed_item += f",{key}={item_information[key]}"
+
+    try:
+        head = constructed_item + f",bonus_id={item_information['bonus_id']}/"
+    except KeyError:
+        head = constructed_item + f",bonus_id="
+
+    return head
 
 
 class LegendarySimulator(Simulator):
@@ -173,11 +155,9 @@ class LegendarySimulator(Simulator):
             data_dict["spell_ids"][legendary.full_name] = legendary.spell_id
 
         if self.settings.custom_profile:
-            data_dict["covenant_profiles"] = _adjust_covenant_profiles_itemlevels(
+            data_dict["covenant_profiles"] = self._adjust_covenant_profiles_itemlevels(
                 data_dict["profile"],
                 data_dict["covenant_profiles"],
-                self.settings,
-                self.fight_style,
             )
 
         SPECIAL_CASES = _load_special_cases()
@@ -204,20 +184,8 @@ class LegendarySimulator(Simulator):
     def add_simulation_data(
         self, simulation_group: Simulation_Group, data_dict: dict
     ) -> None:
-        item_information = data_dict["profile"]["items"]["head"]
-        constructed_item = f"head=,id={item_information['id']}"
-        for key in item_information.keys():
-            if key not in ("id", "bonus_id"):
-                constructed_item += f",{key}={item_information[key]}"
 
-        try:
-            baseline_item = (
-                constructed_item + f",bonus_id={item_information['bonus_id']}"
-            )
-        except KeyError:
-            baseline_item = constructed_item + f",bonus_id="
-
-        covenant_item = baseline_item
+        covenant_item = _get_head_with_legendary(data_dict["profile"])
         covenant_simc_name = data_dict["profile"]["character"]["covenant"]
         covenant_legendary = _get_covenant_legendary(
             covenant_simc_name, self.legendaries
@@ -261,7 +229,9 @@ class LegendarySimulator(Simulator):
         SPECIAL_CASES = _load_special_cases()
 
         for covenant_name in data_dict["covenant_profiles"]:
-            covenant_item = baseline_item
+            covenant_item = _get_head_with_legendary(
+                data_dict["covenant_profiles"][covenant_name]
+            )
             covenant_simc_name = covenant_name
             covenant_legendary = _get_covenant_legendary(
                 covenant_simc_name, self.legendaries
@@ -306,7 +276,7 @@ class LegendarySimulator(Simulator):
                 elif covenant.simc_name in data_dict["covenant_profiles"]:
                     profile = data_dict["covenant_profiles"][covenant.simc_name]
 
-                covenant_item = baseline_item
+                covenant_item = _get_head_with_legendary(profile)
                 covenant_simc_name = covenant.simc_name
                 covenant_legendary = _get_covenant_legendary(
                     covenant_simc_name, self.legendaries
@@ -381,3 +351,43 @@ class LegendarySimulator(Simulator):
         ]
 
         return data_dict
+
+    def _adjust_covenant_profiles_itemlevels(
+        self, profile: dict, covenant_profiles: dict
+    ) -> dict:
+
+        try:
+            extract_profile("custom_profile.txt", self.wow_spec.wow_class)
+        except ValueError:
+            logger.info("Nothing to adjust. No custom profile found.")
+            return covenant_profiles
+
+        simulation = Simulation_Data(
+            name="Grab dem average itemlevel",
+            fight_style=self.fight_style,
+            target_error="0.1",
+            iterations="1",
+            profile=profile,
+            ptr=self.settings.ptr,
+            default_actions=self.settings.default_actions,
+            executable=self.settings.executable,
+        )
+        simulation.simulate()
+
+        logger.debug("Mini simulation is done")
+
+        ilevels = [
+            slot["ilevel"]
+            for slot in simulation.json_data["sim"]["players"][0]["gear"].values()
+            if slot["ilevel"] > 0
+        ]
+        average_itemlevel = sum(ilevels) / len(ilevels)
+        logger.debug(f"Calculated average itemlevel to be: {average_itemlevel}")
+
+        for covenant_profile in covenant_profiles.values():
+            for slot in covenant_profile["items"].values():
+                slot["ilevel"] = str(int(average_itemlevel))
+
+        logger.debug("Adjusted covenant profiles to new average itemlevel")
+
+        return covenant_profiles
