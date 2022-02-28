@@ -3,22 +3,15 @@ import itertools
 import logging
 import typing
 
-from bloodytools.simulations.legendary_simulator import (
-    remove_legendary_bonus_ids,
-)
+from bloodytools.simulations.legendary_simulator import remove_legendary_bonus_ids
 from bloodytools.simulations.simulator import Simulator
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
+from bloodytools.utils.utils import EmptyFileError, extract_profile
 from simc_support.game_data.Conduit import Conduit, get_conduits_for_spec
 from simc_support.game_data.Covenant import COVENANTS, Covenant
-from simc_support.game_data.Legendary import get_legendaries_for_spec, Legendary
-from simc_support.game_data.SoulBind import (
-    SOULBINDS,
-    SoulBindTalent,
-    get_soul_bind,
-)
+from simc_support.game_data.Legendary import Legendary, get_legendaries_for_spec
+from simc_support.game_data.SoulBind import SOULBINDS, SoulBindTalent, get_soul_bind
 from simc_support.game_data.WowSpec import WowSpec
-
-from bloodytools.utils.utils import extract_profile
 
 logger = logging.getLogger(__name__)
 
@@ -385,7 +378,7 @@ class SoulbindSimulator(Simulator):
 
         try:
             extract_profile("custom_profile.txt", self.wow_spec.wow_class)
-        except ValueError:
+        except EmptyFileError:
             logger.info("Nothing to adjust. No custom profile found.")
             return covenant_profiles
 

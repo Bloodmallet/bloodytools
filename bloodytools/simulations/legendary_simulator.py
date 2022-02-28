@@ -4,17 +4,15 @@ import typing
 import pkg_resources
 import yaml
 from bloodytools.simulations.simulator import Simulator
-from bloodytools.utils.config import Config
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
+from bloodytools.utils.utils import EmptyFileError, extract_profile
+from simc_support.game_data.Covenant import Covenant
 from simc_support.game_data.Legendary import (
-    get_legendaries_for_spec,
-    Legendary,
     LEGENDARIES,
+    Legendary,
+    get_legendaries_for_spec,
 )
 from simc_support.game_data.WowSpec import WowSpec, get_wow_spec
-from simc_support.game_data.Covenant import Covenant
-
-from bloodytools.utils.utils import extract_profile
 
 logger = logging.getLogger(__name__)
 
@@ -358,7 +356,7 @@ class LegendarySimulator(Simulator):
 
         try:
             extract_profile("custom_profile.txt", self.wow_spec.wow_class)
-        except ValueError:
+        except EmptyFileError:
             logger.info("Nothing to adjust. No custom profile found.")
             return covenant_profiles
 

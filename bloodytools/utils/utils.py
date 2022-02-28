@@ -14,6 +14,14 @@ from simc_support.game_data.WowSpec import WowSpec
 logger = logging.getLogger(__name__)
 
 
+class EmptyFileError(Exception):
+    pass
+
+
+class IncompleteProfileError(Exception):
+    pass
+
+
 def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: Config) -> str:
     """Create basic profile string to get the standard profile of a spec. Use this function to get the necessary string for your first argument of a simulation_data object.
 
@@ -176,7 +184,7 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
             "class": "",
             "covenant": "",
             "level": "",
-            "position": "",
+            # "position": "",  # optional
             "race": "",
             "role": "",
             "soulbind": "",
@@ -204,7 +212,11 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
     }
 
     if os.stat(path).st_size == 0:
-        raise ValueError("Empty file")
+        raise EmptyFileError("Empty file")
+    with open(path, "r") as f:
+        file_content = f.read()
+    if file_content.strip() == "":
+        raise EmptyFileError("Empty file")
 
     if profile is None:
         provided_profile = {}
@@ -329,8 +341,8 @@ def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dic
         if key not in profile["character"]:
             missing_character_keys.append(key)
     if missing_character_keys:
-        raise ValueError(
-            f"Not a complete profile. Missing keys: {missing_character_keys}"
+        raise IncompleteProfileError(
+            f"'{path}' does not contain a complete profile. Missing keys: {missing_character_keys}"
         )
 
     return_profile = profile if profile["items"] else provided_profile
@@ -361,26 +373,29 @@ def get_profile(wow_spec: WowSpec, fight_style: str, settings: Config) -> dict:
     fallback_profile_location = get_fallback_profile_string(
         wow_spec, settings.tier, fight_style
     )
+    profile = {}
     try:
         profile = extract_profile(fallback_profile_location, wow_spec.wow_class)
-    except FileNotFoundError:
-        profile = None
+    except FileNotFoundError as e:
+        logger.debug(
+            f"Fallback profile '{fallback_profile_location}' not found. Skipping"
+        )
 
     # load base profile for patchwerk or fallback doesn't exist
-    if profile is None or "patchwerk" in fight_style.lower():
+    if not profile or "patchwerk" in fight_style.lower():
         profile_location = create_basic_profile_string(
             wow_spec, settings.tier, settings
         )
         try:
             profile = extract_profile(profile_location, wow_spec.wow_class)
         except FileNotFoundError:
-            profile = None
+            logger.debug(f"Profile '{profile_location}' not found. Skipping")
 
     if settings.custom_profile:
         try:
             profile = extract_profile("custom_profile.txt", wow_spec.wow_class, profile)
-        except ValueError:
-            pass
+        except EmptyFileError as e:
+            logger.debug(e)
 
     if not profile:
         raise FileNotFoundError(f"No profile found or provided for {wow_spec}.")
