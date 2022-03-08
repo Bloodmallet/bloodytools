@@ -1,6 +1,6 @@
 deathknight="T28_Death_Knight_Frost_Venthyr"
 level=60
-race=orc
+race=human
 spec=frost
 role=attack
 position=back
