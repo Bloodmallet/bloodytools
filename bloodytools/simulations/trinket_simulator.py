@@ -157,6 +157,7 @@ LEGION_AGI_TRINKET_IDS = [
     "142165",  # Deteriorated Construct Core    https://www.wowhead.com/item=142165
     # "144480",  # Dreadstone of Endless Shadows    https://www.wowhead.com/item=144480
     # "151310",  # Reality Breacher    https://www.wowhead.com/item=151310
+    "137537",  # Tirathon's Betrayal    https://www.wowhead.com/item=137537
 ]
 
 OBSOLETE = [
