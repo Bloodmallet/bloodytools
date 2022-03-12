@@ -281,6 +281,7 @@ class Simulator(abc.ABC):
         data_dict: dict,
         result_key: str = "sorted_data_keys",
         ignore_key: str = "",
+        ignore_keys: typing.Optional[typing.List[str]] = None,
     ) -> dict:
         """Sort data if it's organized as key-key-value pairs. E.g.
         {
@@ -306,6 +307,8 @@ class Simulator(abc.ABC):
         """
         # create ordered trinket name list
         tmp_list = [name for name in data_dict["data"].keys() if name != ignore_key]
+        if ignore_keys:
+            tmp_list = [name for name in tmp_list if name not in ignore_keys]
         logger.debug("tmp_list: {}".format(tmp_list))
 
         def get_max_value(data: dict, key: str) -> int:

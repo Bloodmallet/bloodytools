@@ -8,9 +8,11 @@ from bloodytools.simulations.soulbind_simulator import SoulbindSimulator
 from bloodytools.simulations.talent_simulator import TalentSimulator
 from bloodytools.simulations.tier_set_simulator import TierSetSimulator
 from bloodytools.simulations.trinket_simulator import TrinketSimulator
+from bloodytools.simulations.conduit_simulator import ConduitSimulator
 
 simulator_factory = SimulatorFactory()
 
+simulator_factory.register_simulator(ConduitSimulator)
 simulator_factory.register_simulator(LegendarySimulator)
 simulator_factory.register_simulator(RaceSimulator)
 simulator_factory.register_simulator(SecondaryDistributionSimulator)
