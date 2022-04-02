@@ -3,7 +3,7 @@ import itertools
 import logging
 import typing
 
-from bloodytools.simulations.legendary_simulator import remove_legendary_bonus_ids
+from bloodytools.simulations.legendary_simulator import remove_bonus_ids
 from bloodytools.simulations.simulator import Simulator
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from bloodytools.utils.utils import EmptyFileError, extract_profile
@@ -121,12 +121,12 @@ class SoulbindSimulator(Simulator):
             for legendary in legendaries
             if len(legendary.covenants) == 1
         ]
-        remove_legendary_bonus_ids(
+        remove_bonus_ids(
             data_dict["profile"], covenant_legendary_ids + [unity.bonus_id]
         )
         inject_bonus_id(data_dict["profile"], unity.bonus_id)
         for covenant_profile in data_dict["covenant_profiles"].values():
-            remove_legendary_bonus_ids(
+            remove_bonus_ids(
                 covenant_profile, covenant_legendary_ids + [unity.bonus_id]
             )
             inject_bonus_id(covenant_profile, unity.bonus_id)
@@ -146,9 +146,7 @@ class SoulbindSimulator(Simulator):
 
             if legendary_ids:
                 for covenant_profile in data_dict["covenant_profiles"].values():
-                    remove_legendary_bonus_ids(
-                        covenant_profile, non_covenant_legendary_ids
-                    )
+                    remove_bonus_ids(covenant_profile, non_covenant_legendary_ids)
                     for bonus_id in legendary_ids:
                         inject_bonus_id(covenant_profile, bonus_id)
 
