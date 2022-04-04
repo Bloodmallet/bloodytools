@@ -31,7 +31,7 @@ def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: Config) 
       settings {Config}
 
     Returns:
-      str -- relative link to the standard simc profile
+      str -- relative link to the standard simc profile. E.g. ./SimulationCraft/profiles/<tier>/<tier>_<wow_spec>.simc
     """
 
     logger.debug("create_basic_profile_string start")
@@ -69,6 +69,7 @@ def create_basic_profile_string(wow_spec: WowSpec, tier: str, settings: Config) 
 
 
 def get_fallback_profile_path(tier: str, fight_style: str) -> str:
+    """e.g. ./fallback_profiles/<fight_style>/<tier>"""
     tmp_tier = "PR" if "PR" in str(tier) else f"Tier{tier}"
     self_file_path = os.path.dirname(os.path.abspath(__file__))
     base_path = os.path.dirname(os.path.dirname(self_file_path))
@@ -80,7 +81,7 @@ def get_fallback_profile_path(tier: str, fight_style: str) -> str:
 
 
 def _get_simc_spec_file_name(
-    tier: str, wow_spec: WowSpec, covenant: Covenant = None
+    tier: str, wow_spec: WowSpec, covenant: typing.Optional[Covenant] = None
 ) -> str:
     name_start = (
         f"{tier}_{wow_spec.wow_class.simc_name.title()}_{wow_spec.simc_name.title()}"
@@ -124,6 +125,7 @@ def get_fallback_covenant_profile_strings(
 
 
 def get_fallback_profile_string(wow_spec: WowSpec, tier: str, fight_style: str) -> str:
+    """e.g. ./fallback_profiles/<fight_style>/<tier>/<tier>_<wow_spec>.simc"""
     base_path = get_fallback_profile_path(tier, fight_style)
     tmp_tier = _get_tier_file_name_part(tier)
     name = _get_simc_spec_file_name(tmp_tier, wow_spec)
@@ -166,7 +168,9 @@ def pretty_timestamp() -> str:
     return datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M")
 
 
-def extract_profile(path: str, wow_class: WowClass, profile: dict = None) -> dict:
+def extract_profile(
+    path: str, wow_class: WowClass, profile: typing.Optional[dict] = None
+) -> dict:
     """Extract all character specific data from a given file.
 
     Arguments:
@@ -452,6 +456,10 @@ def create_base_json_dict(
             continue
         else:
             covenant_profiles[cov_profile["character"]["covenant"]] = cov_profile
+
+    base_profile_path = create_basic_profile_string(wow_spec, settings.tier, settings)
+    base_profile = extract_profile(base_profile_path, wow_spec.wow_class)
+    covenant_profiles[base_profile["character"]["covenant"]] = base_profile
 
     profile = get_profile(wow_spec=wow_spec, fight_style=fight_style, settings=settings)
 
