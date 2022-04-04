@@ -2,7 +2,8 @@ import logging
 
 from bloodytools.simulations.simulator import Simulator
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
-from simc_support.game_data.Conduit import get_conduits_for_spec
+from simc_support.game_data.Conduit import get_conduits_for_spec, CONDUITS
+from simc_support.game_data.WowSpec import get_wow_spec
 import itertools
 
 logger = logging.getLogger(__name__)
@@ -23,7 +24,12 @@ class ConduitSimulator(Simulator):
     def pre_processing(self, data_dict: dict) -> dict:
         data_dict = super().pre_processing(data_dict)
 
-        self._conduits = get_conduits_for_spec(self.wow_spec)
+        self._conduits = list(get_conduits_for_spec(self.wow_spec))
+        # add special cases
+        if self.wow_spec == get_wow_spec("death_knight", "blood"):
+            for c in CONDUITS:
+                if c.full_name == "Eternal Hunger":
+                    self._conduits.append(c)
 
         data_dict["translations"]
         for conduit in self._conduits:
