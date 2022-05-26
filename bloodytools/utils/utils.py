@@ -287,6 +287,7 @@ def extract_profile(
         "talents",
         "spec",
         "azerite_essences",
+        "renown",
         "covenant",
         "default_pet",
         "set_bonus=tier28_2pc",
