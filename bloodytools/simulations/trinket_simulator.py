@@ -128,6 +128,7 @@ LEGION_STR_TRINKET_IDS = [
     # "144480",  # Dreadstone of Endless Shadows    https://www.wowhead.com/item=144480
     # "151310",  # Reality Breacher    https://www.wowhead.com/item=151310
     "137312",  # Nightmare Egg Shell
+    "142159",  # Bloodstained Handkerchief
 ]
 
 LEGION_AGI_TRINKET_IDS = [
@@ -161,6 +162,7 @@ LEGION_AGI_TRINKET_IDS = [
     # "151310",  # Reality Breacher    https://www.wowhead.com/item=151310
     "137537",  # Tirathon's Betrayal    https://www.wowhead.com/item=137537
     "137312",  # Nightmare Egg Shell
+    "142159",  # Bloodstained Handkerchief
 ]
 
 OBSOLETE = [
