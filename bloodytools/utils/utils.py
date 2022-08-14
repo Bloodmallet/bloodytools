@@ -147,6 +147,11 @@ def get_simc_covenant_profile_strings(
     """
 
     base_string = create_basic_profile_string(wow_spec, tier, settings)
+    if not os.path.exists(base_string):
+        base_string = create_basic_profile_string(
+            wow_spec, tier.split("_")[0], settings
+        )
+
     strings = []
     for covenant in COVENANTS:
 
@@ -391,6 +396,11 @@ def get_profile(wow_spec: WowSpec, fight_style: str, settings: Config) -> dict:
         profile_location = create_basic_profile_string(
             wow_spec, settings.tier, settings
         )
+        if not os.path.exists(profile_location):
+            profile_location = create_basic_profile_string(
+                wow_spec, settings.tier.split("_")[0], settings
+            )
+
         try:
             profile = extract_profile(profile_location, wow_spec.wow_class)
         except FileNotFoundError:
@@ -459,6 +469,11 @@ def create_base_json_dict(
             covenant_profiles[cov_profile["character"]["covenant"]] = cov_profile
 
     base_profile_path = create_basic_profile_string(wow_spec, settings.tier, settings)
+    if not os.path.exists(base_profile_path):
+        base_profile_path = create_basic_profile_string(
+            wow_spec, settings.tier.split("_")[0], settings
+        )
+
     base_profile = extract_profile(base_profile_path, wow_spec.wow_class)
     covenant_profiles[base_profile["character"]["covenant"]] = base_profile
 
