@@ -2,6 +2,8 @@ import json
 import logging
 import os
 import typing
+import pkg_resources
+import yaml
 
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from bloodytools.utils.utils import create_base_json_dict
@@ -19,186 +21,65 @@ class TalentSimulator(Simulator):
 
     def pre_processing(self, data_dict: dict) -> dict:
         data_dict = super().pre_processing(data_dict)
-        data_dict["profile"]["character"]["talents"] = "0000000"
-        for talent in get_talents_for_spec(self.wow_spec):
-            data_dict["translations"][talent.name] = talent.translations.get_dict()
+
+        # load predefined talent paths from file
+        file_path = os.path.join(
+            "talent_tree_paths",
+            f"{self.wow_spec.wow_class.simc_name}_{self.wow_spec.simc_name}.yaml",
+        )
+        try:
+            with pkg_resources.resource_stream(__name__, file_path) as f:
+                data_dict["data_profile_overrides"] = yaml.safe_load(f)
+        except FileNotFoundError as e:
+            logger.warning(e)
+            data_dict["data_profile_overrides"] = {}
 
         return data_dict
 
     def add_simulation_data(
         self, simulation_group: Simulation_Group, data_dict: dict
     ) -> None:
-        pass
-
         logger.debug("talent_simulations start")
 
-        talent_blueprint = self.wow_spec.talents_blueprint
+        for i, k_v in enumerate(data_dict["data_profile_overrides"].items()):
+            human_name, simc_args = k_v
 
-        talent_combinations: typing.List[str] = []
+            if i == 0:
+                profile = data_dict["profile"]
+            else:
+                profile = {}
 
-        # build list of all talent combinations
-        for first in range(4):
-            for second in range(4):
-                for third in range(4):
-                    for forth in range(4):
-                        for fifth in range(4):
-                            for sixth in range(4):
-                                for seventh in range(4):
-
-                                    talent_combination = "{}{}{}{}{}{}{}".format(
-                                        first,
-                                        second,
-                                        third,
-                                        forth,
-                                        fifth,
-                                        sixth,
-                                        seventh,
-                                    )
-
-                                    abort = False
-
-                                    tmp_count = 0
-
-                                    # compare all non-dps locations, use only dps talent rows
-                                    location = talent_blueprint.find("0")
-                                    while location > -1:
-                                        if (
-                                            talent_combination[tmp_count + location]
-                                            != "0"
-                                        ):
-                                            abort = True
-                                        tmp_count += location + 1
-                                        location = talent_blueprint[tmp_count:].find(
-                                            "0"
-                                        )
-
-                                    # skip talent combinations with too many (more than one) not chosen dps values
-                                    if (
-                                        talent_combination.count("0")
-                                        > talent_blueprint.count("0") + 1
-                                    ):
-                                        abort = True
-
-                                    if abort:
-                                        continue
-
-                                    talent_combinations.append(talent_combination)
-
-        # filter talent combinations from non-dps talents
-        if self.wow_spec == get_wow_spec("demon_hunter", "vengeance"):
-
-            def _is_not_dps_neutral_talent(talent_combination: str) -> bool:
-                position_denied_talent = (
-                    (1, 1),
-                    (3, 1),
-                    (3, 2),
-                    (4, 3),
-                    (5, 1),
-                    (5, 3),
-                    (6, 1),
-                    (6, 2),
-                )
-                return not any(
-                    [
-                        True if (row, int(column)) in position_denied_talent else False
-                        for row, column in enumerate(talent_combination)
-                    ]
-                )
-
-            talent_combinations = list(
-                [
-                    talent_combination
-                    for talent_combination in talent_combinations
-                    if _is_not_dps_neutral_talent(talent_combination)
-                ]
-            )
-
-        logger.debug(
-            "Creating talent combinations: Done. Created {}.".format(
-                len(talent_combinations)
-            )
-        )
-
-        # no talents profile
-        base_profile = Simulation_Data(
-            name=talent_combinations[0],
-            fight_style=self.fight_style,
-            profile=data_dict["profile"],
-            simc_arguments=[
-                "talents={}".format(talent_combinations[0]),
-            ],
-            target_error=self.settings.target_error.get(self.fight_style, "0.1"),
-            ptr=self.settings.ptr,
-            default_actions=self.settings.default_actions,
-            executable=self.settings.executable,
-            iterations=self.settings.iterations,
-        )
-
-        if self.settings.custom_apl:
-            with open("custom_apl.txt") as f:
-                custom_apl = f.read()
-            base_profile.simc_arguments.append("# custom_apl")
-            base_profile.simc_arguments.append(custom_apl)
-
-        if self.settings.custom_fight_style:
-            with open("custom_fight_style.txt") as f:
-                custom_fight_style = f.read()
-            base_profile.simc_arguments.append("# custom_fight_style")
-            base_profile.simc_arguments.append(custom_fight_style)
-
-        simulation_group.add(base_profile)
-
-        # add all talent combinations to the simulation_group
-        for talent_combination in talent_combinations[1:]:
-            simulation_data = Simulation_Data(
-                name=talent_combination,
+            profile = Simulation_Data(
+                name=human_name,
                 fight_style=self.fight_style,
-                simc_arguments=["talents={}".format(talent_combination)],
+                profile=profile,
+                simc_arguments=simc_args,
                 target_error=self.settings.target_error.get(self.fight_style, "0.1"),
                 ptr=self.settings.ptr,
                 default_actions=self.settings.default_actions,
                 executable=self.settings.executable,
                 iterations=self.settings.iterations,
             )
-            simulation_group.add(simulation_data)
+
+            if i == 0:
+                if self.settings.custom_apl:
+                    with open("custom_apl.txt") as f:
+                        custom_apl = f.read()
+                    profile.simc_arguments.append("# custom_apl")
+                    profile.simc_arguments.append(custom_apl)
+
+                if self.settings.custom_fight_style:
+                    with open("custom_fight_style.txt") as f:
+                        custom_fight_style = f.read()
+                    profile.simc_arguments.append("# custom_fight_style")
+                    profile.simc_arguments.append(custom_fight_style)
+
+            simulation_group.add(profile)
 
     def post_processing(self, data_dict: dict) -> dict:
         data_dict = super().post_processing(data_dict)
 
-        all_dps_talents = []
-        nulled_comparison_talents = []
-
-        for talent_combination in data_dict["data"]:
-            if talent_combination.count("0") == self.wow_spec.talents_blueprint.count(
-                "0"
-            ):
-                all_dps_talents.append(talent_combination)
-            else:
-                nulled_comparison_talents.append(talent_combination)
-
-        def get_value(data, key: str) -> int:
-            """This function exists to make mypy happy."""
-            value: int = data[key]
-            return value
-
-        all_dps_talents = sorted(
-            all_dps_talents,
-            key=lambda name: get_value(data_dict["data"], name),
-            # key=lambda name: max(data_dict["data"][name].values()),
-            reverse=True,
-        )
-        nulled_comparison_talents = sorted(
-            nulled_comparison_talents,
-            key=lambda name: get_value(data_dict["data"], name),
-            # key=lambda name: max(data_dict["data"][name].values()),
-            reverse=True,
-        )
-
-        # add sorted key lists
-        # 1 all usual talent combinations
-        # 2 all talent combinations with one empty dps row
-        data_dict["sorted_data_keys"] = all_dps_talents
-        data_dict["sorted_data_keys_2"] = nulled_comparison_talents
+        data_dict = self.create_sorted_key_value_data(data_dict)
 
         logger.debug("talent_simulations end")
         return data_dict
