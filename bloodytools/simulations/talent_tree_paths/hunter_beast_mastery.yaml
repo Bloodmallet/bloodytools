@@ -37,33 +37,34 @@
 # s388056 Sentinel's Perception (NYI)
 # s378010 Improved Kill Command
 # s378759 Nesingwary's Trapping Apparatus
-# s120360 Barrage
-# s212431 Explosive Shot
+# s390231 Arctic Bola
 # s271788 Serpent Sting
 # s269737 Alpha Predator
 # s273887 Killer Instinct
 # s162488 Steel Trap
-# s325028 Death Chakram
+# s375891 Death Chakram
 # s201430 Stampede
+# s120360 Barrage
+# s212431 Explosive Shot
+# s389882 Serrated Shots
 # s260241 Hydra's Bite
 # s378014 Latent Poison Injectors
 
 #
 # Class talents
 #
-# s217200 Barbed Shot
+# s193455 Cobra Shot
 # s321014 Pack Tactics
 # s2643 Multi-Shot
-# s193455 Cobra Shot
+# s217200 Barbed Shot
 # s191384 Aspect of the Beast
-# s378023 Loaded Quiver
 # s56315 Kindred Spirits
 # s378209 Training Expert
 # s267116 Animal Companion
 # s115939 Beast Cleave
 # s378740 Killer Command
-# s378750 Flamewaker's Cobra Sting
 # s378205 Sharp Barbs
+# s378750 Flamewaker's Cobra Sting
 # s257944 Thrill of the Hunt
 # s378207 Kill Cleave
 # s321530 Bloodshed
@@ -71,18 +72,20 @@
 # s378244 Cobra Senses
 # s120679 Dire Beast
 # s19574 Bestial Wrath
-# s185789 Wild Call
+# s336830 Qa'pla, Eredun War Order
 # s378210 In for the Kill
 # s199530 Stomp
+# s231548 Barbed Wrath
+# s185789 Wild Call
 # s193530 Aspect of the Wild
-# s199528 One with the Pack
 # s378743 Dire Command
 # s193532 Scent of Blood
-# s231548 Barbed Wrath
-# s336830 Qa'pla, Eredun War Order
-# s385810 Pack Resilience
+# s199528 One with the Pack
+# s389660 Snake Bite
+# s389654 Master Handler
+# s385810 Dire Frenzy
 # s355589 Wailing Arrow
-# s386870 Bloody Frenzy
+# s386870 Brutal Companion
 # s359844 Call of the Wild
 # s378745 Dire Pack
 # s336844 Rylakstalker's Piercing Fangs

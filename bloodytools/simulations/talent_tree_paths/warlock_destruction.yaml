@@ -2,27 +2,27 @@
 # Class talents
 #
 # s333889 Fel Domination
-# s386105 Curses of Enfeeblement
+# s19647 Spell Lock
 # s111400 Burning Rush
 # s386113 Quick Fiends
 # s219272 Demon Skin
 # s386124 Fel Armor
 # s386110 Imp Step
-# s19647 Spell Lock
-# s386613 Accrued Vitality
+# s386105 Curses of Enfeeblement
+# s48018 Demonic Circle
 # s6789 Mortal Coil
 # s5484 Howl of Terror
 # s328774 Amplify Curse
 # s288843 Demonic Embrace
 # s386858 Demonic Inspiration
-# s48018 Demonic Circle
+# s389609 Abyss Walker
 # s386864 Wrathful Minion
 # s386617 Demonic Fortitude
 # s710 Banish
 # s387972 Foul Mouth
 # s386619 Desperate Power
 # s386620 Sweet Souls
-# s386646 Lifeblood
+# s389623 Gorefiend's Resolve
 # s111771 Demonic Gateway
 # s386648 Nightmare
 # s386651 Greater Banish
@@ -32,53 +32,54 @@
 # s30283 Shadowfury
 # s386686 Frequent Donor
 # s386664 Ichor of Devils
-# s386689 Claw of Endereth
-# s171975 Grimoire of Synergy
+# s386613 Accrued Vitality
+# s386646 Lifeblood
 # s384069 Shadowflame
 # s264874 Darkfury
-# s385881 Teachings of the Black Harvest
+# s389367 Fel Synergy
 # s108415 Soul Link
-# s385899 Soulburn
-# s387001 Pact of the Imp Mother
+# s385881 Teachings of the Black Harvest
+# s389359 Resolute Barrier
+# s171975 Grimoire of Synergy
+# s389576 Soul Armor
 # s215941 Soul Conduit
-# s387042 Pact of the Annihilan
-# s386344 Inquisitor's Gaze [NYI]
-# s387061 Pact of the Eredar
-# s386244 Summon Jailer [NYI]
-# s386696 Decimating Bolt
-# s387976 Dimensional Rift
+# s389590 Demonic Resilience
+# s386689 Claw of Endereth
+# s386344 Inquisitor's Gaze
+# s386244 Summon Soulkeeper
+# s385899 Soulburn
 
 #
 # Class talents
 #
 # s116858 Chaos Bolt
 # s17962 Conflagrate
-# s80240 Havoc
-# s387506 Mayhem [NYI]
-# s5740 Rain of Fire
-# s196406 Backdraft
 # s266134 Internal Combustion
 # s205148 Reverse Entropy
+# s5740 Rain of Fire
+# s196406 Backdraft
+# s80240 Havoc
+# s387506 Mayhem [NYI]
 # s387095 Pyrogenics
 # s231793 Improved Conflagrate
 # s205184 Roaring Blaze
-# s339896 Combusting Engine
-# s6353 Soul Fire
+# s388827 Explosive Potential
+# s196447 Channel Demonfire
 # s387522 Cry Havoc
 # s387509 Pandemonium
 # s387093 Improved Immolate
 # s152108 Cataclysm
 # s270545 Inferno
-# s196447 Channel Demonfire
+# s6353 Soul Fire
 # s17877 Shadowburn
-# s387176 Decimation
-# s387569 Rolling Havoc
-# s196408 Fire and Brimstone
-# s387390 Chaos Shards
 # s387166 Raging Demonfire
-# s387108 Conflagration of Chaos
+# s387569 Rolling Havoc
 # s387384 Backlash
+# s196408 Fire and Brimstone
+# s387176 Decimation
+# s387108 Conflagration of Chaos
 # s387259 Flashpoint
+# s388832 Scalding Flames
 # s387103 Ruin
 # s196412 Eradication
 # s387252 Ashen Remains
@@ -94,5 +95,6 @@
 # s387153 Burn to Ashes
 # s387084 Wilfred's Sigil of Superior Summoning
 # s266086 Rain of Chaos
+# s387976 Dimensional Rift
 # s387275 Chaos Incarnate
 # s387159 Avatar of Destruction

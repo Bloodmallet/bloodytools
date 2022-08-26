@@ -2,27 +2,27 @@
 # Class talents
 #
 # s333889 Fel Domination
-# s386105 Curses of Enfeeblement
+# s19647 Spell Lock
 # s111400 Burning Rush
 # s386113 Quick Fiends
 # s219272 Demon Skin
 # s386124 Fel Armor
 # s386110 Imp Step
-# s19647 Spell Lock
-# s386613 Accrued Vitality
+# s386105 Curses of Enfeeblement
+# s48018 Demonic Circle
 # s6789 Mortal Coil
 # s5484 Howl of Terror
 # s328774 Amplify Curse
 # s288843 Demonic Embrace
 # s386858 Demonic Inspiration
-# s48018 Demonic Circle
+# s389609 Abyss Walker
 # s386864 Wrathful Minion
 # s386617 Demonic Fortitude
 # s710 Banish
 # s387972 Foul Mouth
 # s386619 Desperate Power
 # s386620 Sweet Souls
-# s386646 Lifeblood
+# s389623 Gorefiend's Resolve
 # s111771 Demonic Gateway
 # s386648 Nightmare
 # s386651 Greater Banish
@@ -32,21 +32,22 @@
 # s30283 Shadowfury
 # s386686 Frequent Donor
 # s386664 Ichor of Devils
-# s386689 Claw of Endereth
-# s171975 Grimoire of Synergy
+# s386613 Accrued Vitality
+# s386646 Lifeblood
 # s384069 Shadowflame
 # s264874 Darkfury
-# s385881 Teachings of the Black Harvest
+# s389367 Fel Synergy
 # s108415 Soul Link
-# s385899 Soulburn
-# s387001 Pact of the Imp Mother
+# s385881 Teachings of the Black Harvest
+# s389359 Resolute Barrier
+# s171975 Grimoire of Synergy
+# s389576 Soul Armor
 # s215941 Soul Conduit
-# s387042 Pact of the Annihilan
-# s386344 Inquisitor's Gaze [NYI]
-# s387061 Pact of the Eredar
-# s386244 Summon Jailer [NYI]
-# s386696 Decimating Bolt
-# s387976 Dimensional Rift
+# s389590 Demonic Resilience
+# s386689 Claw of Endereth
+# s386344 Inquisitor's Gaze
+# s386244 Summon Soulkeeper
+# s385899 Soulburn
 
 #
 # Class talents
@@ -57,36 +58,36 @@
 # s108558 Nightfall
 # s317031 Xavian Teachings
 # s196226 Sow the Seeds
-# s334319 Inevitable Demise
-# s386759 Pandemic Invocation
+# s32388 Shadow Embrace
+# s201424 Harvester of Souls
 # s196102 Writhe in Agony
 # s386922 Agonizing Corruption
-# s198590 Drain Soul
+# s388667 Drain Soul
 # s196103 Absolute Corruption
 # s63106 Siphon Life
 # s278350 Vile Taint
 # s205179 Phantom Singularity
 # s387073 Soul Tap
-# s32388 Shadow Embrace
-# s108503 Grimoire of Sacrifice
-# s199471 Soul Flame
+# s334319 Inevitable Demise
 # s386951 Soul Swap
-# s201424 Harvester of Souls
+# s199471 Soul Flame
+# s108503 Grimoire of Sacrifice
+# s386759 Pandemic Invocation
 # s386976 Withering Bolt
 # s386986 Sacrolash's Dark Strike
-# s264106 Deathbolt
-# s386997 Soul Rot
+# s264000 Creeping Death
 # s48181 Haunt
 # s205180 Summon Darkglare
-# s387223 Death Dealer
-# s387013 Malefic Wrath
-# s387016 Decaying Soul Satchel
-# s387056 Deliberate Malice
-# s387250 Seized Vitality
-# s387065 Wrath of Consumption
-# s387273 Antoran Plating
-# s387289 Pact of the Nathrezim
-# s264000 Creeping Death
+# s386997 Soul Rot
+# s389761 Malefic Affliction
 # s387075 Calamitous Crescendo
+# s387250 Seized Vitality
+# s387273 Antoran Plating
+# s387065 Wrath of Consumption
+# s389630 Soul-Eater's Gluttony
+# s389775 Dread Touch
+# s389764 Doom Blossom
 # s387301 Haunted Soul
+# s389992 Grim Reach
 # s337020 Wilfred's Sigil of Superior Summoning
+# s387016 Decaying Soul Satchel

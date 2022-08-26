@@ -6,35 +6,37 @@
 # s386196 Berserker Stance
 # s382260 Fast Footwork
 # s97462 Rallying Cry
-# s29838 Second Wind
 # s3411 Intervene
 # s18499 Berserker Rage
 # s382258 Siphoning Strikes
 # s202168 Impending Victory
-# s384110 Shattering Throw
+# s29838 Second Wind
 # s382310 Inspiring Presence
 # s23920 Spell Reflection
 # s12323 Piercing Howl
 # s384100 Berserker Shout
-# s346002 War Machine
+# s316733 War Machine
 # s382461 Honed Reflexes
 # s6544 Heroic Leap
 # s5246 Intimidating Shout
 # s6343 Thunder Clap
-# s382529 Furious Blows
-# s772 Rend
+# s390354 Furious Blows
+# s64382 Shattering Throw
+# s384110 Wrecking Throw
+# s382764 Crushing Force
+# s383115 Concussive Blows
+# s275338 Menace
+# s382954 Cacophonous Roar
 # s382549 Pain and Gain
 # s107570 Storm Bolt
-# s382954 Cacophonous Roar
-# s383115 Concussive Blows
-# s382764 Crushing Force
-# s382956 Seismic Reverberation
-# s384124 Armored to the Teeth
+# s382767 Overwhelming Rage
 # s384090 Titanic Throw
+# s384124 Armored to the Teeth
+# s390376 Placeholder Talent
 # s202163 Bounding Stride
 # s203201 Crackling Thunder
 # s384277 Blood and Thunder
-# s382767 Overwhelming Rage
+# s382956 Seismic Reverberation
 # s103827 Double Time
 # s215571 Frothing Berserker
 # s382895 One-Handed Weapon Specialization
@@ -43,19 +45,20 @@
 # s382939 Reinforced Plates
 # s382940 Endurance Training
 # s382946 Quick Thinking
+# s376079 Spear of Bastion
 # s382896 Two-Handed Weapon Specialization
-# s307865 Spear of Bastion
 # s107574 Avatar
 # s383762 Bitter Immunity
 # s46968 Shockwave
-# s384318 Thunderous Roar
 # s382900 Dual Wield Specialization
+# s384318 Thunderous Roar
 # s382948 Piercing Verdict
-# s357996 Elysian Might
+# s386285 Elysian Might
 # s275336 Unstoppable Force
 # s382949 Signet of Tormented Kings
+# s390376 Placeholder Talent
 # s275339 Rumbling Earth
-# s382904 Dauntless Duelist
+# s390376 Placeholder Talent
 # s384969 Thunderous Aftershocks
 
 #
@@ -73,18 +76,19 @@
 # s384042 Unnerving Focus
 # s1161 Challenging Shout
 # s236279 Devastator
-# s382741 Defensive Reflexes
 # s384361 Bloodsurge
-# s385704 Bloodborne
+# s772 Rend
+# s384036 Brutal Vitality
 # s383103 Fueled by Violence
-# s386071 Improved Challenging Shout
+# s386071 Disrupting Shout
+# s386034 Improved Heroic Throw
 # s385843 Show of Force
 # s385840 Thunderlord
 # s871 Shield Wall
-# s385888 Spiked Shield
 # s280001 Bolster
-# s384036 Brutal Vitality
-# s386034 Improved Heroic Throw
+# s279996 Never Surrender
+# s385888 Spiked Shield
+# s385704 Bloodborne
 # s202603 Into the Fray
 # s203177 Heavy Repercussions
 # s29725 Sudden Death
@@ -99,10 +103,9 @@
 # s384067 Focused Vigor
 # s385952 Shield Charge
 # s386477 Outburst
-# s279996 Never Surrender
 # s202095 Indomitable
 # s386014 Spell Block
 # s228920 Ravager
 # s386328 Champion's Bulwark
-# s386394 Battle-Scared Veteran
+# s386394 Battle-Scarred Veteran
 # s382953 Storm of Steel

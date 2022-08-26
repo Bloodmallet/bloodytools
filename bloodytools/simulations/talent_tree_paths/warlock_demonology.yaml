@@ -2,27 +2,27 @@
 # Class talents
 #
 # s333889 Fel Domination
-# s386105 Curses of Enfeeblement
+# s19647 Spell Lock
 # s111400 Burning Rush
 # s386113 Quick Fiends
 # s219272 Demon Skin
 # s386124 Fel Armor
 # s386110 Imp Step
-# s19647 Spell Lock
-# s386613 Accrued Vitality
+# s386105 Curses of Enfeeblement
+# s48018 Demonic Circle
 # s6789 Mortal Coil
 # s5484 Howl of Terror
 # s328774 Amplify Curse
 # s288843 Demonic Embrace
 # s386858 Demonic Inspiration
-# s48018 Demonic Circle
+# s389609 Abyss Walker
 # s386864 Wrathful Minion
 # s386617 Demonic Fortitude
 # s710 Banish
 # s387972 Foul Mouth
 # s386619 Desperate Power
 # s386620 Sweet Souls
-# s386646 Lifeblood
+# s389623 Gorefiend's Resolve
 # s111771 Demonic Gateway
 # s386648 Nightmare
 # s386651 Greater Banish
@@ -32,21 +32,22 @@
 # s30283 Shadowfury
 # s386686 Frequent Donor
 # s386664 Ichor of Devils
-# s386689 Claw of Endereth
-# s171975 Grimoire of Synergy
+# s386613 Accrued Vitality
+# s386646 Lifeblood
 # s384069 Shadowflame
 # s264874 Darkfury
-# s385881 Teachings of the Black Harvest
+# s389367 Fel Synergy
 # s108415 Soul Link
-# s385899 Soulburn
-# s387001 Pact of the Imp Mother
+# s385881 Teachings of the Black Harvest
+# s389359 Resolute Barrier
+# s171975 Grimoire of Synergy
+# s389576 Soul Armor
 # s215941 Soul Conduit
-# s387042 Pact of the Annihilan
-# s386344 Inquisitor's Gaze [NYI]
-# s387061 Pact of the Eredar
-# s386244 Summon Jailer [NYI]
-# s386696 Decimating Bolt
-# s387976 Dimensional Rift
+# s389590 Demonic Resilience
+# s386689 Claw of Endereth
+# s386344 Inquisitor's Gaze
+# s386244 Summon Soulkeeper
+# s385899 Soulburn
 
 #
 # Class talents
@@ -84,13 +85,13 @@
 # s265187 Summon Demonic Tyrant
 # s387494 Antoran Armaments
 # s387526 Ner'zhul's Volition
+# s387602 Stolen Power
 # s267214 Sacrificed Souls
 # s334585 Soulbound Tyrant
 # s387541 Forces of the Horned Nightmare
+# s387600 The Expendables
 # s387549 Command Aura
 # s387578 Gul'dan's Ambition
-# s387600 The Expendables
 # s337020 Wilfred's Sigil of Superior Summoning
-# s267215 Demonic Consumption
-# s387602 Stolen Power
-# s386833 Hold This For Me [NYI]
+# s390173 Reign of Tyranny
+# s386833 Guillotine

@@ -37,14 +37,16 @@
 # s388056 Sentinel's Perception (NYI)
 # s378010 Improved Kill Command
 # s378759 Nesingwary's Trapping Apparatus
-# s120360 Barrage
-# s212431 Explosive Shot
+# s390231 Arctic Bola
 # s271788 Serpent Sting
 # s269737 Alpha Predator
 # s273887 Killer Instinct
 # s162488 Steel Trap
-# s325028 Death Chakram
+# s375891 Death Chakram
 # s201430 Stampede
+# s120360 Barrage
+# s212431 Explosive Shot
+# s389882 Serrated Shots
 # s260241 Hydra's Bite
 # s378014 Latent Poison Injectors
 
@@ -52,14 +54,14 @@
 # Class talents
 #
 # s19434 Aimed Shot
-# s321293 Improved Arcane Shot
+# s321293 Crack Shot
 # s321018 Improved Steady Shot
 # s260240 Precise Shots
 # s257044 Rapid Fire
-# s378765 Killing Blow
+# s155228 Lone Wolf
 # s342049 Chimaera Shot
 # s260367 Streamline
-# s155228 Lone Wolf
+# s378765 Killing Blow
 # s378766 Hunter's Knowledge
 # s260228 Careful Aim
 # s336867 Surging Shots
@@ -73,6 +75,7 @@
 # s321460 Dead Eye
 # s186387 Bursting Shot
 # s257621 Trick Shots
+# s378880 Bombardment
 # s260243 Volley
 # s193533 Steady Focus
 # s378888 Serpentstalker's Trickery
@@ -82,12 +85,14 @@
 # s288613 Trueshot
 # s194595 Lock and Load
 # s204089 Bullseye
-# s378880 Bombardment
+# s389019 Bulletstorm
 # s378907 Sharpshooter
-# s260404 Calling the Shots
-# s190852 Legacy of the Windrunners
+# s389449 Eagletalon's True Focus
 # s355589 Wailing Arrow
+# s190852 Legacy of the Windrunners
 # s384791 Salvo
 # s386878 Unerring Vision
-# s336849 Eagletalon's True Focus
+# s260404 Calling the Shots
+# s389865 Readiness
+# s389866 Windrunner's Barrage
 # s378905 Windrunner's Guidance

@@ -3,45 +3,52 @@
 #
 # s235313 Blazing Barrier
 # s45438 Ice Block
-# s120 Cone of Cold
+# s390218 [NYI]
 # s12982 Shatter
 # s66 Invisibility
-# s382481 Rigid Ice
 # s382424 Winter's Protection
-# s475 Remove Curse
-# s382297 Grounding Surge
-# s382293 Incantation of Swiftness
-# s55342 Mirror Image
-# s31589 Slow
 # s30449 Spellsteal
-# s342245 Alter Time
-# s382820 Reabsorption
-# s382569 Reduplication
-# s382292 Cryo-Freeze
+# s382289 Tempest Barrier
+# s382293 Incantation of Swiftness
+# s475 Remove Curse
+# s383092 Arcane Warding
+# s55342 Mirror Image
 # s116011 Rune of Power
 # s1463 Incanter's Flow
-# s382289 Tempest Barrier
-# s157981 Blast Wave
+# s342245 Alter Time
+# s382292 Cryo-Freeze
+# s382820 Reabsorption
+# s382569 Reduplication
+# s382481 Rigid Ice
 # s383121 Mass Polymorph
-# s382493 Tome of Rhonin
-# s343183 Improved Frost Nova
-# s383092 Arcane Warding
-# s382490 Tome of Antonidas
+# s382297 Grounding Surge
+# s342249 Master of Time
+# s382270 Diverted Energy
 # s157997 Ice Nova
-# s382800 Accumulative Shielding
+# s390221 [NYI]
 # s108839 Ice Floes
 # s212653 Shimmer
-# s382826 Temporal Velocity
-# s342249 Master of Time
+# s31589 Slow
+# s157981 Blast Wave
+# s343183 Improved Frost Nova
+# s113724 Ring of Frost
+# s382493 Tome of Rhonin
+# s382490 Tome of Antonidas
+# s389627 Volatile Detonation
+# s386828 Energized Barriers
 # s235224 Frigid Winds
 # s382268 Flow of Time
-# s382270 Diverted Energy
+# s382826 Temporal Velocity
 # s205036 Ice Ward
-# s113724 Ring of Frost
+# s387807 Time Manipulation
 # s110959 Greater Invisibility
+# s382800 Accumulative Shielding
 # s31661 Dragon's Breath
 # s382440 Shifting Power
+# s386763 Freezing Cold
+# s386539 Temporal Warp
 # s383243 Time Anomaly
+# s389713 Reflection
 # s153561 Meteor
 
 #
@@ -51,40 +58,38 @@
 # s108853 Fire Blast
 # s2120 Flamestrike
 # s2948 Scorch
-# s195283 Hot Streak
+# s257541 Phoenix Flames
 # s343230 Improved Flamestrike
 # s269644 Searing Touch
 # s205026 Firestarter
 # s157642 Fireball
-# s231568 Fire Blast
-# s205023 Conflagration
+# s387044 Fervent Flickering
 # s383604 Improved Scorch
 # s117216 Critical Mass
 # s86949 Cauterize
 # s205029 Flame On
-# s321708 Improved Blazing Barrier
-# s257541 Phoenix Flames
-# s190319 Combustion
 # s205037 Flame Patch
-# s343222 Phoenix Flames
 # s235870 Alexstrasza's Fury
 # s342344 From the Ashes
+# s190319 Combustion
+# s44457 Living Bomb
+# s383665 Incendiary Eruptions
+# s343222 Phoenix Flames
 # s383499 Firemind
 # s321710 Combustion Duration
 # s383659 Tempered Flames
 # s383391 Blaster Master
-# s384033 Molten Skyfall
-# s383665 Incendiary Eruptions
-# s44457 Living Bomb
+# s205023 Conflagration
 # s383476 Phoenix Reborn
 # s203275 Tinder
+# s155148 Kindling
 # s383489 Wildfire
 # s384174 Master of Flame
 # s383669 Controlled Destruction
-# s205020 Pyromaniac
 # s269650 Pyroclasm
+# s384033 Molten Skyfall
+# s205020 Pyromaniac
 # s383810 Fevered Incantation
-# s333313 Sun King's Blessing
-# s155148 Kindling
+# s383886 Sun King's Blessing
 # s383634 Fiery Rush
 # s383860 Fire Frenzy
