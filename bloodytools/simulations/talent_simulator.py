@@ -14,6 +14,10 @@ from bloodytools.simulations.simulator import Simulator
 logger = logging.getLogger(__name__)
 
 
+class MissingTalentTreePathFileError(Exception):
+    pass
+
+
 class TalentSimulator(Simulator):
     @classmethod
     def name(cls) -> str:
@@ -31,8 +35,7 @@ class TalentSimulator(Simulator):
             with pkg_resources.resource_stream(__name__, file_path) as f:
                 data_dict["data_profile_overrides"] = yaml.safe_load(f)
         except FileNotFoundError as e:
-            logger.warning(e)
-            data_dict["data_profile_overrides"] = {}
+            raise MissingTalentTreePathFileError() from e
 
         return data_dict
 
