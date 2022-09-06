@@ -9,6 +9,7 @@ from bloodytools.simulations.talent_simulator import TalentSimulator
 from bloodytools.simulations.tier_set_simulator import TierSetSimulator
 from bloodytools.simulations.trinket_simulator import TrinketSimulator
 from bloodytools.simulations.conduit_simulator import ConduitSimulator
+from bloodytools.simulations.talent_worth_simulator import TalentWorthSimulator
 
 simulator_factory = SimulatorFactory()
 
@@ -20,3 +21,4 @@ simulator_factory.register_simulator(SoulbindSimulator)
 simulator_factory.register_simulator(TierSetSimulator)
 simulator_factory.register_simulator(TrinketSimulator)
 simulator_factory.register_simulator(TalentSimulator)
+simulator_factory.register_simulator(TalentWorthSimulator)
