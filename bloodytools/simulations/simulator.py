@@ -330,6 +330,25 @@ class Simulator(abc.ABC):
 
         return data_dict
 
+    def get_profile_name(self, group_name: str, profile_name: str) -> str:
+        """Get the appropriate name of a key-key-value profile structure.
+
+        Args:
+            group_name (str): e.g. "Category A"
+            profile_name (str): e.g. "Trinket 1"
+
+        Raises:
+            ValueError: Raised if the Simulator specific profile_split_character is contained in group_name and profile_name.
+
+        Returns:
+            str: an appropriate combination of group_name and profile_name
+        """
+        if self.profile_split_character() in group_name + profile_name:
+            raise ValueError(
+                f"Character '{self.profile_split_character()}' is the split character. It's not allowed in group and profile names. Override it."
+            )
+        return self.profile_split_character().join([group_name, profile_name])
+
 
 class SimulatorFactory:
     """Factory to make Simulators available by snake_case_names()."""
