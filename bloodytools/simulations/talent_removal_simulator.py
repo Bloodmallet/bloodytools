@@ -13,10 +13,10 @@ class MissingTalentTreePathFileError(Exception):
     pass
 
 
-class TalentWorthSimulator(Simulator):
+class TalentRemovalSimulator(Simulator):
     @classmethod
     def name(cls) -> str:
-        return "Talent Worths"
+        return "Talent Removal"
 
     def pre_processing(self, data_dict: dict) -> dict:
         data_dict = super().pre_processing(data_dict)
