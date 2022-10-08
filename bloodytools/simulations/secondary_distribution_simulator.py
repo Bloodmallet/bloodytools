@@ -10,6 +10,30 @@ from bloodytools.utils.utils import create_basic_profile_string
 logger = logging.getLogger(__name__)
 
 
+class PlainTalentString:
+    def __init__(self, string: str) -> None:
+        self.string = string
+
+    def __str__(self) -> str:
+        return f"talents={self.string}"
+
+
+class ClassTalentString:
+    def __init__(self, string: str) -> None:
+        self.string = string
+
+    def __str__(self) -> str:
+        return f"class_talents={self.string}"
+
+
+class SpecTalentString:
+    def __init__(self, string: str) -> None:
+        self.string = string
+
+    def __str__(self) -> str:
+        return f"spec_talents={self.string}"
+
+
 class SecondaryDistributionSimulator(Simulator):
     @classmethod
     def name(cls) -> str:
@@ -69,7 +93,7 @@ class SecondaryDistributionSimulator(Simulator):
                     ]["buffed_stats"]["stats"][stat]
                 except KeyError:
                     logger.warning(
-                        f"Stat '{stat}' not found in single iteration simulation data while extracting secondary stats."
+                        f"Stat '{stat}' not found in single iteration simulation data while extracting secondary stats. Assuming 0."
                     )
 
             secondary_amount = int(stats)
@@ -103,13 +127,45 @@ class SecondaryDistributionSimulator(Simulator):
             )
         )
 
-        talent_combinations = None
+        talent_combinations = []
         if self.settings.talent_permutations:
             talent_combinations = self.settings.talent_list.get(
                 self.wow_spec, self.wow_spec.get_talent_combinations()
             )
         else:
-            talent_combinations = [data_dict["profile"]["character"]["talents"]]
+            if "talents" in data_dict["profile"]["character"]:
+                talent_combinations = [(data_dict["profile"]["character"]["talents"],)]
+            elif (
+                "class_talents" in data_dict["profile"]["character"]
+                and "spec_talents" in data_dict["profile"]["character"]
+            ):
+
+                talent_combinations = [
+                    (
+                        ClassTalentString(
+                            data_dict["profile"]["character"]["class_talents"]
+                        ),
+                        SpecTalentString(
+                            data_dict["profile"]["character"]["spec_talents"]
+                        ),
+                    )
+                ]
+            elif "class_talents" in data_dict["profile"]["character"]:
+                talent_combinations = [
+                    (
+                        ClassTalentString(
+                            data_dict["profile"]["character"]["class_talents"]
+                        ),
+                    )
+                ]
+            elif "spec_talents" in data_dict["profile"]["character"]:
+                talent_combinations = [
+                    (
+                        SpecTalentString(
+                            data_dict["profile"]["character"]["spec_talents"]
+                        ),
+                    )
+                ]
 
         secondaries = data_dict["secondary_sum"]
 
@@ -118,7 +174,7 @@ class SecondaryDistributionSimulator(Simulator):
 
                 s_o = Simulation_Data(
                     name="{}{}{}_{}_{}_{}".format(
-                        talent_combination,
+                        hash("".join([str(part) for part in talent_combination])),
                         self.profile_split_character(),
                         crit,
                         haste,
@@ -132,7 +188,7 @@ class SecondaryDistributionSimulator(Simulator):
                     iterations=self.settings.iterations,
                     profile=data_dict["profile"],
                     simc_arguments=[
-                        "talents={}".format(talent_combination),
+                        *[str(part) for part in talent_combination],
                         "gear_crit_rating={}".format(int(secondaries * (crit / 100))),
                         "gear_haste_rating={}".format(int(secondaries * (haste / 100))),
                         "gear_mastery_rating={}".format(
@@ -169,7 +225,7 @@ class SecondaryDistributionSimulator(Simulator):
     def post_processing(self, data_dict: dict) -> dict:
         data_dict = super().post_processing(data_dict)
 
-        data_dict.pop("covenant_profiles")
+        data_dict.pop("covenant_profiles", None)
 
         # create ordered name list
         data_dict["sorted_data_keys"] = {}
