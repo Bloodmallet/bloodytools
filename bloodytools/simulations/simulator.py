@@ -183,7 +183,7 @@ class Simulator(abc.ABC):
                 last_dict = last_dict[name]
                 for key in nested_keys[:-1]:
                     last_dict = last_dict[key]
-            last_dict[last_key] = wanted_value
+            last_dict.update({last_key: wanted_value})
 
             logger.debug(
                 "Added '{}' with {} dps to dictionary.".format(

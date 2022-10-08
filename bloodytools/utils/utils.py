@@ -186,14 +186,14 @@ def extract_profile(
     ] = {
         "character": {
             "class": "",
-            "covenant": "",
+            # "covenant": "",
             "level": "",
             # "position": "",  # optional
             "race": "",
             "role": "",
-            "soulbind": "",
+            # "soulbind": "",
             "spec": "",
-            "talents": "",
+            # "talents": "",
         },
         "items": {
             "back": {},
@@ -285,13 +285,22 @@ def extract_profile(
         "role",
         "position",
         "talents",
+        "class_talents",
+        "spec_talents",
         "spec",
         "azerite_essences",
-        "renown",
-        "covenant",
+        # "renown",
+        # "covenant",
         "default_pet",
         "set_bonus=tier28_2pc",
         "set_bonus=tier28_4pc",
+        "gear_agility",
+        "gear_intellect",
+        "gear_strength",
+        "gear_crit_rating",
+        "gear_haste_rating",
+        "gear_mastery_rating",
+        "gear_versatility_rating",
     ]
     pattern_specifics = {}
     for element in character_specifics:
@@ -329,14 +338,15 @@ def extract_profile(
                     # 'head=' as a head example for an empty overwrite
                     if not new_line:
                         profile["items"].pop(slot_name, None)
-
-                    # check for all elements
-                    for element in item_elements:
-                        new_matches = pattern_element[element].search(new_line)
-                        if new_matches:
-                            profile["items"][slot_name][element] = new_matches.group(
-                                "information"
-                            ).replace('"', "")
+                        profile["items"].pop(slot, None)
+                    else:
+                        # check for all elements
+                        for element in item_elements:
+                            new_matches = pattern_element[element].search(new_line)
+                            if new_matches:
+                                profile["items"][slot_name][
+                                    element
+                                ] = new_matches.group("information").replace('"', "")
 
     logger.debug(f"extracted profile from '{path}' : {profile}")
 
@@ -350,7 +360,7 @@ def extract_profile(
             f"'{path}' does not contain a complete profile. Missing keys: {missing_character_keys}"
         )
 
-    return_profile = profile if profile["items"] else provided_profile
+    return_profile = profile  # if profile["items"] else provided_profile
     logger.debug(f"returning profile: {return_profile}")
 
     return return_profile
@@ -401,6 +411,8 @@ def get_profile(wow_spec: WowSpec, fight_style: str, settings: Config) -> dict:
             profile = extract_profile("custom_profile.txt", wow_spec.wow_class, profile)
         except EmptyFileError as e:
             logger.debug(e)
+        else:
+            logger.debug(f"custom profile was extracted: {profile}")
 
     if not profile:
         raise FileNotFoundError(f"No profile found or provided for {wow_spec}.")
@@ -437,35 +449,8 @@ def create_base_json_dict(
         internal_covenant_profiles = get_fallback_covenant_profile_strings(
             wow_spec, settings.tier, "patchwerk"
         )
-    # trust simc for patchwerk
-    # don't trust simc for any other fight styles IF we have fight style specific profiles
-    if (
-        "patchwerk" in fight_style.lower()
-        or "patchwerk" not in fight_style.lower()
-        and len(internal_covenant_profiles) == 0
-    ):
-        simulationcraft_covenant_profiles = get_simc_covenant_profile_strings(
-            wow_spec, settings.tier, settings
-        )
-    else:
-        simulationcraft_covenant_profiles = []
-    covenant_profiles = {}
-    for profile_path in internal_covenant_profiles + simulationcraft_covenant_profiles:
-        try:
-            cov_profile = extract_profile(profile_path, wow_spec.wow_class)
-        except FileNotFoundError:
-            continue
-        else:
-            covenant_profiles[cov_profile["character"]["covenant"]] = cov_profile
-
-    base_profile_path = create_basic_profile_string(wow_spec, settings.tier, settings)
-    base_profile = extract_profile(base_profile_path, wow_spec.wow_class)
-    covenant_profiles[base_profile["character"]["covenant"]] = base_profile
 
     profile = get_profile(wow_spec=wow_spec, fight_style=fight_style, settings=settings)
-
-    # base profile has a higher priority than covenant specific overrides
-    covenant_profiles[profile["character"]["covenant"]] = profile
 
     # spike the export data with talent data
     talent_data = get_talent_dict(wow_spec, settings.ptr == "1")
@@ -516,7 +501,6 @@ def create_base_json_dict(
         "data": {},
         "translations": {},
         "profile": profile,
-        "covenant_profiles": covenant_profiles,
         "talent_data": talent_data,
         "class_id": class_id,
         "spec_id": spec_id,

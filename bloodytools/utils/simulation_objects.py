@@ -179,7 +179,9 @@ class Simulation_Data:
             self.simc_arguments = [simc_arguments]
         # craft simc input for a proper profile
         if profile:
-            if not profile.get("character", None) or not profile.get("items", None):
+            if not profile.get(
+                "character", None
+            ):  #  or not profile.get("items", None):
                 raise ValueError(
                     "When providing a profile it must have 'character' and 'items' keys."
                 )
@@ -196,14 +198,15 @@ class Simulation_Data:
                     )
 
             items = []
-            for slot in profile["items"]:
-                if profile["items"][slot]:
-                    string = "{}=,".format(slot)
-                    string += ",".join(
-                        "{}={}".format(key, value)
-                        for key, value in profile["items"][slot].items()
-                    )
-                    items.append(string)
+            if profile.get("items", None):
+                for slot in profile["items"]:
+                    if profile["items"][slot]:
+                        string = "{}=,".format(slot)
+                        string += ",".join(
+                            "{}={}".format(key, value)
+                            for key, value in profile["items"][slot].items()
+                        )
+                        items.append(string)
 
             # prepend created character profile input
             self.simc_arguments = character + items + self.simc_arguments
