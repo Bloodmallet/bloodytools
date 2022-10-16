@@ -292,8 +292,10 @@ def extract_profile(
         # "renown",
         # "covenant",
         "default_pet",
-        "set_bonus=tier28_2pc",
-        "set_bonus=tier28_4pc",
+        r"set_bonus=[\"']?tier28_2pc[\"']?",
+        r"set_bonus=[\"']?tier28_4pc[\"']?",
+        r"set_bonus=[\"']?tier29_2pc[\"']?",
+        r"set_bonus=[\"']?tier29_4pc[\"']?",
         "gear_agility",
         "gear_intellect",
         "gear_strength",
@@ -302,10 +304,16 @@ def extract_profile(
         "gear_mastery_rating",
         "gear_versatility_rating",
     ]
+    clean_character_specifics = {
+        r"set_bonus=[\"']?tier28_2pc[\"']?": "set_bonus=tier28_2pc",
+        r"set_bonus=[\"']?tier28_4pc[\"']?": "set_bonus=tier28_4pc",
+        r"set_bonus=[\"']?tier29_2pc[\"']?": "set_bonus=tier29_2pc",
+        r"set_bonus=[\"']?tier29_4pc[\"']?": "set_bonus=tier29_4pc",
+    }
     pattern_specifics = {}
     for element in character_specifics:
         pattern_specifics[element] = re.compile(
-            r'^{}="?(?P<information>.*)"?'.format(element)
+            r'^{}=["\']?(?P<information>.*)["\']?'.format(element)
         )
     soulbind = "soulbind"
     character_specifics.append(soulbind)
@@ -319,9 +327,9 @@ def extract_profile(
 
                 matches = pattern_specifics[specific].search(line)
                 if matches:
-                    profile["character"][specific] = matches.group(
-                        "information"
-                    ).replace('"', "")
+                    profile["character"][
+                        clean_character_specifics.get(specific, specific)
+                    ] = matches.group("information").replace('"', "")
 
             for slot in item_slots:
 
