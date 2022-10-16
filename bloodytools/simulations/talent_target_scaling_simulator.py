@@ -81,6 +81,12 @@ class TalentTargetScalingSimulator(Simulator):
     ) -> None:
         logger.debug("talent_simulations start")
 
+        clear_talents = [
+            "talents=",
+            "spec_talents=",
+            "class_talents=",
+        ]
+
         for i, k_v in enumerate(data_dict["data_profile_overrides"].items()):
             human_name, simc_args = k_v
 
@@ -93,7 +99,7 @@ class TalentTargetScalingSimulator(Simulator):
                 name=human_name,
                 fight_style=self.fight_style,
                 profile=profile,
-                simc_arguments=simc_args,
+                simc_arguments=clear_talents + simc_args,
                 target_error=self.settings.target_error.get(self.fight_style, "0.1"),
                 ptr=self.settings.ptr,
                 default_actions=self.settings.default_actions,
@@ -135,7 +141,7 @@ class TalentTargetScalingSimulator(Simulator):
         logger.debug("Starting pre processing")
         data_dict = self.pre_processing(data_dict)
 
-        for target_count in [1, 2, 3, 4, 5, 6, 7, 10, 15]:
+        for target_count in [1, 2, 3, 4, 5, 6, 8, 9, 15]:
             simulation_group = Simulation_Group(
                 name="simulation_group",
                 threads=self.settings.threads,
@@ -150,7 +156,8 @@ class TalentTargetScalingSimulator(Simulator):
 
             for profile in simulation_group.profiles:
                 profile.name = self.get_profile_name(profile.name, str(target_count))
-                profile.simc_arguments.append(f"desired_targets={target_count}")
+                if profile == simulation_group.profiles[0]:
+                    profile.simc_arguments.append(f"desired_targets={target_count}")
 
             logger.info(f"Simulating {target_count} targets.")
             self._simulate(simulation_group)
