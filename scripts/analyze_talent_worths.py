@@ -39,7 +39,7 @@ def main() -> None:
         table.add_column("talent")
 
         dps_talents = [t for t in build_data.keys() if t != baseline_name]
-        dps_talents.sort(key=lambda name: build_data[name], reverse=is_addition())
+        dps_talents.sort(key=lambda name: build_data[name], reverse=is_addition())  # type: ignore
 
         if is_addition():
             max_value = build_data[dps_talents[0]] - baseline

@@ -10,26 +10,22 @@ from bloodytools.utils.utils import create_basic_profile_string
 logger = logging.getLogger(__name__)
 
 
-class PlainTalentString:
+class TalentString:
     def __init__(self, string: str) -> None:
         self.string = string
 
+
+class PlainTalentString(TalentString):
     def __str__(self) -> str:
         return f"talents={self.string}"
 
 
-class ClassTalentString:
-    def __init__(self, string: str) -> None:
-        self.string = string
-
+class ClassTalentString(TalentString):
     def __str__(self) -> str:
         return f"class_talents={self.string}"
 
 
-class SpecTalentString:
-    def __init__(self, string: str) -> None:
-        self.string = string
-
+class SpecTalentString(TalentString):
     def __str__(self) -> str:
         return f"spec_talents={self.string}"
 
@@ -127,7 +123,7 @@ class SecondaryDistributionSimulator(Simulator):
             )
         )
 
-        talent_combinations = []
+        talent_combinations: typing.List[typing.Tuple[TalentString, ...]] = []
         if "talents" in data_dict["profile"]["character"]:
             talent_combinations = [(data_dict["profile"]["character"]["talents"],)]
         elif (

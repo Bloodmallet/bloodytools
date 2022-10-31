@@ -37,14 +37,14 @@ class TalentRemovalSimulator(Simulator):
 
         if "profile" in data_dict and "character" in data_dict["profile"]:
             if "talents" in data_dict["profile"]["character"]:
-                data_dict["data_profile_overrides"]["custom profile"] = [
+                data_dict["data_profile_overrides"]["custom_profile"] = [  # type: ignore
                     data_dict["profile"]["character"]["talents"]
                 ]
             elif (
                 "class_talents" in data_dict["profile"]["character"]
                 and "spec_talents" in data_dict["profile"]["character"]
             ):
-                data_dict["data_profile_overrides"]["custom profile"] = [
+                data_dict["data_profile_overrides"]["custom_profile"] = [  # type: ignore
                     "class_talents="
                     + data_dict["profile"]["character"]["class_talents"],
                     "spec_talents=" + data_dict["profile"]["character"]["spec_talents"],
