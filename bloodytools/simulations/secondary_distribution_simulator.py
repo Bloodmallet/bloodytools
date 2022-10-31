@@ -128,44 +128,29 @@ class SecondaryDistributionSimulator(Simulator):
         )
 
         talent_combinations = []
-        if self.settings.talent_permutations:
-            talent_combinations = self.settings.talent_list.get(
-                self.wow_spec, self.wow_spec.get_talent_combinations()
-            )
-        else:
-            if "talents" in data_dict["profile"]["character"]:
-                talent_combinations = [(data_dict["profile"]["character"]["talents"],)]
-            elif (
-                "class_talents" in data_dict["profile"]["character"]
-                and "spec_talents" in data_dict["profile"]["character"]
-            ):
+        if "talents" in data_dict["profile"]["character"]:
+            talent_combinations = [(data_dict["profile"]["character"]["talents"],)]
+        elif (
+            "class_talents" in data_dict["profile"]["character"]
+            and "spec_talents" in data_dict["profile"]["character"]
+        ):
 
-                talent_combinations = [
-                    (
-                        ClassTalentString(
-                            data_dict["profile"]["character"]["class_talents"]
-                        ),
-                        SpecTalentString(
-                            data_dict["profile"]["character"]["spec_talents"]
-                        ),
-                    )
-                ]
-            elif "class_talents" in data_dict["profile"]["character"]:
-                talent_combinations = [
-                    (
-                        ClassTalentString(
-                            data_dict["profile"]["character"]["class_talents"]
-                        ),
-                    )
-                ]
-            elif "spec_talents" in data_dict["profile"]["character"]:
-                talent_combinations = [
-                    (
-                        SpecTalentString(
-                            data_dict["profile"]["character"]["spec_talents"]
-                        ),
-                    )
-                ]
+            talent_combinations = [
+                (
+                    ClassTalentString(
+                        data_dict["profile"]["character"]["class_talents"]
+                    ),
+                    SpecTalentString(data_dict["profile"]["character"]["spec_talents"]),
+                )
+            ]
+        elif "class_talents" in data_dict["profile"]["character"]:
+            talent_combinations = [
+                (ClassTalentString(data_dict["profile"]["character"]["class_talents"]),)
+            ]
+        elif "spec_talents" in data_dict["profile"]["character"]:
+            talent_combinations = [
+                (SpecTalentString(data_dict["profile"]["character"]["spec_talents"]),)
+            ]
 
         secondaries = data_dict["secondary_sum"]
 
