@@ -159,7 +159,7 @@ class SecondaryDistributionSimulator(Simulator):
 
                 s_o = Simulation_Data(
                     name="{}{}{}_{}_{}_{}".format(
-                        hash("".join([str(part) for part in talent_combination])),
+                        "base profile",
                         self.profile_split_character(),
                         crit,
                         haste,
