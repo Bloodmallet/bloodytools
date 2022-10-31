@@ -68,7 +68,7 @@ class Simulation_Data:
         calculate_scale_factors: str = "0",
         default_actions: str = "1",
         default_skill: str = "1.0",
-        executable: str = None,
+        executable: str = "",
         fight_style: str = "patchwerk",
         fixed_time: str = "1",
         html: str = "",
@@ -107,7 +107,7 @@ class Simulation_Data:
             self.default_skill = "1.0"
         # describes the location and type of the simc executable
         # if no value was set, determine a standard value
-        if executable == None:
+        if executable == "":
             if sys.platform == "win32":
                 logger.debug(
                     "Setting Windows default value for executable. This might not work for your system."
@@ -538,7 +538,7 @@ class Simulation_Group:
 
     def __init__(
         self,
-        simulation_instance: Union[Simulation_Data, List[Simulation_Data]] = None,
+        simulation_instance: Union[None, Simulation_Data, List[Simulation_Data]] = None,
         name: str = "",
         threads: str = "",
         profileset_work_threads: str = "",
