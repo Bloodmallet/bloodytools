@@ -1,138 +1,34 @@
-#
-# Class talents
-#
-# s1064 Chain Heal
-# s51505 Lava Burst
-# s108271 Astral Shift
-# s188443 Chain Lightning
-# s198103 Earth Elemental
-# s57994 Wind Shear
-# s377933 Astral Bulwark
-# s381647 Planes Traveler
-# s378075 Thunderous Paws
-# s260878 Spirit Wolf
-# s196840 Frost Shock
-# s187880 Maelstrom Weapon
-# s974 Earth Shield
-# s382886 Fire and Ice
-# s192058 Capacitor Totem
-# s51886 Cleanse Spirit
-# s381666 Focused Insight
-# s383010 Elemental Orbit
-# s79206 Spiritwalker's Grace
-# s382947 Ancestral Defense
-# s8143 Tremor Totem
-# s381819 Guardian's Cudgel
-# s265046 Static Charge
-# s378773 Greater Purge
-# s370 Purge
-# s382888 Flurry
-# s378077 Spiritwalker's Aegis
-# s192088 Graceful Spirit
-# s51485 Earthgrab Totem
-# s192077 Wind Rush Totem
-# s51514 Hex
-# s381655 Nature's Fury
-# s381867 Totemic Surge
-# s381650 Elemental Warding
-# s30884 Nature's Guardian
-# s378079 Enfeeblement
-# s204268 Voodoo Mastery
-# s382215 Winds of Al'Akir
-# s381689 Brimming with Life
-# s5394 Healing Stream Totem
-# s381674 Improved Lightning Bolt
-# s108287 Totemic Projection
-# s192063 Gust of Wind
-# s58875 Spirit Walk
-# s378094 Swirling Currents
-# s378081 Nature's Swiftness
-# s51490 Thunderstorm
-# s382201 Totemic Focus
-# s382033 Surging Shields
-# s381678 Go With The Flow
-# s381930 Mana Spring Totem
-# s305483 Lightning Lasso
-# s378779 Thundershock
-# s383013 Poison Cleansing Totem
-# s108285 Call of the Elements
-# s108281 Ancestral Guidance
-# s383019 Tranquil Air Totem
-# s383017 Stoneskin Totem
-# s383012 Creation Core
-# s383011 Improved Call of the Elements
-
-#
-# Class talents
-#
-# s8042 Earth Shock
-# s61882 Earthquake
-# s60188 Elemental Fury
-# s192249 Storm Elemental
-# s198067 Fire Elemental
-# s378776 Inundate
-# s381743 Tumultuous Fissures
-# s382197 Ancestral Wolf Affinity
-# s378193 Primordial Fury
-# s381764 Primordial Bond
-# s378211 Refreshing Waters
-# s378241 Call of Thunder
-# s385923 Flow of Power
-# s77756 Lava Surge
-# s382685 Unrelenting Calamity
-# s210714 Icefury
-# s381707 Swelling Maelstrom
-# s333919 Echo of the Elements
-# s378255 Call of Fire
-# s191634 Stormkeeper
-# s382086 Electrified Shocks
-# s381776 Flux Melting
-# s262303 Surge of Power
-# s273221 Aftershock
-# s378266 Flames of the Cauldron
-# s381936 Flash of Lightning
-# s381708 Eye of the Storm
-# s191861 Power of the Maelstrom
-# s16166 Master of the Elements
-# s382027 Improved Flametongue Weapon
-# s117014 Elemental Blast
-# s375982 Primordial Wave
-# s114050 Ascendance
-# s378270 Deeply Rooted Elements
-# s192222 Liquid Magma Totem
-# s117013 Primal Elementalist
-# s384087 Echoes of Great Sundering
-# s378271 Elemental Equilibrium
-# s386443 Rolling Magma
-# s382032 Echo Chamber
-# s381785 Oath of the Far Seer
-# s381932 Magma Chamber
-# s381782 Searing Flames
-# s191634 Stormkeeper
-# s210689 Lightning Rod
-# s382042 Splintered Elements
-# s386474 Heat Wave
-# s381726 Mountains Will Fall
-# s381787 Further Beyond
-# s378310 Skybreaker's Fiery Demise
-# s378268 Windspeaker's Lava Resurgence
+Lightning & Gambling (LiGa):
+  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1/totemic_recall:1/call_of_the_elements:1
+  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:1/storm_elemental:0/inundate:0/call_of_thunder:1/flow_of_power:1/lava_surge:1/unrelenting_calamity:1/icefury:0/swelling_maelstrom:0/echo_of_the_elements:1/call_of_fire:1/stormkeeper:1/flux_melting:0/electrified_shocks:0/aftershock:0/surge_of_power:1/flames_of_the_cauldron:1/flash_of_lightning:0/eye_of_the_storm:2/power_of_the_maelstrom:2/master_of_the_elements:2/improved_flametongue_weapon:1/elemental_blast:0/primordial_wave:0/deeply_rooted_elements:1/ascendance:0/primal_elementalist:0/liquid_magma_totem:0/echoes_of_great_sundering:0/elemental_equilibrium:0/rolling_magma:0/echo_chamber:2/oath_of_the_far_seer:0/magma_chamber:0/searing_flames:2/lightning_rod:0/primordial_surge:0/splintered_elements:0/mountains_will_fall:1/further_beyond:0/windspeakers_lava_resurgence:1/skybreakers_fiery_demise:0
 The Storm:
   # single target
-  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1
-  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:0/storm_elemental:1/inundate:0/call_of_thunder:1/flow_of_power:1/lava_surge:1/unrelenting_calamity:1/icefury:0/swelling_maelstrom:0/echo_of_the_elements:1/call_of_fire:0/stormkeeper:1/flux_melting:0/electrified_shocks:0/aftershock:0/surge_of_power:1/flames_of_the_cauldron:0/flash_of_lightning:1/eye_of_the_storm:2/power_of_the_maelstrom:2/master_of_the_elements:2/improved_flametongue_weapon:0/elemental_blast:1/primordial_wave:0/deeply_rooted_elements:0/ascendance:0/primal_elementalist:1/liquid_magma_totem:0/echoes_of_great_sundering:2/elemental_equilibrium:0/rolling_magma:0/echo_chamber:2/oath_of_the_far_seer:0/magma_chamber:0/searing_flames:2/lightning_rod:1/heat_wave:0/splintered_elements:0/mountains_will_fall:0/further_beyond:0/windspeakers_lava_resurgence:0/skybreakers_fiery_demise:1
-EoGS AoE:
-  # aoe
-  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1
-  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:0/storm_elemental:1/inundate:0/call_of_thunder:1/flow_of_power:0/lava_surge:1/unrelenting_calamity:1/icefury:0/swelling_maelstrom:0/echo_of_the_elements:1/call_of_fire:0/stormkeeper:1/flux_melting:0/electrified_shocks:0/aftershock:0/surge_of_power:1/flames_of_the_cauldron:0/flash_of_lightning:1/eye_of_the_storm:2/power_of_the_maelstrom:2/master_of_the_elements:2/improved_flametongue_weapon:0/elemental_blast:0/primordial_wave:0/deeply_rooted_elements:0/ascendance:0/primal_elementalist:1/liquid_magma_totem:0/echoes_of_great_sundering:2/elemental_equilibrium:0/rolling_magma:0/echo_chamber:2/oath_of_the_far_seer:0/magma_chamber:2/searing_flames:0/lightning_rod:1/heat_wave:0/splintered_elements:0/mountains_will_fall:0/further_beyond:0/windspeakers_lava_resurgence:0/skybreakers_fiery_demise:1
-The Gambler:
+  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1/totemic_recall:1/call_of_the_elements:1
+  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:0/storm_elemental:1/inundate:0/call_of_thunder:1/flow_of_power:1/lava_surge:0/unrelenting_calamity:1/icefury:1/swelling_maelstrom:0/echo_of_the_elements:1/call_of_fire:0/stormkeeper:1/flux_melting:0/electrified_shocks:1/aftershock:0/surge_of_power:1/flames_of_the_cauldron:0/flash_of_lightning:0/eye_of_the_storm:2/power_of_the_maelstrom:2/master_of_the_elements:2/improved_flametongue_weapon:0/elemental_blast:1/primordial_wave:0/deeply_rooted_elements:0/ascendance:0/primal_elementalist:1/liquid_magma_totem:0/echoes_of_great_sundering:0/elemental_equilibrium:2/rolling_magma:0/echo_chamber:2/oath_of_the_far_seer:0/magma_chamber:0/searing_flames:2/lightning_rod:1/primordial_surge:0/splintered_elements:0/mountains_will_fall:0/further_beyond:0/windspeakers_lava_resurgence:0/skybreakers_fiery_demise:1
+The Burning Storm:
+  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1/totemic_recall:1/call_of_the_elements:1
+  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:0/storm_elemental:1/inundate:0/call_of_thunder:1/flow_of_power:1/lava_surge:1/unrelenting_calamity:1/icefury:1/swelling_maelstrom:0/echo_of_the_elements:1/call_of_fire:1/stormkeeper:1/flux_melting:0/electrified_shocks:1/aftershock:0/surge_of_power:1/flames_of_the_cauldron:1/flash_of_lightning:1/eye_of_the_storm:2/power_of_the_maelstrom:0/master_of_the_elements:0/improved_flametongue_weapon:1/elemental_blast:1/primordial_wave:0/deeply_rooted_elements:0/ascendance:0/primal_elementalist:1/liquid_magma_totem:0/echoes_of_great_sundering:0/elemental_equilibrium:2/rolling_magma:0/echo_chamber:0/oath_of_the_far_seer:0/magma_chamber:0/searing_flames:2/lightning_rod:1/primordial_surge:0/splintered_elements:0/mountains_will_fall:0/further_beyond:0/windspeakers_lava_resurgence:0/skybreakers_fiery_demise:1
+Gambling:
   # single target
-  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1
-  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:1/storm_elemental:0/inundate:0/call_of_thunder:0/flow_of_power:1/lava_surge:1/unrelenting_calamity:0/icefury:1/swelling_maelstrom:0/echo_of_the_elements:1/call_of_fire:1/stormkeeper:0/flux_melting:1/electrified_shocks:0/aftershock:1/surge_of_power:0/flames_of_the_cauldron:1/flash_of_lightning:0/eye_of_the_storm:2/power_of_the_maelstrom:1/master_of_the_elements:2/improved_flametongue_weapon:1/elemental_blast:0/primordial_wave:0/deeply_rooted_elements:1/ascendance:0/primal_elementalist:1/liquid_magma_totem:0/echoes_of_great_sundering:0/elemental_equilibrium:0/rolling_magma:0/echo_chamber:2/oath_of_the_far_seer:2/magma_chamber:2/searing_flames:0/lightning_rod:0/heat_wave:0/splintered_elements:0/mountains_will_fall:1/further_beyond:0/windspeakers_lava_resurgence:1/skybreakers_fiery_demise:0
+  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1/totemic_recall:1/call_of_the_elements:1
+  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:1/storm_elemental:0/inundate:0/call_of_thunder:0/flow_of_power:1/lava_surge:1/unrelenting_calamity:0/icefury:1/swelling_maelstrom:0/echo_of_the_elements:1/call_of_fire:1/stormkeeper:0/flux_melting:1/electrified_shocks:0/aftershock:1/surge_of_power:0/flames_of_the_cauldron:1/flash_of_lightning:0/eye_of_the_storm:2/power_of_the_maelstrom:1/master_of_the_elements:2/improved_flametongue_weapon:1/elemental_blast:0/primordial_wave:0/deeply_rooted_elements:1/ascendance:0/primal_elementalist:0/liquid_magma_totem:0/echoes_of_great_sundering:0/elemental_equilibrium:0/rolling_magma:0/echo_chamber:2/oath_of_the_far_seer:2/magma_chamber:0/searing_flames:2/lightning_rod:0/primordial_surge:0/splintered_elements:0/mountains_will_fall:1/further_beyond:1/windspeakers_lava_resurgence:1/skybreakers_fiery_demise:0
+Ascendance & Lightning:
+  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1/totemic_recall:1/call_of_the_elements:1
+  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:1/storm_elemental:0/inundate:0/call_of_thunder:1/flow_of_power:1/lava_surge:1/unrelenting_calamity:1/icefury:0/swelling_maelstrom:0/echo_of_the_elements:1/call_of_fire:1/stormkeeper:1/flux_melting:0/electrified_shocks:0/aftershock:1/surge_of_power:0/flames_of_the_cauldron:1/flash_of_lightning:0/eye_of_the_storm:1/power_of_the_maelstrom:0/master_of_the_elements:2/improved_flametongue_weapon:1/elemental_blast:0/primordial_wave:0/deeply_rooted_elements:0/ascendance:1/primal_elementalist:0/liquid_magma_totem:0/echoes_of_great_sundering:0/elemental_equilibrium:0/rolling_magma:0/echo_chamber:2/oath_of_the_far_seer:2/magma_chamber:0/searing_flames:2/lightning_rod:0/primordial_surge:0/splintered_elements:0/mountains_will_fall:1/further_beyond:1/windspeakers_lava_resurgence:1/skybreakers_fiery_demise:0
+Lightning EoGS:
+  # aoe
+  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1/totemic_recall:1/call_of_the_elements:1
+  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:0/storm_elemental:1/inundate:0/call_of_thunder:1/flow_of_power:0/lava_surge:1/unrelenting_calamity:1/icefury:1/swelling_maelstrom:0/echo_of_the_elements:1/call_of_fire:0/stormkeeper:1/flux_melting:0/electrified_shocks:0/aftershock:1/surge_of_power:0/flames_of_the_cauldron:0/flash_of_lightning:1/eye_of_the_storm:2/power_of_the_maelstrom:2/master_of_the_elements:2/improved_flametongue_weapon:0/elemental_blast:1/primordial_wave:0/deeply_rooted_elements:0/ascendance:0/primal_elementalist:1/liquid_magma_totem:0/echoes_of_great_sundering:2/elemental_equilibrium:2/rolling_magma:0/echo_chamber:2/oath_of_the_far_seer:0/magma_chamber:0/searing_flames:0/lightning_rod:1/primordial_surge:0/splintered_elements:0/mountains_will_fall:1/further_beyond:0/windspeakers_lava_resurgence:0/skybreakers_fiery_demise:0
 The Wildfire:
   # aoe
-  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1
-  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:1/storm_elemental:0/inundate:0/call_of_thunder:1/flow_of_power:0/lava_surge:1/unrelenting_calamity:1/icefury:0/swelling_maelstrom:0/echo_of_the_elements:1/call_of_fire:1/stormkeeper:1/flux_melting:0/electrified_shocks:0/aftershock:0/surge_of_power:1/flames_of_the_cauldron:1/flash_of_lightning:0/eye_of_the_storm:1/power_of_the_maelstrom:2/master_of_the_elements:2/improved_flametongue_weapon:1/elemental_blast:0/primordial_wave:1/deeply_rooted_elements:1/ascendance:0/primal_elementalist:1/liquid_magma_totem:0/echoes_of_great_sundering:0/elemental_equilibrium:0/rolling_magma:2/echo_chamber:1/oath_of_the_far_seer:0/magma_chamber:2/searing_flames:0/lightning_rod:0/heat_wave:0/splintered_elements:1/mountains_will_fall:0/further_beyond:0/windspeakers_lava_resurgence:0/skybreakers_fiery_demise:1
-The Hybrid:
-  # ???
-  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1
-  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:1/storm_elemental:0/inundate:0/call_of_thunder:0/flow_of_power:1/lava_surge:1/unrelenting_calamity:0/icefury:1/swelling_maelstrom:0/echo_of_the_elements:1/call_of_fire:1/stormkeeper:0/flux_melting:1/electrified_shocks:0/aftershock:0/surge_of_power:1/flames_of_the_cauldron:1/flash_of_lightning:0/eye_of_the_storm:2/power_of_the_maelstrom:2/master_of_the_elements:2/improved_flametongue_weapon:1/elemental_blast:1/primordial_wave:0/deeply_rooted_elements:1/ascendance:0/primal_elementalist:0/liquid_magma_totem:0/echoes_of_great_sundering:2/elemental_equilibrium:0/rolling_magma:0/echo_chamber:2/oath_of_the_far_seer:2/magma_chamber:0/searing_flames:0/lightning_rod:0/heat_wave:0/splintered_elements:0/mountains_will_fall:1/further_beyond:1/windspeakers_lava_resurgence:0/skybreakers_fiery_demise:0
+  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1/totemic_recall:1/call_of_the_elements:1
+  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:1/storm_elemental:0/inundate:0/call_of_thunder:1/flow_of_power:0/lava_surge:1/unrelenting_calamity:1/icefury:0/swelling_maelstrom:0/echo_of_the_elements:1/call_of_fire:1/stormkeeper:1/flux_melting:0/electrified_shocks:0/aftershock:0/surge_of_power:1/flames_of_the_cauldron:1/flash_of_lightning:1/eye_of_the_storm:0/power_of_the_maelstrom:2/master_of_the_elements:2/improved_flametongue_weapon:1/elemental_blast:0/primordial_wave:1/deeply_rooted_elements:1/ascendance:0/primal_elementalist:1/liquid_magma_totem:0/echoes_of_great_sundering:0/elemental_equilibrium:0/rolling_magma:2/echo_chamber:1/oath_of_the_far_seer:0/magma_chamber:2/searing_flames:0/lightning_rod:0/primordial_surge:0/splintered_elements:1/mountains_will_fall:0/further_beyond:0/windspeakers_lava_resurgence:0/skybreakers_fiery_demise:1
+Amanis Abomination:
+  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1/totemic_recall:1/call_of_the_elements:1
+  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:0/storm_elemental:1/inundate:0/call_of_thunder:1/flow_of_power:1/lava_surge:0/unrelenting_calamity:1/icefury:1/swelling_maelstrom:1/echo_of_the_elements:0/call_of_fire:0/stormkeeper:1/flux_melting:0/electrified_shocks:1/aftershock:0/surge_of_power:1/flames_of_the_cauldron:0/flash_of_lightning:0/eye_of_the_storm:2/power_of_the_maelstrom:2/master_of_the_elements:2/improved_flametongue_weapon:0/elemental_blast:0/primordial_wave:0/deeply_rooted_elements:0/ascendance:0/primal_elementalist:1/liquid_magma_totem:0/echoes_of_great_sundering:0/elemental_equilibrium:2/rolling_magma:0/echo_chamber:2/oath_of_the_far_seer:0/magma_chamber:0/searing_flames:2/lightning_rod:1/primordial_surge:0/splintered_elements:0/mountains_will_fall:1/further_beyond:0/windspeakers_lava_resurgence:1/skybreakers_fiery_demise:0
+Frozen EoGS:
+  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1/totemic_recall:1/call_of_the_elements:1
+  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:0/storm_elemental:1/inundate:0/call_of_thunder:1/flow_of_power:1/lava_surge:0/unrelenting_calamity:1/icefury:1/swelling_maelstrom:1/echo_of_the_elements:0/call_of_fire:0/stormkeeper:1/flux_melting:0/electrified_shocks:1/aftershock:1/surge_of_power:0/flames_of_the_cauldron:0/flash_of_lightning:1/eye_of_the_storm:2/power_of_the_maelstrom:2/master_of_the_elements:2/improved_flametongue_weapon:0/elemental_blast:1/primordial_wave:0/deeply_rooted_elements:0/ascendance:0/primal_elementalist:1/liquid_magma_totem:0/echoes_of_great_sundering:2/elemental_equilibrium:1/rolling_magma:0/echo_chamber:2/oath_of_the_far_seer:0/magma_chamber:0/searing_flames:0/lightning_rod:1/primordial_surge:0/splintered_elements:0/mountains_will_fall:1/further_beyond:0/windspeakers_lava_resurgence:0/skybreakers_fiery_demise:0
+Skybreaker's EoGS:
+  - class_talents=improved_lightning_bolt:2/natures_fury:2/frost_shock:1/totemic_surge:2/fire_and_ice:1/totemic_recall:1/call_of_the_elements:1
+  - spec_talents=earth_shock:1/earthquake:1/elemental_fury:1/fire_elemental:0/storm_elemental:1/inundate:1/call_of_thunder:1/flow_of_power:1/lava_surge:0/unrelenting_calamity:1/icefury:1/swelling_maelstrom:1/echo_of_the_elements:0/call_of_fire:0/stormkeeper:1/flux_melting:0/electrified_shocks:0/aftershock:0/surge_of_power:1/flames_of_the_cauldron:0/flash_of_lightning:1/eye_of_the_storm:2/power_of_the_maelstrom:2/master_of_the_elements:2/improved_flametongue_weapon:0/elemental_blast:0/primordial_wave:0/deeply_rooted_elements:0/ascendance:0/primal_elementalist:1/liquid_magma_totem:0/echoes_of_great_sundering:2/elemental_equilibrium:0/rolling_magma:0/echo_chamber:2/oath_of_the_far_seer:0/magma_chamber:0/searing_flames:2/lightning_rod:1/primordial_surge:0/splintered_elements:0/mountains_will_fall:1/further_beyond:0/windspeakers_lava_resurgence:0/skybreakers_fiery_demise:1
