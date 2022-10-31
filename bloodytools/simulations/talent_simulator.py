@@ -1,14 +1,10 @@
 import json
 import logging
 import os
-import typing
 import pkg_resources
 import yaml
 
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
-from bloodytools.utils.utils import create_base_json_dict
-from simc_support.game_data.Talent import get_talents_for_spec
-from simc_support.game_data.WowSpec import WowSpec, get_wow_spec
 from bloodytools.simulations.simulator import Simulator
 
 logger = logging.getLogger(__name__)
