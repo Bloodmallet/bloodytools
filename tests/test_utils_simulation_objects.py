@@ -101,10 +101,10 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.iterations, dict)
         self.assertNotEqual(self.sd.iterations, int)
         self.sd = None
-        self.sd = simulation_objects.Simulation_Data(iterations=15000)
+        self.sd = simulation_objects.Simulation_Data(iterations="15000")
         self.assertEqual(self.sd.iterations, "15000")
         self.sd = None
-        self.sd = simulation_objects.Simulation_Data(iterations=15000.75)
+        self.sd = simulation_objects.Simulation_Data(iterations="15000.75")
         self.assertEqual(self.sd.iterations, "15000")
 
     def test_log(self):
@@ -116,7 +116,7 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.log, dict)
         self.assertNotEqual(self.sd.log, int)
         self.sd = None
-        self.sd = simulation_objects.Simulation_Data(iterations=15000)
+        self.sd = simulation_objects.Simulation_Data(iterations="15000")
         self.assertEqual(self.sd.log, "0")
 
     def test_name(self):
@@ -136,7 +136,7 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.optimize_expressions, dict)
         self.assertNotEqual(self.sd.optimize_expressions, int)
         self.sd = None
-        self.sd = simulation_objects.Simulation_Data(optimize_expressions=["1"])
+        self.sd = simulation_objects.Simulation_Data(optimize_expressions="1")
         self.assertEqual(self.sd.optimize_expressions, "1")
 
     def test_ptr(self):
@@ -148,7 +148,7 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.ptr, dict)
         self.assertNotEqual(self.sd.ptr, int)
         self.sd = None
-        self.sd = simulation_objects.Simulation_Data(ptr=["1"])
+        self.sd = simulation_objects.Simulation_Data(ptr="1")
         self.assertEqual(self.sd.ptr, "0")
 
     def test_ready_trigger(self):
@@ -160,16 +160,8 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.ready_trigger, dict)
         self.assertNotEqual(self.sd.ready_trigger, int)
         self.sd = None
-        self.sd = simulation_objects.Simulation_Data(ready_trigger=["1"])
+        self.sd = simulation_objects.Simulation_Data(ready_trigger="1")
         self.assertEqual(self.sd.ready_trigger, "1")
-
-    def test_simc_arguments(self):
-        self.sd = simulation_objects.Simulation_Data(simc_arguments="1")
-        self.assertNotEqual(self.sd.simc_arguments, "1")
-        self.assertEqual(self.sd.simc_arguments, ["1"])
-        self.sd = None
-        self.sd = simulation_objects.Simulation_Data(simc_arguments=["a", "b"])
-        self.assertEqual(self.sd.simc_arguments, ["a", "b"])
 
     def test_target_error(self):
         self.sd = simulation_objects.Simulation_Data(target_error="0.5")
