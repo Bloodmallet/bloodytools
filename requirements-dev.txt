@@ -9,4 +9,7 @@ mypy
 pylint
 types-requests
 
+# progress bars, tables, styling, cli loves it
+rich 
+
 -r requirements.txt

@@ -1,0 +1,121 @@
+#
+# Class talents
+#
+# s235450 Prismatic Barrier
+# s45438 Ice Block
+# s390218 [NYI]
+# s12982 Shatter
+# s66 Invisibility
+# s382424 Winter's Protection
+# s30449 Spellsteal
+# s382289 Tempest Barrier
+# s382293 Incantation of Swiftness
+# s475 Remove Curse
+# s383092 Arcane Warding
+# s55342 Mirror Image
+# s116011 Rune of Power
+# s1463 Incanter's Flow
+# s342245 Alter Time
+# s382292 Cryo-Freeze
+# s382820 Reabsorption
+# s382569 Reduplication
+# s382481 Rigid Ice
+# s383121 Mass Polymorph
+# s382297 Grounding Surge
+# s342249 Master of Time
+# s382270 Diverted Energy
+# s157997 Ice Nova
+# s390221 [NYI]
+# s108839 Ice Floes
+# s212653 Shimmer
+# s31589 Slow
+# s157981 Blast Wave
+# s343183 Improved Frost Nova
+# s113724 Ring of Frost
+# s382493 Tome of Rhonin
+# s382490 Tome of Antonidas
+# s389627 Volatile Detonation
+# s386828 Energized Barriers
+# s235224 Frigid Winds
+# s382268 Flow of Time
+# s382826 Temporal Velocity
+# s205036 Ice Ward
+# s387807 Time Manipulation
+# s110959 Greater Invisibility
+# s382800 Accumulative Shielding
+# s31661 Dragon's Breath
+# s382440 Shifting Power
+# s386763 Freezing Cold
+# s386539 Temporal Warp
+# s383243 Time Anomaly
+# s389713 Reflection
+# s153561 Meteor
+
+#
+# Class talents
+#
+# s44425 Arcane Barrage
+# s5143 Arcane Missiles
+# s153626 Arcane Orb
+# s79684 Clearcasting
+# s383980 Arcane Tempo
+# s383661 Improved Arcane Missiles
+# s365350 Arcane Surge
+# s321752 Improved Arcane Explosion
+# s383676 Impetus
+# s264354 Rule of Threes
+# s205022 Arcane Familiar
+# s384651 Charged Orb
+# s231564 Improved Arcane Barrage
+# s321739 Arcane Power
+# s321526 Mana Adept
+# s383782 Nether Precision
+# s236628 Amplification
+# s205025 Presence of Mind
+# s384861 Foresight
+# s205028 Resonance
+# s281482 Reverberate
+# s114923 Nether Tempest
+# s321745 Improved Prismatic Barrier
+# s236457 Slipstream
+# s321420 Improved Clearcasting
+# s235711 Chrono Shift
+# s321507 Touch of the Magi
+# s157980 Supernova
+# s12051 Evocation
+# s321387 Enlightened
+# s342231 Arcane Echo
+# s384581 Arcane Bombardment
+# s384060 Illuminated Thoughts
+# s759 Conjure Mana Gem
+# s384187 Siphon Storm
+# s384612 Prodigious Savant
+# s376103 Radiant Spark
+# s384374 Concentration
+# s384276 Cascading Power
+# s384858 Orb Barrage
+# s384683 Harmonic Echo
+# s384452 Arcane Harmony
+AOE-SS/RS/Gem/Slip:
+- talents=B4DAAAAAAAAAAAAAAAAAAAAAAIJQolIhkUAJtEiIikIJBaJkIJAAAAAAAAAAAAkkkESSSSC
+
+AOE-SS/RS/Gem:
+- talents=B4DAAAAAAAAAAAAAAAAAAAAAAIJQolIhkUAJtEiIikIJBHolQikAAAAAAAAAAAAQSkESSSSC
+
+AOE-SS/RS/Harmony/Slip:
+- talents=B4DAAAAAAAAAAAAAAAAAAAAAAIJQolIhkUAJtEiIikIhEaJgkAAAAAAAAAAAAIJJJhkkkkA
+
+AOE-SS/RS/Harmony:
+- talents=B4DAAAAAAAAAAAAAAAAAAAAAAIJQolIhkUAJtEiIikIhEaJISCAAAAAAAAAAAgkEJhkkkkA
+
+SS/RS/Harmony/Slip:
+- talents=B4DAAAAAAAAAAAAAAAAAAAAAAIJQolIhkUAJtEiIikIhEaBSLJAAAAAAAAAAAASSSSIJJJB
+
+SS/RS/Harmony:
+- talents=B4DAAAAAAAAAAAAAAAAAAAAAAIJQolIhkUAJtEiIikIhEaBSLJAAAAAAAAAAAASSSSIJJJB
+
+SS/RS/Gem/Slip:
+- talents=B4DAAAAAAAAAAAAAAAAAAAAAAIJQolIhkUAJtEiIikIJBaBJtkAAAAAAAAAAAAEJJJhkkkEA
+
+SS/Harmony/Gem:
+- talents=B4DAAAAAAAAAAAAAAAAAAAAAAIJQolIhkUAJtEiIikIJJhWQSLJAAAAAAAAAAAASSSSIIJB

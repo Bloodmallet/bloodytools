@@ -1,6 +1,12 @@
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from .simulator import Simulator
-from simc_support.game_data.Covenant import get_covenant
+import os
+import pkg_resources
+import yaml
+
+
+class MissingTalentTreePathFileError(Exception):
+    pass
 
 
 class TierSetSimulator(Simulator):
@@ -8,36 +14,80 @@ class TierSetSimulator(Simulator):
     def name(cls) -> str:
         return "Tier Set"
 
+    def pre_processing(self, data_dict: dict) -> dict:
+        data_dict = super().pre_processing(data_dict)
+
+        # load predefined talent paths from file
+        file_path = os.path.join(
+            "talent_tree_paths",
+            f"{self.wow_spec.wow_class.simc_name}_{self.wow_spec.simc_name}.yaml",
+        )
+        try:
+            with pkg_resources.resource_stream(__name__, file_path) as f:
+                data_dict["data_profile_overrides"] = yaml.safe_load(f)
+        except FileNotFoundError as e:
+            raise MissingTalentTreePathFileError() from e
+
+        if data_dict["data_profile_overrides"] is None:
+            data_dict["data_profile_overrides"] = {}
+
+        if "profile" in data_dict and "character" in data_dict["profile"]:
+            if "talents" in data_dict["profile"]["character"]:
+                data_dict["data_profile_overrides"]["custom_profile"] = [  # type: ignore
+                    data_dict["profile"]["character"]["talents"]
+                ]
+            elif (
+                "class_talents" in data_dict["profile"]["character"]
+                and "spec_talents" in data_dict["profile"]["character"]
+            ):
+                data_dict["data_profile_overrides"]["custom_profile"] = [  # type: ignore
+                    "class_talents="
+                    + data_dict["profile"]["character"]["class_talents"],
+                    "spec_talents=" + data_dict["profile"]["character"]["spec_talents"],
+                ]
+
+        return data_dict
+
     def add_simulation_data(
         self, simulation_group: Simulation_Group, data_dict: dict
     ) -> None:
         tier_mapping = {
             "no tier": [
-                "set_bonus=tier28_2pc=0",
-                "set_bonus=tier28_4pc=0",
+                "set_bonus=tier29_2pc=0",
+                "set_bonus=tier29_4pc=0",
             ],
             "2p": [
-                "set_bonus=tier28_2pc=1",
-                "set_bonus=tier28_4pc=0",
+                "set_bonus=tier29_2pc=1",
+                "set_bonus=tier29_4pc=0",
             ],
             "4p": [
-                "set_bonus=tier28_2pc=1",
-                "set_bonus=tier28_4pc=1",
+                "set_bonus=tier29_2pc=1",
+                "set_bonus=tier29_4pc=1",
             ],
         }
 
         for tier, simc_input in tier_mapping.items():
-            for covenant_name, covenant_profile in data_dict[
-                "covenant_profiles"
-            ].items():
-                covenant = get_covenant(name=covenant_name)
+            for i, k_v in enumerate(data_dict["data_profile_overrides"].items()):
+                human_name, simc_args = k_v
+
+                if len(simulation_group.profiles) == 0:
+                    profile = data_dict["profile"]
+                else:
+                    profile = {}
+
+                clear_talents = [
+                    "talents=",
+                    "spec_talents=",
+                    "class_talents=",
+                ]
+
+                merged_simc_args = simc_input + clear_talents + simc_args
+
                 data = Simulation_Data(
-                    name=self.profile_split_character().join(
-                        [covenant.full_name, tier]
-                    ),
-                    simc_arguments=simc_input,
+                    name=self.profile_split_character().join([human_name, tier]),
+                    simc_arguments=merged_simc_args,
                     fight_style=self.fight_style,
-                    profile=covenant_profile,
+                    profile=profile,
                     target_error=self.settings.target_error.get(
                         self.fight_style, "0.1"
                     ),

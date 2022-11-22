@@ -1,6 +1,6 @@
 import logging
 
-SIMC_BRANCH = "shadowlands"
+SIMC_BRANCH = "dragonflight"
 
 logger = logging.getLogger(__name__)
 
