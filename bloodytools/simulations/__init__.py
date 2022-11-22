@@ -1,3 +1,4 @@
+from bloodytools.simulations.consumable_simulator import ConsumableSimulator
 from bloodytools.simulations.race_simulator import RaceSimulator
 from bloodytools.simulations.secondary_distribution_simulator import (
     SecondaryDistributionSimulator,
@@ -14,6 +15,7 @@ from bloodytools.simulations.talent_target_scaling_simulator import (
 
 simulator_factory = SimulatorFactory()
 
+simulator_factory.register_simulator(ConsumableSimulator)
 simulator_factory.register_simulator(RaceSimulator)
 simulator_factory.register_simulator(SecondaryDistributionSimulator)
 simulator_factory.register_simulator(TalentAddSimulator)
