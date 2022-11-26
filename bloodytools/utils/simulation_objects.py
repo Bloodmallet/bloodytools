@@ -126,7 +126,11 @@ class Simulation_Data:
                 logger.error("{}".format(e))
                 raise e
         # simc setting to determine the fight style
-        if fight_style == "custom" or fight_style in FIGHTSTYLES:
+        if (
+            fight_style == "custom"
+            or fight_style in FIGHTSTYLES
+            or FightStyle.CASTINGPATCHWERK in fight_style
+        ):
             self.fight_style = fight_style
         else:
             logger.warning(
@@ -405,9 +409,9 @@ class Simulation_Data:
         self.filename = "{}.simc".format(self.uuid)
         self.json_filename = "{}.json".format(self.uuid)
 
-        if self.fight_style in (
-            FightStyle.CASTINGPATCHWERK3,
-            FightStyle.CASTINGPATCHWERK5,
+        if (
+            FightStyle.CASTINGPATCHWERK in self.fight_style
+            and FightStyle.CASTINGPATCHWERK != self.fight_style
         ):
             simc_fight_style = FightStyle.CASTINGPATCHWERK
             special_remark = "desired_targets=" + self.fight_style[-1]
@@ -701,9 +705,9 @@ class Simulation_Group:
                     self.filename = "{}.simc".format(self.uuid)
                     self.json_filename = "{}.json".format(self.uuid)
 
-                    if self.profiles[0].fight_style in (
-                        FightStyle.CASTINGPATCHWERK3,
-                        FightStyle.CASTINGPATCHWERK5,
+                    if (
+                        FightStyle.CASTINGPATCHWERK in self.profiles[0].fight_style
+                        and FightStyle.CASTINGPATCHWERK != self.profiles[0].fight_style
                     ):
                         simc_fight_style = FightStyle.CASTINGPATCHWERK
                         special_remark = (
@@ -963,9 +967,9 @@ class Simulation_Group:
                     )
                 else:
 
-                    if self.profiles[0].fight_style in (
-                        FightStyle.CASTINGPATCHWERK3,
-                        FightStyle.CASTINGPATCHWERK5,
+                    if (
+                        FightStyle.CASTINGPATCHWERK in self.profiles[0].fight_style
+                        and FightStyle.CASTINGPATCHWERK != self.profiles[0].fight_style
                     ):
                         simc_fight_style = FightStyle.CASTINGPATCHWERK
                         special_remark = (
