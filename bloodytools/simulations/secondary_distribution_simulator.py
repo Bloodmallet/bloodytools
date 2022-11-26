@@ -125,7 +125,9 @@ class SecondaryDistributionSimulator(Simulator):
 
         talent_combinations: typing.List[typing.Tuple[TalentString, ...]] = []
         if "talents" in data_dict["profile"]["character"]:
-            talent_combinations = [(data_dict["profile"]["character"]["talents"],)]
+            talent_combinations = [
+                ("talents=" + data_dict["profile"]["character"]["talents"],)
+            ]
         elif (
             "class_talents" in data_dict["profile"]["character"]
             and "spec_talents" in data_dict["profile"]["character"]
