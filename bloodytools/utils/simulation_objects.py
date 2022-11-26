@@ -12,6 +12,7 @@ import time
 import uuid
 
 # wow game data and simc input checks
+from simc_support.simc_data import FightStyle
 from simc_support.simc_data.FightStyle import FIGHTSTYLES
 from typing import List, Union
 from bloodytools.utils.request import request as r
@@ -404,11 +405,22 @@ class Simulation_Data:
         self.filename = "{}.simc".format(self.uuid)
         self.json_filename = "{}.json".format(self.uuid)
 
+        if self.fight_style in (
+            FightStyle.CASTINGPATCHWERK3,
+            FightStyle.CASTINGPATCHWERK5,
+        ):
+            simc_fight_style = FightStyle.CASTINGPATCHWERK
+            special_remark = "desired_targets=" + self.fight_style[-1]
+        else:
+            simc_fight_style = self.fight_style
+            special_remark = ""
+
         argument = [self.executable]
         argument.append("json=" + self.json_filename)
         argument.append("iterations=" + self.iterations)
         argument.append("target_error=" + self.target_error)
-        argument.append("fight_style=" + self.fight_style)
+        argument.append("fight_style=" + simc_fight_style)
+        argument.append(special_remark)
         argument.append("fixed_time=" + self.fixed_time)
         argument.append("optimize_expressions=" + self.optimize_expressions)
         argument.append("default_actions=" + self.default_actions)
@@ -689,6 +701,18 @@ class Simulation_Group:
                     self.filename = "{}.simc".format(self.uuid)
                     self.json_filename = "{}.json".format(self.uuid)
 
+                    if self.profiles[0].fight_style in (
+                        FightStyle.CASTINGPATCHWERK3,
+                        FightStyle.CASTINGPATCHWERK5,
+                    ):
+                        simc_fight_style = FightStyle.CASTINGPATCHWERK
+                        special_remark = (
+                            "desired_targets=" + self.profiles[0].fight_style[-1]
+                        )
+                    else:
+                        simc_fight_style = self.profiles[0].fight_style
+                        special_remark = ""
+
                     # write arguments to file
                     with open(self.filename, "w") as f:
                         # write the equal values to file
@@ -712,7 +736,8 @@ class Simulation_Group:
                         f.write(
                             "default_skill={}\n".format(self.profiles[0].default_skill)
                         )
-                        f.write("fight_style={}\n".format(self.profiles[0].fight_style))
+                        f.write(f"fight_style={simc_fight_style}\n")
+                        f.write(f"{special_remark}\n")
                         f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
                         if self.profiles[0].html != "":
                             f.write("html={}\n".format(self.profiles[0].html))
@@ -937,6 +962,19 @@ class Simulation_Group:
                         )
                     )
                 else:
+
+                    if self.profiles[0].fight_style in (
+                        FightStyle.CASTINGPATCHWERK3,
+                        FightStyle.CASTINGPATCHWERK5,
+                    ):
+                        simc_fight_style = FightStyle.CASTINGPATCHWERK
+                        special_remark = (
+                            "desired_targets=" + self.profiles[0].fight_style[-1]
+                        )
+                    else:
+                        simc_fight_style = self.profiles[0].fight_style
+                        special_remark = ""
+
                     self.filename = str(uuid.uuid4()) + ".simc"
 
                     # if somehow the random naming function created the same name twice
@@ -958,7 +996,8 @@ class Simulation_Group:
                         f.write(
                             "default_skill={}\n".format(self.profiles[0].default_skill)
                         )
-                        f.write("fight_style={}\n".format(self.profiles[0].fight_style))
+                        f.write(f"fight_style={simc_fight_style}\n")
+                        f.write(f"{special_remark}\n")
                         f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
                         f.write("iterations={}\n".format(self.profiles[0].iterations))
                         f.write(
