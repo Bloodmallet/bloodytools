@@ -30,6 +30,9 @@ class ConsumableSimulator(Simulator, abc.ABC):
     def max_rank(self) -> int:
         return 3
 
+    def get_simulation_steps(self) -> typing.List[int]:
+        return list(range(1, self.max_rank + 1))
+
     def add_simulation_data(
         self,
         simulation_group: Simulation_Group,
@@ -77,7 +80,7 @@ class ConsumableSimulator(Simulator, abc.ABC):
                 simc_string = self.simc_key()
                 simc_string += name.lower().replace(" ", "_")
 
-            for rank in range(1, self.max_rank + 1):
+            for rank in self.get_simulation_steps():
                 scaled_name = self.get_profile_name(name, str(rank))
                 scaled_simc_string = f"{simc_string}_{rank}"
 
@@ -100,6 +103,8 @@ class ConsumableSimulator(Simulator, abc.ABC):
 
     def post_processing(self, data_dict: dict) -> dict:
         data_dict = super().post_processing(data_dict)
+
+        data_dict["simulated_steps"] = sorted(self.get_simulation_steps(), reverse=True)
 
         data_dict = self.create_sorted_key_key_value_data(data_dict)
 
