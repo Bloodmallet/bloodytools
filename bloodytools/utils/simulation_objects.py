@@ -440,6 +440,9 @@ class Simulation_Data:
 
         argument.append("ready_trigger=" + self.ready_trigger)
 
+        # drop empty args
+        argument = [a for a in argument if a and a[0] != "#"]
+
         fail_counter = 0
         simulation_output: subprocess.CompletedProcess
         # should prevent additional empty windows popping up...on win32 systems without breaking different OS
