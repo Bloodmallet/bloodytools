@@ -34,7 +34,7 @@ class TierSetSimulator(Simulator):
         if "profile" in data_dict and "character" in data_dict["profile"]:
             if "talents" in data_dict["profile"]["character"]:
                 data_dict["data_profile_overrides"]["custom_profile"] = [  # type: ignore
-                    data_dict["profile"]["character"]["talents"]
+                    "talents=" + data_dict["profile"]["character"]["talents"]
                 ]
             elif (
                 "class_talents" in data_dict["profile"]["character"]
