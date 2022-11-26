@@ -441,7 +441,7 @@ class Simulation_Data:
         argument.append("ready_trigger=" + self.ready_trigger)
 
         # drop empty, pseudo empty, and comment args
-        argument = [a for a in argument if a and a.strip() and a[0] != "#"]
+        argument = [a for a in argument if a and a.strip() and a.strip()[0] != "#"]
 
         fail_counter = 0
         simulation_output: subprocess.CompletedProcess
