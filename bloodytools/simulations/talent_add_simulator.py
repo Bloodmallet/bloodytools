@@ -1,7 +1,4 @@
 import logging
-import os
-import pkg_resources
-import yaml
 
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from bloodytools.simulations.simulator import Simulator
@@ -21,34 +18,7 @@ class TalentAddSimulator(Simulator):
     def pre_processing(self, data_dict: dict) -> dict:
         data_dict = super().pre_processing(data_dict)
 
-        # load predefined talent paths from file
-        file_path = os.path.join(
-            "talent_tree_paths",
-            f"{self.wow_spec.wow_class.simc_name}_{self.wow_spec.simc_name}.yaml",
-        )
-        try:
-            with pkg_resources.resource_stream(__name__, file_path) as f:
-                data_dict["data_profile_overrides"] = yaml.safe_load(f)
-        except FileNotFoundError as e:
-            raise MissingTalentTreePathFileError() from e
-
-        if data_dict["data_profile_overrides"] is None:
-            data_dict["data_profile_overrides"] = {}
-
-        if "profile" in data_dict and "character" in data_dict["profile"]:
-            if "talents" in data_dict["profile"]["character"]:
-                data_dict["data_profile_overrides"]["custom_profile"] = [  # type: ignore
-                    "talents=" + data_dict["profile"]["character"]["talents"]
-                ]
-            elif (
-                "class_talents" in data_dict["profile"]["character"]
-                and "spec_talents" in data_dict["profile"]["character"]
-            ):
-                data_dict["data_profile_overrides"]["custom_profile"] = [  # type: ignore
-                    "class_talents="
-                    + data_dict["profile"]["character"]["class_talents"],
-                    "spec_talents=" + data_dict["profile"]["character"]["spec_talents"],
-                ]
+        data_dict = self.get_additional_talent_paths(data_dict)
 
         return data_dict
 

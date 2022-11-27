@@ -3,18 +3,26 @@ import dataclasses
 import json
 import logging
 import os
+import pkg_resources
 import typing
+import yaml
+
 
 from bloodytools.utils.config import Config
 from bloodytools.utils.data_type import DataType
 from bloodytools.utils.simulation_objects import Simulation_Group
 from bloodytools.utils.utils import create_base_json_dict
+from bloodytools.utils.utils import extract_profile, EmptyFileError
 from simc_support.game_data.WowSpec import WowSpec
 
 logger = logging.getLogger(__name__)
 
 
 class UnknownFightStyleError(Exception):
+    pass
+
+
+class MissingTalentTreePathFileError(Exception):
     pass
 
 
@@ -58,7 +66,7 @@ class Simulator(abc.ABC):
         return str(cls.name()).lower().replace(" ", "_")
 
     def _get_talents(self, json_data: dict) -> str:
-        return json_data["sim"]["players"][0]["talents"]
+        return json_data["sim"]["players"][-1]["talents"]
 
     def run(self) -> None:
         """Manages the simulation flow. You can adjust by overwriting the provided methods."""
@@ -356,6 +364,52 @@ class Simulator(abc.ABC):
                 f"Character '{self.profile_split_character()}' is the split character. It's not allowed in group and profile names. Override it."
             )
         return self.profile_split_character().join([group_name, profile_name])
+
+    def get_additional_talent_paths(
+        self, data_dict: dict
+    ) -> typing.Dict[str, typing.List[str]]:
+        # load predefined talent paths from file
+        file_path = os.path.join(
+            "talent_tree_paths",
+            f"{self.wow_spec.wow_class.simc_name}_{self.wow_spec.simc_name}.yaml",
+        )
+        try:
+            with pkg_resources.resource_stream(__name__, file_path) as f:
+                data_dict["data_profile_overrides"] = yaml.safe_load(f)
+        except FileNotFoundError as e:
+            raise MissingTalentTreePathFileError() from e
+
+        if data_dict["data_profile_overrides"] is None:
+            data_dict["data_profile_overrides"] = {}
+
+        if "profile" not in data_dict:
+            data_dict["profile"] = {}
+        if "character" not in data_dict["profile"]:
+            data_dict["profile"]["character"] = {}
+
+        try:
+            extract_profile("custom_profile.txt", self.wow_spec.wow_class)
+            custom_profile = True
+        except EmptyFileError:
+            custom_profile = False
+
+        profile_name = "T" + self.settings.tier
+        if custom_profile:
+            profile_name = "custom profile"
+
+        if "talents" in data_dict["profile"]["character"]:
+            data_dict["data_profile_overrides"][profile_name] = [  # type: ignore
+                "talents=" + data_dict["profile"]["character"]["talents"]
+            ]
+        elif (
+            "class_talents" in data_dict["profile"]["character"]
+            and "spec_talents" in data_dict["profile"]["character"]
+        ):
+            data_dict["data_profile_overrides"][profile_name] = [  # type: ignore
+                "class_talents=" + data_dict["profile"]["character"]["class_talents"],
+                "spec_talents=" + data_dict["profile"]["character"]["spec_talents"],
+            ]
+        return data_dict
 
 
 class SimulatorFactory:
