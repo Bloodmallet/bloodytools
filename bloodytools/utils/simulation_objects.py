@@ -232,7 +232,7 @@ class Simulation_Data:
             self.threads = ""
         self.remove_files = remove_files
 
-        # set independant default values
+        # set independent default values
         # creation time of the simulation object
         self.so_creation_time = datetime.datetime.utcnow()
         # simulation dps result
@@ -241,6 +241,7 @@ class Simulation_Data:
         self.external_simulation = False
         # simulation full report (command line print out)
         self.full_report: str = ""
+        self.json_data: typing.Optional[dict] = None
         # simulation end time
         self.so_simulation_end_time: typing.Optional[datetime.datetime] = None
         # simulation start time
@@ -495,7 +496,7 @@ class Simulation_Data:
         # parse results from generated json file
         with open(self.json_filename, "r") as json_file:
             self.json_data = json.load(json_file)
-            self.set_json_data(self.json_data)
+        self.set_json_data(self.json_data)
 
         # remove json file after parsing
         if self.json_filename is not None and self.remove_files:
@@ -569,6 +570,7 @@ class Simulation_Group:
         self.name = name
         self.filename: str = ""
         self.json_filename: str = ""
+        self.json_data: typing.Optional[dict] = None
         self.threads = threads
         self.remove_files = remove_files
         # simulationcrafts own multithreading
@@ -908,7 +910,7 @@ class Simulation_Group:
                     # parse results from generated json file
                     with open(self.json_filename, "r") as json_file:
                         self.json_data = json.load(json_file)
-                        self.set_json_data(self.json_data)
+                    self.set_json_data(self.json_data)
 
                     # remove json file after parsing
                     if self.json_filename is not None and self.remove_files:
