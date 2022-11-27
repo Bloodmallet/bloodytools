@@ -95,7 +95,7 @@ class TalentTargetScalingSimulator(Simulator):
             else:
                 profile = {}
 
-            profile = Simulation_Data(
+            simulation_data = Simulation_Data(
                 name=human_name,
                 fight_style=self.fight_style,
                 profile=profile,
@@ -107,21 +107,37 @@ class TalentTargetScalingSimulator(Simulator):
                 iterations=self.settings.iterations,
             )
 
+            # get talent string
+            data_copy = simulation_data.copy()
+            data_copy.iterations = "1"
+            data_copy.simc_arguments = (
+                data_copy.get_simc_arguments_from_profile(data_dict["profile"])
+                + data_copy.simc_arguments
+            )
+            tmp_group = Simulation_Group(data_copy, name="extract_talents")
+            tmp_group.simulate()
+            if tmp_group.profiles[0].json_data:
+                talents = "talents=" + self._get_talents(
+                    tmp_group.profiles[0].json_data
+                )
+                if talents not in data_dict["data_profile_overrides"][human_name]:
+                    data_dict["data_profile_overrides"][human_name].append(talents)
+
             if i == 0:
                 if self.settings.custom_apl:
                     with open("custom_apl.txt") as f:
                         custom_apl = f.read()
-                    profile.simc_arguments.append("# custom_apl")
-                    profile.simc_arguments.append(custom_apl)
+                    simulation_data.simc_arguments.append("# custom_apl")
+                    simulation_data.simc_arguments.append(custom_apl)
 
                 # need to disable this to not accidentally override desired target count
                 # if self.settings.custom_fight_style:
                 #     with open("custom_fight_style.txt") as f:
                 #         custom_fight_style = f.read()
-                #     profile.simc_arguments.append("# custom_fight_style")
-                #     profile.simc_arguments.append(custom_fight_style)
+                #     simulation_data.simc_arguments.append("# custom_fight_style")
+                #     simulation_data.simc_arguments.append(custom_fight_style)
 
-            simulation_group.add(profile)
+            simulation_group.add(simulation_data)
 
     def post_processing(self, data_dict: dict) -> dict:
         data_dict = super().post_processing(data_dict)
@@ -169,6 +185,11 @@ class TalentTargetScalingSimulator(Simulator):
                 data_dict["data"],
                 self._collect_data(simulation_group, self.settings.data_type),
             )
+
+            if simulation_group.json_data:
+                data_dict["profile"]["character"][
+                    "talents"
+                ] = simulation_group.json_data["sim"]["players"][0]["talents"]
 
         logger.debug("Starting post processing")
         data_dict = self.post_processing(data_dict)

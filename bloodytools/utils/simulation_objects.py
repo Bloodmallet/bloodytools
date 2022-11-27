@@ -184,37 +184,10 @@ class Simulation_Data:
             self.simc_arguments = [simc_arguments]
         # craft simc input for a proper profile
         if profile:
-            if not profile.get(
-                "character", None
-            ):  #  or not profile.get("items", None):
-                raise ValueError(
-                    "When providing a profile it must have 'character' and 'items' keys."
-                )
-
-            character = []
-            for name in profile["character"]:
-                if name != "class":
-                    character.append("{}={}".format(name, profile["character"][name]))
-                else:
-                    character.append(
-                        "{}=baseline".format(
-                            profile["character"][name].replace("_", "")
-                        )
-                    )
-
-            items = []
-            if profile.get("items", None):
-                for slot in profile["items"]:
-                    if profile["items"][slot]:
-                        string = "{}=,".format(slot)
-                        string += ",".join(
-                            "{}={}".format(key, value)
-                            for key, value in profile["items"][slot].items()
-                        )
-                        items.append(string)
-
             # prepend created character profile input
-            self.simc_arguments = character + items + self.simc_arguments
+            self.simc_arguments = (
+                self.get_simc_arguments_from_profile(profile) + self.simc_arguments
+            )
 
         # simc setting to determine the target_error
         try:
@@ -246,6 +219,34 @@ class Simulation_Data:
         self.so_simulation_end_time: typing.Optional[datetime.datetime] = None
         # simulation start time
         self.so_simulation_start_time: typing.Optional[datetime.datetime] = None
+
+    def get_simc_arguments_from_profile(self, profile: dict) -> typing.List[str]:
+        if not profile.get("character", None):  #  or not profile.get("items", None):
+            raise ValueError(
+                "When providing a profile it must have 'character' and 'items' keys."
+            )
+
+        character = []
+        for name in profile["character"]:
+            if name != "class":
+                character.append("{}={}".format(name, profile["character"][name]))
+            else:
+                character.append(
+                    "{}=baseline".format(profile["character"][name].replace("_", ""))
+                )
+
+        items = []
+        if profile.get("items", None):
+            for slot in profile["items"]:
+                if profile["items"][slot]:
+                    string = "{}=,".format(slot)
+                    string += ",".join(
+                        "{}={}".format(key, value)
+                        for key, value in profile["items"][slot].items()
+                    )
+                    items.append(string)
+
+        return character + items
 
     def is_equal(self, simulation_instance: "Simulation_Data") -> bool:
         """Determines if the current and given simulation_data share the
@@ -437,7 +438,7 @@ class Simulation_Data:
 
         for simc_argument in self.simc_arguments:
             argument.append(simc_argument)
-        argument.append("name=" + self.name)
+        argument.append(f'name="{self.name}"')
 
         argument.append("ready_trigger=" + self.ready_trigger)
 
@@ -526,7 +527,7 @@ class Simulation_Data:
             optimize_expressions=self.optimize_expressions,
             ptr=self.ptr,
             ready_trigger=self.ready_trigger,
-            simc_arguments=list(self.simc_arguments),
+            simc_arguments=list(self.simc_arguments).copy(),
             target_error=self.target_error,
             threads=self.threads,
         )

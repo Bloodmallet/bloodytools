@@ -57,6 +57,9 @@ class Simulator(abc.ABC):
         """
         return str(cls.name()).lower().replace(" ", "_")
 
+    def _get_talents(self, json_data: dict) -> str:
+        return json_data["sim"]["players"][0]["talents"]
+
     def run(self) -> None:
         """Manages the simulation flow. You can adjust by overwriting the provided methods."""
         logger.debug(f"Start pipeline for {self.name()} of {self.wow_spec}")
@@ -86,9 +89,9 @@ class Simulator(abc.ABC):
         )
 
         if simulation_group.json_data:
-            data_dict["profile"]["character"]["talents"] = simulation_group.json_data[
-                "sim"
-            ]["players"][0]["talents"]
+            data_dict["profile"]["character"]["talents"] = self._get_talents(
+                simulation_group.json_data
+            )
 
         logger.debug("Starting post processing")
         data_dict = self.post_processing(data_dict)

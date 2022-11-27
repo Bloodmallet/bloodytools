@@ -77,6 +77,22 @@ class TalentAddSimulator(Simulator):
                 iterations=self.settings.iterations,
             )
 
+            # get talent string
+            data_copy = simulation.copy()
+            data_copy.iterations = "1"
+            data_copy.simc_arguments = (
+                data_copy.get_simc_arguments_from_profile(data_dict["profile"])
+                + data_copy.simc_arguments
+            )
+            tmp_group = Simulation_Group(data_copy, name="extract_talents")
+            tmp_group.simulate()
+            if tmp_group.profiles[0].json_data:
+                talents = "talents=" + self._get_talents(
+                    tmp_group.profiles[0].json_data
+                )
+                if talents not in data_dict["data_profile_overrides"][human_name]:
+                    data_dict["data_profile_overrides"][human_name].append(talents)
+
             if i == 0:
                 if self.settings.custom_apl:
                     with open("custom_apl.txt") as f:
