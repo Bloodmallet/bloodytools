@@ -5,12 +5,12 @@
 # Cool Other Build:
 #   - talents=WOW_EXPORT_STRING
 AoE Breath: 
-   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAkIAgkkIBSQkkkEiISSkEEBhIJJJJJJJpFAAAAAAAAAAAAA
+   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAkIAAJJkUiEEJJJhQikERQSAikkkkkkkkWAAAAAAAAAAAAA
 AoE DW Obliteration: 
-   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAICAQSCJiERkkkECJSSERCBBJJRkkkkkSSAAAAAAAAAAAAA
+   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAICAQSCJiERkkkECJSSERiEAJJRkkkkkSSAAAAAAAAAAAAA
    - off_hand=strike_twice,id=193700,bonus_id=6652/1643/8767,enchant=rune_of_razorice
 AoE 2h Obliteration: 
-   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAICAQSCJiERkkkECJSSEJJEEkkQkkkkkSSAAAAAAAAAAAAA
+   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAICAQSCJiERkkkECJSSEJJEAJJRkkkkkSSAAAAAAAAAAAAA
    - head=maw_of_the_haunted_frostbrood,id=200408,bonus_id=4800/4786/1498/6935,gem_id=192985
    - neck=elemental_lariat,id=193001,bonus_id=6652/7936/7979/1540/8767/8782,gem_id=192948/192948/192948,crafted_stats=32/49
    - shoulders=jaws_of_the_haunted_frostbrood,id=200410,bonus_id=4800/4786/1498
@@ -28,10 +28,10 @@ AoE 2h Obliteration:
    - main_hand=incarnate_skysplitter,id=195528,bonus_id=4800/4786/1498,enchant=rune_of_the_fallen_crusader,enchant_id=3368
    - off_hand=
 ST DW Obliteration: 
-   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAcgIBASSiEIBRSSSIiIJRSEASkERkkkkkSSAAAAAAAAAAAAA
+   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAcgEBASSiEIBRSSSIiIJRSEEkEJJAJJJpkEAAAAAAAAAAAAA
    - off_hand=strike_twice,id=193700,bonus_id=6652/1643/8767,enchant=rune_of_razorice
 ST 2h Obliteration: 
-   - talents=BwPAAAAAAAAAAAAAAAAAAAAAAAAIIJJBSAJJRIJSSSkAAAAAAAAAAKJJhIAAgEpkIRSSikA
+   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAkEBASSiEIBRSSSIiIJRSSAkQSCQSSSKJBAAAAAAAAAAAA
    - head=maw_of_the_haunted_frostbrood,id=200408,bonus_id=4800/4786/1498/6935,gem_id=192985
    - neck=elemental_lariat,id=193001,bonus_id=6652/7936/7979/1540/8767/8782,gem_id=192948/192948/192948,crafted_stats=32/49
    - shoulders=jaws_of_the_haunted_frostbrood,id=200410,bonus_id=4800/4786/1498
