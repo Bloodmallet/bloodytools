@@ -83,14 +83,15 @@ class SecondaryDistributionSimulator(Simulator):
 
             stats = 0
             for stat in rating_names:
-                try:
-                    stats += simulation.json_data["sim"]["players"][0][
-                        "collected_data"
-                    ]["buffed_stats"]["stats"][stat]
-                except KeyError:
-                    logger.warning(
-                        f"Stat '{stat}' not found in single iteration simulation data while extracting secondary stats. Assuming 0."
-                    )
+                if simulation.json_data:
+                    try:
+                        stats += simulation.json_data["sim"]["players"][0][
+                            "collected_data"
+                        ]["buffed_stats"]["stats"][stat]
+                    except KeyError:
+                        logger.warning(
+                            f"Stat '{stat}' not found in single iteration simulation data while extracting secondary stats. Assuming 0."
+                        )
 
             secondary_amount = int(stats)
 

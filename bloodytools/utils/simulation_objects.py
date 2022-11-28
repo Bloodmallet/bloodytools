@@ -496,8 +496,11 @@ class Simulation_Data:
 
         # parse results from generated json file
         with open(self.json_filename, "r") as json_file:
-            self.json_data = json.load(json_file)
-        self.set_json_data(self.json_data)
+            data = json.load(json_file)
+        if data and isinstance(data, dict):
+            self.json_data = data
+        if self.json_data:
+            self.set_json_data(self.json_data)
 
         # remove json file after parsing
         if self.json_filename is not None and self.remove_files:
@@ -549,7 +552,8 @@ class Simulation_Data:
         """
         logger.debug("Setting dps for baseprofile.")
         self.set_dps(
-            data["sim"]["players"][0]["collected_data"]["dps"]["mean"], external=False
+            data["sim"]["players"][0]["collected_data"]["dps"]["mean"],
+            external=False,
         )
         logger.debug("Set dps for profile.")
 
@@ -910,8 +914,11 @@ class Simulation_Group:
 
                     # parse results from generated json file
                     with open(self.json_filename, "r") as json_file:
-                        self.json_data = json.load(json_file)
-                    self.set_json_data(self.json_data)
+                        data = json.load(json_file)
+                    if data and isinstance(data, dict):
+                        self.json_data = data
+                    if self.json_data:
+                        self.set_json_data(self.json_data)
 
                     # remove json file after parsing
                     if self.json_filename is not None and self.remove_files:

@@ -66,7 +66,7 @@ class Simulator(abc.ABC):
         return str(cls.name()).lower().replace(" ", "_")
 
     def _get_talents(self, json_data: dict) -> str:
-        return json_data["sim"]["players"][-1]["talents"]
+        return str(json_data["sim"]["players"][-1]["talents"])
 
     def run(self) -> None:
         """Manages the simulation flow. You can adjust by overwriting the provided methods."""
