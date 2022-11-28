@@ -38,7 +38,7 @@ jobs:
     #     pytest --doctest-modules --junitxml=junit/test-results.xml --cov=simc_support --cov-report=xml --cov-report=html tests/test_utils_simulation_objects.py
 
   merge:
-    needs: [publish]
+    needs: [test]
     runs-on: ubuntu-latest
 
     steps:
@@ -49,4 +49,4 @@ jobs:
         type: now
         target_branch: master
         github_token: ${{ github.token }}
-        message: '[CD] merge published code into master'
+        message: '[CD] merge tested code into master'
