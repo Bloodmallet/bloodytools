@@ -36,7 +36,7 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertEqual(self.sd.threads, "")
         self.assertEqual(type(self.sd.so_creation_time), datetime.datetime)
         self.assertEqual(self.sd.external_simulation, False)
-        self.assertEqual(self.sd.full_report, None)
+        self.assertEqual(self.sd.full_report, "")
         self.assertEqual(self.sd.so_simulation_end_time, None)
         self.assertEqual(self.sd.so_simulation_start_time, None)
 
@@ -101,10 +101,10 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.iterations, dict)
         self.assertNotEqual(self.sd.iterations, int)
         self.sd = None
-        self.sd = simulation_objects.Simulation_Data(iterations=15000)
+        self.sd = simulation_objects.Simulation_Data(iterations="15000")
         self.assertEqual(self.sd.iterations, "15000")
         self.sd = None
-        self.sd = simulation_objects.Simulation_Data(iterations=15000.75)
+        self.sd = simulation_objects.Simulation_Data(iterations="15000.75")
         self.assertEqual(self.sd.iterations, "15000")
 
     def test_log(self):
@@ -116,7 +116,7 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.log, dict)
         self.assertNotEqual(self.sd.log, int)
         self.sd = None
-        self.sd = simulation_objects.Simulation_Data(iterations=15000)
+        self.sd = simulation_objects.Simulation_Data(iterations="15000")
         self.assertEqual(self.sd.log, "0")
 
     def test_name(self):
@@ -136,7 +136,7 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.optimize_expressions, dict)
         self.assertNotEqual(self.sd.optimize_expressions, int)
         self.sd = None
-        self.sd = simulation_objects.Simulation_Data(optimize_expressions=["1"])
+        self.sd = simulation_objects.Simulation_Data(optimize_expressions="1")
         self.assertEqual(self.sd.optimize_expressions, "1")
 
     def test_ptr(self):
@@ -148,7 +148,7 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.ptr, dict)
         self.assertNotEqual(self.sd.ptr, int)
         self.sd = None
-        self.sd = simulation_objects.Simulation_Data(ptr=["1"])
+        self.sd = simulation_objects.Simulation_Data(ptr="1")
         self.assertEqual(self.sd.ptr, "0")
 
     def test_ready_trigger(self):
@@ -160,16 +160,8 @@ class TestSimulationDataInit(unittest.TestCase):
         self.assertNotEqual(self.sd.ready_trigger, dict)
         self.assertNotEqual(self.sd.ready_trigger, int)
         self.sd = None
-        self.sd = simulation_objects.Simulation_Data(ready_trigger=["1"])
+        self.sd = simulation_objects.Simulation_Data(ready_trigger="1")
         self.assertEqual(self.sd.ready_trigger, "1")
-
-    def test_simc_arguments(self):
-        self.sd = simulation_objects.Simulation_Data(simc_arguments="1")
-        self.assertNotEqual(self.sd.simc_arguments, "1")
-        self.assertEqual(self.sd.simc_arguments, ["1"])
-        self.sd = None
-        self.sd = simulation_objects.Simulation_Data(simc_arguments=["a", "b"])
-        self.assertEqual(self.sd.simc_arguments, ["a", "b"])
 
     def test_target_error(self):
         self.sd = simulation_objects.Simulation_Data(target_error="0.5")
@@ -194,16 +186,15 @@ class TestSimulationDataMethods(unittest.TestCase):
     def setUp(self):
         self.sd = simulation_objects.Simulation_Data()
 
-    def tearDown(self):
-        self.sd = None
-
     def test_is_equal(self):
         sd1 = self.sd
         sd2 = simulation_objects.Simulation_Data()
         self.assertTrue(sd1.is_equal(sd2))
         self.assertTrue(sd2.is_equal(sd1))
         self.assertTrue(sd1.is_equal(sd1))
-        self.assertFalse(sd1.is_equal("Döner"))
+        with self.assertRaises(TypeError):
+            sd1.is_equal("Döner")
+
         sd_calculate_scale_factors = simulation_objects.Simulation_Data(
             calculate_scale_factors="1"
         )
@@ -249,7 +240,7 @@ class TestSimulationDataMethods(unittest.TestCase):
             self.sd.set_dps(5678.9)
         with self.assertRaises(TypeError):
             self.sd.set_dps("5678", external="Hallo")
-        self.sd = None
+
         self.sd = simulation_objects.Simulation_Data()
         with self.assertRaises(TypeError):
             self.sd.set_dps("Bonjour", external="Bonsoir")
@@ -257,14 +248,6 @@ class TestSimulationDataMethods(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.sd.set_dps("Bonjour", external=False)
         self.assertEqual(self.sd.get_dps(), -1)
-
-    def test_get_avg(self):
-        sd = simulation_objects.Simulation_Data()
-        sd.set_dps(100)
-        self.sd.set_dps(50)
-        self.assertEqual(sd.get_avg(self.sd), 75)
-        sd_empty = simulation_objects.Simulation_Data()
-        self.assertEqual(self.sd.get_avg(sd_empty), None)
 
     def test_get_simulation_duration(self):
         with self.assertRaises(simulation_objects.NotStartedYetError):

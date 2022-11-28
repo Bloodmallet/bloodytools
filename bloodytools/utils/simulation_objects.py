@@ -6,14 +6,16 @@ import os
 import requests
 import subprocess
 import sys
+import typing
 import threading
 import time
 import uuid
 
 # wow game data and simc input checks
+from simc_support.simc_data import FightStyle
 from simc_support.simc_data.FightStyle import FIGHTSTYLES
 from typing import List, Union
-from bloodytools.utils.utils import request as r
+from bloodytools.utils.request import request as r
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +69,7 @@ class Simulation_Data:
         calculate_scale_factors: str = "0",
         default_actions: str = "1",
         default_skill: str = "1.0",
-        executable: str = None,
+        executable: str = "",
         fight_style: str = "patchwerk",
         fixed_time: str = "1",
         html: str = "",
@@ -106,7 +108,7 @@ class Simulation_Data:
             self.default_skill = "1.0"
         # describes the location and type of the simc executable
         # if no value was set, determine a standard value
-        if executable == None:
+        if executable == "":
             if sys.platform == "win32":
                 logger.debug(
                     "Setting Windows default value for executable. This might not work for your system."
@@ -124,7 +126,11 @@ class Simulation_Data:
                 logger.error("{}".format(e))
                 raise e
         # simc setting to determine the fight style
-        if fight_style == "custom" or fight_style in FIGHTSTYLES:
+        if (
+            fight_style == "custom"
+            or fight_style in FIGHTSTYLES
+            or FightStyle.CASTINGPATCHWERK in fight_style
+        ):
             self.fight_style = fight_style
         else:
             logger.warning(
@@ -172,40 +178,16 @@ class Simulation_Data:
             self.ready_trigger = "1"
         # specific data to be run, like talent combinations, specific gear or
         #   traits
-        if type(simc_arguments) == list or simc_arguments == []:
+        if isinstance(simc_arguments, list):
             self.simc_arguments = simc_arguments
         else:
             self.simc_arguments = [simc_arguments]
         # craft simc input for a proper profile
         if profile:
-            if not profile.get("character", None) or not profile.get("items", None):
-                raise ValueError(
-                    "When providing a profile it must have 'character' and 'items' keys."
-                )
-
-            character = []
-            for name in profile["character"]:
-                if name != "class":
-                    character.append("{}={}".format(name, profile["character"][name]))
-                else:
-                    character.append(
-                        "{}=baseline".format(
-                            profile["character"][name].replace("_", "")
-                        )
-                    )
-
-            items = []
-            for slot in profile["items"]:
-                if profile["items"][slot]:
-                    string = "{}=,".format(slot)
-                    string += ",".join(
-                        "{}={}".format(key, value)
-                        for key, value in profile["items"][slot].items()
-                    )
-                    items.append(string)
-
             # prepend created character profile input
-            self.simc_arguments = character + items + self.simc_arguments
+            self.simc_arguments = (
+                self.get_simc_arguments_from_profile(profile) + self.simc_arguments
+            )
 
         # simc setting to determine the target_error
         try:
@@ -223,7 +205,7 @@ class Simulation_Data:
             self.threads = ""
         self.remove_files = remove_files
 
-        # set independant default values
+        # set independent default values
         # creation time of the simulation object
         self.so_creation_time = datetime.datetime.utcnow()
         # simulation dps result
@@ -231,11 +213,40 @@ class Simulation_Data:
         # flag to know whether data was generated with external simulation function
         self.external_simulation = False
         # simulation full report (command line print out)
-        self.full_report: str = None
+        self.full_report: str = ""
+        self.json_data: typing.Optional[dict] = None
         # simulation end time
-        self.so_simulation_end_time: datetime.datetime = None
+        self.so_simulation_end_time: typing.Optional[datetime.datetime] = None
         # simulation start time
-        self.so_simulation_start_time: datetime.datetime = None
+        self.so_simulation_start_time: typing.Optional[datetime.datetime] = None
+
+    def get_simc_arguments_from_profile(self, profile: dict) -> typing.List[str]:
+        if not profile.get("character", None):  #  or not profile.get("items", None):
+            raise ValueError(
+                "When providing a profile it must have 'character' and 'items' keys."
+            )
+
+        character = []
+        for name in profile["character"]:
+            if name != "class":
+                character.append("{}={}".format(name, profile["character"][name]))
+            else:
+                character.append(
+                    "{}=baseline".format(profile["character"][name].replace("_", ""))
+                )
+
+        items = []
+        if profile.get("items", None):
+            for slot in profile["items"]:
+                if profile["items"][slot]:
+                    string = "{}=,".format(slot)
+                    string += ",".join(
+                        "{}={}".format(key, value)
+                        for key, value in profile["items"][slot].items()
+                    )
+                    items.append(string)
+
+        return character + items
 
     def is_equal(self, simulation_instance: "Simulation_Data") -> bool:
         """Determines if the current and given simulation_data share the
@@ -251,41 +262,40 @@ class Simulation_Data:
             bool -- True if equallity between mentioned data is guaranteed.
         """
 
-        try:
-            if (
-                self.calculate_scale_factors
-                != simulation_instance.calculate_scale_factors
-            ):
-                return False
-            if self.default_actions != simulation_instance.default_actions:
-                return False
-            if self.default_skill != simulation_instance.default_skill:
-                return False
-            if self.executable != simulation_instance.executable:
-                return False
-            if self.fight_style != simulation_instance.fight_style:
-                return False
-            if self.fixed_time != simulation_instance.fixed_time:
-                return False
-            if self.html != simulation_instance.html:
-                return False
-            if self.iterations != simulation_instance.iterations:
-                return False
-            if self.log != simulation_instance.log:
-                return False
-            if self.optimize_expressions != simulation_instance.optimize_expressions:
-                return False
-            if self.ptr != simulation_instance.ptr:
-                return False
-            if self.ready_trigger != simulation_instance.ready_trigger:
-                return False
-            if self.target_error != simulation_instance.target_error:
-                return False
-            if self.threads != simulation_instance.threads:
-                return False
-            return True
-        except Exception:
+        if not isinstance(simulation_instance, Simulation_Data):
+            raise TypeError(
+                f"Expected Simulation_Data, got <{type(simulation_instance)}> instead."
+            )
+
+        if self.calculate_scale_factors != simulation_instance.calculate_scale_factors:
             return False
+        if self.default_actions != simulation_instance.default_actions:
+            return False
+        if self.default_skill != simulation_instance.default_skill:
+            return False
+        if self.executable != simulation_instance.executable:
+            return False
+        if self.fight_style != simulation_instance.fight_style:
+            return False
+        if self.fixed_time != simulation_instance.fixed_time:
+            return False
+        if self.html != simulation_instance.html:
+            return False
+        if self.iterations != simulation_instance.iterations:
+            return False
+        if self.log != simulation_instance.log:
+            return False
+        if self.optimize_expressions != simulation_instance.optimize_expressions:
+            return False
+        if self.ptr != simulation_instance.ptr:
+            return False
+        if self.ready_trigger != simulation_instance.ready_trigger:
+            return False
+        if self.target_error != simulation_instance.target_error:
+            return False
+        if self.threads != simulation_instance.threads:
+            return False
+        return True
 
     def get_dps(self) -> int:
         """Get the dps of the simulation_instance.
@@ -331,25 +341,6 @@ class Simulation_Data:
         except Exception as e:
             raise e
         logger.debug("Set DPS of profile '{}' to {}.".format(self.name, self.get_dps()))
-
-    def get_avg(self, simulation_instance: "Simulation_Data") -> int:
-        """Get the average between to the parent and given simulation_instance.
-
-        Arguments:
-            simulation_instance {simulation_data} -- A finished simulation_data instance.
-
-        Returns:
-            int -- Average of parent and simulation_instance.
-        """
-        if (
-            self.get_dps()
-            and self.get_dps() != -1
-            and simulation_instance.get_dps()
-            and simulation_instance.get_dps() != -1
-        ):
-            return int((self.get_dps() + simulation_instance.get_dps()) / 2)
-        else:
-            return None
 
     def get_simulation_duration(self) -> datetime.timedelta:
         """Return the simulation duration.
@@ -420,11 +411,22 @@ class Simulation_Data:
         self.filename = "{}.simc".format(self.uuid)
         self.json_filename = "{}.json".format(self.uuid)
 
+        if (
+            FightStyle.CASTINGPATCHWERK in self.fight_style
+            and FightStyle.CASTINGPATCHWERK != self.fight_style
+        ):
+            simc_fight_style = FightStyle.CASTINGPATCHWERK
+            special_remark = "desired_targets=" + self.fight_style[-1]
+        else:
+            simc_fight_style = self.fight_style
+            special_remark = ""
+
         argument = [self.executable]
         argument.append("json=" + self.json_filename)
         argument.append("iterations=" + self.iterations)
         argument.append("target_error=" + self.target_error)
-        argument.append("fight_style=" + self.fight_style)
+        argument.append("fight_style=" + simc_fight_style)
+        argument.append(special_remark)
         argument.append("fixed_time=" + self.fixed_time)
         argument.append("optimize_expressions=" + self.optimize_expressions)
         argument.append("default_actions=" + self.default_actions)
@@ -436,12 +438,15 @@ class Simulation_Data:
 
         for simc_argument in self.simc_arguments:
             argument.append(simc_argument)
-        argument.append("name=" + self.name)
+        argument.append(f'name="{self.name}"')
 
         argument.append("ready_trigger=" + self.ready_trigger)
 
+        # drop empty, pseudo empty, and comment args
+        argument = [a for a in argument if a and a.strip() and a.strip()[0] != "#"]
+
         fail_counter = 0
-        simulation_output: subprocess.CompletedProcess = None
+        simulation_output: subprocess.CompletedProcess
         # should prevent additional empty windows popping up...on win32 systems without breaking different OS
         if sys.platform == "win32":
             # call simulationcraft in the background. Save output for processing
@@ -450,16 +455,13 @@ class Simulation_Data:
 
             while not hasattr(self, "success") and fail_counter < 5:
 
-                try:
-                    simulation_output = subprocess.run(
-                        argument,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT,
-                        universal_newlines=True,
-                        startupinfo=startupinfo,
-                    )
-                except FileNotFoundError as e:
-                    raise e
+                simulation_output = subprocess.run(
+                    argument,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True,
+                    startupinfo=startupinfo,
+                )
 
                 if simulation_output.returncode != 0:
                     fail_counter += 1
@@ -470,15 +472,12 @@ class Simulation_Data:
 
             while not hasattr(self, "success") and fail_counter < 5:
 
-                try:
-                    simulation_output = subprocess.run(
-                        argument,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT,
-                        universal_newlines=True,
-                    )
-                except FileNotFoundError as e:
-                    raise e
+                simulation_output = subprocess.run(
+                    argument,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True,
+                )
 
                 if simulation_output.returncode != 0:
                     fail_counter += 1
@@ -497,7 +496,10 @@ class Simulation_Data:
 
         # parse results from generated json file
         with open(self.json_filename, "r") as json_file:
-            self.json_data = json.load(json_file)
+            data = json.load(json_file)
+        if data and isinstance(data, dict):
+            self.json_data = data
+        if self.json_data:
             self.set_json_data(self.json_data)
 
         # remove json file after parsing
@@ -528,7 +530,7 @@ class Simulation_Data:
             optimize_expressions=self.optimize_expressions,
             ptr=self.ptr,
             ready_trigger=self.ready_trigger,
-            simc_arguments=list(self.simc_arguments),
+            simc_arguments=list(self.simc_arguments).copy(),
             target_error=self.target_error,
             threads=self.threads,
         )
@@ -550,7 +552,8 @@ class Simulation_Data:
         """
         logger.debug("Setting dps for baseprofile.")
         self.set_dps(
-            data["sim"]["players"][0]["collected_data"]["dps"]["mean"], external=False
+            data["sim"]["players"][0]["collected_data"]["dps"]["mean"],
+            external=False,
         )
         logger.debug("Set dps for profile.")
 
@@ -560,7 +563,7 @@ class Simulation_Group:
 
     def __init__(
         self,
-        simulation_instance: Union[Simulation_Data, List[Simulation_Data]] = None,
+        simulation_instance: Union[None, Simulation_Data, List[Simulation_Data]] = None,
         name: str = "",
         threads: str = "",
         profileset_work_threads: str = "",
@@ -571,15 +574,16 @@ class Simulation_Group:
 
         self.name = name
         self.filename: str = ""
-        self.json_filename: str = None
+        self.json_filename: str = ""
+        self.json_data: typing.Optional[dict] = None
         self.threads = threads
         self.remove_files = remove_files
         # simulationcrafts own multithreading
         self.profileset_work_threads = profileset_work_threads
         self.executable = executable
         self.profiles: List[Simulation_Data]
-        self.sg_simulation_start_time: datetime.datetime = None
-        self.sg_simulation_end_time: datetime.datetime = None
+        self.sg_simulation_start_time: typing.Optional[datetime.datetime] = None
+        self.sg_simulation_end_time: typing.Optional[datetime.datetime] = None
 
         # check input types
         if not simulation_instance:
@@ -711,6 +715,18 @@ class Simulation_Group:
                     self.filename = "{}.simc".format(self.uuid)
                     self.json_filename = "{}.json".format(self.uuid)
 
+                    if (
+                        FightStyle.CASTINGPATCHWERK in self.profiles[0].fight_style
+                        and FightStyle.CASTINGPATCHWERK != self.profiles[0].fight_style
+                    ):
+                        simc_fight_style = FightStyle.CASTINGPATCHWERK
+                        special_remark = (
+                            "desired_targets=" + self.profiles[0].fight_style[-1]
+                        )
+                    else:
+                        simc_fight_style = self.profiles[0].fight_style
+                        special_remark = ""
+
                     # write arguments to file
                     with open(self.filename, "w") as f:
                         # write the equal values to file
@@ -734,7 +750,8 @@ class Simulation_Group:
                         f.write(
                             "default_skill={}\n".format(self.profiles[0].default_skill)
                         )
-                        f.write("fight_style={}\n".format(self.profiles[0].fight_style))
+                        f.write(f"fight_style={simc_fight_style}\n")
+                        f.write(f"{special_remark}\n")
                         f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
                         if self.profiles[0].html != "":
                             f.write("html={}\n".format(self.profiles[0].html))
@@ -780,11 +797,22 @@ class Simulation_Group:
                                 )
 
                             else:
-                                for special_argument in profile.simc_arguments:
+                                from simc_support.game_data.WowClass import WOWCLASSES
+
+                                simc_wow_class_names = [
+                                    wow_class.simc_name.replace("_", "")
+                                    for wow_class in WOWCLASSES
+                                ]
+                                filtered_arguments = [
+                                    arg
+                                    for arg in profile.simc_arguments
+                                    if arg.split("=")[0] not in simc_wow_class_names
+                                ]
+                                for argument in filtered_arguments:
                                     f.write(
                                         'profileset."{profile_name}"+={argument}\n'.format(
                                             profile_name=profile.name,
-                                            argument=special_argument,
+                                            argument=argument,
                                         )
                                     )
 
@@ -792,7 +820,7 @@ class Simulation_Group:
                         logger.debug(f.read())
                     # counter of failed simulation attempts
                     fail_counter = 0
-                    simulation_output: subprocess.CompletedProcess = None
+                    simulation_output: subprocess.Popen
                     # should prevent additional empty windows popping up...on win32 systems without breaking different OS
                     if sys.platform == "win32":
                         # call simulationcraft in the background. Save output for processing
@@ -802,7 +830,6 @@ class Simulation_Group:
                         while not hasattr(self, "success") and fail_counter < 5:
 
                             try:
-                                # do stuff here
                                 simulation_output = subprocess.Popen(
                                     [self.executable, self.filename],
                                     stdout=subprocess.PIPE,
@@ -877,7 +904,7 @@ class Simulation_Group:
                     elif self.remove_files:
                         # remove profilesets file
                         os.remove(self.filename)
-                        self.filename = None
+                        self.filename = ""
 
                     logger.debug(self.simulation_output)
 
@@ -887,7 +914,10 @@ class Simulation_Group:
 
                     # parse results from generated json file
                     with open(self.json_filename, "r") as json_file:
-                        self.json_data = json.load(json_file)
+                        data = json.load(json_file)
+                    if data and isinstance(data, dict):
+                        self.json_data = data
+                    if self.json_data:
                         self.set_json_data(self.json_data)
 
                     # remove json file after parsing
@@ -901,18 +931,19 @@ class Simulation_Group:
 
             self.set_simulation_end_time()
 
-            logger.debug(
-                "Simulation time: {}.".format(
-                    self.sg_simulation_end_time - self.sg_simulation_start_time
+            if self.sg_simulation_end_time and self.sg_simulation_start_time:
+                logger.debug(
+                    "Simulation time: {}.".format(
+                        self.sg_simulation_end_time - self.sg_simulation_start_time
+                    )
                 )
-            )
 
         else:
             return False
 
         return True
 
-    def simulate_with_raidbots(self, apikey) -> bool:
+    def simulate_with_raidbots(self, apikey) -> str:
         """Triggers the simulation of all profiles using Raidbots.com API.
 
         Raises:
@@ -920,9 +951,9 @@ class Simulation_Group:
             NotSetYetError -- No data available to simulate.
 
         Returns:
-            bool -- True if simulations ended successfully.
+            bool, str -- Returns the git hash as a string if simulations ended successfully, otherwise False.
         """
-        simc_hash = False
+        simc_hash = ""
 
         if not hasattr(self, "session"):
             self.session = requests.Session()
@@ -948,6 +979,19 @@ class Simulation_Group:
                         )
                     )
                 else:
+
+                    if (
+                        FightStyle.CASTINGPATCHWERK in self.profiles[0].fight_style
+                        and FightStyle.CASTINGPATCHWERK != self.profiles[0].fight_style
+                    ):
+                        simc_fight_style = FightStyle.CASTINGPATCHWERK
+                        special_remark = (
+                            "desired_targets=" + self.profiles[0].fight_style[-1]
+                        )
+                    else:
+                        simc_fight_style = self.profiles[0].fight_style
+                        special_remark = ""
+
                     self.filename = str(uuid.uuid4()) + ".simc"
 
                     # if somehow the random naming function created the same name twice
@@ -969,7 +1013,8 @@ class Simulation_Group:
                         f.write(
                             "default_skill={}\n".format(self.profiles[0].default_skill)
                         )
-                        f.write("fight_style={}\n".format(self.profiles[0].fight_style))
+                        f.write(f"fight_style={simc_fight_style}\n")
+                        f.write(f"{special_remark}\n")
                         f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
                         f.write("iterations={}\n".format(self.profiles[0].iterations))
                         f.write(
@@ -1166,13 +1211,13 @@ class Simulation_Group:
 
                     # remove profilesets file
                     os.remove(self.filename)
-                    self.filename = None
+                    self.filename = ""
 
                     try:
                         simc_hash = raidbots_data["git_revision"]
                     except Exception:
                         logger.error("'git_revision' not found in raidbots answer.")
-                        simc_hash = False
+                        simc_hash = ""
 
                     # set basic profile dps
                     self.set_json_data(raidbots_data)
@@ -1184,14 +1229,15 @@ class Simulation_Group:
 
             self.set_simulation_end_time()
 
-            logger.debug(
-                "Simulation time: {}.".format(
-                    self.sg_simulation_end_time - self.sg_simulation_start_time
+            if self.sg_simulation_end_time and self.sg_simulation_start_time:
+                logger.debug(
+                    "Simulation time: {}.".format(
+                        self.sg_simulation_end_time - self.sg_simulation_start_time
+                    )
                 )
-            )
 
         else:
-            return False
+            return ""
 
         return simc_hash
 
