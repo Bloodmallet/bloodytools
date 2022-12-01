@@ -57,6 +57,7 @@ class TalentTargetScalingSimulator(Simulator):
             "class_talents=",
         ]
 
+        # TODO: fix order of profiles. custom/T29 needs to be first
         for i, k_v in enumerate(data_dict["data_profile_overrides"].items()):
             human_name, simc_args = k_v
 
