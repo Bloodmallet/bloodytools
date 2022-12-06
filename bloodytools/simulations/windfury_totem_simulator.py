@@ -11,7 +11,8 @@ from simc_support.game_data.Role import Role
 
 logger = logging.getLogger(__name__)
 
-ENHANCEMENT_ALTERNATIVE_TALENT_STRINGS = []
+ENHANCEMENT_ALTERNATIVE_TALENT_STRINGS: typing.List[str] = []
+"""List of simc arguments to override whatever enhancement loses/wins to properly check the value of Windfury Totem"""
 
 
 class WindfuryEnum(enum.Enum):
