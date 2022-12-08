@@ -11,8 +11,11 @@ from simc_support.game_data.Role import Role
 
 logger = logging.getLogger(__name__)
 
-ENHANCEMENT_ALTERNATIVE_TALENT_STRINGS: typing.List[str] = []
-"""List of simc arguments to override whatever enhancement loses/wins to properly check the value of Windfury Totem"""
+ENHANCEMENT_WINDFURY: typing.List[str] = []
+"""List of simc arguments to properly communicate how an Enhancement profile performs if given an external Windfury Totem."""
+
+ENHANCEMENT_NO_WINDFURY: typing.List[str] = []
+"""List of simc arguments to properly communicate how an Enhancement profile performs if they have to cast Windfury Totem on their own."""
 
 
 class WindfuryEnum(enum.Enum):
@@ -145,10 +148,16 @@ class WindfuryTotemSimulator(Simulator):
             for windfury_name, windfury_override in WINDFURY_OPTIONS.items():
                 if (
                     melee_spec == ENHANCEMENT
-                    and windfury_name == "no windfury"
-                    and ENHANCEMENT_ALTERNATIVE_TALENT_STRINGS
+                    and windfury_name == "windfury"
+                    and ENHANCEMENT_WINDFURY
                 ):
-                    windfury_override.append(*ENHANCEMENT_ALTERNATIVE_TALENT_STRINGS)
+                    windfury_override.append(*ENHANCEMENT_WINDFURY)
+                if (
+                    melee_spec == ENHANCEMENT
+                    and windfury_name == "no windfury"
+                    and ENHANCEMENT_NO_WINDFURY
+                ):
+                    windfury_override.append(*ENHANCEMENT_NO_WINDFURY)
 
                 full_spec_name = " ".join(
                     [melee_spec.full_name, melee_spec.wow_class.full_name]
