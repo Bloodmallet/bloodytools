@@ -1,4 +1,5 @@
 import logging
+import typing
 
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from bloodytools.simulations.simulator import Simulator
@@ -79,7 +80,7 @@ class TalentRemovalSimulator(Simulator):
             simulation_group.add(simulation)
 
             # create simulations for each missing talent
-            talent_strings = [
+            talent_strings: typing.List[str] = [
                 args
                 for args in simc_args
                 if args.startswith("talents=")
@@ -88,6 +89,8 @@ class TalentRemovalSimulator(Simulator):
             ]
             other_args = [arg for arg in simc_args if arg not in talent_strings]
             for talent_string in talent_strings:
+                if talent_string.startswith("talents="):
+                    continue
                 other_talent_strings = [s for s in talent_strings if s != talent_string]
                 prefix = talent_string.split("=")[0]
                 cleaned_talents = talent_string.split("=")[1].split("#")[0].strip()
