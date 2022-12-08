@@ -84,7 +84,7 @@ class WindfuryTotemSimulator(Simulator):
         ]
 
         # create new sorted_data_keys_2 based on absolute gain
-        data_key_value_pairs: typing.List[typing.Tuple[str, float]] = []
+        data_key_value_pairs = []
         for spec_name in data_dict["data"]:
             increase = (
                 data_dict["data"][spec_name][WindfuryEnum.WINDFURY.value]
