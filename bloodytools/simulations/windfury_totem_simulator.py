@@ -7,6 +7,7 @@ from bloodytools.simulations.simulator import Simulator
 from bloodytools.utils.utils import create_base_json_dict, get_profile
 from simc_support.game_data.WowSpec import WOWSPECS, ENHANCEMENT
 from simc_support.game_data.Role import Role
+from simc_support.game_data.Stat import Stat
 
 
 logger = logging.getLogger(__name__)
@@ -130,7 +131,11 @@ class WindfuryTotemSimulator(Simulator):
         logger.debug("Starting pre processing")
         data_dict = self.pre_processing(data_dict)
 
-        melee_specs = [spec for spec in WOWSPECS if spec.role == Role.MELEE]
+        melee_specs = [
+            spec
+            for spec in WOWSPECS
+            if spec.role == Role.MELEE and spec.stat != Stat.INTELLECT
+        ]
 
         for melee_spec in melee_specs:
             try:
@@ -148,6 +153,7 @@ class WindfuryTotemSimulator(Simulator):
             )
 
             for windfury_name, windfury_override in WINDFURY_OPTIONS.items():
+                windfury_override = windfury_override.copy()
                 if (
                     melee_spec == ENHANCEMENT
                     and windfury_name == "windfury"
