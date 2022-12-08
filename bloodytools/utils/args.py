@@ -4,7 +4,7 @@ from bloodytools.utils.config import Config
 
 
 def arg_parse_config():
-    settings = Config()
+    settings = Config(log_warnings=False)
     parser = argparse.ArgumentParser(
         description="Simulate different aspects of World of Warcraft data."
     )
