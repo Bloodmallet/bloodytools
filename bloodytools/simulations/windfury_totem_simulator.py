@@ -11,7 +11,9 @@ from simc_support.game_data.Role import Role
 
 logger = logging.getLogger(__name__)
 
-ENHANCEMENT_WINDFURY: typing.List[str] = []
+ENHANCEMENT_WINDFURY: typing.List[str] = [
+    "talents=BcQAAAAAAAAAAAAAAAAAAAAAAIRSKRCIJhcgkkQJhAAAAAAAAAAAAAQLCRIRLFBIlkkUAUSkEA"
+]
 """List of simc arguments to properly communicate how an Enhancement profile performs if given an external Windfury Totem."""
 
 ENHANCEMENT_NO_WINDFURY: typing.List[str] = []
