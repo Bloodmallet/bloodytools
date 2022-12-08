@@ -61,17 +61,28 @@ class WindfuryTotemSimulator(Simulator):
     ) -> None:
         pass
 
+    def pre_processing(self, data_dict: dict) -> dict:
+        data_dict = super().pre_processing(data_dict)
+
+        data_dict["title"] = " | ".join([self.name(), self.fight_style.title()])
+
+        return data_dict
+
     def post_processing(self, data_dict: dict) -> dict:
         data_dict = super().post_processing(data_dict)
 
-        data_dict = self.create_sorted_key_key_value_data(data_dict)
+        data_dict = self.create_sorted_key_value_data(data_dict)
+
+        simple_profile_names: typing.List[str] = []
+        for name in data_dict["data"]:
+            if name[0] != "{" and name[-1] != "}":
+                simple_profile_names.append(name)
 
         # create new sorted_data_keys based on percentage gain
         data_key_value_pairs: typing.List[typing.Tuple[str, float]] = []
-        for spec_name in data_dict["data"]:
+        for spec_name in simple_profile_names:
             increase = (
-                data_dict["data"][spec_name][WindfuryEnum.WINDFURY.value]
-                / data_dict["data"][spec_name][WindfuryEnum.NO_WINDFURY.value]
+                data_dict["data"][spec_name] / data_dict["data"][f"{{{spec_name}}}"]
             )
             data_key_value_pairs.append((spec_name, increase))
 
@@ -85,10 +96,9 @@ class WindfuryTotemSimulator(Simulator):
 
         # create new sorted_data_keys_2 based on absolute gain
         data_key_value_pairs = []
-        for spec_name in data_dict["data"]:
+        for spec_name in simple_profile_names:
             increase = (
-                data_dict["data"][spec_name][WindfuryEnum.WINDFURY.value]
-                - data_dict["data"][spec_name][WindfuryEnum.NO_WINDFURY.value]
+                data_dict["data"][spec_name] - data_dict["data"][f"{{{spec_name}}}"]
             )
             data_key_value_pairs.append((spec_name, increase))
 
@@ -140,13 +150,14 @@ class WindfuryTotemSimulator(Simulator):
                 ):
                     windfury_override.append(*ENHANCEMENT_ALTERNATIVE_TALENT_STRINGS)
 
+                full_spec_name = " ".join(
+                    [melee_spec.full_name, melee_spec.wow_class.full_name]
+                )
+                if windfury_name == WindfuryEnum.NO_WINDFURY.value:
+                    full_spec_name = f"{{{full_spec_name}}}"
+
                 simulation_data = Simulation_Data(
-                    name=self.get_profile_name(
-                        " ".join(
-                            [melee_spec.wow_class.full_name, melee_spec.full_name]
-                        ),
-                        windfury_name,
-                    ),
+                    name=full_spec_name,
                     fight_style=self.fight_style,
                     profile=profile,
                     simc_arguments=windfury_override,
