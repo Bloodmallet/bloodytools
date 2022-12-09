@@ -58,11 +58,13 @@ class TalentRemovalSimulator(Simulator):
             tmp_group = Simulation_Group(data_copy, name="extract_talents")
             tmp_group.simulate()
             if tmp_group.profiles[0].json_data:
-                talents = "talents=" + self._get_talents(
+                talent_string = "talents=" + self._get_talents(
                     tmp_group.profiles[0].json_data
                 )
-                if talents not in data_dict["data_profile_overrides"][human_name]:
-                    data_dict["data_profile_overrides"][human_name].append(talents)
+                if talent_string not in data_dict["data_profile_overrides"][human_name]:
+                    data_dict["data_profile_overrides"][human_name].append(
+                        talent_string
+                    )
 
             if i == 0:
                 if self.settings.custom_apl:
