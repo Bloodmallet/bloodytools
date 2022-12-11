@@ -39,6 +39,9 @@ class TalentTargetScalingSimulator(Simulator):
     def name(cls) -> str:
         return "Talent Target Scaling"
 
+    def profile_split_character(self) -> str:
+        return "|||"
+
     def pre_processing(self, data_dict: dict) -> dict:
         data_dict = super().pre_processing(data_dict)
 
