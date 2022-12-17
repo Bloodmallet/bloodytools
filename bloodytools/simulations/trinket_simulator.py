@@ -11,6 +11,7 @@ from simc_support.game_data.Trinket import (
 )
 from simc_support.game_data.WowSpec import WowSpec
 from simc_support.game_data.Season import Season
+from simc_support.game_data.Source import Source
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,19 @@ SPECIAL_CASE_BONUS_IDS = {
         "haste": 6917,
         "mastery": 6918,
         "all": 6915,
+    },
+}
+
+SPECIAL_CASE_SIMC_OPTIONS = {
+    194301: {  # Whispering Incarnate Icon
+        "dps": "dragonflight.whispering_incarnate_icon_roles=dps",
+        "dps/heal": "dragonflight.whispering_incarnate_icon_roles=dps/heal",
+        "dps/tank": "dragonflight.whispering_incarnate_icon_roles=dps/tank",
+        "dps/heal/tank": "dragonflight.whispering_incarnate_icon_roles=dps/heal/tank",
+    },
+    200563: {  # Primal Ritual Shell
+        "wind": "dragonflight.primal_ritual_shell_blessing=wind",
+        "flame": "dragonflight.primal_ritual_shell_blessing=flame",
     },
 }
 
@@ -79,6 +93,10 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     trinket_list = [
         t for t in trinket_list if str(t.item_id) not in NON_DPS_TRINKET_IDS
     ]
+
+    # remove lower pvp trinkets
+    trinket_list = [t for t in trinket_list if t != Source.LOW_PVP]
+
     return trinket_list
 
 
@@ -125,6 +143,21 @@ class TrinketSimulator(Simulator):
                 for key in data_dict["translations"][tmp_name]:
                     data_dict["translations"][tmp_name][key] = (
                         data_dict["translations"][tmp_name][key] + f" [{stat.title()}]"
+                    )
+                data_dict["data"][tmp_name] = {}
+                data_dict["data_active"][tmp_name] = trinket.on_use
+                data_dict["data_sources"][tmp_name] = trinket.source.value
+                data_dict["item_ids"][tmp_name] = trinket.item_id
+
+            for special_option in SPECIAL_CASE_SIMC_OPTIONS.get(
+                trinket.item_id, {}
+            ).keys():
+                tmp_name = f"{trinket.name} [{special_option.title()}]"
+                data_dict["translations"][tmp_name] = trinket.translations.get_dict()
+                for key in data_dict["translations"][tmp_name]:
+                    data_dict["translations"][tmp_name][key] = (
+                        data_dict["translations"][tmp_name][key]
+                        + f" [{special_option.title()}]"
                     )
                 data_dict["data"][tmp_name] = {}
                 data_dict["data_active"][tmp_name] = trinket.on_use
@@ -219,8 +252,22 @@ class TrinketSimulator(Simulator):
                             new_data.simc_arguments[-1]
                             + f",bonus_id={SPECIAL_CASE_BONUS_IDS[trinket.item_id][stat]}"
                         )
-                        new_data.name = self.profile_split_character().join(
-                            [f"{trinket.name} [{stat.title()}]", str(itemlevel)]
+                        new_data.name = self.get_profile_name(
+                            f"{trinket.name} [{stat.title()}]", str(itemlevel)
+                        )
+
+                        simulation_group.add(new_data)
+
+                if trinket.item_id in SPECIAL_CASE_SIMC_OPTIONS:
+                    base_simulation = simulation_group.profiles[-1].copy()
+                    simulation_group.profiles = simulation_group.profiles[:-1]
+                    for option in SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id]:
+                        new_data = base_simulation.copy()
+                        new_data.simc_arguments = new_data.simc_arguments + [
+                            SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id][option]
+                        ]
+                        new_data.name = self.get_profile_name(
+                            f"{trinket.name} [{option.title()}]", str(itemlevel)
                         )
 
                         simulation_group.add(new_data)
