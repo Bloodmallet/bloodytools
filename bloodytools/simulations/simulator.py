@@ -140,7 +140,7 @@ class Simulator(abc.ABC):
         pass
 
     def profile_split_character(self) -> str:
-        return "/"
+        return "|||"
 
     def _collect_data(
         self, simulation_group: Simulation_Group, data_type: DataType
