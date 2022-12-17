@@ -12,6 +12,7 @@ from bloodytools.simulations.talent_add_simulator import TalentAddSimulator
 from bloodytools.simulations.talent_target_scaling_simulator import (
     TalentTargetScalingSimulator,
 )
+from bloodytools.simulations.weapon_enchant_simulator import WeaponEnchantmentSimulator
 from bloodytools.simulations.windfury_totem_simulator import WindfuryTotemSimulator
 
 simulator_factory = SimulatorFactory()
@@ -26,4 +27,5 @@ simulator_factory.register_simulator(TalentSimulator)
 simulator_factory.register_simulator(TalentTargetScalingSimulator)
 simulator_factory.register_simulator(TierSetSimulator)
 simulator_factory.register_simulator(TrinketSimulator)
+simulator_factory.register_simulator(WeaponEnchantmentSimulator)
 simulator_factory.register_simulator(WindfuryTotemSimulator)
