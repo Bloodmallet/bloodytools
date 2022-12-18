@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 class WeaponEnchant(SimcObject):
-    def __init__(self, name: str, item_id: str, *args, **kwargs):
-        super().__init__(full_name=name, *args, **kwargs)
+    def __init__(self, name: str, item_id: str):
+        super().__init__(full_name=name)
 
         self.ranks: typing.Tuple[int, ...] = (1, 2, 3)
         self.item_id: str = item_id
