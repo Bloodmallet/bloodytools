@@ -16,6 +16,12 @@ from simc_support.game_data.Source import Source
 logger = logging.getLogger(__name__)
 
 # special cases
+M0_ITEMLEVEL = 372
+ALLOWED_NON_SEASONAL_DUNGEON_ITEMS = (
+    193743,  # Irideus Frament
+    193791,  # Time-Breaching Talon
+)
+
 SPECIAL_CASE_BONUS_IDS = {
     # Mistcaller Ocarina
     178715: {
@@ -97,7 +103,14 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     # remove lower pvp trinkets
     trinket_list = [t for t in trinket_list if t != Source.LOW_PVP]
 
-    return trinket_list
+    # add special case trinkets
+    special_trinkets = [
+        t
+        for t in list(get_trinkets_for_spec(wow_spec))
+        if t.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS
+    ]
+
+    return trinket_list + special_trinkets
 
 
 def _get_second_trinket(wow_spec: WowSpec) -> Trinket:
@@ -207,6 +220,8 @@ class TrinketSimulator(Simulator):
             itemlevels = [
                 i for i in trinket.itemlevels if _is_valid_itemlevel(i, self.settings)
             ]
+            if not itemlevels and trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
+                itemlevels.append(M0_ITEMLEVEL)
             # weed out every other itemlevel, except first and last
             if len(itemlevels) > 10:
                 first = itemlevels[0]
