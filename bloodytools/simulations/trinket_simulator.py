@@ -183,10 +183,20 @@ class TrinketSimulator(Simulator):
         self, simulation_group: Simulation_Group, data_dict: dict
     ) -> None:
 
+        all_itemlevels: typing.Set[int] = set()
+        trinket_list = _get_trinkets(self.wow_spec, self.settings)
+        for trinket in trinket_list:
+            itemlevels = [
+                i for i in trinket.itemlevels if _is_valid_itemlevel(i, self.settings)
+            ]
+            if not itemlevels and trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
+                itemlevels.append(M0_ITEMLEVEL)
+            for itemlevel in itemlevels:
+                all_itemlevels.add(itemlevel)
+        min_itemlevel = min(all_itemlevels)
+
         simulation_data = Simulation_Data(
-            name=self.profile_split_character().join(
-                ["baseline", str(self.settings.min_ilevel)]
-            ),
+            name=self.profile_split_character().join(["baseline", str(min_itemlevel)]),
             fight_style=self.fight_style,
             iterations=self.settings.iterations,
             target_error=self.settings.target_error.get(self.fight_style, "0.1"),
@@ -212,8 +222,6 @@ class TrinketSimulator(Simulator):
             simulation_data.simc_arguments.append(custom_fight_style)
 
         simulation_group.add(simulation_data)
-
-        trinket_list = _get_trinkets(self.wow_spec, self.settings)
 
         for trinket in trinket_list:
             # for each available itemlevel of the trinket
