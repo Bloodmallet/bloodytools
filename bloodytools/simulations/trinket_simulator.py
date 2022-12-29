@@ -20,6 +20,7 @@ M0_ITEMLEVEL = 372
 ALLOWED_NON_SEASONAL_DUNGEON_ITEMS = (
     193743,  # Irideus Frament
     193791,  # Time-Breaching Talon
+    193773,  # Spoils of Neltharus
 )
 
 SPECIAL_CASE_BONUS_IDS = {
