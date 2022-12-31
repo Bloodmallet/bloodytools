@@ -206,7 +206,10 @@ class SecondaryDistributionSimulator(Simulator):
                     executable=self.settings.executable,
                 )
 
-                if (crit, haste, mastery, vers) == distribution_multipliers[0]:
+                if (crit, haste, mastery, vers) == distribution_multipliers[0] and (
+                    human_name,
+                    talent_combination,
+                ) == list(talent_combinations.items())[0]:
                     custom_apl = None
                     if self.settings.custom_apl:
                         with open("custom_apl.txt") as f:
