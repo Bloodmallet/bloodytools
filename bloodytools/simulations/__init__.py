@@ -1,4 +1,5 @@
 from bloodytools.simulations.consumable_simulator import PhialSimulator, PotionSimulator
+from bloodytools.simulations.power_infusion_simulator import PowerInfusionSimulator
 from bloodytools.simulations.race_simulator import RaceSimulator
 from bloodytools.simulations.secondary_distribution_simulator import (
     SecondaryDistributionSimulator,
@@ -19,6 +20,7 @@ simulator_factory = SimulatorFactory()
 
 simulator_factory.register_simulator(PhialSimulator)
 simulator_factory.register_simulator(PotionSimulator)
+simulator_factory.register_simulator(PowerInfusionSimulator)
 simulator_factory.register_simulator(RaceSimulator)
 simulator_factory.register_simulator(SecondaryDistributionSimulator)
 simulator_factory.register_simulator(TalentAddSimulator)
