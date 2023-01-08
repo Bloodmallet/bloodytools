@@ -4,6 +4,7 @@ import typing
 from bloodytools.simulations.simulator import Simulator
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from simc_support.game_data.SimcObject import SimcObject
+from simc_support.game_data.WowClass import DEATHKNIGHT
 from simc_support.game_data.WowSpec import BEASTMASTERY, MARKSMANSHIP
 
 logger = logging.getLogger(__name__)
@@ -15,6 +16,13 @@ class WeaponEnchant(SimcObject):
 
         self.ranks: typing.Tuple[int, ...] = (1, 2, 3)
         self.item_id: str = item_id
+
+
+class DKEnchant(SimcObject):
+    def __init__(self, name: str, spell_id: str):
+        super().__init__(full_name=name)
+
+        self.spell_id: str = spell_id
 
 
 WEAPON_ENCHANTS = [
@@ -34,7 +42,14 @@ RANGED_HUNTER_ENCHANTS = [
     WeaponEnchant(name="High Intensity Thermal Scanner", item_id="198316"),
 ]
 
-DK_ENCHANTS = []
+DK_ENCHANTS = [
+    DKEnchant(name="Rune of Hysteria", spell_id="326911"),
+    DKEnchant(name="Rune of Razorice", spell_id="53343"),
+    DKEnchant(name="Rune of Sanguination", spell_id="326805"),
+    DKEnchant(name="Rune of the Apocalypse", spell_id="327082"),
+    DKEnchant(name="Rune of the Fallen Crusader", spell_id="53344"),
+    DKEnchant(name="Rune of the Stoneskin Gargoyle", spell_id="62158"),
+]
 
 
 class WeaponEnchantmentSimulator(Simulator):
@@ -99,23 +114,52 @@ class WeaponEnchantmentSimulator(Simulator):
             if string.startswith("main_hand"):
                 weapon_base_string = string
 
-        enchants = WEAPON_ENCHANTS
+        enchants = WEAPON_ENCHANTS.copy()
         if self.wow_spec in (BEASTMASTERY, MARKSMANSHIP):
             enchants = RANGED_HUNTER_ENCHANTS
 
-        for enchant in enchants:
-            for rank in enchant.ranks:
+        if self.wow_spec.wow_class == DEATHKNIGHT:
+            enchants += DK_ENCHANTS
 
-                scaled_name = self.get_profile_name(enchant.full_name, str(rank))
-                scaled_simc_string = (
-                    f"{weapon_base_string},enchant={enchant.simc_name}_{rank}"
-                )
+        for enchant in enchants:
+            if isinstance(enchant, WeaponEnchant):
+                for rank in enchant.ranks:
+
+                    scaled_name = self.get_profile_name(enchant.full_name, str(rank))
+                    scaled_simc_string = (
+                        f"{weapon_base_string},enchant={enchant.simc_name}_{rank}"
+                    )
+
+                    simulation_data = Simulation_Data(
+                        name=scaled_name,
+                        fight_style=self.fight_style,
+                        profile=profile,
+                        simc_arguments=[scaled_simc_string],
+                        target_error=self.settings.target_error.get(
+                            self.fight_style, "0.1"
+                        ),
+                        ptr=self.settings.ptr,
+                        default_actions=self.settings.default_actions,
+                        executable=self.settings.executable,
+                        iterations=self.settings.iterations,
+                        remove_files=not self.settings.keep_files,
+                    )
+
+                    simulation_group.add(simulation_data)
+            elif isinstance(enchant, DKEnchant):
+                if enchant.full_name == "Rune of the Stoneskin Gargoyle" and data_dict[
+                    "profile"
+                ]["items"].get("off_hand", {}).get("id", False):
+                    continue
+
+                scaled_name = self.get_profile_name(enchant.full_name, "1")
+                simc_string = f"{weapon_base_string},enchant={enchant.simc_name}"
 
                 simulation_data = Simulation_Data(
                     name=scaled_name,
                     fight_style=self.fight_style,
                     profile=profile,
-                    simc_arguments=[scaled_simc_string],
+                    simc_arguments=[simc_string],
                     target_error=self.settings.target_error.get(
                         self.fight_style, "0.1"
                     ),
@@ -127,6 +171,10 @@ class WeaponEnchantmentSimulator(Simulator):
                 )
 
                 simulation_group.add(simulation_data)
+            else:
+                raise ValueError(
+                    f"Type {type(enchant)} of listed enchants is not handled."
+                )
 
     def post_processing(self, data_dict: dict) -> dict:
         data_dict = super().post_processing(data_dict)
@@ -139,10 +187,17 @@ class WeaponEnchantmentSimulator(Simulator):
             e for e in data_dict["sorted_data_keys"] if e != "baseline"
         ]
 
-        enchants = WEAPON_ENCHANTS
+        enchants = WEAPON_ENCHANTS.copy()
         if self.wow_spec in (BEASTMASTERY, MARKSMANSHIP):
             enchants = RANGED_HUNTER_ENCHANTS
+        if self.wow_spec.wow_class == DEATHKNIGHT:
+            enchants += DK_ENCHANTS
 
-        data_dict["item_ids"] = {e.full_name: e.item_id for e in enchants}
+        data_dict["item_ids"] = {
+            e.full_name: e.item_id for e in enchants if isinstance(e, WeaponEnchant)
+        }
+        data_dict["spell_ids"] = {
+            e.full_name: e.spell_id for e in enchants if isinstance(e, DKEnchant)
+        }
 
         return data_dict
