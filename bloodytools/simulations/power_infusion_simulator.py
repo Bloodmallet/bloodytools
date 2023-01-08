@@ -175,9 +175,9 @@ class PowerInfusionSimulator(Simulator):
             # detect handle profiles without PI apl
             min_dps = min([p.get_dps() for p in simulation_group.profiles])
             max_dps = max([p.get_dps() for p in simulation_group.profiles])
-            if (max_dps - min_dps) * 100 / min_dps < float(
-                self.settings.target_error[self.fight_style]
-            ):
+            if (max_dps - min_dps) * 100 / max_dps < float(
+                self.settings.target_error.get(self.fight_style, "0.1")
+            ) * 2:
                 logger.info(
                     f"Profile for {spec} does not have a PI line. Falling back to hardcoded timing."
                 )
