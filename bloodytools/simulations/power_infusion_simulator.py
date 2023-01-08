@@ -172,6 +172,39 @@ class PowerInfusionSimulator(Simulator):
 
             data_dict["data"] = _deep_update(data_dict["data"], data)
 
+            # detect handle profiles without PI apl
+            min_dps = min([p.get_dps() for p in simulation_group.profiles])
+            max_dps = max([p.get_dps() for p in simulation_group.profiles])
+            if (max_dps - min_dps) * 100 / min_dps < float(
+                self.settings.target_error[self.fight_style]
+            ):
+                logger.info(
+                    f"Profile for {spec} does not have a PI line. Falling back to hardcoded timing."
+                )
+                profile_name = " ".join([spec.full_name, spec.wow_class.full_name])
+                simulation_data = Simulation_Data(
+                    name=profile_name,
+                    fight_style=self.fight_style,
+                    profile=profile,
+                    simc_arguments=["external_buffs.power_infusion=1/121/241"],
+                    target_error=self.settings.target_error.get(
+                        self.fight_style, "0.1"
+                    ),
+                    ptr=self.settings.ptr,
+                    default_actions=self.settings.default_actions,
+                    executable=self.settings.executable,
+                    iterations=self.settings.iterations,
+                    remove_files=not self.settings.keep_files,
+                )
+
+                fallback_data = simulation_data.simulate()
+                data_dict["data"][profile_name] = fallback_data
+
+                non_apl_key = "profile_without_pi_support"
+                if non_apl_key not in data_dict:
+                    data_dict[non_apl_key] = []
+                data_dict[non_apl_key].append(profile_name)
+
         logger.debug("Starting post processing")
         data_dict = self.post_processing(data_dict)
 
