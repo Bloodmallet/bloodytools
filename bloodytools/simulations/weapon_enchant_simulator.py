@@ -4,6 +4,7 @@ import typing
 from bloodytools.simulations.simulator import Simulator
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from simc_support.game_data.SimcObject import SimcObject
+from simc_support.game_data.WowSpec import BEASTMASTERY, MARKSMANSHIP
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,14 @@ WEAPON_ENCHANTS = [
     WeaponEnchant(name="Frozen Devotion", item_id="199972"),
 ]
 
+RANGED_HUNTER_ENCHANTS = [
+    WeaponEnchant(name="Projectile Propulsion Pinion", item_id="198313"),
+    WeaponEnchant(name="Gyroscopic Kaleidoscope", item_id="198310"),
+    WeaponEnchant(name="High Intensity Thermal Scanner", item_id="198316"),
+]
+
+DK_ENCHANTS = []
+
 
 class WeaponEnchantmentSimulator(Simulator):
     """Abstract base simulator for consumables."""
@@ -37,8 +46,6 @@ class WeaponEnchantmentSimulator(Simulator):
 
     def _remove_weapon_enchants(self, profile: dict) -> None:
         """Alters the provided dict and removes weapon enchants."""
-        # enchant_names = [e.simc_name for e in WEAPON_ENCHANTS]
-
         remove_enchants = ("enchant_id", "enchant")
 
         for key in ("main_hand", "off_hand"):
@@ -92,7 +99,11 @@ class WeaponEnchantmentSimulator(Simulator):
             if string.startswith("main_hand"):
                 weapon_base_string = string
 
-        for enchant in WEAPON_ENCHANTS:
+        enchants = WEAPON_ENCHANTS
+        if self.wow_spec in (BEASTMASTERY, MARKSMANSHIP):
+            enchants = RANGED_HUNTER_ENCHANTS
+
+        for enchant in enchants:
             for rank in enchant.ranks:
 
                 scaled_name = self.get_profile_name(enchant.full_name, str(rank))
@@ -128,6 +139,10 @@ class WeaponEnchantmentSimulator(Simulator):
             e for e in data_dict["sorted_data_keys"] if e != "baseline"
         ]
 
-        data_dict["item_ids"] = {e.full_name: e.item_id for e in WEAPON_ENCHANTS}
+        enchants = WEAPON_ENCHANTS
+        if self.wow_spec in (BEASTMASTERY, MARKSMANSHIP):
+            enchants = RANGED_HUNTER_ENCHANTS
+
+        data_dict["item_ids"] = {e.full_name: e.item_id for e in enchants}
 
         return data_dict
