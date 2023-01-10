@@ -42,6 +42,13 @@ RANGED_HUNTER_ENCHANTS = [
     WeaponEnchant(name="High Intensity Thermal Scanner", item_id="198316"),
 ]
 
+THERMAL_SCANNER_STATS = {
+    "critical strike": "target_race=elemental",
+    "haste": "target_race=demon",
+    "mastery": "target_race=mechanical",
+    "versatility": "target_race=undead",
+}
+
 DK_ENCHANTS = [
     DKEnchant(name="Rune of Hysteria", spell_id="326911"),
     DKEnchant(name="Rune of Razorice", spell_id="53343"),
@@ -125,27 +132,55 @@ class WeaponEnchantmentSimulator(Simulator):
             if isinstance(enchant, WeaponEnchant):
                 for rank in enchant.ranks:
 
-                    scaled_name = self.get_profile_name(enchant.full_name, str(rank))
-                    scaled_simc_string = (
-                        f"{weapon_base_string},enchant={enchant.simc_name}_{rank}"
-                    )
+                    if enchant.full_name == "High Intensity Thermal Scanner":
+                        for stat, target_race in THERMAL_SCANNER_STATS.items():
+                            stat_adjusted_name = enchant.full_name + f" [{stat}]"
+                            scaled_name = self.get_profile_name(
+                                stat_adjusted_name, str(rank)
+                            )
+                            scaled_simc_string = f"{weapon_base_string},enchant={enchant.simc_name}_{rank}"
 
-                    simulation_data = Simulation_Data(
-                        name=scaled_name,
-                        fight_style=self.fight_style,
-                        profile=profile,
-                        simc_arguments=[scaled_simc_string],
-                        target_error=self.settings.target_error.get(
-                            self.fight_style, "0.1"
-                        ),
-                        ptr=self.settings.ptr,
-                        default_actions=self.settings.default_actions,
-                        executable=self.settings.executable,
-                        iterations=self.settings.iterations,
-                        remove_files=not self.settings.keep_files,
-                    )
+                            simulation_data = Simulation_Data(
+                                name=scaled_name,
+                                fight_style=self.fight_style,
+                                profile=profile,
+                                simc_arguments=[scaled_simc_string, target_race],
+                                target_error=self.settings.target_error.get(
+                                    self.fight_style, "0.1"
+                                ),
+                                ptr=self.settings.ptr,
+                                default_actions=self.settings.default_actions,
+                                executable=self.settings.executable,
+                                iterations=self.settings.iterations,
+                                remove_files=not self.settings.keep_files,
+                            )
 
-                    simulation_group.add(simulation_data)
+                            simulation_group.add(simulation_data)
+
+                    else:
+                        scaled_name = self.get_profile_name(
+                            enchant.full_name, str(rank)
+                        )
+                        scaled_simc_string = (
+                            f"{weapon_base_string},enchant={enchant.simc_name}_{rank}"
+                        )
+
+                        simulation_data = Simulation_Data(
+                            name=scaled_name,
+                            fight_style=self.fight_style,
+                            profile=profile,
+                            simc_arguments=[scaled_simc_string],
+                            target_error=self.settings.target_error.get(
+                                self.fight_style, "0.1"
+                            ),
+                            ptr=self.settings.ptr,
+                            default_actions=self.settings.default_actions,
+                            executable=self.settings.executable,
+                            iterations=self.settings.iterations,
+                            remove_files=not self.settings.keep_files,
+                        )
+
+                        simulation_group.add(simulation_data)
             elif isinstance(enchant, DKEnchant):
                 if enchant.full_name == "Rune of the Stoneskin Gargoyle" and data_dict[
                     "profile"
@@ -199,5 +234,16 @@ class WeaponEnchantmentSimulator(Simulator):
         data_dict["spell_ids"] = {
             e.full_name: e.spell_id for e in enchants if isinstance(e, DKEnchant)
         }
+
+        if self.wow_spec in (BEASTMASTERY, MARKSMANSHIP):
+            base_name = "High Intensity Thermal Scanner"
+            stat_changing_enchant = None
+            for enchant in RANGED_HUNTER_ENCHANTS:
+                if enchant.full_name == base_name:
+                    stat_changing_enchant = enchant
+            if stat_changing_enchant:
+                for stat in THERMAL_SCANNER_STATS.keys():
+                    stated_name = f"{base_name} [{stat}]"
+                    data_dict["item_ids"][stated_name] = stat_changing_enchant.item_id
 
         return data_dict
