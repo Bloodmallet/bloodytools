@@ -51,6 +51,12 @@ SPECIAL_CASE_SIMC_OPTIONS = {
         "wind": "dragonflight.primal_ritual_shell_blessing=wind",
         "flame": "dragonflight.primal_ritual_shell_blessing=flame",
     },
+    193757: {  # Ruby Whelp Shell
+        "ST": "dragonflight.player.ruby_whelp_shell_training=fire_shot:6",
+        "AoE": "dragonflight.player.ruby_whelp_shell_training=lobbing_fire_nova:6",
+        "haste": "dragonflight.player.ruby_whelp_shell_training=under_red_wings:6",
+        "crit": "dragonflight.player.ruby_whelp_shell_training=sleepy_ruby_warmth:6",
+    },
 }
 
 NON_DPS_TRINKET_IDS = [
