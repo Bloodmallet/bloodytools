@@ -26,7 +26,7 @@ class Config:
     debug: bool = False
     default_actions: str = "1"
     executable: str = "../SimulationCraft/simc"
-    iterations: str = "20000"
+    iterations: str = "60000"
     keep_files: bool = False
     # affects trinkets
     max_ilevel: int = 430
