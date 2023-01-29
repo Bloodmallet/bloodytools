@@ -1,3 +1,7 @@
+"""
+https://github.com/WarcraftPriests/df-shadow-priest/blob/main/trinkets/other.simc#L40-L58
+"""
+
 import logging
 import typing
 
@@ -22,6 +26,14 @@ ALLOWED_NON_SEASONAL_DUNGEON_ITEMS = (
     193791,  # Time-Breaching Talon
     193773,  # Spoils of Neltharus
 )
+DARKMOON_DECK_BOX_BONUS_IDS = {
+    "Emberscale": 8858,
+    "Jetscale": 8860,
+    "Sagescale": 8861,
+    "Azurescale": 8859,
+    "Bronzescale": 8857,
+    "None": "",
+}
 
 SPECIAL_CASE_BONUS_IDS = {
     # Mistcaller Ocarina
@@ -38,6 +50,12 @@ SPECIAL_CASE_BONUS_IDS = {
         "mastery": 6918,
         "all": 6915,
     },
+    # Darkmoon Deck Box: Rime
+    198477: DARKMOON_DECK_BOX_BONUS_IDS,
+    # Darkmoon Deck Box: Inferno
+    194872: DARKMOON_DECK_BOX_BONUS_IDS,
+    # Darkmoon Deck Box: Dance
+    198478: DARKMOON_DECK_BOX_BONUS_IDS,
 }
 
 SPECIAL_CASE_SIMC_OPTIONS = {
