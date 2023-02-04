@@ -26,16 +26,16 @@ ALLOWED_NON_SEASONAL_DUNGEON_ITEMS = (
     193791,  # Time-Breaching Talon
     193773,  # Spoils of Neltharus
 )
-DARKMOON_DECK_BOX_BONUS_IDS = {
+DARKMOON_DECK_BOX_BONUS_IDS: typing.Dict[str, int] = {
     "Emberscale": 8858,
     "Jetscale": 8860,
     "Sagescale": 8861,
     "Azurescale": 8859,
     "Bronzescale": 8857,
-    "None": "",
+    "None": "",  # type: ignore
 }
 
-SPECIAL_CASE_BONUS_IDS = {
+SPECIAL_CASE_BONUS_IDS: typing.Dict[int, typing.Dict[str, int]] = {
     # Mistcaller Ocarina
     178715: {
         "crit": 6920,
@@ -207,7 +207,6 @@ class TrinketSimulator(Simulator):
     def add_simulation_data(
         self, simulation_group: Simulation_Group, data_dict: dict
     ) -> None:
-
         all_itemlevels: typing.Set[int] = set()
         trinket_list = _get_trinkets(self.wow_spec, self.settings)
         for trinket in trinket_list:

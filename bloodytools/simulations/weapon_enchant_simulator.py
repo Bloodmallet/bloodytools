@@ -121,9 +121,11 @@ class WeaponEnchantmentSimulator(Simulator):
             if string.startswith("main_hand"):
                 weapon_base_string = string
 
-        enchants = WEAPON_ENCHANTS.copy()
+        enchants: typing.List[typing.Union[WeaponEnchant, DKEnchant]] = list(
+            WEAPON_ENCHANTS.copy()
+        )
         if self.wow_spec in (BEASTMASTERY, MARKSMANSHIP):
-            enchants = RANGED_HUNTER_ENCHANTS
+            enchants = list(RANGED_HUNTER_ENCHANTS)
 
         if self.wow_spec.wow_class == DEATHKNIGHT:
             enchants += DK_ENCHANTS
@@ -131,7 +133,6 @@ class WeaponEnchantmentSimulator(Simulator):
         for enchant in enchants:
             if isinstance(enchant, WeaponEnchant):
                 for rank in enchant.ranks:
-
                     if enchant.full_name == "High Intensity Thermal Scanner":
                         for stat, target_race in THERMAL_SCANNER_STATS.items():
                             stat_adjusted_name = enchant.full_name + f" [{stat}]"
@@ -222,9 +223,11 @@ class WeaponEnchantmentSimulator(Simulator):
             e for e in data_dict["sorted_data_keys"] if e != "baseline"
         ]
 
-        enchants = WEAPON_ENCHANTS.copy()
+        enchants: typing.List[typing.Union[WeaponEnchant, DKEnchant]] = list(
+            WEAPON_ENCHANTS.copy()
+        )
         if self.wow_spec in (BEASTMASTERY, MARKSMANSHIP):
-            enchants = RANGED_HUNTER_ENCHANTS
+            enchants = list(RANGED_HUNTER_ENCHANTS)
         if self.wow_spec.wow_class == DEATHKNIGHT:
             enchants += DK_ENCHANTS
 
