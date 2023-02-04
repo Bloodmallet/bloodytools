@@ -150,7 +150,7 @@ class Simulation_Data:
         # simc setting to determine the maximum number of run iterations
         #   (target_error and iterations determine the actually simulated
         #   iterations count)
-        self.iterations = str(int(iterations))
+        self.iterations = str(int(iterations.split(".")[0]))
         # simc setting to enable/disable a log file
         if log == "0" or log == "1":
             self.log = log

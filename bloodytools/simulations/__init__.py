@@ -1,4 +1,5 @@
 from bloodytools.simulations.consumable_simulator import PhialSimulator, PotionSimulator
+from bloodytools.simulations.power_infusion_simulator import PowerInfusionSimulator
 from bloodytools.simulations.race_simulator import RaceSimulator
 from bloodytools.simulations.secondary_distribution_simulator import (
     SecondaryDistributionSimulator,
@@ -12,11 +13,14 @@ from bloodytools.simulations.talent_add_simulator import TalentAddSimulator
 from bloodytools.simulations.talent_target_scaling_simulator import (
     TalentTargetScalingSimulator,
 )
+from bloodytools.simulations.weapon_enchant_simulator import WeaponEnchantmentSimulator
+from bloodytools.simulations.windfury_totem_simulator import WindfuryTotemSimulator
 
 simulator_factory = SimulatorFactory()
 
 simulator_factory.register_simulator(PhialSimulator)
 simulator_factory.register_simulator(PotionSimulator)
+simulator_factory.register_simulator(PowerInfusionSimulator)
 simulator_factory.register_simulator(RaceSimulator)
 simulator_factory.register_simulator(SecondaryDistributionSimulator)
 simulator_factory.register_simulator(TalentAddSimulator)
@@ -25,3 +29,5 @@ simulator_factory.register_simulator(TalentSimulator)
 simulator_factory.register_simulator(TalentTargetScalingSimulator)
 simulator_factory.register_simulator(TierSetSimulator)
 simulator_factory.register_simulator(TrinketSimulator)
+simulator_factory.register_simulator(WeaponEnchantmentSimulator)
+simulator_factory.register_simulator(WindfuryTotemSimulator)

@@ -206,6 +206,8 @@ def extract_profile(
         "ilevel",
         "gem_id",
         "enchant_id",
+        "crafted_stats",
+        "drop_level",
     ]
     pattern_element = {}
     # don't recompile this for each slot

@@ -103,6 +103,8 @@ class SecondaryDistributionSimulator(Simulator):
         data_dict = super().pre_processing(data_dict)
         data_dict["secondary_sum"] = self.get_available_secondary_stats(data_dict)
 
+        data_dict = self.get_additional_talent_paths(data_dict)
+
         return data_dict
 
     def add_simulation_data(
@@ -124,41 +126,57 @@ class SecondaryDistributionSimulator(Simulator):
             )
         )
 
-        talent_combinations: typing.List[typing.Tuple[TalentString, ...]] = []
+        talent_combinations: typing.Dict[str, typing.Tuple[TalentString, ...]] = {}
         if "talents" in data_dict["profile"]["character"]:
-            talent_combinations = [
-                ("talents=" + data_dict["profile"]["character"]["talents"],)
-            ]
+            talent_combinations["baseline"] = (
+                "talents=" + data_dict["profile"]["character"]["talents"],
+            )
+
         elif (
             "class_talents" in data_dict["profile"]["character"]
             and "spec_talents" in data_dict["profile"]["character"]
         ):
 
-            talent_combinations = [
-                (
-                    ClassTalentString(
-                        data_dict["profile"]["character"]["class_talents"]
-                    ),
-                    SpecTalentString(data_dict["profile"]["character"]["spec_talents"]),
-                )
-            ]
+            talent_combinations["baseline"] = (
+                ClassTalentString(data_dict["profile"]["character"]["class_talents"]),
+                SpecTalentString(data_dict["profile"]["character"]["spec_talents"]),
+            )
+
         elif "class_talents" in data_dict["profile"]["character"]:
-            talent_combinations = [
-                (ClassTalentString(data_dict["profile"]["character"]["class_talents"]),)
-            ]
+            talent_combinations["baseline"] = (
+                ClassTalentString(data_dict["profile"]["character"]["class_talents"]),
+            )
+
         elif "spec_talents" in data_dict["profile"]["character"]:
-            talent_combinations = [
-                (SpecTalentString(data_dict["profile"]["character"]["spec_talents"]),)
-            ]
+            talent_combinations["baseline"] = (
+                SpecTalentString(data_dict["profile"]["character"]["spec_talents"]),
+            )
+
+        for i, k_v in enumerate(data_dict["data_profile_overrides"].items()):
+            human_name, simc_args = k_v
+            if len(human_name) == 3 and human_name.startswith("T"):
+                try:
+                    int(human_name[1:])
+                except ValueError:
+                    pass
+                else:
+                    continue
+            talent_combinations[human_name] = simc_args
 
         secondaries = data_dict["secondary_sum"]
 
-        for talent_combination in talent_combinations:
+        clear_talents = [
+            "talents=",
+            "spec_talents=",
+            "class_talents=",
+        ]
+
+        for human_name, talent_combination in talent_combinations.items():
             for crit, haste, mastery, vers in distribution_multipliers:
 
                 s_o = Simulation_Data(
                     name="{}{}{}_{}_{}_{}".format(
-                        "base profile",
+                        human_name,
                         self.profile_split_character(),
                         crit,
                         haste,
@@ -172,6 +190,7 @@ class SecondaryDistributionSimulator(Simulator):
                     iterations=self.settings.iterations,
                     profile=data_dict["profile"],
                     simc_arguments=[
+                        *clear_talents,
                         *[str(part) for part in talent_combination],
                         "gear_crit_rating={}".format(int(secondaries * (crit / 100))),
                         "gear_haste_rating={}".format(int(secondaries * (haste / 100))),
@@ -187,7 +206,10 @@ class SecondaryDistributionSimulator(Simulator):
                     executable=self.settings.executable,
                 )
 
-                if (crit, haste, mastery, vers) == distribution_multipliers[0]:
+                if (crit, haste, mastery, vers) == distribution_multipliers[0] and (
+                    human_name,
+                    talent_combination,
+                ) == list(talent_combinations.items())[0]:
                     custom_apl = None
                     if self.settings.custom_apl:
                         with open("custom_apl.txt") as f:

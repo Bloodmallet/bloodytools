@@ -26,12 +26,12 @@ class Config:
     debug: bool = False
     default_actions: str = "1"
     executable: str = "../SimulationCraft/simc"
-    iterations: str = "20000"
+    iterations: str = "60000"
     keep_files: bool = False
     # affects trinkets
     max_ilevel: int = 430
     # affects trinkets
-    min_ilevel: int = 380
+    min_ilevel: int = 370
     pretty: bool = False
     profileset_work_threads: str = "2"
     ptr: str = "0"
@@ -64,6 +64,9 @@ class Config:
     )
     fight_styles: typing.List[str] = dataclasses.field(default_factory=list)
 
+    log_warnings: bool = True
+    """Log warnings for Config creation."""
+
     def __post_init__(self, *args, **kwargs) -> None:
         self.target_error["patchwerk"] = "0.1"
         self.target_error["hecticaddcleave"] = "0.2"
@@ -71,7 +74,7 @@ class Config:
         self.set_simc_hash()
 
     def set_simc_hash(self) -> None:
-        new_hash = get_simc_hash(self.executable)
+        new_hash = get_simc_hash(self.executable, self.log_warnings)
         if new_hash:
             self.simc_hash = new_hash
 
@@ -82,7 +85,9 @@ class Config:
     @classmethod
     def create_config_from_args(cls, args: object) -> "Config":
 
-        config = cls()
+        config = cls(log_warnings=False)
+
+        config.log_warnings = True
 
         if args.single_sim:  # type: ignore
             logger.debug("-s / --single_sim detected")

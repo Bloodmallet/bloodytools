@@ -1,3 +1,7 @@
+"""
+https://github.com/WarcraftPriests/df-shadow-priest/blob/main/trinkets/other.simc#L40-L58
+"""
+
 import logging
 import typing
 
@@ -11,11 +15,27 @@ from simc_support.game_data.Trinket import (
 )
 from simc_support.game_data.WowSpec import WowSpec
 from simc_support.game_data.Season import Season
+from simc_support.game_data.Source import Source
 
 logger = logging.getLogger(__name__)
 
 # special cases
-SPECIAL_CASE_BONUS_IDS = {
+M0_ITEMLEVEL = 372
+ALLOWED_NON_SEASONAL_DUNGEON_ITEMS = (
+    193743,  # Irideus Frament
+    193791,  # Time-Breaching Talon
+    193773,  # Spoils of Neltharus
+)
+DARKMOON_DECK_BOX_BONUS_IDS: typing.Dict[str, int] = {
+    "Emberscale": 8858,
+    "Jetscale": 8860,
+    "Sagescale": 8861,
+    "Azurescale": 8859,
+    "Bronzescale": 8857,
+    "None": "",  # type: ignore
+}
+
+SPECIAL_CASE_BONUS_IDS: typing.Dict[int, typing.Dict[str, int]] = {
     # Mistcaller Ocarina
     178715: {
         "crit": 6920,
@@ -29,6 +49,31 @@ SPECIAL_CASE_BONUS_IDS = {
         "haste": 6917,
         "mastery": 6918,
         "all": 6915,
+    },
+    # Darkmoon Deck Box: Rime
+    198477: DARKMOON_DECK_BOX_BONUS_IDS,
+    # Darkmoon Deck Box: Inferno
+    194872: DARKMOON_DECK_BOX_BONUS_IDS,
+    # Darkmoon Deck Box: Dance
+    198478: DARKMOON_DECK_BOX_BONUS_IDS,
+}
+
+SPECIAL_CASE_SIMC_OPTIONS = {
+    194301: {  # Whispering Incarnate Icon
+        "dps": "dragonflight.whispering_incarnate_icon_roles=dps",
+        "dps/heal": "dragonflight.whispering_incarnate_icon_roles=dps/heal",
+        "dps/tank": "dragonflight.whispering_incarnate_icon_roles=dps/tank",
+        "dps/heal/tank": "dragonflight.whispering_incarnate_icon_roles=dps/heal/tank",
+    },
+    200563: {  # Primal Ritual Shell
+        "wind": "dragonflight.primal_ritual_shell_blessing=wind",
+        "flame": "dragonflight.primal_ritual_shell_blessing=flame",
+    },
+    193757: {  # Ruby Whelp Shell
+        "ST": "dragonflight.player.ruby_whelp_shell_training=fire_shot:6",
+        "AoE": "dragonflight.player.ruby_whelp_shell_training=lobbing_fire_nova:6",
+        "haste": "dragonflight.player.ruby_whelp_shell_training=under_red_wings:6",
+        "crit": "dragonflight.player.ruby_whelp_shell_training=sleepy_ruby_warmth:6",
     },
 }
 
@@ -79,7 +124,18 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     trinket_list = [
         t for t in trinket_list if str(t.item_id) not in NON_DPS_TRINKET_IDS
     ]
-    return trinket_list
+
+    # remove lower pvp trinkets
+    trinket_list = [t for t in trinket_list if t != Source.LOW_PVP]
+
+    # add special case trinkets
+    special_trinkets = [
+        t
+        for t in list(get_trinkets_for_spec(wow_spec))
+        if t.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS
+    ]
+
+    return trinket_list + special_trinkets
 
 
 def _get_second_trinket(wow_spec: WowSpec) -> Trinket:
@@ -131,16 +187,40 @@ class TrinketSimulator(Simulator):
                 data_dict["data_sources"][tmp_name] = trinket.source.value
                 data_dict["item_ids"][tmp_name] = trinket.item_id
 
+            for special_option in SPECIAL_CASE_SIMC_OPTIONS.get(
+                trinket.item_id, {}
+            ).keys():
+                tmp_name = f"{trinket.name} [{special_option.title()}]"
+                data_dict["translations"][tmp_name] = trinket.translations.get_dict()
+                for key in data_dict["translations"][tmp_name]:
+                    data_dict["translations"][tmp_name][key] = (
+                        data_dict["translations"][tmp_name][key]
+                        + f" [{special_option.title()}]"
+                    )
+                data_dict["data"][tmp_name] = {}
+                data_dict["data_active"][tmp_name] = trinket.on_use
+                data_dict["data_sources"][tmp_name] = trinket.source.value
+                data_dict["item_ids"][tmp_name] = trinket.item_id
+
         return data_dict
 
     def add_simulation_data(
         self, simulation_group: Simulation_Group, data_dict: dict
     ) -> None:
+        all_itemlevels: typing.Set[int] = set()
+        trinket_list = _get_trinkets(self.wow_spec, self.settings)
+        for trinket in trinket_list:
+            itemlevels = [
+                i for i in trinket.itemlevels if _is_valid_itemlevel(i, self.settings)
+            ]
+            if not itemlevels and trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
+                itemlevels.append(M0_ITEMLEVEL)
+            for itemlevel in itemlevels:
+                all_itemlevels.add(itemlevel)
+        min_itemlevel = min(all_itemlevels)
 
         simulation_data = Simulation_Data(
-            name=self.profile_split_character().join(
-                ["baseline", str(self.settings.min_ilevel)]
-            ),
+            name=self.profile_split_character().join(["baseline", str(min_itemlevel)]),
             fight_style=self.fight_style,
             iterations=self.settings.iterations,
             target_error=self.settings.target_error.get(self.fight_style, "0.1"),
@@ -167,13 +247,13 @@ class TrinketSimulator(Simulator):
 
         simulation_group.add(simulation_data)
 
-        trinket_list = _get_trinkets(self.wow_spec, self.settings)
-
         for trinket in trinket_list:
             # for each available itemlevel of the trinket
             itemlevels = [
                 i for i in trinket.itemlevels if _is_valid_itemlevel(i, self.settings)
             ]
+            if not itemlevels and trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
+                itemlevels.append(M0_ITEMLEVEL)
             # weed out every other itemlevel, except first and last
             if len(itemlevels) > 10:
                 first = itemlevels[0]
@@ -219,8 +299,22 @@ class TrinketSimulator(Simulator):
                             new_data.simc_arguments[-1]
                             + f",bonus_id={SPECIAL_CASE_BONUS_IDS[trinket.item_id][stat]}"
                         )
-                        new_data.name = self.profile_split_character().join(
-                            [f"{trinket.name} [{stat.title()}]", str(itemlevel)]
+                        new_data.name = self.get_profile_name(
+                            f"{trinket.name} [{stat.title()}]", str(itemlevel)
+                        )
+
+                        simulation_group.add(new_data)
+
+                if trinket.item_id in SPECIAL_CASE_SIMC_OPTIONS:
+                    base_simulation = simulation_group.profiles[-1].copy()
+                    simulation_group.profiles = simulation_group.profiles[:-1]
+                    for option in SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id]:
+                        new_data = base_simulation.copy()
+                        new_data.simc_arguments = new_data.simc_arguments + [
+                            SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id][option]
+                        ]
+                        new_data.name = self.get_profile_name(
+                            f"{trinket.name} [{option.title()}]", str(itemlevel)
                         )
 
                         simulation_group.add(new_data)

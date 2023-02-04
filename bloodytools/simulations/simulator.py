@@ -140,7 +140,7 @@ class Simulator(abc.ABC):
         pass
 
     def profile_split_character(self) -> str:
-        return "/"
+        return "|||"
 
     def _collect_data(
         self, simulation_group: Simulation_Group, data_type: DataType
@@ -368,19 +368,7 @@ class Simulator(abc.ABC):
     def get_additional_talent_paths(
         self, data_dict: dict
     ) -> typing.Dict[str, typing.List[str]]:
-        # load predefined talent paths from file
-        file_path = os.path.join(
-            "talent_tree_paths",
-            f"{self.wow_spec.wow_class.simc_name}_{self.wow_spec.simc_name}.yaml",
-        )
-        try:
-            with pkg_resources.resource_stream(__name__, file_path) as f:
-                data_dict["data_profile_overrides"] = yaml.safe_load(f)
-        except FileNotFoundError as e:
-            raise MissingTalentTreePathFileError() from e
-
-        if data_dict["data_profile_overrides"] is None:
-            data_dict["data_profile_overrides"] = {}
+        data_dict["data_profile_overrides"] = {}
 
         if "profile" not in data_dict:
             data_dict["profile"] = {}
@@ -409,6 +397,21 @@ class Simulator(abc.ABC):
                 "class_talents=" + data_dict["profile"]["character"]["class_talents"],
                 "spec_talents=" + data_dict["profile"]["character"]["spec_talents"],
             ]
+
+        # load predefined talent paths from file
+        file_path = os.path.join(
+            "talent_tree_paths",
+            f"{self.wow_spec.wow_class.simc_name}_{self.wow_spec.simc_name}.yaml",
+        )
+        try:
+            with pkg_resources.resource_stream(__name__, file_path) as f:
+                loaded_data = yaml.safe_load(f)
+        except FileNotFoundError as e:
+            raise MissingTalentTreePathFileError() from e
+
+        if loaded_data is not None and isinstance(loaded_data, dict):
+            data_dict["data_profile_overrides"].update(loaded_data)
+
         return data_dict
 
 
