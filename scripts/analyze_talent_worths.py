@@ -5,9 +5,7 @@ from rich.table import Table
 FILE_PATH = r"results\talent_removal\shaman_elemental_castingpatchwerk.json"
 FILE_PATH = r"results\talent_addition\shaman_elemental_castingpatchwerk.json"
 baseline_name = "baseline"
-BUILD = "The Gambler"
-# BUILD = "The Reliable"
-BUILD = "Amanis Abomination"
+BUILD = None
 
 
 def is_addition() -> bool:
@@ -15,9 +13,13 @@ def is_addition() -> bool:
 
 
 def main() -> None:
-
     with open(FILE_PATH, "r") as f:
         data = json.load(f)
+
+    if is_addition():
+        print("Talent ADDITION")
+    else:
+        print("Talent REMOVAL")
 
     print(
         "Bigger number = more important for the build. Lower number = less impact on the build. Negative number = target error at play, apl issue, or actually an improvement to not have."
@@ -41,10 +43,13 @@ def main() -> None:
         dps_talents = [t for t in build_data.keys() if t != baseline_name]
         dps_talents.sort(key=lambda name: build_data[name], reverse=is_addition())  # type: ignore
 
-        if is_addition():
+        if is_addition() and dps_talents:
             max_value = build_data[dps_talents[0]] - baseline
-        else:
+        elif dps_talents:
             max_value = baseline - build_data[dps_talents[0]]
+        else:
+            print(f"Skipping {build}. dps talents couldn't get extracted")
+            continue
 
         for dps_talent in dps_talents:
             if is_addition():
