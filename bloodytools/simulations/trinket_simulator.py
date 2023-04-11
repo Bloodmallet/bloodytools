@@ -112,7 +112,15 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     # get main-trinkets
     trinket_list = list(get_trinkets_for_spec(wow_spec))
 
-    trinket_list = [t for t in trinket_list if Season.SEASON_1 in t.seasons]
+    allowed_season = [
+        Season.SEASON_1,
+    ]
+
+    new_trinket_list = []
+    for trinket in trinket_list:
+        for season in trinket.seasons:
+            if season in allowed_season and trinket not in new_trinket_list:
+                new_trinket_list.append(trinket)
 
     # filter trinket list by available itemlevels:
     trinket_list = [
@@ -252,8 +260,8 @@ class TrinketSimulator(Simulator):
             itemlevels = [
                 i for i in trinket.itemlevels if _is_valid_itemlevel(i, self.settings)
             ]
-            if not itemlevels and trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
-                itemlevels.append(M0_ITEMLEVEL)
+            if trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
+                itemlevels = [M0_ITEMLEVEL]
             # weed out every other itemlevel, except first and last
             if len(itemlevels) > 10:
                 first = itemlevels[0]
