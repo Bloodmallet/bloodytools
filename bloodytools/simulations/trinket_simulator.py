@@ -114,18 +114,22 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
 
     allowed_season = [
         Season.SEASON_1,
+        # Season.SEASON_2
     ]
 
     new_trinket_list = []
     for trinket in trinket_list:
         for season in trinket.seasons:
             if season in allowed_season and trinket not in new_trinket_list:
+                logger.debug(
+                    f"Adding {trinket.full_name} to the list. It's seasons: {trinket.seasons}"
+                )
                 new_trinket_list.append(trinket)
 
     # filter trinket list by available itemlevels:
     trinket_list = [
         t
-        for t in trinket_list
+        for t in new_trinket_list
         if any([_is_valid_itemlevel(ilevel, settings) for ilevel in t.itemlevels])
     ]
 
