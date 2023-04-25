@@ -4,9 +4,15 @@
 #   - spec_talents=talent_name_d:1/talent_name_e:0/talent_name_f:3
 # Cool Other Build:
 #   - talents=WOW_EXPORT_STRING
-M+ Build:
-   - talents=BsbBnWR3R1Z1HmbUKIpvm3XXhTDCAAAAAAKaIJikEJkEJlkk0CSBJJhkEIJJSESSC
-Cleave Build:
-   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAkAAAAAAgiWKSiIJkQSkUSS0gUCJSIJEkkIRikkA
-Firestorm Build:
-   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAQDAAAAAAgmGSiIRkkkkDkUSSSLIFkkESSgkkIRIJJ
+M+ AoE w/Unravel and Shattering Star:
+   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAQDCAAAAAAKapIJCJkQSkUSSSLItQikkECSSkIcgkE
+M+ AoE w/Overawe and Cauterizing flame:
+   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAQDCAAAAAAKaIJikEJkEJlkk0g0CSSkkIkkEJCHIJB
+Raid Pure Single Target Build:
+   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAkAAAAAAgiWKkIkQCJJJtkENINkIRSIhkEJSkkE
+Raid Raid - General with AoE Burst Build:
+   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAkAAAAAAgiWKSiIJkQSkUSS0g0QiEJhESSkIRSSA
+Raid - Council Cleave Build:
+   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAIAAAAAAoohIJSkkgkDkUSSSDSDJSkECSSSiEJJB
+Raid - Everburning Flame Council Build:
+   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAIAAAAAAophIJSkIJSkUSSSDSDJSkECSSSiEJJB
