@@ -34,6 +34,7 @@ WEAPON_ENCHANTS = [
     WeaponEnchant(name="Sophic Devotion", item_id="199970"),
     WeaponEnchant(name="Wafting Devotion", item_id="199974"),
     WeaponEnchant(name="Frozen Devotion", item_id="199972"),
+    WeaponEnchant(name="Shadowflame Wreathe", item_id="204621"),
 ]
 
 RANGED_HUNTER_ENCHANTS = [
