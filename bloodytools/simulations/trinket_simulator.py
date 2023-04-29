@@ -58,7 +58,9 @@ SPECIAL_CASE_BONUS_IDS: typing.Dict[int, typing.Dict[str, int]] = {
     198478: DARKMOON_DECK_BOX_BONUS_IDS,
 }
 
-SPECIAL_CASE_SIMC_OPTIONS = {
+SPECIAL_CASE_SIMC_OPTIONS: typing.Dict[
+    int, typing.Dict[str, typing.Union[str, typing.List[str]]]
+] = {
     194301: {  # Whispering Incarnate Icon
         "dps": "dragonflight.whispering_incarnate_icon_roles=dps",
         "dps/heal": "dragonflight.whispering_incarnate_icon_roles=dps/heal",
@@ -74,6 +76,33 @@ SPECIAL_CASE_SIMC_OPTIONS = {
         "AoE": "dragonflight.player.ruby_whelp_shell_training=lobbing_fire_nova:6",
         "haste": "dragonflight.player.ruby_whelp_shell_training=under_red_wings:6",
         "crit": "dragonflight.player.ruby_whelp_shell_training=sleepy_ruby_warmth:6",
+    },
+    203729: {  # Ominous Chromatic Essence
+        "obsidian": "dragonflight.ominous_chromatic_essence_dragonflight=obsidian",
+        "obsidian+all": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=obsidian",
+            "dragonflight.ominous_chromatic_essence_allies=ruby/bronze/azure/emerald",
+        ],
+        "ruby": "dragonflight.ominous_chromatic_essence_dragonflight=ruby",
+        "ruby+all": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=ruby",
+            "dragonflight.ominous_chromatic_essence_allies=obsidian/bronze/azure/emerald",
+        ],
+        "bronze": "dragonflight.ominous_chromatic_essence_dragonflight=bronze",
+        "bronze+all": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=bronze",
+            "dragonflight.ominous_chromatic_essence_allies=obsidian/ruby/azure/emerald",
+        ],
+        "azure": "dragonflight.ominous_chromatic_essence_dragonflight=azure",
+        "azure+all": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=azure",
+            "dragonflight.ominous_chromatic_essence_allies=obsidian/ruby/bronze/emerald",
+        ],
+        "emerald": "dragonflight.ominous_chromatic_essence_dragonflight=emerald",
+        "emerald+all": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=emerald",
+            "dragonflight.ominous_chromatic_essence_allies=obsidian/ruby/bronze/azure",
+        ],
     },
 }
 
@@ -322,9 +351,21 @@ class TrinketSimulator(Simulator):
                     simulation_group.profiles = simulation_group.profiles[:-1]
                     for option in SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id]:
                         new_data = base_simulation.copy()
-                        new_data.simc_arguments = new_data.simc_arguments + [
-                            SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id][option]
-                        ]
+                        if isinstance(
+                            SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id][option], str
+                        ):
+                            new_data.simc_arguments = new_data.simc_arguments + [
+                                SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id][option]
+                            ]
+                        elif isinstance(
+                            SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id][option], list
+                        ):
+                            # iterable..probably
+                            new_data.simc_arguments = (
+                                new_data.simc_arguments
+                                + SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id][option]
+                            )
+
                         new_data.name = self.get_profile_name(
                             f"{trinket.name} [{option.title()}]", str(itemlevel)
                         )
