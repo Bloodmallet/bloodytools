@@ -22,9 +22,9 @@ logger = logging.getLogger(__name__)
 # special cases
 M0_ITEMLEVEL = 372
 ALLOWED_NON_SEASONAL_DUNGEON_ITEMS = (
-    193743,  # Irideus Frament
-    193791,  # Time-Breaching Talon
-    193773,  # Spoils of Neltharus
+    # 193743,  # Irideus Frament
+    # 193791,  # Time-Breaching Talon
+    # 193773,  # Spoils of Neltharus
 )
 DARKMOON_DECK_BOX_BONUS_IDS: typing.Dict[str, int] = {
     "Emberscale": 8858,
@@ -113,8 +113,8 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     trinket_list = list(get_trinkets_for_spec(wow_spec))
 
     allowed_season = [
-        Season.SEASON_1,
-        # Season.SEASON_2
+        # Season.SEASON_1,
+        Season.SEASON_2
     ]
 
     new_trinket_list = []

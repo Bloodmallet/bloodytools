@@ -28,14 +28,16 @@ class TierSetSimulator(Simulator):
             "no tier": [
                 "set_bonus=tier29_2pc=0",
                 "set_bonus=tier29_4pc=0",
+                "set_bonus=tier30_2pc=0",
+                "set_bonus=tier30_4pc=0",
             ],
             "2p": [
-                "set_bonus=tier29_2pc=1",
-                "set_bonus=tier29_4pc=0",
+                "set_bonus=tier30_2pc=1",
+                "set_bonus=tier30_4pc=0",
             ],
             "4p": [
-                "set_bonus=tier29_2pc=1",
-                "set_bonus=tier29_4pc=1",
+                "set_bonus=tier30_2pc=1",
+                "set_bonus=tier30_4pc=1",
             ],
         }
 
