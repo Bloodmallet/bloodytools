@@ -175,7 +175,7 @@ class PhialSimulator(ConsumableSimulator):
             "Phial of Glacial Fury": "",
             "Phial of Static Empowerment": "",
             "Phial of Tepid Versatility": "",
-            "Charged Phial of Alacrity": "",
+            # "Charged Phial of Alacrity": "",
             "Phial of Elemental Chaos": "",
         }
 
@@ -188,6 +188,6 @@ class PhialSimulator(ConsumableSimulator):
             "Phial of Glacial Fury": "191333",
             "Phial of Static Empowerment": "191336",
             "Phial of Tepid Versatility": "191339",
-            "Charged Phial of Alacrity": "191348",
+            # "Charged Phial of Alacrity": "191348",
             "Phial of Elemental Chaos": "191357",
         }
