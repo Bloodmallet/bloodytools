@@ -104,6 +104,10 @@ SPECIAL_CASE_SIMC_OPTIONS: typing.Dict[
             "dragonflight.ominous_chromatic_essence_allies=obsidian/ruby/bronze/azure",
         ],
     },
+    203996: {  # Igneous Flowstone
+        "High Tide": "dragonflight.flowstone_starting_state=high",
+        "Low Tide": "dragonflight.flowstone_starting_state=low",
+    },
 }
 
 NON_DPS_TRINKET_IDS = [
