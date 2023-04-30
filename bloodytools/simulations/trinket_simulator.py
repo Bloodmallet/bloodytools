@@ -130,6 +130,11 @@ NON_DPS_TRINKET_IDS = [
     "142168",  # Majordomo's Dinner Bell
     "151340",  # Echo of L'ura
     "186434",  # Weave of Warped Fates
+    "193805",  # Inexorable Resonator
+    "133246",  # Heart of Thunder
+    "193736",  # Water's Beating Heart
+    "133252",  # Rainsong
+    "202614",  # Rashok's Molten Heart
 ]
 
 
