@@ -56,8 +56,8 @@ def simc_name(name: str) -> str:
     return name.replace(" ", "_").lower()
 
 
-def load_tier_data(specs: typing.List[typing.Tuple[str, str]]) -> list[TierData]:
-    data: list[TierData] = []
+def load_tier_data(specs: typing.List[typing.Tuple[str, str]]) -> typing.List[TierData]:
+    data: typing.List[TierData] = []
 
     print(f"Listed class-spec combination below don't  have a T{TIER} profile yet.")
     for wow_class, wow_spec in specs:
@@ -98,7 +98,7 @@ def relative_gain(data: TierData, target: str) -> float:
 
 
 def custom_table(
-    data: list[TierData],
+    data: typing.List[TierData],
     fn: typing.Callable[[TierData, str], float],
     title: str,
 ) -> None:
