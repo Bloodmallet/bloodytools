@@ -31,7 +31,7 @@ FIGHT_STYLE = "castingpatchwerk"
 # )
 
 
-def simulate_tier_data(specs: list[tuple[str, str]]) -> None:
+def simulate_tier_data(specs: typing.List[typing.Tuple[str, str]]) -> None:
     config = Config(
         executable=EXECUTABLE,
         pretty=True,
@@ -56,7 +56,7 @@ def simc_name(name: str) -> str:
     return name.replace(" ", "_").lower()
 
 
-def load_tier_data(specs: list[tuple[str, str]]) -> list[TierData]:
+def load_tier_data(specs: typing.List[typing.Tuple[str, str]]) -> list[TierData]:
     data: list[TierData] = []
 
     print(f"Listed class-spec combination below don't  have a T{TIER} profile yet.")
@@ -125,7 +125,9 @@ def custom_table(
     console.print(table)
 
 
-def filter_by_existing_profiles(specs: list[tuple[str, str]]) -> list[tuple[str, str]]:
+def filter_by_existing_profiles(
+    specs: typing.List[typing.Tuple[str, str]]
+) -> typing.List[typing.Tuple[str, str]]:
     simc_path = os.path.join(*EXECUTABLE.split("/")[:-1])
     return [
         spec
