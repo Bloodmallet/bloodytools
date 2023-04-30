@@ -18,7 +18,9 @@ def get_simc_hash(path: str, log_warning: bool = True) -> str:
         if "engine" in new_path[-7:]:
             new_path = new_path[:-7]
     elif log_warning:
-        logger.warning(f"Strange path '{path}' to work with to find simulationcraft repository.")
+        logger.warning(
+            f"Strange path '{path}' to work with to find simulationcraft repository."
+        )
 
     # add path to file to variable
     new_path += f".git/refs/heads/{SIMC_BRANCH}"
