@@ -20,11 +20,13 @@ from simc_support.game_data.Source import Source
 logger = logging.getLogger(__name__)
 
 # special cases
-M0_ITEMLEVEL = 372
+M0_ITEMLEVEL = 411
+PREVIOUS_SEASON_ITEMLEVELS = [415, 421]
 ALLOWED_NON_SEASONAL_DUNGEON_ITEMS = (
     # 193743,  # Irideus Frament
     # 193791,  # Time-Breaching Talon
     # 193773,  # Spoils of Neltharus
+    193701,  # Algeth'ar Puzzle Box
 )
 DARKMOON_DECK_BOX_BONUS_IDS: typing.Dict[str, int] = {
     "Emberscale": 8858,
@@ -265,6 +267,8 @@ class TrinketSimulator(Simulator):
             ]
             if not itemlevels and trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
                 itemlevels.append(M0_ITEMLEVEL)
+                for ilvl in PREVIOUS_SEASON_ITEMLEVELS:
+                    itemlevels.append(ilvl)
             for itemlevel in itemlevels:
                 all_itemlevels.add(itemlevel)
         min_itemlevel = min(all_itemlevels)
@@ -303,7 +307,7 @@ class TrinketSimulator(Simulator):
                 i for i in trinket.itemlevels if _is_valid_itemlevel(i, self.settings)
             ]
             if trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
-                itemlevels = [M0_ITEMLEVEL]
+                itemlevels = [M0_ITEMLEVEL, *PREVIOUS_SEASON_ITEMLEVELS]
             # weed out every other itemlevel, except first and last
             if len(itemlevels) > 10:
                 first = itemlevels[0]
