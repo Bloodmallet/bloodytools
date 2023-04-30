@@ -8,7 +8,7 @@ AoE Breath:
    - talents=BsPAAAAAAAAAAAAAAAAAAAAAAkIAISSCJiERISSIkIJREigERikkkkkkWOAAAAAAAAAAAAAA
 AoE DW Obliteration: 
    - talents=BsPAAAAAAAAAAAAAAAAAAAAAAICAIJJkISEhkkECJSSEJhAhkERSSSSKJBAAAAAAAAAAAA
-   - off_hand=strike_twice,id=193700,bonus_id=6652/1643/8767,enchant=rune_of_razorice
+   - off_hand=proctors_tactical_cleaver,id=204320,bonus_id=4800/4786/1498,enchant=rune_of_razorice
 AoE 2h Obliteration: 
    - talents=BsPAAAAAAAAAAAAAAAAAAAAAAICAIJJkISEhkkECJSSEJhAhkERSSSSKJBAAAAAAAAAAAA
    - head=lingering_phantoms_dreadhorns,id=202461,bonus_id=4800/4786/1504/6935,gem_id=192985
