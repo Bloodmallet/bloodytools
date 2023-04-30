@@ -152,10 +152,7 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     # get main-trinkets
     trinket_list = list(get_trinkets_for_spec(wow_spec))
 
-    allowed_season = [
-        # Season.SEASON_1,
-        Season.SEASON_2
-    ]
+    allowed_season = [Season.SEASON_1, Season.SEASON_2]
 
     new_trinket_list = []
     for trinket in trinket_list:
