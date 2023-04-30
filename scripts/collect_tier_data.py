@@ -9,24 +9,26 @@ import enum
 from rich.console import Console
 from rich.table import Table
 import typing
+import os
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.ERROR)
 
 logger = logging.getLogger()
 
-TIER = "29"
+TIER = "30"
 EXECUTABLE = "../simc/simc.exe"
 FIGHT_STYLE = "castingpatchwerk"
 
-MISSING_PROFILES = (
-    ("Druid", "Restoration"),
-    ("Evoker", "Preservation"),
-    ("Monk", "Mistweaver"),
-    ("Paladin", "Holy"),
-    ("Priest", "Holy"),
-    ("Priest", "Discipline"),
-    ("Shaman", "Restoration"),
-)
+# MISSING_PROFILES = (
+#     ("Druid", "Restoration"),
+#     ("Evoker", "Preservation"),
+#     ("Monk", "Mistweaver"),
+#     ("Paladin", "Holy"),
+#     ("Priest", "Holy"),
+#     ("Priest", "Discipline"),
+#     ("Shaman", "Restoration"),
+#     # ???
+# )
 
 
 def simulate_tier_data(specs: list[tuple[str, str]]) -> None:
@@ -57,9 +59,16 @@ def simc_name(name: str) -> str:
 def load_tier_data(specs: list[tuple[str, str]]) -> list[TierData]:
     data: list[TierData] = []
 
+    print(f"Listed class-spec combination below don't  have a T{TIER} profile yet.")
     for wow_class, wow_spec in specs:
+        file_path = f"results/tier_set/{simc_name(wow_class)}_{simc_name(wow_spec)}_{FIGHT_STYLE}.json"
+
+        if not os.path.exists(file_path):
+            print(f'("{wow_class}", "{wow_spec}"),')
+            continue
+
         with open(
-            f"results/tier_set/{simc_name(wow_class)}_{simc_name(wow_spec)}_{FIGHT_STYLE}.json",
+            file_path,
             "r",
             encoding="utf-8",
         ) as f:
@@ -72,9 +81,9 @@ def load_tier_data(specs: list[tuple[str, str]]) -> list[TierData]:
             TierData(
                 wow_class=wow_class,
                 wow_spec=wow_spec,
-                no_tier_dps=loaded_file["data"]["custom profile"]["no tier"],
-                tier_2pc_dps=loaded_file["data"]["custom profile"]["2p"],
-                tier_4pc_dps=loaded_file["data"]["custom profile"]["4p"],
+                no_tier_dps=loaded_file["data"][f"T{TIER}"]["no tier"],
+                tier_2pc_dps=loaded_file["data"][f"T{TIER}"]["2p"],
+                tier_4pc_dps=loaded_file["data"][f"T{TIER}"]["4p"],
             )
         )
     return data
@@ -116,10 +125,21 @@ def custom_table(
     console.print(table)
 
 
+def filter_by_existing_profiles(specs: list[tuple[str, str]]) -> list[tuple[str, str]]:
+    simc_path = os.path.join(*EXECUTABLE.split("/")[:-1])
+    return [
+        spec
+        for spec in specs
+        if os.path.exists(
+            f"{simc_path}/profiles/Tier{TIER}/T{TIER}_{spec[0]}_{spec[1]}.simc"
+        )
+    ]
+
+
 def main() -> None:
     specs = [(s.wow_class.full_name, s.full_name) for s in WowSpec.WOWSPECS]
-    specs = [t for t in specs if t not in MISSING_PROFILES]
-    # simulate_tier_data()
+    specs = filter_by_existing_profiles(specs)
+    # simulate_tier_data(specs)
     data = load_tier_data(specs)
 
     custom_table(data, absolute_gain, f"Absolute gain T{TIER}")
