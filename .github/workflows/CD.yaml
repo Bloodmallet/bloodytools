@@ -29,7 +29,7 @@ jobs:
     - name: Style with black
       run: |
         # stop the build if there are style errors
-        black .
+        black --check .
     - name: Type checking with mypy
       run: |
         mypy .
