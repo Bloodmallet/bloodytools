@@ -29,9 +29,9 @@ class Config:
     iterations: str = "60000"
     keep_files: bool = False
     # affects trinkets
-    max_ilevel: int = 430
+    max_ilevel: int = 457
     # affects trinkets
-    min_ilevel: int = 370
+    min_ilevel: int = 420
     pretty: bool = False
     profileset_work_threads: str = "2"
     ptr: str = "0"
@@ -54,7 +54,7 @@ class Config:
     talent_permutations: bool = False
     target_error: typing.Dict[str, str] = dataclasses.field(default_factory=dict)
     threads: str = ""
-    tier: str = "29"
+    tier: str = "30"
     use_raidbots: bool = False
     write_humanreadable_secondary_distribution_file: bool = False
     apikey: str = ""
@@ -84,7 +84,6 @@ class Config:
 
     @classmethod
     def create_config_from_args(cls, args: object) -> "Config":
-
         config = cls(log_warnings=False)
 
         config.log_warnings = True

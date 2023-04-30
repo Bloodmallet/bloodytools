@@ -22,9 +22,9 @@ logger = logging.getLogger(__name__)
 # special cases
 M0_ITEMLEVEL = 372
 ALLOWED_NON_SEASONAL_DUNGEON_ITEMS = (
-    193743,  # Irideus Frament
-    193791,  # Time-Breaching Talon
-    193773,  # Spoils of Neltharus
+    # 193743,  # Irideus Frament
+    # 193791,  # Time-Breaching Talon
+    # 193773,  # Spoils of Neltharus
 )
 DARKMOON_DECK_BOX_BONUS_IDS: typing.Dict[str, int] = {
     "Emberscale": 8858,
@@ -58,7 +58,9 @@ SPECIAL_CASE_BONUS_IDS: typing.Dict[int, typing.Dict[str, int]] = {
     198478: DARKMOON_DECK_BOX_BONUS_IDS,
 }
 
-SPECIAL_CASE_SIMC_OPTIONS = {
+SPECIAL_CASE_SIMC_OPTIONS: typing.Dict[
+    int, typing.Dict[str, typing.Union[str, typing.List[str]]]
+] = {
     194301: {  # Whispering Incarnate Icon
         "dps": "dragonflight.whispering_incarnate_icon_roles=dps",
         "dps/heal": "dragonflight.whispering_incarnate_icon_roles=dps/heal",
@@ -74,6 +76,33 @@ SPECIAL_CASE_SIMC_OPTIONS = {
         "AoE": "dragonflight.player.ruby_whelp_shell_training=lobbing_fire_nova:6",
         "haste": "dragonflight.player.ruby_whelp_shell_training=under_red_wings:6",
         "crit": "dragonflight.player.ruby_whelp_shell_training=sleepy_ruby_warmth:6",
+    },
+    203729: {  # Ominous Chromatic Essence
+        "obsidian": "dragonflight.ominous_chromatic_essence_dragonflight=obsidian",
+        "obsidian+all": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=obsidian",
+            "dragonflight.ominous_chromatic_essence_allies=ruby/bronze/azure/emerald",
+        ],
+        "ruby": "dragonflight.ominous_chromatic_essence_dragonflight=ruby",
+        "ruby+all": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=ruby",
+            "dragonflight.ominous_chromatic_essence_allies=obsidian/bronze/azure/emerald",
+        ],
+        "bronze": "dragonflight.ominous_chromatic_essence_dragonflight=bronze",
+        "bronze+all": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=bronze",
+            "dragonflight.ominous_chromatic_essence_allies=obsidian/ruby/azure/emerald",
+        ],
+        "azure": "dragonflight.ominous_chromatic_essence_dragonflight=azure",
+        "azure+all": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=azure",
+            "dragonflight.ominous_chromatic_essence_allies=obsidian/ruby/bronze/emerald",
+        ],
+        "emerald": "dragonflight.ominous_chromatic_essence_dragonflight=emerald",
+        "emerald+all": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=emerald",
+            "dragonflight.ominous_chromatic_essence_allies=obsidian/ruby/bronze/azure",
+        ],
     },
 }
 
@@ -112,12 +141,24 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     # get main-trinkets
     trinket_list = list(get_trinkets_for_spec(wow_spec))
 
-    trinket_list = [t for t in trinket_list if Season.SEASON_1 in t.seasons]
+    allowed_season = [
+        # Season.SEASON_1,
+        Season.SEASON_2
+    ]
+
+    new_trinket_list = []
+    for trinket in trinket_list:
+        for season in trinket.seasons:
+            if season in allowed_season and trinket not in new_trinket_list:
+                logger.debug(
+                    f"Adding {trinket.full_name} to the list. It's seasons: {trinket.seasons}"
+                )
+                new_trinket_list.append(trinket)
 
     # filter trinket list by available itemlevels:
     trinket_list = [
         t
-        for t in trinket_list
+        for t in new_trinket_list
         if any([_is_valid_itemlevel(ilevel, settings) for ilevel in t.itemlevels])
     ]
 
@@ -252,8 +293,8 @@ class TrinketSimulator(Simulator):
             itemlevels = [
                 i for i in trinket.itemlevels if _is_valid_itemlevel(i, self.settings)
             ]
-            if not itemlevels and trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
-                itemlevels.append(M0_ITEMLEVEL)
+            if trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
+                itemlevels = [M0_ITEMLEVEL]
             # weed out every other itemlevel, except first and last
             if len(itemlevels) > 10:
                 first = itemlevels[0]
@@ -310,9 +351,21 @@ class TrinketSimulator(Simulator):
                     simulation_group.profiles = simulation_group.profiles[:-1]
                     for option in SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id]:
                         new_data = base_simulation.copy()
-                        new_data.simc_arguments = new_data.simc_arguments + [
-                            SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id][option]
-                        ]
+                        if isinstance(
+                            SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id][option], str
+                        ):
+                            new_data.simc_arguments = new_data.simc_arguments + [
+                                SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id][option]
+                            ]
+                        elif isinstance(
+                            SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id][option], list
+                        ):
+                            # iterable..probably
+                            new_data.simc_arguments = (
+                                new_data.simc_arguments
+                                + SPECIAL_CASE_SIMC_OPTIONS[trinket.item_id][option]
+                            )
+
                         new_data.name = self.get_profile_name(
                             f"{trinket.name} [{option.title()}]", str(itemlevel)
                         )

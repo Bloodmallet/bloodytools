@@ -85,7 +85,6 @@ class Simulation_Data:
         threads: str = "",
         remove_files: bool = True,
     ) -> None:
-
         super(Simulation_Data, self).__init__()
 
         logger.debug("simulation_data initiated.")
@@ -454,7 +453,6 @@ class Simulation_Data:
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW  # type: ignore
 
             while not hasattr(self, "success") and fail_counter < 5:
-
                 simulation_output = subprocess.run(
                     argument,
                     stdout=subprocess.PIPE,
@@ -469,9 +467,7 @@ class Simulation_Data:
                     self.success = True
 
         else:
-
             while not hasattr(self, "success") and fail_counter < 5:
-
                 simulation_output = subprocess.run(
                     argument,
                     stdout=subprocess.PIPE,
@@ -684,7 +680,6 @@ class Simulation_Group:
             bool -- True if simulations ended successfully.
         """
         if self.profiles:
-
             self.set_simulation_start_time()
 
             if len(self.profiles) == 1:
@@ -695,7 +690,6 @@ class Simulation_Group:
                     raise e
 
             elif len(self.profiles) >= 2:
-
                 # check for a path to executable
                 if not self.executable:
                     raise ValueError(
@@ -828,7 +822,6 @@ class Simulation_Group:
                         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW  # type: ignore
 
                         while not hasattr(self, "success") and fail_counter < 5:
-
                             try:
                                 simulation_output = subprocess.Popen(
                                     [self.executable, self.filename],
@@ -855,9 +848,7 @@ class Simulation_Group:
                                 self.success = True
 
                     else:
-
                         while not hasattr(self, "success") and fail_counter < 5:
-
                             try:
                                 simulation_output = subprocess.Popen(
                                     [self.executable, self.filename],
@@ -959,7 +950,6 @@ class Simulation_Group:
             self.session = requests.Session()
 
         if self.profiles:
-
             self.set_simulation_start_time()
 
             if len(self.profiles) == 1:
@@ -970,7 +960,6 @@ class Simulation_Group:
                     raise e
 
             elif len(self.profiles) >= 2:
-
                 # write data to file, create file name
                 if self.filename:
                     raise AlreadySetError(
@@ -979,7 +968,6 @@ class Simulation_Group:
                         )
                     )
                 else:
-
                     if (
                         FightStyle.CASTINGPATCHWERK in self.profiles[0].fight_style
                         and FightStyle.CASTINGPATCHWERK != self.profiles[0].fight_style
@@ -1099,7 +1087,6 @@ class Simulation_Group:
                         not progress["job"]["state"] == "complete"
                         and 10 * backoff < 3600
                     ):
-
                         # backoff
                         time.sleep(10)
                         backoff += 1
@@ -1148,7 +1135,6 @@ class Simulation_Group:
                     # if too many profilesets were simulated, get the full json
                     if "hasFullJson" in raidbots_data["simbot"]:
                         if raidbots_data["simbot"]["hasFullJson"]:
-
                             # simulation is done, get data
                             raidbots_data = r(
                                 f"https://www.raidbots.com/reports/{raidbots_sim_id}/data.full.json",

@@ -31,7 +31,9 @@ def main(args=None):
     logger.debug("main start")
     logger.info("Bloodytools at your service.")
 
-    if args:
+    if isinstance(args, Config):
+        config = args
+    elif args:
         config = Config.create_config_from_args(args)
     else:
         config = Config()
@@ -42,7 +44,9 @@ def main(args=None):
         for simulator_name in config.simulator_type_names:
             simulator = simulator_factory.get_simulator(simulator_name)
             for fight_style in config.fight_styles:
-                logger.info(f"Starting {simulator.name()} simulations.")
+                logger.info(
+                    f"Starting {simulator.name()} simulation for {wow_spec} fighting {fight_style}."
+                )
                 try:
                     simulator(
                         wow_spec=wow_spec,

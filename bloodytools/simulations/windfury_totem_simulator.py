@@ -12,12 +12,12 @@ from simc_support.game_data.Stat import Stat
 
 logger = logging.getLogger(__name__)
 
-ENHANCEMENT_WINDFURY: typing.List[str] = [
-    "talents=BcQAAAAAAAAAAAAAAAAAAAAAAIRSKRCIJhcgkkQJhAAAAAAAAAAAAAQLCRIRLFBIlkkUAUSkEA"
+ENHANCEMENT_EXTERNAL_WINDFURY: typing.List[str] = [
+    "spec_talents+=/windfury_totem:0/elemental_assault:1"
 ]
 """List of simc arguments to properly communicate how an Enhancement profile performs if given an external Windfury Totem."""
 
-ENHANCEMENT_NO_WINDFURY: typing.List[str] = []
+ENHANCEMENT_OWN_WINDFURY: typing.List[str] = []
 """List of simc arguments to properly communicate how an Enhancement profile performs if they have to cast Windfury Totem on their own."""
 
 
@@ -157,15 +157,15 @@ class WindfuryTotemSimulator(Simulator):
                 if (
                     melee_spec == ENHANCEMENT
                     and windfury_name == "windfury"
-                    and ENHANCEMENT_WINDFURY
+                    and ENHANCEMENT_EXTERNAL_WINDFURY
                 ):
-                    windfury_override.append(*ENHANCEMENT_WINDFURY)
+                    windfury_override.append(*ENHANCEMENT_EXTERNAL_WINDFURY)
                 if (
                     melee_spec == ENHANCEMENT
                     and windfury_name == "no windfury"
-                    and ENHANCEMENT_NO_WINDFURY
+                    and ENHANCEMENT_OWN_WINDFURY
                 ):
-                    windfury_override.append(*ENHANCEMENT_NO_WINDFURY)
+                    windfury_override.append(*ENHANCEMENT_OWN_WINDFURY)
 
                 full_spec_name = " ".join(
                     [melee_spec.full_name, melee_spec.wow_class.full_name]
