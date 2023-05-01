@@ -240,6 +240,8 @@ def extract_profile(
         "gear_haste_rating",
         "gear_mastery_rating",
         "gear_versatility_rating",
+        "deathknight.ams_absorb_percent",
+        "deathknight.amz_absorb_percent",
     ]
     clean_character_specifics = {
         r"set_bonus=[\"']?tier28_2pc[\"']?": "set_bonus=tier28_2pc",
