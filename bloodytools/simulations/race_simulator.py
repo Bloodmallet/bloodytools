@@ -71,7 +71,6 @@ class RaceSimulator(Simulator):
             data_dict["translations"][race.full_name] = race.translations.get_dict()
 
             if "Zandalari" in race.full_name:
-
                 loas = filter(
                     lambda name: race.full_name in name, data_dict["data"].keys()
                 )

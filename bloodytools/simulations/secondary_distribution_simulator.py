@@ -36,7 +36,6 @@ class SecondaryDistributionSimulator(Simulator):
         return "Secondary Distributions"
 
     def get_available_secondary_stats(self, data_dict: dict) -> int:
-
         secondary_amount = 0
 
         rating_names = [
@@ -110,7 +109,6 @@ class SecondaryDistributionSimulator(Simulator):
     def add_simulation_data(
         self, simulation_group: Simulation_Group, data_dict: dict
     ) -> None:
-
         step_size = self.settings.secondary_distributions_step_size
         lower_threshold = 10  # percent
         upper_threshold = 70  # percent
@@ -136,7 +134,6 @@ class SecondaryDistributionSimulator(Simulator):
             "class_talents" in data_dict["profile"]["character"]
             and "spec_talents" in data_dict["profile"]["character"]
         ):
-
             talent_combinations["baseline"] = (
                 ClassTalentString(data_dict["profile"]["character"]["class_talents"]),
                 SpecTalentString(data_dict["profile"]["character"]["spec_talents"]),
@@ -173,7 +170,6 @@ class SecondaryDistributionSimulator(Simulator):
 
         for human_name, talent_combination in talent_combinations.items():
             for crit, haste, mastery, vers in distribution_multipliers:
-
                 s_o = Simulation_Data(
                     name="{}{}{}_{}_{}_{}".format(
                         human_name,

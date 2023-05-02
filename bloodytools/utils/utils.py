@@ -231,6 +231,8 @@ def extract_profile(
         r"set_bonus=[\"']?tier28_4pc[\"']?",
         r"set_bonus=[\"']?tier29_2pc[\"']?",
         r"set_bonus=[\"']?tier29_4pc[\"']?",
+        r"set_bonus=[\"']?tier30_2pc[\"']?",
+        r"set_bonus=[\"']?tier30_4pc[\"']?",
         "gear_agility",
         "gear_intellect",
         "gear_strength",
@@ -238,12 +240,16 @@ def extract_profile(
         "gear_haste_rating",
         "gear_mastery_rating",
         "gear_versatility_rating",
+        "deathknight.ams_absorb_percent",
+        "deathknight.amz_absorb_percent",
     ]
     clean_character_specifics = {
         r"set_bonus=[\"']?tier28_2pc[\"']?": "set_bonus=tier28_2pc",
         r"set_bonus=[\"']?tier28_4pc[\"']?": "set_bonus=tier28_4pc",
         r"set_bonus=[\"']?tier29_2pc[\"']?": "set_bonus=tier29_2pc",
         r"set_bonus=[\"']?tier29_4pc[\"']?": "set_bonus=tier29_4pc",
+        r"set_bonus=[\"']?tier30_2pc[\"']?": "set_bonus=tier30_2pc",
+        r"set_bonus=[\"']?tier30_4pc[\"']?": "set_bonus=tier30_4pc",
     }
     pattern_specifics = {}
     for element in character_specifics:
@@ -253,8 +259,10 @@ def extract_profile(
 
     with open(path, "r") as f:
         for line in f:
-            for specific in character_specifics:
+            if line.lstrip().startswith("#"):
+                continue
 
+            for specific in character_specifics:
                 matches = pattern_specifics[specific].search(line)
                 if matches:
                     profile["character"][
@@ -262,7 +270,6 @@ def extract_profile(
                     ] = matches.group("information").replace('"', "")
 
             for slot in item_slots:
-
                 matches = pattern_slots[slot].search(line)
                 slot_name = slot
                 if slot in official_name:
