@@ -4,8 +4,6 @@
 #   - spec_talents=talent_name_d:1/talent_name_e:0/talent_name_f:3
 # Cool Other Build:
 #   - talents=WOW_EXPORT_STRING
-AoE Breath: 
-   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAkIAISSCJiERISSIkIJREigERikkkkkkWOAAAAAAAAAAAAAA
 AoE DW Obliteration: 
    - talents=BsPAAAAAAAAAAAAAAAAAAAAAAICAIJJkISEhkkECJSSEJhAhkERSSSSKJBAAAAAAAAAAAA
    - off_hand=proctors_tactical_cleaver,id=204320,bonus_id=4800/4786/1498,enchant=rune_of_razorice
