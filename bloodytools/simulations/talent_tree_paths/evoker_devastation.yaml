@@ -4,15 +4,13 @@
 #   - spec_talents=talent_name_d:1/talent_name_e:0/talent_name_f:3
 # Cool Other Build:
 #   - talents=WOW_EXPORT_STRING
-M+ AoE w/Unravel and Shattering Star:
-   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAQDCAAAAAAKapIJCJkQSkUSSSLItQikkECSSkIcgkE
-M+ AoE w/Overawe and Cauterizing flame:
-   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAQDCAAAAAAKaIJikEJkEJlkk0g0CSSkkIkkEJCHIJB
-Raid Pure Single Target Build:
-   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAkAAAAAAgiWKkIkQCJJJtkENINkIRSIhkEJSkkE
-Raid Raid - General with AoE Burst Build:
-   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAkAAAAAAgiWKSiIJkQSkUSS0g0QiEJhESSkIRSSA
-Raid - Council Cleave Build:
-   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAIAAAAAAoohIJSkkgkDkUSSSDSDJSkECSSSiEJJB
-Raid - Everburning Flame Council Build:
-   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAIAAAAAAophIJSkIJSkUSSSDSDJSkECSSSiEJJB
+
+# 10.1 release day update using wowhead guide from preheat: https://www.wowhead.com/guide/classes/evoker/devastation/talent-builds-pve-dps
+Raid - General:
+   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAkAAAAAAApkWSiQCCJJJtkENINkIRSIhkEJSkkEB
+Raid - Pure Single Target:
+   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAkAAAAAAApkWkIHQCCJJJtkENINkIRSIhkEJSkkEB
+Raid - Council Cleave w/Everburning:
+   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkGJSiEkUikkUSSSDSDJSkESIJJJEJJJB
+Mythic+ - General AoE:
+   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAQDCAAAAAAkSaJJCJIkkkUSSig0QiEJhESSkIkkEB
