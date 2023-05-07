@@ -162,7 +162,14 @@ def extract_profile(path: str, wow_class: WowClass) -> dict:
         typing.Dict[
             str,
             typing.Union[
-                str, typing.Dict[str, typing.Union[str, typing.Dict[str, str]]]
+                str,
+                typing.Dict[
+                    str,
+                    typing.Union[
+                        str,
+                        typing.Dict[str, str],
+                    ],
+                ],
             ],
         ],
     ] = {
@@ -195,7 +202,7 @@ def extract_profile(path: str, wow_class: WowClass) -> dict:
         "shoulder": "shoulders",
         "wrist": "wrists",
     }
-    pattern_slots = {}
+    pattern_slots: typing.Dict[str, re.Pattern] = {}
     for element in item_slots:
         pattern_slots[element] = re.compile(
             r'^{}=["\']?(?P<information>.*)["\']?$'.format(element)
@@ -214,7 +221,7 @@ def extract_profile(path: str, wow_class: WowClass) -> dict:
         "crafted_stats",
         "drop_level",
     ]
-    pattern_element = {}
+    pattern_element: typing.Dict[str, re.Pattern] = {}
     # don't recompile this for each slot
     for element in item_elements:
         pattern_element[element] = re.compile(
@@ -256,7 +263,7 @@ def extract_profile(path: str, wow_class: WowClass) -> dict:
         r"set_bonus=[\"']?tier30_2pc[\"']?": "set_bonus=tier30_2pc",
         r"set_bonus=[\"']?tier30_4pc[\"']?": "set_bonus=tier30_4pc",
     }
-    pattern_specifics = {}
+    pattern_specifics: typing.Dict[str, re.Pattern] = {}
     for element in character_specifics:
         pattern_specifics[element] = re.compile(
             r'^{}=["\']?(?P<information>.*)["\']?'.format(element)
@@ -291,12 +298,12 @@ def extract_profile(path: str, wow_class: WowClass) -> dict:
 
                     # check for all elements
                     for element in item_elements:
-                        new_matches = pattern_element[element].search(new_line)
+                        new_matches: typing.Union[re.Match, None] = pattern_element[
+                            element
+                        ].search(new_line)
 
-                        if new_matches and isinstance(
-                            profile["items"][slot_name], dict
-                        ):
-                            profile["items"][slot_name][element] = (
+                        if new_matches:
+                            profile["items"][slot_name][element] = (  # type: ignore[index]
                                 new_matches.group("information")
                                 .replace('"', "")
                                 .replace("'", "")
