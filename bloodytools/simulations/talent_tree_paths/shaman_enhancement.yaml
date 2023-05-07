@@ -1,6 +1,24 @@
-## Example
-# My Awesome Build:
-#   - class_talents=talent_name_a:2/talent_name_b:1/talent_name_c:0
-#   - spec_talents=talent_name_d:1/talent_name_e:0/talent_name_f:3
-# Cool Other Build:
-#   - talents=WOW_EXPORT_STRING
+# disabled because T30 uses this build
+# Elementalist ST:
+#   - class_talents=chain_heal:1/lava_burst:1/astral_shift:1/chain_lightning:1/wind_shear:1/planes_traveler:1/spirit_wolf:1/frost_shock:1/maelstrom_weapon:1/earth_shield:1/fire_and_ice:1/earth_elemental:1/capacitor_totem:1/brimming_with_life:1/healing_stream_totem:1/ancestral_defense:1/purge:1/flurry:1/swirling_currents:2/wind_rush_totem:1/natures_fury:2/elemental_warding:2/natures_guardian:1/winds_of_alakir:2/thunderstorm:1/gust_of_wind:1/ancestral_guidance:1/totemic_projection:1/thundershock:1
+#   - spec_talents=stormstrike:1/windfury_weapon:1/lava_lash:1/improved_maelstrom_weapon:2/molten_assault:2/raging_maelstrom:1/ice_strike:1/hailstorm:1/sundering:1/windfury_totem:1/swirling_maelstrom:1/hot_hand:2/storms_wrath:1/ashen_catalyst:1/elemental_blast:1/elemental_weapons:2/lashing_flames:1/primordial_wave:1/feral_spirit:1/ascendance:1/witch_doctors_ancestry:2/static_accumulation:2/elemental_spirits:1/thorims_invocation:1
+
+Elementalist AOE:
+   - class_talents=chain_heal:1/lava_burst:1/astral_shift:1/chain_lightning:1/wind_shear:1/planes_traveler:1/spirit_wolf:1/frost_shock:1/maelstrom_weapon:1/earth_shield:1/fire_and_ice:1/earth_elemental:1/capacitor_totem:1/brimming_with_life:1/healing_stream_totem:1/ancestral_defense:1/purge:1/flurry:1/swirling_currents:2/wind_rush_totem:1/natures_fury:2/elemental_warding:2/natures_guardian:1/winds_of_alakir:2/thunderstorm:1/gust_of_wind:1/ancestral_guidance:1/totemic_projection:1/thundershock:1
+   - spec_talents=stormstrike:1/windfury_weapon:1/lava_lash:1/improved_maelstrom_weapon:2/molten_assault:2/raging_maelstrom:1/ice_strike:1/hailstorm:1/sundering:1/overflowing_maelstrom:1/windfury_totem:1/swirling_maelstrom:1/hot_hand:2/crash_lightning:1/ashen_catalyst:1/elemental_weapons:2/crashing_storms:1/lashing_flames:1/primordial_wave:1/feral_spirit:1/primal_maelstrom:2/witch_doctors_ancestry:2/splintered_elements:1/elemental_spirits:1
+   
+Elementalist Cleave:
+   - class_talents=chain_heal:1/lava_burst:1/astral_shift:1/chain_lightning:1/wind_shear:1/planes_traveler:1/spirit_wolf:1/frost_shock:1/maelstrom_weapon:1/earth_shield:1/fire_and_ice:1/earth_elemental:1/capacitor_totem:1/brimming_with_life:1/healing_stream_totem:1/ancestral_defense:1/purge:1/flurry:1/swirling_currents:2/wind_rush_totem:1/natures_fury:2/elemental_warding:2/natures_guardian:1/winds_of_alakir:2/thunderstorm:1/gust_of_wind:1/ancestral_guidance:1/totemic_projection:1/thundershock:1
+   - spec_talents=stormstrike:1/windfury_weapon:1/lava_lash:1/improved_maelstrom_weapon:2/molten_assault:2/raging_maelstrom:1/ice_strike:1/hailstorm:1/sundering:1/windfury_totem:1/swirling_maelstrom:1/hot_hand:2/crash_lightning:1/ashen_catalyst:1/elemental_weapons:2/crashing_storms:1/lashing_flames:1/primordial_wave:1/feral_spirit:1/ascendance:1/witch_doctors_ancestry:2/static_accumulation:2/elemental_spirits:1/thorims_invocation:1
+   
+Storm ST:
+   - class_talents=chain_heal:1/lava_burst:1/astral_shift:1/chain_lightning:1/wind_shear:1/planes_traveler:1/spirit_wolf:1/frost_shock:1/maelstrom_weapon:1/earth_shield:1/fire_and_ice:1/earth_elemental:1/capacitor_totem:1/brimming_with_life:1/healing_stream_totem:1/ancestral_defense:1/purge:1/flurry:1/swirling_currents:2/wind_rush_totem:1/natures_fury:2/elemental_warding:2/natures_guardian:1/winds_of_alakir:2/thunderstorm:1/gust_of_wind:1/ancestral_guidance:1/totemic_projection:1/thundershock:1
+   - spec_talents=stormstrike:1/windfury_weapon:1/lava_lash:1/forceful_winds:1/improved_maelstrom_weapon:2/molten_assault:1/unruly_winds:1/raging_maelstrom:1/ice_strike:1/doom_winds:1/sundering:1/overflowing_maelstrom:1/windfury_totem:1/storms_wrath:1/stormflurry:1/elemental_blast:1/stormblast:1/elemental_weapons:2/feral_spirit:1/deeply_rooted_elements:1/elemental_assault:2/witch_doctors_ancestry:2/legacy_of_the_frost_witch:1/static_accumulation:2/thorims_invocation:1
+   
+Storm Cleave:
+   - class_talents=chain_heal:1/lava_burst:1/astral_shift:1/chain_lightning:1/wind_shear:1/planes_traveler:1/spirit_wolf:1/frost_shock:1/maelstrom_weapon:1/earth_shield:1/fire_and_ice:1/earth_elemental:1/capacitor_totem:1/brimming_with_life:1/healing_stream_totem:1/ancestral_defense:1/purge:1/flurry:1/swirling_currents:2/wind_rush_totem:1/natures_fury:2/elemental_warding:2/natures_guardian:1/winds_of_alakir:2/thunderstorm:1/gust_of_wind:1/ancestral_guidance:1/totemic_projection:1/thundershock:1
+   - spec_talents=stormstrike:1/windfury_weapon:1/lava_lash:1/forceful_winds:1/improved_maelstrom_weapon:2/molten_assault:1/unruly_winds:1/raging_maelstrom:1/doom_winds:1/sundering:1/overflowing_maelstrom:1/windfury_totem:1/storms_wrath:1/crash_lightning:1/stormflurry:1/stormblast:1/elemental_weapons:2/crashing_storms:1/feral_spirit:1/deeply_rooted_elements:1/elemental_assault:2/witch_doctors_ancestry:2/legacy_of_the_frost_witch:1/static_accumulation:2/thorims_invocation:1
+   
+Storm AOE:
+   - class_talents=chain_heal:1/lava_burst:1/astral_shift:1/chain_lightning:1/wind_shear:1/planes_traveler:1/spirit_wolf:1/frost_shock:1/maelstrom_weapon:1/earth_shield:1/fire_and_ice:1/earth_elemental:1/capacitor_totem:1/brimming_with_life:1/healing_stream_totem:1/ancestral_defense:1/purge:1/flurry:1/swirling_currents:2/wind_rush_totem:1/natures_fury:2/elemental_warding:2/natures_guardian:1/winds_of_alakir:2/thunderstorm:1/gust_of_wind:1/ancestral_guidance:1/totemic_projection:1/thundershock:1
+   - spec_talents=stormstrike:1/windfury_weapon:1/lava_lash:1/forceful_winds:1/improved_maelstrom_weapon:2/molten_assault:2/unruly_winds:1/raging_maelstrom:1/fire_nova:1/doom_winds:1/sundering:1/overflowing_maelstrom:1/windfury_totem:1/swirling_maelstrom:1/crash_lightning:1/elemental_weapons:2/crashing_storms:1/feral_spirit:1/deeply_rooted_elements:1/witch_doctors_ancestry:2/legacy_of_the_frost_witch:2/static_accumulation:2/alpha_wolf:1/thorims_invocation:1
