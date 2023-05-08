@@ -1,6 +1,16 @@
-## Example
-# My Awesome Build:
-#   - class_talents=talent_name_a:2/talent_name_b:1/talent_name_c:0
-#   - spec_talents=talent_name_d:1/talent_name_e:0/talent_name_f:3
-# Cool Other Build:
-#   - talents=WOW_EXPORT_STRING
+# Wowhead Talent Builds
+# https://www.wowhead.com/guide/classes/hunter/survival/talent-builds-pve-dps
+Raid - Spearhead / T29 Single Target Build:
+  - talents=B8PAAAAAAAAAAAAAAAAAAAAAAIhWaBJBKBBJkEJkIEJhkkAAAAAABRRoJkIBhgCAAAAA
+Raid - Coordinated Assault Single Target Build:
+  - talents=B8PAAAAAAAAAAAAAAAAAAAAAAIhWahkEoEEkEJRChQkkWECAAAAAEEFhmQiEECKAAAAAA
+Raid - No CD Single Target Build:
+  - talents=B8PAAAAAAAAAAAAAAAAAAAAAAIhWaBJBKBBJRSkE5ACRSQiAAAAAABRRoJkIBhgCAAAAA
+Mythic+ - No CD AoE Build:
+  - talents=B8PAAAAAAAAAAAAAAAAAAAAAA4ABaBJRoEEkkkkWSCQkEkIAAAAAQEpUkiGkIhESoAAAAAA
+Mythic+ - Coordinated Assault AoE Build:
+  - talents=B8PAAAAAAAAAAAAAAAAAAAAAA4ABahkEhSQgkkkWiAEJpEhAAAAAARkSRKaQiESIhCAAAAA
+# Icy Veins Builds
+# https://www.icy-veins.com/wow/survival-hunter-pve-dps-mythic-plus-guide
+M+ Build - Bomb + KC:
+  - talents=B8PAAAAAAAAAAAAAAAAAAAAAA4ABahkAKBBSSSaJgDIRSKRiAAAAAAREFpo5AkIhESoAAAAAA
