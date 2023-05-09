@@ -75,7 +75,7 @@ def create_simc_profile_path(wow_spec: WowSpec, tier: str, executable_path: str)
     )
 
     logger.debug(
-        f"Created simc_profile_path for {tier} of {wow_spec} is '{base_profile_string}'."
+        f"Created simc_profile_path for Tier {tier} of {wow_spec} is '{base_profile_string}'."
     )
     return base_profile_string
 
@@ -97,7 +97,7 @@ def create_fallback_profile_path(wow_spec: WowSpec, tier: str, fight_style: str)
     )
 
     logger.debug(
-        f"Created fall_back_profile_path for {tier} of {wow_spec} is '{fallback_profile_path}'"
+        f"Created fall_back_profile_path for Tier {tier} of {wow_spec} is '{fallback_profile_path}'"
     )
     return fallback_profile_path
 
