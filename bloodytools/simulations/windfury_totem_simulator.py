@@ -13,7 +13,7 @@ from simc_support.game_data.Stat import Stat
 logger = logging.getLogger(__name__)
 
 ENHANCEMENT_EXTERNAL_WINDFURY: typing.List[str] = [
-    "spec_talents+=/windfury_totem:0/elemental_assault:1"
+    "spec_talents+=/windfury_totem:0/swirling_maelstrom:1"
 ]
 """List of simc arguments to properly communicate how an Enhancement profile performs if given an external Windfury Totem."""
 
