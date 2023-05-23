@@ -1,7 +1,3 @@
-"""
-https://github.com/WarcraftPriests/df-shadow-priest/blob/main/trinkets/other.simc#L40-L58
-"""
-
 import logging
 import typing
 
@@ -16,6 +12,7 @@ from simc_support.game_data.Trinket import (
 from simc_support.game_data.WowSpec import WowSpec
 from simc_support.game_data.Season import Season
 from simc_support.game_data.Source import Source
+from simc_support.game_data.ItemLevel import _champion, _hero
 
 logger = logging.getLogger(__name__)
 
@@ -159,7 +156,7 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
         for season in trinket.seasons:
             if season in allowed_season and trinket not in new_trinket_list:
                 logger.debug(
-                    f"Adding {trinket.full_name} to the list. It's seasons: {trinket.seasons}"
+                    f"Adding {trinket.full_name} to the list. Its seasons: {trinket.seasons}"
                 )
                 new_trinket_list.append(trinket)
 
@@ -189,6 +186,45 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
 
 def _get_second_trinket(wow_spec: WowSpec) -> Trinket:
     return get_versatility_trinket(wow_spec.stat)
+
+
+def _get_reduced_itemlevel_list(trinket: Trinket, settings: Config) -> typing.List[int]:
+    # _champion = [415, 418, 421, 424, 428, 431, 434, 437]
+    # _hero = [428, 431, 434, 437, 441]
+    allowed_champion_itemlevels = [_champion[0], _champion[3], _champion[-1]]
+    allowed_hero_itemlevels = [_hero[0], _hero[-1]]
+
+    # for each available itemlevel of the trinket
+    itemlevels = [i for i in trinket.itemlevels if _is_valid_itemlevel(i, settings)]
+    if trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
+        itemlevels = [M0_ITEMLEVEL, *PREVIOUS_SEASON_ITEMLEVELS]
+
+    # filter out champion and hero itemlevels
+    if all((ilvl in itemlevels for ilvl in _champion)):
+        itemlevels = [ilvl for ilvl in itemlevels if ilvl not in _champion]
+        itemlevels += allowed_champion_itemlevels
+    if all((ilvl in itemlevels for ilvl in _hero)):
+        itemlevels = [ilvl for ilvl in itemlevels if ilvl not in _hero]
+        itemlevels += allowed_hero_itemlevels
+    itemlevels = sorted(itemlevels)
+
+    # weed out every other itemlevel, except first and last
+    if len(itemlevels) > 10:
+        first = itemlevels[0]
+        last = itemlevels[-1]
+        filtered_itemlevels = [level for i, level in enumerate(itemlevels, 1) if i % 2]
+        if last not in filtered_itemlevels:
+            filtered_itemlevels = [first] + [
+                level for i, level in enumerate(itemlevels, 1) if (i + 1) % 2
+            ]
+        if first not in filtered_itemlevels or last not in filtered_itemlevels:
+            raise ValueError(
+                "Somehow first or last valid itemlevel are missing the generated filtered_itemlevels."
+            )
+    else:
+        filtered_itemlevels = itemlevels
+
+    return filtered_itemlevels
 
 
 class TrinketSimulator(Simulator):
@@ -299,29 +335,7 @@ class TrinketSimulator(Simulator):
         simulation_group.add(simulation_data)
 
         for trinket in trinket_list:
-            # for each available itemlevel of the trinket
-            itemlevels = [
-                i for i in trinket.itemlevels if _is_valid_itemlevel(i, self.settings)
-            ]
-            if trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
-                itemlevels = [M0_ITEMLEVEL, *PREVIOUS_SEASON_ITEMLEVELS]
-            # weed out every other itemlevel, except first and last
-            if len(itemlevels) > 10:
-                first = itemlevels[0]
-                last = itemlevels[-1]
-                filtered_itemlevels = [
-                    level for i, level in enumerate(itemlevels, 1) if i % 2
-                ]
-                if last not in filtered_itemlevels:
-                    filtered_itemlevels = [first] + [
-                        level for i, level in enumerate(itemlevels, 1) if (i + 1) % 2
-                    ]
-                if first not in filtered_itemlevels or last not in filtered_itemlevels:
-                    raise ValueError(
-                        "Somehow first or last valid itemlevel are missing the generated filtered_itemlevels."
-                    )
-            else:
-                filtered_itemlevels = itemlevels
+            filtered_itemlevels = _get_reduced_itemlevel_list(trinket, self.settings)
 
             for itemlevel in filtered_itemlevels:
                 simulation_data = Simulation_Data(
