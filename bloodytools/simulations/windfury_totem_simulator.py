@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 
 ENHANCEMENT_EXTERNAL_WINDFURY: typing.Dict[str, typing.List[str]] = {
     "castingpatchwerk": ["spec_talents+=/windfury_totem:0/swirling_maelstrom:1"],
-    "castingpatchwerk3": [],
-    "castingpatchwerk5": [],
+    "castingpatchwerk3": ["spec_talents+=/windfury_totem:0/forceful_winds:1"],
+    "castingpatchwerk5": ["spec_talents+=/windfury_totem:0/forceful_winds:1"],
 }
 """List of simc arguments to properly communicate how an Enhancement profile performs if given an external Windfury Totem."""
 
