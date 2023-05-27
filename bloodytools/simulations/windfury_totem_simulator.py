@@ -2,9 +2,10 @@ import enum
 import logging
 import typing
 
-from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from bloodytools.simulations.simulator import Simulator
-from bloodytools.utils.utils import create_base_json_dict, get_profile
+from bloodytools.utils.profile_extraction import get_profile
+from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
+from bloodytools.utils.utils import create_base_json_dict
 from simc_support.game_data.WowSpec import WOWSPECS, ENHANCEMENT
 from simc_support.game_data.Role import Role
 from simc_support.game_data.Stat import Stat
@@ -12,12 +13,18 @@ from simc_support.game_data.Stat import Stat
 
 logger = logging.getLogger(__name__)
 
-ENHANCEMENT_EXTERNAL_WINDFURY: typing.List[str] = [
-    "spec_talents+=/windfury_totem:0/swirling_maelstrom:1"
-]
+ENHANCEMENT_EXTERNAL_WINDFURY: typing.Dict[str, typing.List[str]] = {
+    "castingpatchwerk": ["spec_talents+=/windfury_totem:0/swirling_maelstrom:1"],
+    "castingpatchwerk3": [],
+    "castingpatchwerk5": [],
+}
 """List of simc arguments to properly communicate how an Enhancement profile performs if given an external Windfury Totem."""
 
-ENHANCEMENT_OWN_WINDFURY: typing.List[str] = []
+ENHANCEMENT_OWN_WINDFURY: typing.Dict[str, typing.List[str]] = {
+    "castingpatchwerk": [],
+    "castingpatchwerk3": [],
+    "castingpatchwerk5": [],
+}
 """List of simc arguments to properly communicate how an Enhancement profile performs if they have to cast Windfury Totem on their own."""
 
 
@@ -157,15 +164,19 @@ class WindfuryTotemSimulator(Simulator):
                 if (
                     melee_spec == ENHANCEMENT
                     and windfury_name == "windfury"
-                    and ENHANCEMENT_EXTERNAL_WINDFURY
+                    and ENHANCEMENT_EXTERNAL_WINDFURY.get(self.fight_style.lower(), [])
                 ):
-                    windfury_override.append(*ENHANCEMENT_EXTERNAL_WINDFURY)
+                    windfury_override.append(
+                        *ENHANCEMENT_EXTERNAL_WINDFURY[self.fight_style.lower()]
+                    )
                 if (
                     melee_spec == ENHANCEMENT
                     and windfury_name == "no windfury"
-                    and ENHANCEMENT_OWN_WINDFURY
+                    and ENHANCEMENT_OWN_WINDFURY.get(self.fight_style.lower(), [])
                 ):
-                    windfury_override.append(*ENHANCEMENT_OWN_WINDFURY)
+                    windfury_override.append(
+                        *ENHANCEMENT_OWN_WINDFURY[self.fight_style.lower()]
+                    )
 
                 full_spec_name = " ".join(
                     [melee_spec.full_name, melee_spec.wow_class.full_name]
