@@ -254,6 +254,8 @@ def extract_profile(path: str, wow_class: WowClass) -> dict:
         "gear_versatility_rating",
         "deathknight.ams_absorb_percent",
         "deathknight.amz_absorb_percent",
+        "dragonflight.ominous_chromatic_essence_dragonflight",
+        "dragonflight.ominous_chromatic_essence_allies",
     ]
     clean_character_specifics = {
         r"set_bonus=[\"']?tier28_2pc[\"']?": "set_bonus=tier28_2pc",
