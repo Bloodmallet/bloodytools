@@ -77,27 +77,42 @@ SPECIAL_CASE_SIMC_OPTIONS: typing.Dict[
         "crit": "dragonflight.player.ruby_whelp_shell_training=sleepy_ruby_warmth:6",
     },
     203729: {  # Ominous Chromatic Essence
-        "obsidian": "dragonflight.ominous_chromatic_essence_dragonflight=obsidian",
+        "obsidian": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=obsidian",
+            "dragonflight.ominous_chromatic_essence_allies=",
+        ],
         "obsidian+all": [
             "dragonflight.ominous_chromatic_essence_dragonflight=obsidian",
             "dragonflight.ominous_chromatic_essence_allies=ruby/bronze/azure/emerald",
         ],
-        "ruby": "dragonflight.ominous_chromatic_essence_dragonflight=ruby",
+        "ruby": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=ruby",
+            "dragonflight.ominous_chromatic_essence_allies=",
+        ],
         "ruby+all": [
             "dragonflight.ominous_chromatic_essence_dragonflight=ruby",
             "dragonflight.ominous_chromatic_essence_allies=obsidian/bronze/azure/emerald",
         ],
-        "bronze": "dragonflight.ominous_chromatic_essence_dragonflight=bronze",
+        "bronze": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=bronze",
+            "dragonflight.ominous_chromatic_essence_allies=",
+        ],
         "bronze+all": [
             "dragonflight.ominous_chromatic_essence_dragonflight=bronze",
             "dragonflight.ominous_chromatic_essence_allies=obsidian/ruby/azure/emerald",
         ],
-        "azure": "dragonflight.ominous_chromatic_essence_dragonflight=azure",
+        "azure": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=azure",
+            "dragonflight.ominous_chromatic_essence_allies=",
+        ],
         "azure+all": [
             "dragonflight.ominous_chromatic_essence_dragonflight=azure",
             "dragonflight.ominous_chromatic_essence_allies=obsidian/ruby/bronze/emerald",
         ],
-        "emerald": "dragonflight.ominous_chromatic_essence_dragonflight=emerald",
+        "emerald": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=emerald",
+            "dragonflight.ominous_chromatic_essence_allies=",
+        ],
         "emerald+all": [
             "dragonflight.ominous_chromatic_essence_dragonflight=emerald",
             "dragonflight.ominous_chromatic_essence_allies=obsidian/ruby/bronze/azure",
