@@ -9,7 +9,7 @@ from simc_support.game_data.Trinket import (
     get_trinkets_for_spec,
     get_versatility_trinket,
 )
-from simc_support.game_data.WowSpec import WowSpec
+from simc_support.game_data.WowSpec import WowSpec, get_wow_spec
 from simc_support.game_data.Season import Season
 from simc_support.game_data.Source import Source
 from simc_support.game_data.ItemLevel import _champion, _hero
@@ -164,9 +164,12 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     # get main-trinkets
     trinket_list = list(get_trinkets_for_spec(wow_spec))
 
-    allowed_season = [Season.SEASON_1, Season.SEASON_2]
+    allowed_season = [
+        Season.SEASON_1,
+        Season.SEASON_2,
+    ]
 
-    new_trinket_list = []
+    new_trinket_list: typing.List[Trinket] = []
     for trinket in trinket_list:
         for season in trinket.seasons:
             if season in allowed_season and trinket not in new_trinket_list:
@@ -186,8 +189,11 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
         t for t in trinket_list if str(t.item_id) not in NON_DPS_TRINKET_IDS
     ]
 
+    # remove old season pvp items
+    trinket_list = [t for t in trinket_list if "Crimson Combatant's" not in t.full_name]
+
     # remove lower pvp trinkets
-    trinket_list = [t for t in trinket_list if t != Source.LOW_PVP]
+    trinket_list = [t for t in trinket_list if t.source != Source.LOW_PVP]
 
     # add special case trinkets
     special_trinkets = [
@@ -203,7 +209,9 @@ def _get_second_trinket(wow_spec: WowSpec) -> Trinket:
     return get_versatility_trinket(wow_spec.stat)
 
 
-def _get_reduced_itemlevel_list(trinket: Trinket, settings: Config) -> typing.List[int]:
+def _get_reduced_itemlevel_list(
+    trinket: Trinket, wow_spec: WowSpec, settings: Config
+) -> typing.List[int]:
     # _champion = [415, 418, 421, 424, 428, 431, 434, 437]
     # _hero = [428, 431, 434, 437, 441]
     allowed_champion_itemlevels = [_champion[0], _champion[3], _champion[-1]]
@@ -222,6 +230,13 @@ def _get_reduced_itemlevel_list(trinket: Trinket, settings: Config) -> typing.Li
         itemlevels = [ilvl for ilvl in itemlevels if ilvl not in _hero]
         itemlevels += allowed_hero_itemlevels
     itemlevels = sorted(itemlevels)
+
+    # remove unobtainable itemlevels
+    blood_dk = get_wow_spec("Death Knight", "Blood")
+    if wow_spec == blood_dk and trinket.item_id == 133641:
+        itemlevels = [
+            ilevel for ilevel in itemlevels if ilevel <= min(PREVIOUS_SEASON_ITEMLEVELS)
+        ]
 
     # weed out every other itemlevel, except first and last
     if len(itemlevels) > 10:
@@ -350,7 +365,9 @@ class TrinketSimulator(Simulator):
         simulation_group.add(simulation_data)
 
         for trinket in trinket_list:
-            filtered_itemlevels = _get_reduced_itemlevel_list(trinket, self.settings)
+            filtered_itemlevels = _get_reduced_itemlevel_list(
+                trinket, self.wow_spec, self.settings
+            )
 
             for itemlevel in filtered_itemlevels:
                 simulation_data = Simulation_Data(
