@@ -949,298 +949,246 @@ class Simulation_Group:
         if not hasattr(self, "session"):
             self.session = requests.Session()
 
-        if self.profiles:
-            self.set_simulation_start_time()
-
-            if len(self.profiles) == 1:
-                # if only one profiles is in the group this profile is simulated normally
-                try:
-                    self.profiles[0].simulate()
-                except Exception as e:
-                    raise e
-
-            elif len(self.profiles) >= 2:
-                # write data to file, create file name
-                if self.filename:
-                    raise AlreadySetError(
-                        "Filename '{}' was already set for the simulation_group. You probably tried to simulate the same group twice.".format(
-                            self.filename
-                        )
-                    )
-                else:
-                    if (
-                        FightStyle.CASTINGPATCHWERK in self.profiles[0].fight_style
-                        and FightStyle.CASTINGPATCHWERK != self.profiles[0].fight_style
-                    ):
-                        simc_fight_style = FightStyle.CASTINGPATCHWERK
-                        special_remark = (
-                            "desired_targets=" + self.profiles[0].fight_style[-1]
-                        )
-                    else:
-                        simc_fight_style = self.profiles[0].fight_style
-                        special_remark = ""
-
-                    self.filename = str(uuid.uuid4()) + ".simc"
-
-                    # if somehow the random naming function created the same name twice
-                    if os.path.isfile(self.filename):
-                        logger.debug(
-                            "Somehow the random filename generator generated a name ('{}') that is already on use.".format(
-                                self.filename
-                            )
-                        )
-                        self.filename = str(uuid.uuid4()) + ".simc"
-                    # write arguments to file
-                    with open(self.filename, "w") as f:
-                        # write the equal values to file
-                        f.write(
-                            "default_actions={}\n".format(
-                                self.profiles[0].default_actions
-                            )
-                        )
-                        f.write(
-                            "default_skill={}\n".format(self.profiles[0].default_skill)
-                        )
-                        f.write(f"fight_style={simc_fight_style}\n")
-                        f.write(f"{special_remark}\n")
-                        f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
-                        f.write("iterations={}\n".format(self.profiles[0].iterations))
-                        f.write(
-                            "optimize_expressions={}\n".format(
-                                self.profiles[0].optimize_expressions
-                            )
-                        )
-                        if int(self.profiles[0].ptr) == 1:
-                            f.write("ptr={}\n".format(self.profiles[0].ptr))
-                        f.write(
-                            "target_error={}\n".format(self.profiles[0].target_error)
-                        )
-
-                        # write all specific arguments to file
-                        for profile in self.profiles:
-                            # first used profile needs to be written as normal profile instead of profileset
-                            if profile == self.profiles[0]:
-                                logger.debug(
-                                    "simc_arguments of first profile of simulation_group"
-                                )
-                                logger.debug(profile.simc_arguments)
-                                for argument in profile.simc_arguments:
-                                    f.write("{}\n".format(argument))
-                                f.write(
-                                    'name="{}"\n\n# Profileset start\n'.format(
-                                        profile.name
-                                    )
-                                )
-                                # or else in wrong scope
-                                f.write(
-                                    "ready_trigger={}\n".format(
-                                        self.profiles[0].ready_trigger
-                                    )
-                                )
-
-                            else:
-                                from simc_support.game_data.WowClass import WOWCLASSES
-
-                                simc_wow_class_names = [
-                                    wow_class.simc_name.replace("_", "")
-                                    for wow_class in WOWCLASSES
-                                ]
-                                filtered_arguments = [
-                                    arg
-                                    for arg in profile.simc_arguments
-                                    if arg.split("=")[0] not in simc_wow_class_names
-                                ]
-                                for argument in filtered_arguments:
-                                    f.write(
-                                        'profileset."{profile_name}"+={argument}\n'.format(
-                                            profile_name=profile.name,
-                                            argument=argument,
-                                        )
-                                    )
-
-                                # add iterations hack
-                                # f.write("profileset.\"{profile_name}\"+=iterations={iterations}\n".format(profile_name=profile.name, iterations=self.profiles[0].iterations))
-
-                    # create advanced input string
-                    raidbots_advancedInput = ""
-                    with open(self.filename, "r") as f:
-                        for line in f:
-                            raidbots_advancedInput += line
-
-                    logger.debug(raidbots_advancedInput)
-
-                    raidbots_response = r(
-                        "https://www.raidbots.com/sim",
-                        apikey=apikey,
-                        data=raidbots_advancedInput,
-                        session=self.session,
-                    )
-
-                    logger.debug(raidbots_response)
-
-                    raidbots_sim_id = raidbots_response["simId"]
-
-                    # monitor simulation progress
-                    logger.info(
-                        "Simulation of {} is underway. Please wait".format(self.name)
-                    )
-
-                    time.sleep(4)
-
-                    # simulation progress
-                    try:
-                        progress = r(
-                            f"https://www.raidbots.com/api/job/{raidbots_sim_id}",
-                            session=self.session,
-                        )
-                    except Exception as e:
-                        logger.error(e)
-                        progress = {"job": {"state": ""}, "retriesRemaining": 8}
-
-                    # not a proper back off in this case, due to the progress of a simulation not being properly monitorable with exponential backoff
-                    backoff = 0
-                    while (
-                        not progress["job"]["state"] == "complete"
-                        and 10 * backoff < 3600
-                    ):
-                        # backoff
-                        time.sleep(10)
-                        backoff += 1
-
-                        try:
-                            progress = r(
-                                f"https://www.raidbots.com/api/job/{raidbots_sim_id}",
-                                session=self.session,
-                            )
-                        except requests.exceptions.HTTPError as e:
-                            logger.error(e)
-                            backoff += 360
-
-                        logger.info(
-                            "{} progress {}%".format(
-                                self.name, progress["job"]["progress"]
-                            )
-                        )
-                        logger.debug(progress)
-
-                        if (
-                            progress["job"]["state"] == "failed"
-                            and int(progress["retriesRemaining"]) <= 0
-                        ):
-                            break
-
-                    if (
-                        progress["job"]["state"] == "failed"
-                        and int(progress["retriesRemaining"]) <= 0
-                    ):
-                        raise SimulationError("Simulation failed. No Retries possible.")
-
-                    logger.info(
-                        "Simulating {} is done. Fetching data.".format(self.name)
-                    )
-
-                    # simulation is done, get data
-                    raidbots_data = r(
-                        f"https://www.raidbots.com/reports/{raidbots_sim_id}/data.json",
-                        session=self.session,
-                    )
-
-                    logger.info("Fetching data for {} succeeded.".format(self.name))
-                    logger.debug(f"{raidbots_data}")
-
-                    # if too many profilesets were simulated, get the full json
-                    if "hasFullJson" in raidbots_data["simbot"]:
-                        if raidbots_data["simbot"]["hasFullJson"]:
-                            # simulation is done, get data
-                            raidbots_data = r(
-                                f"https://www.raidbots.com/reports/{raidbots_sim_id}/data.full.json",
-                                session=self.session,
-                            )
-                            logger.info(
-                                "Fetching data for {} succeeded.".format(self.name)
-                            )
-                            logger.debug(f"{raidbots_data}")
-
-                    # if simulation failed
-                    if progress["job"]["state"] == "failed":
-                        logger.info("Job failed. Collecting information.")
-
-                        raidbots_input = r(
-                            f"https://www.raidbots.com/reports/{raidbots_sim_id}/input.txt",
-                            session=self.session,
-                        )
-
-                        logger.debug(
-                            "Fetching input data for {} succeeded.".format(self.name)
-                        )
-                        logger.debug(raidbots_input)
-
-                        raidbots_output = r(
-                            f"https://www.raidbots.com/reports/{raidbots_sim_id}/output.txt",
-                            session=self.session,
-                        )
-                        logger.debug(
-                            "Fetching output data for {} succeeded.".format(self.name)
-                        )
-                        logger.debug(raidbots_output)
-
-                        with open("{}.error".format(raidbots_sim_id), "w") as f:
-                            f.write("############## INPUT #############\n")
-                            f.write(json.dumps(raidbots_advancedInput))
-                            f.write("\n\n############# RECEIVED ###########\n")
-                            f.write(json.dumps(raidbots_input))
-                            f.write("\n\n############# OUTPUT #############\n")
-                            f.write(json.dumps(raidbots_output))
-
-                            try:
-                                f.write(
-                                    "\n\n############## DATA ##############\n{}".format(
-                                        json.dumps(
-                                            raidbots_data, sort_keys=True, indent=4
-                                        )
-                                    )
-                                )
-                            except Exception:
-                                f.write(
-                                    "\n\n############## DATA ##############\nNo data available.\n"
-                                )
-
-                        raise SimulationError(
-                            "Simulating with Raidbots failed. Please check out {}.error file.".format(
-                                raidbots_sim_id
-                            )
-                        )
-
-                    if self.remove_files:
-                        # remove profilesets file
-                        os.remove(self.filename)
-                        self.filename = ""
-
-                    try:
-                        simc_hash = raidbots_data["git_revision"]
-                    except Exception:
-                        logger.error("'git_revision' not found in raidbots answer.")
-                        simc_hash = ""
-
-                    # set basic profile dps
-                    self.set_json_data(raidbots_data)
-
-            else:
-                raise NotSetYetError(
-                    "No profiles were added to this simulation_group yet. Nothing can be simulated."
-                )
-
-            self.set_simulation_end_time()
-
-            if self.sg_simulation_end_time and self.sg_simulation_start_time:
-                logger.debug(
-                    "Simulation time: {}.".format(
-                        self.sg_simulation_end_time - self.sg_simulation_start_time
-                    )
-                )
-
-        else:
+        if not self.profiles:
             return ""
+
+        self.set_simulation_start_time()
+
+        # write data to file, create file name
+        if self.filename:
+            raise AlreadySetError(
+                "Filename '{}' was already set for the simulation_group. You probably tried to simulate the same group twice.".format(
+                    self.filename
+                )
+            )
+
+        if (
+            FightStyle.CASTINGPATCHWERK in self.profiles[0].fight_style
+            and FightStyle.CASTINGPATCHWERK != self.profiles[0].fight_style
+        ):
+            simc_fight_style = FightStyle.CASTINGPATCHWERK
+            special_remark = "desired_targets=" + self.profiles[0].fight_style[-1]
+        else:
+            simc_fight_style = self.profiles[0].fight_style
+            special_remark = ""
+
+        self.filename = str(uuid.uuid4()) + ".simc"
+
+        # if somehow the random naming function created the same name twice
+        if os.path.isfile(self.filename):
+            logger.debug(
+                "Somehow the random filename generator generated a name ('{}') that is already on use.".format(
+                    self.filename
+                )
+            )
+            self.filename = str(uuid.uuid4()) + ".simc"
+        # write arguments to file
+        with open(self.filename, "w") as f:
+            # write the equal values to file
+            f.write("default_actions={}\n".format(self.profiles[0].default_actions))
+            f.write("default_skill={}\n".format(self.profiles[0].default_skill))
+            f.write(f"fight_style={simc_fight_style}\n")
+            f.write(f"{special_remark}\n")
+            f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
+            f.write("iterations={}\n".format(self.profiles[0].iterations))
+            f.write(
+                "optimize_expressions={}\n".format(
+                    self.profiles[0].optimize_expressions
+                )
+            )
+            if int(self.profiles[0].ptr) == 1:
+                f.write("ptr={}\n".format(self.profiles[0].ptr))
+            f.write("target_error={}\n".format(self.profiles[0].target_error))
+
+            # write all specific arguments to file
+            for profile in self.profiles:
+                # first used profile needs to be written as normal profile instead of profileset
+                if profile == self.profiles[0]:
+                    logger.debug("simc_arguments of first profile of simulation_group")
+                    logger.debug(profile.simc_arguments)
+                    for argument in profile.simc_arguments:
+                        f.write("{}\n".format(argument))
+                    f.write('name="{}"\n\n# Profileset start\n'.format(profile.name))
+                    # or else in wrong scope
+                    f.write("ready_trigger={}\n".format(self.profiles[0].ready_trigger))
+
+                else:
+                    from simc_support.game_data.WowClass import WOWCLASSES
+
+                    simc_wow_class_names = [
+                        wow_class.simc_name.replace("_", "") for wow_class in WOWCLASSES
+                    ]
+                    filtered_arguments = [
+                        arg
+                        for arg in profile.simc_arguments
+                        if arg.split("=")[0] not in simc_wow_class_names
+                    ]
+                    for argument in filtered_arguments:
+                        f.write(
+                            'profileset."{profile_name}"+={argument}\n'.format(
+                                profile_name=profile.name,
+                                argument=argument,
+                            )
+                        )
+
+                    # add iterations hack
+                    # f.write("profileset.\"{profile_name}\"+=iterations={iterations}\n".format(profile_name=profile.name, iterations=self.profiles[0].iterations))
+
+        # create advanced input string
+        raidbots_advancedInput = ""
+        with open(self.filename, "r") as f:
+            for line in f:
+                raidbots_advancedInput += line
+
+        logger.debug(raidbots_advancedInput)
+
+        raidbots_response = r(
+            "https://www.raidbots.com/sim",
+            apikey=apikey,
+            data=raidbots_advancedInput,
+            session=self.session,
+        )
+
+        logger.debug(raidbots_response)
+
+        raidbots_sim_id = raidbots_response["simId"]
+
+        # monitor simulation progress
+        logger.info("Simulation of {} is underway. Please wait".format(self.name))
+
+        time.sleep(4)
+
+        # simulation progress
+        try:
+            progress = r(
+                f"https://www.raidbots.com/api/job/{raidbots_sim_id}",
+                session=self.session,
+            )
+        except Exception as e:
+            logger.error(e)
+            progress = {"job": {"state": ""}, "retriesRemaining": 8}
+
+        # not a proper back off in this case, due to the progress of a simulation not being properly monitorable with exponential backoff
+        backoff = 0
+        while not progress["job"]["state"] == "complete" and 10 * backoff < 3600:
+            # backoff
+            time.sleep(10)
+            backoff += 1
+
+            try:
+                progress = r(
+                    f"https://www.raidbots.com/api/job/{raidbots_sim_id}",
+                    session=self.session,
+                )
+            except requests.exceptions.HTTPError as e:
+                logger.error(e)
+                backoff += 360
+
+            logger.info(
+                "{} progress {}%".format(self.name, progress["job"]["progress"])
+            )
+            logger.debug(progress)
+
+            if (
+                progress["job"]["state"] == "failed"
+                and int(progress["retriesRemaining"]) <= 0
+            ):
+                break
+
+        if (
+            progress["job"]["state"] == "failed"
+            and int(progress["retriesRemaining"]) <= 0
+        ):
+            raise SimulationError("Simulation failed. No Retries possible.")
+
+        logger.info("Simulating {} is done. Fetching data.".format(self.name))
+
+        # simulation is done, get data
+        raidbots_data = r(
+            f"https://www.raidbots.com/reports/{raidbots_sim_id}/data.json",
+            session=self.session,
+        )
+
+        logger.info("Fetching data for {} succeeded.".format(self.name))
+        logger.debug(f"{raidbots_data}")
+
+        # if too many profilesets were simulated, get the full json
+        if "hasFullJson" in raidbots_data["simbot"]:
+            if raidbots_data["simbot"]["hasFullJson"]:
+                # simulation is done, get data
+                raidbots_data = r(
+                    f"https://www.raidbots.com/reports/{raidbots_sim_id}/data.full.json",
+                    session=self.session,
+                )
+                logger.info("Fetching data for {} succeeded.".format(self.name))
+                logger.debug(f"{raidbots_data}")
+
+        # if simulation failed
+        if progress["job"]["state"] == "failed":
+            logger.info("Job failed. Collecting information.")
+
+            raidbots_input = r(
+                f"https://www.raidbots.com/reports/{raidbots_sim_id}/input.txt",
+                session=self.session,
+            )
+
+            logger.debug("Fetching input data for {} succeeded.".format(self.name))
+            logger.debug(raidbots_input)
+
+            raidbots_output = r(
+                f"https://www.raidbots.com/reports/{raidbots_sim_id}/output.txt",
+                session=self.session,
+            )
+            logger.debug("Fetching output data for {} succeeded.".format(self.name))
+            logger.debug(raidbots_output)
+
+            with open("{}.error".format(raidbots_sim_id), "w") as f:
+                f.write("############## INPUT #############\n")
+                f.write(json.dumps(raidbots_advancedInput))
+                f.write("\n\n############# RECEIVED ###########\n")
+                f.write(json.dumps(raidbots_input))
+                f.write("\n\n############# OUTPUT #############\n")
+                f.write(json.dumps(raidbots_output))
+
+                try:
+                    f.write(
+                        "\n\n############## DATA ##############\n{}".format(
+                            json.dumps(raidbots_data, sort_keys=True, indent=4)
+                        )
+                    )
+                except Exception:
+                    f.write(
+                        "\n\n############## DATA ##############\nNo data available.\n"
+                    )
+
+            raise SimulationError(
+                "Simulating with Raidbots failed. Please check out {}.error file.".format(
+                    raidbots_sim_id
+                )
+            )
+
+        if self.remove_files:
+            # remove profilesets file
+            os.remove(self.filename)
+            self.filename = ""
+
+        try:
+            simc_hash = raidbots_data["git_revision"]
+        except Exception:
+            logger.error("'git_revision' not found in raidbots answer.")
+            simc_hash = ""
+
+        # set basic profile dps
+        self.set_json_data(raidbots_data)
+
+        self.set_simulation_end_time()
+
+        if self.sg_simulation_end_time and self.sg_simulation_start_time:
+            logger.debug(
+                "Simulation time: {}.".format(
+                    self.sg_simulation_end_time - self.sg_simulation_start_time
+                )
+            )
 
         return simc_hash
 
@@ -1257,9 +1205,10 @@ class Simulation_Group:
         )
         logger.debug("Set dps for baseprofile.")
 
-        for profile in data["sim"]["profilesets"]["results"]:
-            logger.debug("Setting dps for {}".format(profile["name"]))
-            self.set_dps_of(profile["name"], profile["mean"])
+        if "profilesets" in data["sim"]:
+            for profile in data["sim"]["profilesets"]["results"]:
+                logger.debug("Setting dps for {}".format(profile["name"]))
+                self.set_dps_of(profile["name"], profile["mean"])
 
     def add(self, simulation_instance: Simulation_Data) -> bool:
         """Add another simulation_instance object to the group.
