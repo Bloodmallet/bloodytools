@@ -1020,6 +1020,10 @@ class Simulation_Group:
                         for profile in self.profiles:
                             # first used profile needs to be written as normal profile instead of profileset
                             if profile == self.profiles[0]:
+                                logger.debug(
+                                    "simc_arguments of first profile of simulation_group"
+                                )
+                                logger.debug(profile.simc_arguments)
                                 for argument in profile.simc_arguments:
                                     f.write("{}\n".format(argument))
                                 f.write(
@@ -1035,13 +1039,25 @@ class Simulation_Group:
                                 )
 
                             else:
-                                for special_argument in profile.simc_arguments:
+                                from simc_support.game_data.WowClass import WOWCLASSES
+
+                                simc_wow_class_names = [
+                                    wow_class.simc_name.replace("_", "")
+                                    for wow_class in WOWCLASSES
+                                ]
+                                filtered_arguments = [
+                                    arg
+                                    for arg in profile.simc_arguments
+                                    if arg.split("=")[0] not in simc_wow_class_names
+                                ]
+                                for argument in filtered_arguments:
                                     f.write(
                                         'profileset."{profile_name}"+={argument}\n'.format(
                                             profile_name=profile.name,
-                                            argument=special_argument,
+                                            argument=argument,
                                         )
                                     )
+
                                 # add iterations hack
                                 # f.write("profileset.\"{profile_name}\"+=iterations={iterations}\n".format(profile_name=profile.name, iterations=self.profiles[0].iterations))
 
@@ -1195,9 +1211,10 @@ class Simulation_Group:
                             )
                         )
 
-                    # remove profilesets file
-                    os.remove(self.filename)
-                    self.filename = ""
+                    if self.remove_files:
+                        # remove profilesets file
+                        os.remove(self.filename)
+                        self.filename = ""
 
                     try:
                         simc_hash = raidbots_data["git_revision"]
