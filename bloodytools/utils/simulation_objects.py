@@ -690,31 +690,41 @@ class Simulation_Group:
         """
         return self.simulate_with_profilesets()
 
-    def write_profileset_file(self, fight_style: str, special_remark: str) -> None:
+    def write_profileset_file(
+        self, fight_style: str, special_remark: str, local_simulation: bool = True
+    ) -> None:
         # write arguments to file
         with open(self.filename, "w") as f:
             # write the equal values to file
-            f.write("json={}\n".format(self.json_filename))
-            f.write(
-                "calculate_scale_factors={}\n".format(
-                    self.profiles[0].calculate_scale_factors
+            # local
+            if local_simulation:
+                f.write("json={}\n".format(self.json_filename))
+                if self.profiles[0].html != "":
+                    f.write("html={}\n".format(self.profiles[0].html))
+                f.write("log={}\n".format(self.profiles[0].log))
+                f.write(
+                    "calculate_scale_factors={}\n".format(
+                        self.profiles[0].calculate_scale_factors
+                    )
                 )
-            )
-            f.write("profileset_metric={}\n".format(",".join(["dps"])))
-            f.write(
-                "calculate_scale_factors={}\n".format(
-                    self.profiles[0].calculate_scale_factors
+                f.write("profileset_metric={}\n".format(",".join(["dps"])))
+                f.write(
+                    "calculate_scale_factors={}\n".format(
+                        self.profiles[0].calculate_scale_factors
+                    )
                 )
-            )
+                f.write("threads={}\n".format(self.threads))
+                f.write(
+                    "profileset_work_threads={}\n".format(self.profileset_work_threads)
+                )
+
+            # general
             f.write("default_actions={}\n".format(self.profiles[0].default_actions))
             f.write("default_skill={}\n".format(self.profiles[0].default_skill))
             f.write(f"fight_style={fight_style}\n")
             f.write(f"{special_remark}\n")
             f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
-            if self.profiles[0].html != "":
-                f.write("html={}\n".format(self.profiles[0].html))
             f.write("iterations={}\n".format(self.profiles[0].iterations))
-            f.write("log={}\n".format(self.profiles[0].log))
             f.write(
                 "optimize_expressions={}\n".format(
                     self.profiles[0].optimize_expressions
@@ -723,8 +733,6 @@ class Simulation_Group:
             if int(self.profiles[0].ptr) == 1:
                 f.write("ptr={}\n".format(self.profiles[0].ptr))
             f.write("target_error={}\n".format(self.profiles[0].target_error))
-            f.write("threads={}\n".format(self.threads))
-            f.write("profileset_work_threads={}\n".format(self.profileset_work_threads))
 
             # write first profile
             logger.debug("simc_arguments of first profile of simulation_group")
@@ -752,6 +760,15 @@ class Simulation_Group:
                             argument=argument,
                         )
                     )
+
+                # add iterations hack
+                # if not local_simulation:
+                #     f.write(
+                #         'profileset."{profile_name}"+=iterations={iterations}\n'.format(
+                #             profile_name=profile.name,
+                #             iterations=self.profiles[0].iterations,
+                #         )
+                #     )
 
         with open(self.filename, "r") as f:
             logger.debug(f.read())
@@ -988,55 +1005,12 @@ class Simulation_Group:
                 )
             )
             self.filename = str(uuid.uuid4()) + ".simc"
-        # write arguments to file
-        with open(self.filename, "w") as f:
-            # write the equal values to file
-            f.write("default_actions={}\n".format(self.profiles[0].default_actions))
-            f.write("default_skill={}\n".format(self.profiles[0].default_skill))
-            f.write(f"fight_style={simc_fight_style}\n")
-            f.write(f"{special_remark}\n")
-            f.write("fixed_time={}\n".format(self.profiles[0].fixed_time))
-            f.write("iterations={}\n".format(self.profiles[0].iterations))
-            f.write(
-                "optimize_expressions={}\n".format(
-                    self.profiles[0].optimize_expressions
-                )
-            )
-            if int(self.profiles[0].ptr) == 1:
-                f.write("ptr={}\n".format(self.profiles[0].ptr))
-            f.write("target_error={}\n".format(self.profiles[0].target_error))
 
-            # write all specific arguments to file
-            for profile in self.profiles:
-                # first used profile needs to be written as normal profile instead of profileset
-                if profile == self.profiles[0]:
-                    logger.debug("simc_arguments of first profile of simulation_group")
-                    logger.debug(profile.simc_arguments)
-                    for argument in profile.simc_arguments:
-                        f.write("{}\n".format(argument))
-                    f.write('name="{}"\n\n# Profileset start\n'.format(profile.name))
-                    # or else in wrong scope
-                    f.write("ready_trigger={}\n".format(self.profiles[0].ready_trigger))
-
-                else:
-                    simc_wow_class_names = [
-                        wow_class.simc_name.replace("_", "") for wow_class in WOWCLASSES
-                    ]
-                    filtered_arguments = [
-                        arg
-                        for arg in profile.simc_arguments
-                        if arg.split("=")[0] not in simc_wow_class_names
-                    ]
-                    for argument in filtered_arguments:
-                        f.write(
-                            'profileset."{profile_name}"+={argument}\n'.format(
-                                profile_name=profile.name,
-                                argument=argument,
-                            )
-                        )
-
-                    # add iterations hack
-                    # f.write("profileset.\"{profile_name}\"+=iterations={iterations}\n".format(profile_name=profile.name, iterations=self.profiles[0].iterations))
+        self.write_profileset_file(
+            fight_style=simc_fight_style,
+            special_remark=special_remark,
+            local_simulation=False,
+        )
 
         # create advanced input string
         raidbots_advancedInput = ""
