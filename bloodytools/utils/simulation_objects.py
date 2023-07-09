@@ -13,7 +13,7 @@ import uuid
 
 # wow game data and simc input checks
 from simc_support.simc_data import FightStyle
-from simc_support.simc_data.FightStyle import FIGHTSTYLES
+from simc_support.game_data.WowClass import WOWCLASSES
 from typing import List, Union
 from bloodytools.utils.request import request as r
 
@@ -131,7 +131,7 @@ class Simulation_Data:
         # simc setting to determine the fight style
         if (
             fight_style == "custom"
-            or fight_style in FIGHTSTYLES
+            or fight_style in FightStyle.FIGHTSTYLES
             or FightStyle.CASTINGPATCHWERK in fight_style
         ):
             self.fight_style = fight_style
@@ -449,7 +449,7 @@ class Simulation_Data:
         argument = [a for a in argument if a and a.strip() and a.strip()[0] != "#"]
 
         fail_counter = 0
-        simulation_output: subprocess.CompletedProcess
+        simulation_output: typing.Optional[subprocess.CompletedProcess] = None
         # should prevent additional empty windows popping up...on win32 systems without breaking different OS
         if sys.platform == "win32":
             # call simulationcraft in the background. Save output for processing
@@ -483,6 +483,11 @@ class Simulation_Data:
                     fail_counter += 1
                 else:
                     self.success = True
+
+        if simulation_output is None:
+            raise SimulationWasNotRunError(
+                "Programming logic allowed a simulation to be skipped. Aborting"
+            )
 
         if fail_counter >= 5:
             logger.error("ERROR: An Error occured during simulation.")
@@ -721,36 +726,33 @@ class Simulation_Group:
             f.write("threads={}\n".format(self.threads))
             f.write("profileset_work_threads={}\n".format(self.profileset_work_threads))
 
+            # write first profile
+            logger.debug("simc_arguments of first profile of simulation_group")
+            logger.debug(self.profiles[0].simc_arguments)
+            for argument in self.profiles[0].simc_arguments:
+                f.write("{}\n".format(argument))
+            f.write('name="{}"\n\n# Profileset start\n'.format(self.profiles[0].name))
+            # or else in wrong scope
+            f.write("ready_trigger={}\n".format(self.profiles[0].ready_trigger))
+
             # write all specific arguments to file
-            for profile in self.profiles:
-                # first used profile needs to be written as normal profile instead of profileset
-                if profile == self.profiles[0]:
-                    logger.debug("simc_arguments of first profile of simulation_group")
-                    logger.debug(profile.simc_arguments)
-                    for argument in profile.simc_arguments:
-                        f.write("{}\n".format(argument))
-                    f.write('name="{}"\n\n# Profileset start\n'.format(profile.name))
-                    # or else in wrong scope
-                    f.write("ready_trigger={}\n".format(self.profiles[0].ready_trigger))
-
-                else:
-                    from simc_support.game_data.WowClass import WOWCLASSES
-
-                    simc_wow_class_names = [
-                        wow_class.simc_name.replace("_", "") for wow_class in WOWCLASSES
-                    ]
-                    filtered_arguments = [
-                        arg
-                        for arg in profile.simc_arguments
-                        if arg.split("=")[0] not in simc_wow_class_names
-                    ]
-                    for argument in filtered_arguments:
-                        f.write(
-                            'profileset."{profile_name}"+={argument}\n'.format(
-                                profile_name=profile.name,
-                                argument=argument,
-                            )
+            for profile in self.profiles[1:]:
+                simc_wow_class_names = [
+                    wow_class.simc_name.replace("_", "") for wow_class in WOWCLASSES
+                ]
+                filtered_arguments = [
+                    arg
+                    for arg in profile.simc_arguments
+                    if arg.split("=")[0] not in simc_wow_class_names
+                ]
+                for argument in filtered_arguments:
+                    f.write(
+                        'profileset."{profile_name}"+={argument}\n'.format(
+                            profile_name=profile.name,
+                            argument=argument,
                         )
+                    )
+
         with open(self.filename, "r") as f:
             logger.debug(f.read())
 
@@ -881,7 +883,7 @@ class Simulation_Group:
 
             if simulation_output is None:
                 raise SimulationWasNotRunError(
-                    "Programming logic allowed somehow to skip the simulation."
+                    "Programming logic allowed a simulation to be skipped. Aborting"
                 )
 
             # handle broken simulations
@@ -1017,8 +1019,6 @@ class Simulation_Group:
                     f.write("ready_trigger={}\n".format(self.profiles[0].ready_trigger))
 
                 else:
-                    from simc_support.game_data.WowClass import WOWCLASSES
-
                     simc_wow_class_names = [
                         wow_class.simc_name.replace("_", "") for wow_class in WOWCLASSES
                     ]
