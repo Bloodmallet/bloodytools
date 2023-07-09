@@ -18,6 +18,10 @@ class IncompleteProfileError(Exception):
     pass
 
 
+class SpecMismatchError(Exception):
+    pass
+
+
 def _get_tier_directory_name(tier: str) -> str:
     """PreRaids vs TierXX"""
     return "PreRaids" if tier == "PR" else f"Tier{tier}"
@@ -100,6 +104,26 @@ def create_fallback_profile_path(wow_spec: WowSpec, tier: str, fight_style: str)
         f"Created fall_back_profile_path for Tier {tier} of {wow_spec} is '{fallback_profile_path}'"
     )
     return fallback_profile_path
+
+
+def create_custom_profiles_path(wow_spec: WowSpec) -> str:
+    """e.g. ./custom_profiles/<wow_class>_<wow_spec>.simc"""
+
+    # ./bloodytools/utils
+    self_file_path = os.path.dirname(os.path.abspath(__file__))
+    # ./
+    bloodytools_root_path = os.path.dirname(os.path.dirname(self_file_path))
+
+    custom_profiles_path = os.path.join(
+        bloodytools_root_path,
+        "custom_profiles",
+        f"{wow_spec.wow_class.simc_name}_{wow_spec.simc_name}.simc",
+    )
+
+    logger.debug(
+        f"Created cumstom_profiles_path for Tier of {wow_spec} is '{custom_profiles_path}'"
+    )
+    return custom_profiles_path
 
 
 def extract_profile(path: str, wow_class: WowClass) -> dict:
@@ -372,6 +396,10 @@ def get_profile(wow_spec: WowSpec, fight_style: str, settings: Config) -> dict:
             wow_spec.wow_class,
             accepted_errors=(FileNotFoundError, EmptyFileError),
         )
+        if custom_profile["character"]["spec"] != wow_spec.simc_name:
+            logger.warning(
+                f"Extracted spec '{custom_profile['character']['spec']}' from custom profile does not match expected '{wow_spec.simc_name}'."
+            )
         if custom_profile:
             return custom_profile
 
