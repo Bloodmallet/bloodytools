@@ -396,7 +396,7 @@ def get_profile(wow_spec: WowSpec, fight_style: str, settings: Config) -> dict:
             wow_spec.wow_class,
             accepted_errors=(FileNotFoundError, EmptyFileError),
         )
-        if custom_profile["character"]["spec"] != wow_spec.simc_name:
+        if custom_profile and custom_profile["character"]["spec"] != wow_spec.simc_name:
             logger.warning(
                 f"Extracted spec '{custom_profile['character']['spec']}' from custom profile does not match expected '{wow_spec.simc_name}'."
             )
