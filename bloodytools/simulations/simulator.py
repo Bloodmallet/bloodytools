@@ -12,7 +12,7 @@ from bloodytools.utils.config import Config
 from bloodytools.utils.data_type import DataType
 from bloodytools.utils.simulation_objects import Simulation_Group
 from bloodytools.utils.utils import create_base_json_dict
-from bloodytools.utils.utils import extract_profile, EmptyFileError
+from bloodytools.utils.profile_extraction import extract_profile, EmptyFileError
 from simc_support.game_data.WowSpec import WowSpec
 
 logger = logging.getLogger(__name__)

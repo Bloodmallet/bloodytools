@@ -26,12 +26,13 @@ class Config:
     debug: bool = False
     default_actions: str = "1"
     executable: str = "../SimulationCraft/simc"
+    """Path to the executable, including the executable"""
     iterations: str = "60000"
     keep_files: bool = False
     # affects trinkets
     max_ilevel: int = 457
     # affects trinkets
-    min_ilevel: int = 420
+    min_ilevel: int = 411
     pretty: bool = False
     profileset_work_threads: str = "2"
     ptr: str = "0"

@@ -5,7 +5,7 @@ import typing
 
 from bloodytools.simulations.simulator import Simulator
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
-from bloodytools.utils.utils import create_basic_profile_string
+from bloodytools.utils.profile_extraction import create_simc_profile_path
 
 logger = logging.getLogger(__name__)
 
@@ -49,8 +49,8 @@ class SecondaryDistributionSimulator(Simulator):
         lines = None
         try:
             with open(
-                create_basic_profile_string(
-                    self.wow_spec, self.settings.tier, self.settings
+                create_simc_profile_path(
+                    self.wow_spec, self.settings.tier, self.settings.executable
                 ),
                 "r",
             ) as f:

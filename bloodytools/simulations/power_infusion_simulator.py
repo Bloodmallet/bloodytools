@@ -9,7 +9,8 @@ import typing
 
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 from bloodytools.simulations.simulator import Simulator
-from bloodytools.utils.utils import create_base_json_dict, get_profile
+from bloodytools.utils.utils import create_base_json_dict
+from bloodytools.utils.profile_extraction import get_profile
 from simc_support.game_data.WowSpec import WOWSPECS
 
 
@@ -166,7 +167,12 @@ class PowerInfusionSimulator(Simulator):
                 simulation_group.add(simulation_data)
 
             logger.info(f"Simulating {spec}.")
-            simulation_group.simulate()
+            if self.settings.use_raidbots and self.settings.apikey:
+                self.settings.simc_hash = simulation_group.simulate_with_raidbots(
+                    self.settings.apikey
+                )
+            else:
+                simulation_group.simulate()
 
             data = self._collect_data(simulation_group, self.settings.data_type)
 

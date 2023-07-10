@@ -72,6 +72,15 @@ def arg_parse_config():
         ),
     )
     parser.add_argument(
+        "--custom_profiles",
+        action="store_const",
+        const=True,
+        default=False,
+        help="Enables usage of '/custom_profiles' directory. See the `README.md` file in that directory. Default: '{}'".format(
+            settings.custom_profile
+        ),
+    )
+    parser.add_argument(
         "--custom_apl",
         action="store_const",
         const=True,

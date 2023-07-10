@@ -1,7 +1,3 @@
-"""
-https://github.com/WarcraftPriests/df-shadow-priest/blob/main/trinkets/other.simc#L40-L58
-"""
-
 import logging
 import typing
 
@@ -13,18 +9,21 @@ from simc_support.game_data.Trinket import (
     get_trinkets_for_spec,
     get_versatility_trinket,
 )
-from simc_support.game_data.WowSpec import WowSpec
+from simc_support.game_data.WowSpec import WowSpec, get_wow_spec
 from simc_support.game_data.Season import Season
 from simc_support.game_data.Source import Source
+from simc_support.game_data.ItemLevel import _champion, _hero
 
 logger = logging.getLogger(__name__)
 
 # special cases
-M0_ITEMLEVEL = 372
+M0_ITEMLEVEL = 411
+PREVIOUS_SEASON_ITEMLEVELS = [415, 421]
 ALLOWED_NON_SEASONAL_DUNGEON_ITEMS = (
     # 193743,  # Irideus Frament
     # 193791,  # Time-Breaching Talon
     # 193773,  # Spoils of Neltharus
+    193701,  # Algeth'ar Puzzle Box
 )
 DARKMOON_DECK_BOX_BONUS_IDS: typing.Dict[str, int] = {
     "Emberscale": 8858,
@@ -78,31 +77,50 @@ SPECIAL_CASE_SIMC_OPTIONS: typing.Dict[
         "crit": "dragonflight.player.ruby_whelp_shell_training=sleepy_ruby_warmth:6",
     },
     203729: {  # Ominous Chromatic Essence
-        "obsidian": "dragonflight.ominous_chromatic_essence_dragonflight=obsidian",
+        "obsidian": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=obsidian",
+            "dragonflight.ominous_chromatic_essence_allies=",
+        ],
         "obsidian+all": [
             "dragonflight.ominous_chromatic_essence_dragonflight=obsidian",
             "dragonflight.ominous_chromatic_essence_allies=ruby/bronze/azure/emerald",
         ],
-        "ruby": "dragonflight.ominous_chromatic_essence_dragonflight=ruby",
+        "ruby": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=ruby",
+            "dragonflight.ominous_chromatic_essence_allies=",
+        ],
         "ruby+all": [
             "dragonflight.ominous_chromatic_essence_dragonflight=ruby",
             "dragonflight.ominous_chromatic_essence_allies=obsidian/bronze/azure/emerald",
         ],
-        "bronze": "dragonflight.ominous_chromatic_essence_dragonflight=bronze",
+        "bronze": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=bronze",
+            "dragonflight.ominous_chromatic_essence_allies=",
+        ],
         "bronze+all": [
             "dragonflight.ominous_chromatic_essence_dragonflight=bronze",
             "dragonflight.ominous_chromatic_essence_allies=obsidian/ruby/azure/emerald",
         ],
-        "azure": "dragonflight.ominous_chromatic_essence_dragonflight=azure",
+        "azure": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=azure",
+            "dragonflight.ominous_chromatic_essence_allies=",
+        ],
         "azure+all": [
             "dragonflight.ominous_chromatic_essence_dragonflight=azure",
             "dragonflight.ominous_chromatic_essence_allies=obsidian/ruby/bronze/emerald",
         ],
-        "emerald": "dragonflight.ominous_chromatic_essence_dragonflight=emerald",
+        "emerald": [
+            "dragonflight.ominous_chromatic_essence_dragonflight=emerald",
+            "dragonflight.ominous_chromatic_essence_allies=",
+        ],
         "emerald+all": [
             "dragonflight.ominous_chromatic_essence_dragonflight=emerald",
             "dragonflight.ominous_chromatic_essence_allies=obsidian/ruby/bronze/azure",
         ],
+    },
+    203996: {  # Igneous Flowstone
+        "High Tide": "dragonflight.flowstone_starting_state=high",
+        "Low Tide": "dragonflight.flowstone_starting_state=low",
     },
 }
 
@@ -131,7 +149,7 @@ NON_DPS_TRINKET_IDS = [
     "151340",  # Echo of L'ura
     "186434",  # Weave of Warped Fates
     "193805",  # Inexorable Resonator
-    "133246",  # Heart of Thunder
+    # "133246",  # Heart of Thunder
     "193736",  # Water's Beating Heart
     "133252",  # Rainsong
     "202614",  # Rashok's Molten Heart
@@ -147,16 +165,16 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     trinket_list = list(get_trinkets_for_spec(wow_spec))
 
     allowed_season = [
-        # Season.SEASON_1,
-        Season.SEASON_2
+        Season.SEASON_1,
+        Season.SEASON_2,
     ]
 
-    new_trinket_list = []
+    new_trinket_list: typing.List[Trinket] = []
     for trinket in trinket_list:
         for season in trinket.seasons:
             if season in allowed_season and trinket not in new_trinket_list:
                 logger.debug(
-                    f"Adding {trinket.full_name} to the list. It's seasons: {trinket.seasons}"
+                    f"Adding {trinket.full_name} to the list. Its seasons: {trinket.seasons}"
                 )
                 new_trinket_list.append(trinket)
 
@@ -171,8 +189,11 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
         t for t in trinket_list if str(t.item_id) not in NON_DPS_TRINKET_IDS
     ]
 
+    # remove old season pvp items
+    trinket_list = [t for t in trinket_list if "Crimson Combatant's" not in t.full_name]
+
     # remove lower pvp trinkets
-    trinket_list = [t for t in trinket_list if t != Source.LOW_PVP]
+    trinket_list = [t for t in trinket_list if t.source != Source.LOW_PVP]
 
     # add special case trinkets
     special_trinkets = [
@@ -186,6 +207,54 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
 
 def _get_second_trinket(wow_spec: WowSpec) -> Trinket:
     return get_versatility_trinket(wow_spec.stat)
+
+
+def _get_reduced_itemlevel_list(
+    trinket: Trinket, wow_spec: WowSpec, settings: Config
+) -> typing.List[int]:
+    # _champion = [415, 418, 421, 424, 428, 431, 434, 437]
+    # _hero = [428, 431, 434, 437, 441]
+    allowed_champion_itemlevels = [_champion[0], _champion[3], _champion[-1]]
+    allowed_hero_itemlevels = [_hero[0], _hero[-1]]
+
+    # for each available itemlevel of the trinket
+    itemlevels = [i for i in trinket.itemlevels if _is_valid_itemlevel(i, settings)]
+    if trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
+        itemlevels = [M0_ITEMLEVEL, *PREVIOUS_SEASON_ITEMLEVELS]
+
+    # filter out champion and hero itemlevels
+    if all((ilvl in itemlevels for ilvl in _champion)):
+        itemlevels = [ilvl for ilvl in itemlevels if ilvl not in _champion]
+        itemlevels += allowed_champion_itemlevels
+    if all((ilvl in itemlevels for ilvl in _hero)):
+        itemlevels = [ilvl for ilvl in itemlevels if ilvl not in _hero]
+        itemlevels += allowed_hero_itemlevels
+    itemlevels = sorted(itemlevels)
+
+    # remove unobtainable itemlevels
+    blood_dk = get_wow_spec("Death Knight", "Blood")
+    if wow_spec == blood_dk and trinket.item_id == 133641:
+        itemlevels = [
+            ilevel for ilevel in itemlevels if ilevel <= min(PREVIOUS_SEASON_ITEMLEVELS)
+        ]
+
+    # weed out every other itemlevel, except first and last
+    if len(itemlevels) > 10:
+        first = itemlevels[0]
+        last = itemlevels[-1]
+        filtered_itemlevels = [level for i, level in enumerate(itemlevels, 1) if i % 2]
+        if last not in filtered_itemlevels:
+            filtered_itemlevels = [first] + [
+                level for i, level in enumerate(itemlevels, 1) if (i + 1) % 2
+            ]
+        if first not in filtered_itemlevels or last not in filtered_itemlevels:
+            raise ValueError(
+                "Somehow first or last valid itemlevel are missing the generated filtered_itemlevels."
+            )
+    else:
+        filtered_itemlevels = itemlevels
+
+    return filtered_itemlevels
 
 
 class TrinketSimulator(Simulator):
@@ -261,6 +330,8 @@ class TrinketSimulator(Simulator):
             ]
             if not itemlevels and trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
                 itemlevels.append(M0_ITEMLEVEL)
+                for ilvl in PREVIOUS_SEASON_ITEMLEVELS:
+                    itemlevels.append(ilvl)
             for itemlevel in itemlevels:
                 all_itemlevels.add(itemlevel)
         min_itemlevel = min(all_itemlevels)
@@ -294,29 +365,9 @@ class TrinketSimulator(Simulator):
         simulation_group.add(simulation_data)
 
         for trinket in trinket_list:
-            # for each available itemlevel of the trinket
-            itemlevels = [
-                i for i in trinket.itemlevels if _is_valid_itemlevel(i, self.settings)
-            ]
-            if trinket.item_id in ALLOWED_NON_SEASONAL_DUNGEON_ITEMS:
-                itemlevels = [M0_ITEMLEVEL]
-            # weed out every other itemlevel, except first and last
-            if len(itemlevels) > 10:
-                first = itemlevels[0]
-                last = itemlevels[-1]
-                filtered_itemlevels = [
-                    level for i, level in enumerate(itemlevels, 1) if i % 2
-                ]
-                if last not in filtered_itemlevels:
-                    filtered_itemlevels = [first] + [
-                        level for i, level in enumerate(itemlevels, 1) if (i + 1) % 2
-                    ]
-                if first not in filtered_itemlevels or last not in filtered_itemlevels:
-                    raise ValueError(
-                        "Somehow first or last valid itemlevel are missing the generated filtered_itemlevels."
-                    )
-            else:
-                filtered_itemlevels = itemlevels
+            filtered_itemlevels = _get_reduced_itemlevel_list(
+                trinket, self.wow_spec, self.settings
+            )
 
             for itemlevel in filtered_itemlevels:
                 simulation_data = Simulation_Data(
