@@ -174,7 +174,7 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
         for season in trinket.seasons:
             if season in allowed_season and trinket not in new_trinket_list:
                 logger.debug(
-                    f"Adding {trinket.full_name} to the list. Its seasons: {trinket.seasons}"
+                    f"Adding {trinket.full_name} ({trinket.itemlevels}) to the list. Its seasons: {trinket.seasons}"
                 )
                 new_trinket_list.append(trinket)
 
