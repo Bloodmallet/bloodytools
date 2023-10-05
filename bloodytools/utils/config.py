@@ -75,7 +75,7 @@ class Config:
         self.set_simc_hash()
 
     def set_simc_hash(self) -> None:
-        new_hash = get_simc_hash(self.executable, self.log_warnings)
+        new_hash = get_simc_hash(self.executable)
         if new_hash:
             self.simc_hash = new_hash
 
