@@ -11,6 +11,7 @@ def get_simc_hash(path: str, log_warning: bool = True) -> str:
     Returns:
       str -- [description]
     """
+    new_path = ""
     if path.endswith("simc.exe"):
         new_path = path.split("simc.exe")[0]
     elif path.endswith("simc"):
@@ -29,6 +30,7 @@ def get_simc_hash(path: str, log_warning: bool = True) -> str:
         with open(new_path, "r", encoding="utf-8") as f:
             simc_hash = f.read().strip()
     except FileNotFoundError as e:
+        simc_hash = "not found"
         if log_warning:
             logger.warning(e)
 
