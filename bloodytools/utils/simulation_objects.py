@@ -837,6 +837,8 @@ class Simulation_Group:
                 fight_style=simc_fight_style, special_remark=special_remark
             )
 
+            logger.info(f"Simulating {len(self.profiles)} profiles")
+
             # counter of failed simulation attempts
             fail_counter = 0
             simulation_output: typing.Optional[subprocess.Popen] = None
