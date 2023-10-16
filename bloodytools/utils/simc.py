@@ -1,6 +1,7 @@
 import re
 import subprocess
 
+
 def get_simc_hash(executable_path: str) -> str:
     """Get the FETCH_HEAD or shallow simc git hash.
 
@@ -17,5 +18,5 @@ def get_simc_hash(executable_path: str) -> str:
     ).stdout
     # Extract git hash from build version, which looks like
     # SimulationCraft 1015-01 for World of Warcraft 10.1.7.51536 Live (hotfix 2023-09-27/51536, git build dragonflight d90d5c5)
-    simc_hash = re.search(r'git build \w+ ([^\)]+)', simc_output).group(1)
+    simc_hash = re.search(r"git build \w+ ([^\)]+)", simc_output).group(1)
     return simc_hash
