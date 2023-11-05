@@ -389,7 +389,7 @@ class Simulator(abc.ABC):
             data_dict["data_profile_overrides"][profile_name] = [  # type: ignore
                 "talents=" + data_dict["profile"]["character"]["talents"]
             ]
-        elif (
+        if (
             "class_talents" in data_dict["profile"]["character"]
             and "spec_talents" in data_dict["profile"]["character"]
         ):
