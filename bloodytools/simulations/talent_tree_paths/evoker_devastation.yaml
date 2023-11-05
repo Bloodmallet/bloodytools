@@ -6,11 +6,11 @@
 #   - talents=WOW_EXPORT_STRING
 
 # 10.1 release day update using wowhead guide from preheat: https://www.wowhead.com/guide/classes/evoker/devastation/talent-builds-pve-dps
-Raid - General:
-   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAkAAAAAAApkWSiQCCJJJtkENINkIRSIhkEJSkkEB
-Raid - Pure Single Target:
-   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAkAAAAAAApkWkIHQCCJJJtkENINkIRSIhkEJSkkEB
-Raid - Council Cleave w/Everburning:
-   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkGJSiEkUikkUSSSDSDJSkESIJJJEJJJB
-Mythic+ - General AoE:
-   - talents=BsbBAAAAAAAAAAAAAAAAAAAAAQDCAAAAAAkSaJJCJIkkkUSSig0QiEJhESSkIkkEB
+# Raid - General:
+#    - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAkAAAAAAApkWSiQCCJJJtkENINkIRSIhkEJSkkEB
+# Raid - Pure Single Target:
+#    - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAkAAAAAAApkWkIHQCCJJJtkENINkIRSIhkEJSkkEB
+# Raid - Council Cleave w/Everburning:
+#    - talents=BsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkGJSiEkUikkUSSSDSDJSkESIJJJEJJJB
+# Mythic+ - General AoE:
+#    - talents=BsbBAAAAAAAAAAAAAAAAAAAAAQDCAAAAAAkSaJJCJIkkkUSSig0QiEJhESSkIkkEB
