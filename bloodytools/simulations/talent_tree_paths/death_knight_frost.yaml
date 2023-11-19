@@ -4,6 +4,8 @@
 #   - spec_talents=talent_name_d:1/talent_name_e:0/talent_name_f:3
 # Cool Other Build:
 #   - talents=WOW_EXPORT_STRING
+AoE Breath: 
+   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAkIAiQSCJiEBJSSIkIJREiQcARSSkkkkkWOAAAAAAAAAAAAAA
 AoE DW Obliteration: 
    - talents=BsPAAAAAAAAAAAAAAAAAAAAAAICACJJkISEhkkECJSSEJBkcASSEJJJJpkEAAAAAAAAAAAAA
    - head=piercing_gaze_of_the_risen_nightmare,id=207200,bonus_id=7187/1520/6935,gem_id=192988,enchant_id=7052
