@@ -1,0 +1,35 @@
+hunter="T31_Hunter_Survival"
+source=default
+spec=survival
+level=70
+race=tauren
+role=attack
+position=back
+talents=B8PAAAAAAAAAAAAAAAAAAAAAA4ABahkEhSQgkkkWiAEJpEhAAAAAARkSRKaQiESIhGAAAAA
+
+head=snake_eaters_cowl,id=207141,bonus_id=7187/1520/1808,gem_id=192982,enchant=incandescent_essence
+neck=amulet_of_eonars_chosen,id=208445,bonus_id=7187/1520/8782,gem_id=192935/192935/192935
+shoulders=blazing_dreamstalkers_finest_hunt,id=207216,bonus_id=7187/1520
+back=inflammable_drapeleaf,id=207160,bonus_id=7187/1520
+chest=blazing_dreamstalkers_scaled_hauberk,id=207221,bonus_id=7187/1520,enchant=waking_stats_3
+wrists=flametouched_cuffs,id=193428,bonus_id=9500/9405/1808/9379,gem_id=192935,crafted_stats=32/36
+hands=blazing_dreamstalkers_skinners,id=207219,bonus_id=7187/1520
+waist=forlorn_leaf_clasp,id=207144,bonus_id=7187/1520/1808,gem_id=192935,enchant=shadowed_belt_clasp_3
+legs=blazing_dreamstalkers_shellgreaves,id=207217,bonus_id=7187/1520,enchant=lambent_armor_kit_3
+feet=flametouched_treads,id=193421,bonus_id=9500/9405/9379,crafted_stats=32/36
+finger1=signet_of_the_last_elder,id=207162,bonus_id=7187/1520/1808,gem_id=192935,enchant=devotion_of_critical_strike_3
+finger2=thornwoven_band,id=162548,bonus_id=657/9367/5923/7981/1808,gem_id=192935,enchant=devotion_of_haste_3
+trinket1=cataclysmic_signet_brand,id=207166,bonus_id=7187/1520
+trinket2=coiled_serpent_idol,id=207175,bonus_id=7187/1520
+main_hand=rashon_the_immortal_blaze,id=207793,bonus_id=7187/1520,enchant=wafting_devotion_3
+
+# Gear Summary
+# gear_ilvl=488.60
+# gear_agility=9753
+# gear_stamina=38850
+# gear_crit_rating=5362
+# gear_haste_rating=5735
+# gear_versatility_rating=3970
+# gear_armor=7685
+# set_bonus=tier31_2pc=1
+# set_bonus=tier31_4pc=1
