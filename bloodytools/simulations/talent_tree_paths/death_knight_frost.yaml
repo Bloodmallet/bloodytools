@@ -8,7 +8,7 @@ AoE Breath:
    - talents=BsPAAAAAAAAAAAAAAAAAAAAAAkIAiQSCJiEBJSSIkIJREiQcARSSkkkkkWOAAAAAAAAAAAAAA
    - trinket2=accelerating_sandglass,id=207566,bonus_id=6536/1540/6646
 AoE DW Obliteration: 
-   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAICACJJkISEhkkECJSSEJhQcASSEJJJJpkEAAAAAAAAAAAAA
+   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAICACJJkISEhkkECJSSEJBaxBIJRkkkkkSSAAAAAAAAAAAAA
    - head=piercing_gaze_of_the_risen_nightmare,id=207200,bonus_id=7187/1520/6935,gem_id=192988,enchant_id=7052
    - neck=elemental_lariat,id=193001,bonus_id=9500/9405/8782/8960,gem_id=192922/192922/192922,crafted_stats=32/49
    - shoulders=skewers_of_the_risen_nightmare,id=207198,bonus_id=7187/1520
@@ -26,7 +26,7 @@ AoE DW Obliteration:
    - main_hand=gholak_the_final_conflagration,id=207786,bonus_id=7187/1520,enchant=rune_of_the_fallen_crusader
    - off_hand=volcorosss_barbed_fang,id=207789,bonus_id=7187/1520,enchant=sophic_devotion_3
 AoE 2h Obliteration: 
-   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAICACJJkISEhkkECJSSEJhQcASSEJJJJpkEAAAAAAAAAAAAA
+   - talents=BsPAAAAAAAAAAAAAAAAAAAAAAICACJJkISEhkkECJSSEJBaxBIJRkkkkkSSAAAAAAAAAAAAA
    - head=piercing_gaze_of_the_risen_nightmare,id=207200,bonus_id=7187/1520/6935,gem_id=192988,enchant_id=7052
    - neck=elemental_lariat,id=193001,bonus_id=9500/9405/8782/8960,gem_id=192922/192922/192922,crafted_stats=32/49
    - shoulders=skewers_of_the_risen_nightmare,id=207198,bonus_id=7187/1520
