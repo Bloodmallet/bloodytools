@@ -84,7 +84,7 @@ class Simulation_Data:
         ptr: str = "0",
         ready_trigger: str = "1",
         profile: dict = {},
-        simc_arguments: list = [],
+        simc_arguments: typing.Union[typing.List[str], str] = [],
         target_error: str = "0.1",
         threads: str = "",
         remove_files: bool = True,
@@ -229,7 +229,7 @@ class Simulation_Data:
                 "When providing a profile it must have 'character' and 'items' keys."
             )
 
-        character = []
+        character: typing.List[str] = []
         for name in profile["character"]:
             if name != "class":
                 character.append("{}={}".format(name, profile["character"][name]))
@@ -748,12 +748,19 @@ class Simulation_Group:
                 simc_wow_class_names = [
                     wow_class.simc_name.replace("_", "") for wow_class in WOWCLASSES
                 ]
+                # remove class declaration, profilesets are allergic
                 filtered_arguments = [
                     arg
                     for arg in profile.simc_arguments
                     if arg.split("=")[0] not in simc_wow_class_names
                 ]
-                for argument in filtered_arguments:
+
+                unique_arguments: typing.Dict[str, str] = {}
+                for arg in filtered_arguments:
+                    identifier = arg.split("=")[0]
+                    unique_arguments[identifier] = arg
+
+                for argument in unique_arguments.values():
                     f.write(
                         'profileset."{profile_name}"+={argument}\n'.format(
                             profile_name=profile.name,
