@@ -1,26 +1,11 @@
 # base image
-FROM alpine:latest AS build
-
-ARG THREADS=1
-
-# install SimulationCraft
-RUN apk --no-cache add --virtual build_dependencies \
-    git \
-    g++ \
-    make && \
-    git clone --depth 1 https://github.com/simulationcraft/simc.git /app/SimulationCraft && \
-    make -C /app/SimulationCraft/engine optimized -j $THREADS SC_NO_NETWORKING=1 LTO_THIN=1 OPTS+="-Os -mtune=native" && \
-    apk del build_dependencies
-
-# disable ptr to reduce build size
-# sed -i '' -e 's/#define SC_USE_PTR 1/#define SC_USE_PTR 0/g' engine/dbc.hpp
 
 # fresh container
 FROM alpine:latest
 
 # get compiled simc and profiles
-COPY --from=build /app/SimulationCraft/engine/simc /app/SimulationCraft/engine/
-COPY --from=build /app/SimulationCraft/profiles/ /app/SimulationCraft/profiles/
+COPY --from=simulationcraftorg/simc /app/SimulationCraft/simc /app/SimulationCraft/simc
+COPY --from=simulationcraftorg/simc /app/SimulationCraft/profiles/ /app/SimulationCraft/profiles/
 
 # install bloodytools
 COPY ./requirements.txt /app/bloodytools/
@@ -41,5 +26,5 @@ RUN apk --no-cache add --virtual build_dependencies \
 ## set bloodytools entrypoint, this container will be usable like a command line tool
 COPY . /app/bloodytools
 WORKDIR /app/bloodytools
-ENTRYPOINT ["python3", "-m", "bloodytools", "--executable", "../SimulationCraft/engine/simc"]
+ENTRYPOINT ["python3", "-m", "bloodytools"]
 CMD ["--help"]

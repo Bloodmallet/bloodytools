@@ -1,37 +1,22 @@
-import logging
-
-SIMC_BRANCH = "dragonflight"
-
-logger = logging.getLogger(__name__)
+import re
+import subprocess
 
 
-def get_simc_hash(path: str, log_warning: bool = True) -> str:
+def get_simc_hash(executable_path: str) -> str:
     """Get the FETCH_HEAD or shallow simc git hash.
 
     Returns:
       str -- [description]
     """
-    new_path = ""
-    if path.endswith("simc.exe"):
-        new_path = path.split("simc.exe")[0]
-    elif path.endswith("simc"):
-        new_path = path[:-4]  # cut "simc" from unix path
-        if "engine" in new_path[-7:]:
-            new_path = new_path[:-7]
-    elif log_warning:
-        logger.warning(
-            f"Strange path '{path}' to work with to find simulationcraft repository."
-        )
-
-    # add path to file to variable
-    new_path += f".git/refs/heads/{SIMC_BRANCH}"
-    simc_hash: str = ""
-    try:
-        with open(new_path, "r", encoding="utf-8") as f:
-            simc_hash = f.read().strip()
-    except FileNotFoundError as e:
-        simc_hash = "not found"
-        if log_warning:
-            logger.warning(e)
-
+    # Execute simc with a fast input that does nothing put print the build information
+    # simc display_build=1 spell_query=spell.id=0
+    simc_output = subprocess.run(
+        [str(executable_path), "display_build=1", "spell_query=spell.id=0"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
+    ).stdout
+    # Extract git hash from build version, which looks like
+    # SimulationCraft 1015-01 for World of Warcraft 10.1.7.51536 Live (hotfix 2023-09-27/51536, git build dragonflight d90d5c5)
+    simc_hash = re.search(r"git build \w+ ([^\)]+)", simc_output).group(1)
     return simc_hash
