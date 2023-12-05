@@ -6,7 +6,7 @@
 #   - talents=WOW_EXPORT_STRING
 AoE Breath: 
    - talents=BsPAAAAAAAAAAAAAAAAAAAAAAkIAISSQiIREikECJSSSECaJEJJJJJJJpFAAAAAAAAAAAAA
-   - trinket2=accelerating_sandglass,id=207566,bonus_id=6536/1540/6646
+   - trinket2=ashes_of_the_embersoul,id=207167,bonus_id=7187/1520
 AoE DW Obliteration: 
    - talents=BsPAAAAAAAAAAAAAAAAAAAAAAICACJJkISEhkkECJSSEJBaxBIJRkkkkkSSAAAAAAAAAAAAA
    - head=piercing_gaze_of_the_risen_nightmare,id=207200,bonus_id=7187/1520/6935,gem_id=192988,enchant_id=7052
@@ -21,7 +21,7 @@ AoE DW Obliteration:
    - feet=rook_footmans_warboots,id=139241,bonus_id=3326/1514/6536/6646
    - finger1=archdruids_tainted_seal,id=134487,bonus_id=3326/1514/6536/6646/6935,gem_id=192922,enchant=devotion_of_haste_3
    - finger2=band_of_twisted_bark,id=134531,bonus_id=3326/1514/6536/6646/6935,gem_id=192922,enchant=devotion_of_haste_3
-   - trinket1=accelerating_sandglass,id=207566,bonus_id=6536/1540/6646
+   - trinket1=ashes_of_the_embersoul,id=207167,bonus_id=7187/1520
    - trinket2=pips_emerald_friendship_badge,id=207168,bonus_id=7187/1520
    - main_hand=gholak_the_final_conflagration,id=207786,bonus_id=7187/1520,enchant=rune_of_the_fallen_crusader
    - off_hand=volcorosss_barbed_fang,id=207789,bonus_id=7187/1520,enchant=sophic_devotion_3
@@ -39,7 +39,7 @@ AoE 2h Obliteration:
    - feet=rook_footmans_warboots,id=139241,bonus_id=3326/1514/6536/6646
    - finger1=archdruids_tainted_seal,id=134487,bonus_id=3326/1514/6536/6646/6935,gem_id=192922,enchant=devotion_of_haste_3
    - finger2=band_of_twisted_bark,id=134531,bonus_id=3326/1514/6536/6646/6935,gem_id=192922,enchant=devotion_of_haste_3
-   - trinket1=accelerating_sandglass,id=207566,bonus_id=6536/1540/6646
+   - trinket1=ashes_of_the_embersoul,id=207167,bonus_id=7187/1520
    - trinket2=pips_emerald_friendship_badge,id=207168,bonus_id=7187/1520
    - main_hand=fyralath_the_dreamrender,id=206448,ilevel=496,enchant=rune_of_the_fallen_crusader
    - off_hand=
