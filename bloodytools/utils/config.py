@@ -73,7 +73,14 @@ class Config:
         self.target_error["castingpatchwerk"] = "0.1"
         self.target_error["hecticaddcleave"] = "0.2"
         self.target_error["beastlord"] = "0.2"
-        self.set_simc_hash()
+        try:
+            self.set_simc_hash()
+        except ValueError as e:
+            logger.debug(
+                "Setting simc hash failed. This is usually ok, because the default path is probably incorrect.",
+                exc_info=e,
+            )
+            pass
 
     def set_simc_hash(self) -> None:
         new_hash = get_simc_hash(self.executable)
