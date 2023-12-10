@@ -6,7 +6,7 @@ race=tauren
 role=attack
 position=back
 talents=BcGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEJt0kQSSSSJtDgSSkIJAAAAAAKAkkAgQSSSikIlgWiDAAAAAAgEAAA
-
+        
 head=benevolent_embersages_casque,id=207254,bonus_id=1808,enchant_id=7052,gem_id=192982,ilevel=489
 neck=chain_of_the_green_flight,id=137311,bonus_id=4786/8782/9843/9569,gem_id=192922/192922/192922,ilevel=489
 shoulder=benevolent_embersages_wisdom,id=207252,bonus_id=4795,ilevel=489
