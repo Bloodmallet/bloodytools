@@ -14,14 +14,13 @@ RUN apk --no-cache add --virtual build_dependencies \
     git \
     libgcc \
     libstdc++ && \
-    apk --no-cache add python3 && \
-    if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi && \
-    python3 -m ensurepip && \
-    python3 -m pip install --upgrade pip && \
-    rm -r /usr/lib/python*/ensurepip && \
-    pip3 install --no-cache --upgrade pip setuptools wheel && \
-    if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi && \
-    pip3 install --no-cache-dir -r bloodytools/requirements.txt
+    apk add --no-cache python3 py3-pip && \
+    python3 -m venv /app/.venv && \
+    . /app/.venv/bin/activate && \
+    pip3 install --no-cache-dir -r /app/bloodytools/requirements.txt
+
+# Enable python venv in entrypoint
+ENV PATH="/app/.venv/bin:$PATH"
 
 ## set bloodytools entrypoint, this container will be usable like a command line tool
 COPY . /app/bloodytools
