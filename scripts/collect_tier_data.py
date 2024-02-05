@@ -1,4 +1,5 @@
 """Simulate and then collect all data of a tier."""
+
 from bloodytools.utils.config import Config
 from simc_support.game_data import WowSpec
 from bloodytools.main import main as main_routine
@@ -18,17 +19,6 @@ logger = logging.getLogger()
 TIER = "30"
 EXECUTABLE = "../simc/simc.exe"
 FIGHT_STYLE = "castingpatchwerk"
-
-# MISSING_PROFILES = (
-#     ("Druid", "Restoration"),
-#     ("Evoker", "Preservation"),
-#     ("Monk", "Mistweaver"),
-#     ("Paladin", "Holy"),
-#     ("Priest", "Holy"),
-#     ("Priest", "Discipline"),
-#     ("Shaman", "Restoration"),
-#     # ???
-# )
 
 
 def simulate_tier_data(specs: typing.List[typing.Tuple[str, str]]) -> None:
@@ -133,7 +123,7 @@ def filter_by_existing_profiles(
         spec
         for spec in specs
         if os.path.exists(
-            f"{simc_path}/profiles/Tier{TIER}/T{TIER}_{spec[0]}_{spec[1]}.simc"
+            f"{simc_path}/profiles/Tier{TIER}/T{TIER}_{spec[0].replace(' ', '_')}_{spec[1].replace(' ', '_')}.simc"
         )
     ]
 
