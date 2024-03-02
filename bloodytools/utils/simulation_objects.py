@@ -717,7 +717,11 @@ class Simulation_Group:
                         self.profiles[0].calculate_scale_factors
                     )
                 )
-                if self.profiles[0]._raw_profile["character"]["class"] == "evoker" and self.profiles[0]._raw_profile["character"]["spec"] == "augmentation":
+                if (
+                    self.profiles[0]._raw_profile["character"]["class"] == "evoker"
+                    and self.profiles[0]._raw_profile["character"]["spec"]
+                    == "augmentation"
+                ):
                     f.write("profileset_metric={}\n".format(",".join(["raid_dps"])))
                 else:
                     f.write("profileset_metric={}\n".format(",".join(["dps"])))
@@ -847,7 +851,9 @@ class Simulation_Group:
                 and FightStyle.CASTINGPATCHWERK != self.profiles[0].fight_style
             ):
                 simc_fight_style = FightStyle.CASTINGPATCHWERK
-                special_remark = "desired_targets=" + self.profiles[0].fight_style.replace(FightStyle.CASTINGPATCHWERK, "")
+                special_remark = "desired_targets=" + self.profiles[
+                    0
+                ].fight_style.replace(FightStyle.CASTINGPATCHWERK, "")
             else:
                 simc_fight_style = self.profiles[0].fight_style
                 special_remark = ""
