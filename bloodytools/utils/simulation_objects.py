@@ -430,6 +430,9 @@ class Simulation_Data:
         argument.append("iterations=" + self.iterations)
         argument.append("target_error=" + self.target_error)
         argument.append("fight_style=" + simc_fight_style)
+        # this feature should only be used by single profiles anyway and augmentation evokers are special
+        argument.append("single_actor_batch=0")
+        argument.append("profileset_metric=raid_dps")
         argument.append(special_remark)
         argument.append("fixed_time=" + self.fixed_time)
         argument.append("optimize_expressions=" + self.optimize_expressions)
@@ -448,6 +451,8 @@ class Simulation_Data:
 
         # drop empty, pseudo empty, and comment args
         argument = [a for a in argument if a and a.strip() and a.strip()[0] != "#"]
+
+        logger.debug(f"Starting simulation using the following args: '{argument}'")
 
         fail_counter = 0
         simulation_output: typing.Optional[subprocess.CompletedProcess] = None
@@ -557,8 +562,12 @@ class Simulation_Data:
           data {dict} -- json data from SimulationCraft json report
         """
         logger.debug("Setting dps for baseprofile.")
+        # self.set_dps(
+        #     data["sim"]["players"][0]["collected_data"]["dps"]["mean"],
+        #     external=False,
+        # )
         self.set_dps(
-            data["sim"]["players"][0]["collected_data"]["dps"]["mean"],
+            data["sim"]["statistics"]["raid_dps"]["mean"],
             external=False,
         )
         logger.debug("Set dps for profile.")
