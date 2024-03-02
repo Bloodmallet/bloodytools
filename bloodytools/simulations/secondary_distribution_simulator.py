@@ -45,54 +45,31 @@ class SecondaryDistributionSimulator(Simulator):
             "versatility_rating",
         ]
 
-        # get secondary sum from profile
-        lines = None
-        try:
-            with open(
-                create_simc_profile_path(
-                    self.wow_spec, self.settings.tier, self.settings.executable
-                ),
-                "r",
-            ) as f:
-                lines = f.readlines()
-        except FileNotFoundError:
-            logger.warning(f"{self.wow_spec} profile not found. Skipping.")
+        simulation = Simulation_Data(
+            name="Grab dem secondary values",
+            fight_style=self.fight_style,
+            target_error=self.settings.target_error.get(self.fight_style, "0.1"),
+            iterations="1",
+            profile=data_dict["profile"],
+            ptr=self.settings.ptr,
+            default_actions=self.settings.default_actions,
+            executable=self.settings.executable,
+        )
+        simulation.simulate()
 
-        if lines:
-            for line in lines:
-                for rating_name in rating_names:
-                    combined_rating_name = f"gear_{rating_name}="
-                    if combined_rating_name in line:
-                        secondary_amount += int(
-                            line.split(combined_rating_name)[1].strip()
-                        )
+        stats = 0
+        for stat in rating_names:
+            if simulation.json_data:
+                try:
+                    stats += simulation.json_data["sim"]["players"][0][
+                        "collected_data"
+                    ]["buffed_stats"]["stats"][stat]
+                except KeyError:
+                    logger.warning(
+                        f"Stat '{stat}' not found in single iteration simulation data while extracting secondary stats. Assuming 0."
+                    )
 
-        if self.settings.custom_profile:
-            simulation = Simulation_Data(
-                name="Grab dem secondary values",
-                fight_style=self.fight_style,
-                target_error=self.settings.target_error.get(self.fight_style, "0.1"),
-                iterations="1",
-                profile=data_dict["profile"],
-                ptr=self.settings.ptr,
-                default_actions=self.settings.default_actions,
-                executable=self.settings.executable,
-            )
-            simulation.simulate()
-
-            stats = 0
-            for stat in rating_names:
-                if simulation.json_data:
-                    try:
-                        stats += simulation.json_data["sim"]["players"][0][
-                            "collected_data"
-                        ]["buffed_stats"]["stats"][stat]
-                    except KeyError:
-                        logger.warning(
-                            f"Stat '{stat}' not found in single iteration simulation data while extracting secondary stats. Assuming 0."
-                        )
-
-            secondary_amount = int(stats)
+        secondary_amount = int(stats)
 
         logger.debug("Extracted secondary_amount: {}".format(secondary_amount))
 
