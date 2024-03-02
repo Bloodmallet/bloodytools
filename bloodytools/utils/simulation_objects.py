@@ -187,6 +187,7 @@ class Simulation_Data:
             self.simc_arguments = [simc_arguments]
         # craft simc input for a proper profile
         if profile:
+            self._raw_profile = profile
             # prepend created character profile input
             self.simc_arguments = (
                 self.get_simc_arguments_from_profile(profile) + self.simc_arguments
@@ -707,7 +708,10 @@ class Simulation_Group:
                         self.profiles[0].calculate_scale_factors
                     )
                 )
-                f.write("profileset_metric={}\n".format(",".join(["dps"])))
+                if self.profiles[0]._raw_profile["character"]["class"] == "evoker" and self.profiles[0]._raw_profile["character"]["spec"] == "augmentation":
+                    f.write("profileset_metric={}\n".format(",".join(["raid_dps"])))
+                else:
+                    f.write("profileset_metric={}\n".format(",".join(["dps"])))
                 f.write(
                     "calculate_scale_factors={}\n".format(
                         self.profiles[0].calculate_scale_factors
@@ -803,7 +807,7 @@ class Simulation_Group:
         self.set_simulation_start_time()
 
         if len(self.profiles) == 1:
-            # if only one profiles is in the group this profile is simulated normally
+            # if only one profile is in the group this profile is simulated normally
             try:
                 self.profiles[0].simulate()
             except Exception as e:
@@ -834,7 +838,7 @@ class Simulation_Group:
                 and FightStyle.CASTINGPATCHWERK != self.profiles[0].fight_style
             ):
                 simc_fight_style = FightStyle.CASTINGPATCHWERK
-                special_remark = "desired_targets=" + self.profiles[0].fight_style[-1]
+                special_remark = "desired_targets=" + self.profiles[0].fight_style.replace(FightStyle.CASTINGPATCHWERK, "")
             else:
                 simc_fight_style = self.profiles[0].fight_style
                 special_remark = ""
@@ -1188,7 +1192,7 @@ class Simulation_Group:
         logger.debug("Setting dps for baseprofile.")
         self.set_dps_of(
             profileset_data["sim"]["players"][0]["name"],
-            profileset_data["sim"]["players"][0]["collected_data"]["dps"]["mean"],
+            profileset_data["sim"]["statistics"]["raid_dps"]["mean"],
         )
         logger.debug("Set dps for baseprofile.")
 
