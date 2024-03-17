@@ -92,9 +92,23 @@ class Simulator(abc.ABC):
 
         self._simulate(simulation_group)
 
+        if simulation_group.json_data:
+           self._last_simc_json = simulation_group.json_data
+
         data_dict["data"] = self._collect_data(
             simulation_group, self.settings.data_type
         )
+
+        # augmentation evoker need their own dps value too, otherwise raid-dps
+        if "metadata" not in data_dict["profile"]:
+            data_dict["profile"]["metadata"] = {}
+
+        if simulation_group.json_data:
+            try:
+                data_dict["profile"]["metadata"]["base_dps"] = simulation_group.json_data["sim"]["players"][0]["collected_data"]["dps"]["mean"]
+            except KeyError:
+                logger.warning("Couldn't find mean dps of player index 0.")
+                data_dict["profile"]["metadata"]["base_dps"] = 0
 
         if simulation_group.json_data:
             data_dict["profile"]["character"]["talents"] = self._get_talents(
