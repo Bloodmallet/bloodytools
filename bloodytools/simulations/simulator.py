@@ -93,7 +93,7 @@ class Simulator(abc.ABC):
         self._simulate(simulation_group)
 
         if simulation_group.json_data:
-           self._last_simc_json = simulation_group.json_data
+            self._last_simc_json = simulation_group.json_data
 
         data_dict["data"] = self._collect_data(
             simulation_group, self.settings.data_type
@@ -105,7 +105,11 @@ class Simulator(abc.ABC):
 
         if simulation_group.json_data:
             try:
-                data_dict["profile"]["metadata"]["base_dps"] = simulation_group.json_data["sim"]["players"][0]["collected_data"]["dps"]["mean"]
+                data_dict["profile"]["metadata"]["base_dps"] = (
+                    simulation_group.json_data["sim"]["players"][0]["collected_data"][
+                        "dps"
+                    ]["mean"]
+                )
             except KeyError:
                 logger.warning("Couldn't find mean dps of player index 0.")
                 data_dict["profile"]["metadata"]["base_dps"] = 0
