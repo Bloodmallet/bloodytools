@@ -92,9 +92,27 @@ class Simulator(abc.ABC):
 
         self._simulate(simulation_group)
 
+        if simulation_group.json_data:
+            self._last_simc_json = simulation_group.json_data
+
         data_dict["data"] = self._collect_data(
             simulation_group, self.settings.data_type
         )
+
+        # augmentation evoker need their own dps value too, otherwise raid-dps
+        if "metadata" not in data_dict["profile"]:
+            data_dict["profile"]["metadata"] = {}
+
+        if simulation_group.json_data:
+            try:
+                data_dict["profile"]["metadata"]["base_dps"] = (
+                    simulation_group.json_data["sim"]["players"][0]["collected_data"][
+                        "dps"
+                    ]["mean"]
+                )
+            except KeyError:
+                logger.warning("Couldn't find mean dps of player index 0.")
+                data_dict["profile"]["metadata"]["base_dps"] = 0
 
         if simulation_group.json_data:
             data_dict["profile"]["character"]["talents"] = self._get_talents(
@@ -234,7 +252,7 @@ class Simulator(abc.ABC):
 
         file_name = f"{self.wow_spec.wow_class.simc_name}_{self.wow_spec.simc_name}_{self.fight_style.lower()}.json"
         full_path = os.path.join(path, file_name)
-        logger.debug(f"Writing data to {full_path}")
+        logger.info(f"Writing result to {full_path}")
         # write json to file
         with open(full_path, "w", encoding="utf-8") as f:
             f.write(
@@ -381,7 +399,7 @@ class Simulator(abc.ABC):
         except EmptyFileError:
             custom_profile = False
 
-        profile_name = "T" + self.settings.tier
+        profile_name = self.settings.tier
         if custom_profile:
             profile_name = "custom profile"
 
@@ -389,7 +407,7 @@ class Simulator(abc.ABC):
             data_dict["data_profile_overrides"][profile_name] = [  # type: ignore
                 "talents=" + data_dict["profile"]["character"]["talents"]
             ]
-        elif (
+        if (
             "class_talents" in data_dict["profile"]["character"]
             and "spec_talents" in data_dict["profile"]["character"]
         ):

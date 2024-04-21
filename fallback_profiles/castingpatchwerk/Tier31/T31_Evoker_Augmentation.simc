@@ -1,0 +1,34 @@
+evoker="T31_Evoker_Augmentation"
+spec=augmentation
+level=70
+race=dracthyr
+role=spell
+position=back
+
+talents=BEcBAAAAAAAAAAAAAAAAAAAAAQSJpFJJESSKJIJJNAAAAAQAAQSggISIkkAAAAgEJtIJikARLB
+
+#,enchant_id=7052
+head=,id=207227,bonus_id=8780,gem_id=192988,ilevel=489,enchant_id=7052
+neck=eye_of_the_rising_flame,id=207163,bonus_id=8782,ilevel=489,gem_id=192961/192961/192961
+shoulder=,id=207225,ilevel=489
+back=mantle_of_blazing_sacrifice,id=207161,ilevel=489
+chest=,id=207230,enchant_id=6625,ilevel=489
+wrist=complicated_cuffs,id=198332,bonus_id=523,ilevel=486,gem_id=0/192961,enchant_id=6574,crafted_stats=49/49
+hands=,id=207228,ilevel=489
+waist=weyrnkeepers_timeless_adorned_sash,id=207224,ilevel=489,bonus_id=8780,gem_id=192961
+legs=,id=193464,ilevel=486,enchant_id=6541
+#legs=,id=207138,ilevel=489,enchant_id=6541
+#feet=,id=207878,ilevel=489
+feet=whelp_handlers_lined_boots,id=134464,ilevel=489
+#feet=,id=193421,bonus_id=1576/8932,crafted_stats=36/49,ilevel=486
+#finger1=,id=133189,ilevel=489,bonus_id=8780,gem_id=192961,enchant_id=6562
+#finger1=,id=192999,enchant_id=6562,bonus_id=8780/1576,gem_id=192961,crafted_stats=36/49,ilevel=486
+finger1=,id=192999,enchant_id=6562,bonus_id=8780/1576/8932,gem_id=192961,crafted_stats=36/49,ilevel=486
+finger2=archdruids_tainted_seal,id=134487,ilevel=489,bonus_id=8780,gem_id=192961,enchant_id=6562
+#trinket1=balefire_branch,id=159630,ilevel=489
+trinket1=nymues_unraveling_spindle,id=208615,ilevel=489
+trinket2=belorrelos_the_suncaller,id=207172,ilevel=489
+# trinket1=augury_of_the_primal_flame,id=208614,ilevel=496
+# trinket2=pips_emerald_friendship_badge,id=207168,ilevel=489
+main_hand=vakash_the_shadowed_inferno,id=207788,ilevel=489,enchant_id=6643
+off_hand=tricksters_captivating_chime,id=207796,ilevel=489

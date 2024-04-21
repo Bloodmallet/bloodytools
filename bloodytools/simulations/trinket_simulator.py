@@ -12,7 +12,8 @@ from simc_support.game_data.Trinket import (
 from simc_support.game_data.WowSpec import WowSpec, get_wow_spec
 from simc_support.game_data.Season import Season
 from simc_support.game_data.Source import Source
-from simc_support.game_data.ItemLevel import _champion, _hero
+from simc_support.game_data.ItemLevel import _s3_champion as _champion
+from simc_support.game_data.ItemLevel import _s3_hero as _hero
 
 logger = logging.getLogger(__name__)
 
@@ -153,6 +154,14 @@ NON_DPS_TRINKET_IDS = [
     "193736",  # Water's Beating Heart
     "133252",  # Rainsong
     "202614",  # Rashok's Molten Heart
+    # season 3
+    "136714",  # Amalgam's Seventh Spine
+    "207171",  # Blossom of Amirdrassil
+    "110009",  # Leaf of the Ancient Protectors
+    "158320",  # Revitalizing Voodoo Totem
+    "207170",  # Smoldering Seedling
+    "137315",  # Writhing Heart of Darkness
+    "110019",  # Xeri'tac's Unhatched Egg Sac
 ]
 
 
@@ -164,19 +173,35 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     # get main-trinkets
     trinket_list = list(get_trinkets_for_spec(wow_spec))
 
+    trinket_list = sorted(
+        trinket_list, key=lambda trinket: trinket.item_id, reverse=True
+    )
+
+    trinket_list = [t for t in trinket_list if wow_spec.stat in t.stats or not t.stats]
+
     allowed_season = [
         Season.SEASON_1,
         Season.SEASON_2,
+        Season.SEASON_3,
     ]
 
+    already_added_trinkets: typing.Set[str] = set()
     new_trinket_list: typing.List[Trinket] = []
     for trinket in trinket_list:
         for season in trinket.seasons:
-            if season in allowed_season and trinket not in new_trinket_list:
+            if trinket.full_name in already_added_trinkets:
+                # trinkets with higher item_id are the ones we're interested in
+                # that's why we sorted the trinket list earlier in descending order
+                continue
+            if trinket in new_trinket_list:
+                # trinket was already added
+                continue
+            if season in allowed_season:
                 logger.debug(
-                    f"Adding {trinket.full_name} to the list. Its seasons: {trinket.seasons}"
+                    f"Adding {trinket.full_name} ({trinket.itemlevels}) to the list. Its seasons: {trinket.seasons}"
                 )
                 new_trinket_list.append(trinket)
+                already_added_trinkets.add(trinket.full_name)
 
     # filter trinket list by available itemlevels:
     trinket_list = [

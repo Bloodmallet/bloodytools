@@ -1,3 +1,5 @@
+import dataclasses
+import enum
 import logging
 import os
 import re
@@ -8,6 +10,198 @@ from simc_support.game_data.WowClass import WowClass
 from simc_support.game_data.WowSpec import WowSpec
 
 logger = logging.getLogger(__name__)
+
+
+class CharacterSource(enum.Enum):
+    SIMULATIONCRAFT = enum.auto()
+    CUSTOM_PROFILE = enum.auto()
+    FALLBACK_PROFILE = enum.auto()
+
+
+class ItemSlot(enum.Enum):
+    HEAD = "head"
+    NECK = "neck"
+    SHOULDERS = "shoulders"
+    BACK = "back"
+    CHEST = "chest"
+    WRISTS = "wrists"
+    HANDS = "hands"
+    WAIST = "waist"
+    LEGS = "legs"
+    FEET = "feet"
+    FINGER_1 = "finger1"
+    FINGER_2 = "finger2"
+    TRINKET_1 = "trinket1"
+    TRINKET_2 = "trinket2"
+    MAIN_HAND = "main_hand"
+    OFF_HAND = "off_hand"
+    NONE = "none"
+
+
+class NotAnItemLineError(Exception):
+    pass
+
+
+@dataclasses.dataclass
+class Item:
+    slot: ItemSlot
+    slot_alternative_names: typing.List[str]
+
+    item_id: int
+    bonus_id: typing.List[int]
+    enchant: str
+    ilevel: int
+    gem_id: typing.List[int]
+    enchant_id: int
+    crafted_stats: typing.List[int]
+    drop_level: int
+
+    @staticmethod
+    def from_simc_string(simc_string: str) -> "Item":
+        simc_string = simc_string.strip()
+
+        # drop comments
+        simc_string = simc_string.split("#")[0]
+
+        if not simc_string:
+            raise NotAnItemLineError(
+                "Empty line found (comments were dropped beforehand)."
+            )
+
+        slot: typing.Union[None, ItemSlot] = None
+        alternative_slot_names: typing.Dict[ItemSlot, str] = {
+            ItemSlot.SHOULDERS: "shoulder",
+            ItemSlot.WRISTS: "wrist",
+        }
+        for slot_option in ItemSlot:
+            if (
+                simc_string.startswith(slot_option.value)
+                or slot_option in alternative_slot_names
+                and simc_string.startswith(alternative_slot_names[slot_option])
+            ):
+                slot = slot_option
+
+        if not slot:
+            raise NotAnItemLineError("ItemSlot not found in line")
+
+        # dropping slot information
+        simc_parts = simc_string.split(",")[1:]
+
+        empty_item = Item(
+            slot=slot,
+            slot_alternative_names=[],
+            item_id=-1,
+            bonus_id=[],
+            enchant="",
+            ilevel=-1,
+            gem_id=[],
+            enchant_id=-1,
+            crafted_stats=[],
+            drop_level=-1,
+        )
+        for part in simc_parts:
+            # ! stop the implementation! the actual goal is to ensure only one profile is printed in profilesets. head over there
+            pass
+
+        return empty_item
+
+
+@dataclasses.dataclass
+class HeadItem(Item):
+    slot = ItemSlot.HEAD
+
+
+@dataclasses.dataclass
+class NeckItem(Item):
+    slot = ItemSlot.NECK
+
+
+@dataclasses.dataclass
+class ShouldersItem(Item):
+    slot = ItemSlot.SHOULDERS
+
+
+@dataclasses.dataclass
+class BackItem(Item):
+    slot = ItemSlot.BACK
+
+
+@dataclasses.dataclass
+class ChestItem(Item):
+    slot = ItemSlot.CHEST
+
+
+@dataclasses.dataclass
+class WristsItem(Item):
+    slot = ItemSlot.WRISTS
+
+
+@dataclasses.dataclass
+class HandsItem(Item):
+    slot = ItemSlot.HANDS
+
+
+@dataclasses.dataclass
+class WaistItem(Item):
+    slot = ItemSlot.WAIST
+
+
+@dataclasses.dataclass
+class LegsItem(Item):
+    slot = ItemSlot.LEGS
+
+
+@dataclasses.dataclass
+class FeetItem(Item):
+    slot = ItemSlot.FEET
+
+
+@dataclasses.dataclass
+class Finger1Item(Item):
+    slot = ItemSlot.FINGER_1
+
+
+@dataclasses.dataclass
+class Finger2Item(Item):
+    slot = ItemSlot.FINGER_2
+
+
+@dataclasses.dataclass
+class Trinket1Item(Item):
+    slot = ItemSlot.TRINKET_1
+
+
+@dataclasses.dataclass
+class Trinket2Item(Item):
+    slot = ItemSlot.TRINKET_2
+
+
+@dataclasses.dataclass
+class MainHandItem(Item):
+    slot = ItemSlot.MAIN_HAND
+
+
+@dataclasses.dataclass
+class OffHandItem(Item):
+    slot = ItemSlot.OFF_HAND
+
+
+@dataclasses.dataclass
+class CharacterProfile:
+    source: str
+    path: str
+
+    # character
+    class_str: str
+    level: str
+    race: str
+    role: str
+    spec: str
+
+    # items
+    back: BackItem
+    chest: ChestItem
+    feet: FeetItem
 
 
 class EmptyFileError(Exception):
@@ -23,13 +217,21 @@ class SpecMismatchError(Exception):
 
 
 def _get_tier_directory_name(tier: str) -> str:
-    """PreRaids vs TierXX"""
-    return "PreRaids" if tier == "PR" else f"Tier{tier}"
+    """
+    SimulationCraft switched to expansion + season count as names
+
+    old:PreRaids vs TierXX
+    """
+    return tier
 
 
 def _get_tier_file_name_part(tier: str) -> str:
-    """PR vs TXX"""
-    return "PR" if "PR" in str(tier) else f"T{tier}"
+    """
+    SimulationCraft switched to expansion + season count as names
+
+    PR vs TXX
+    """
+    return tier
 
 
 def _get_simc_profile_file_name(tier: str, wow_spec: WowSpec) -> str:

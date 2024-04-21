@@ -30,9 +30,9 @@ class Config:
     iterations: str = "60000"
     keep_files: bool = False
     # affects trinkets
-    max_ilevel: int = 457
+    max_ilevel: int = 528
     # affects trinkets
-    min_ilevel: int = 411
+    min_ilevel: int = 480
     pretty: bool = False
     profileset_work_threads: str = "2"
     ptr: str = "0"
@@ -55,7 +55,7 @@ class Config:
     talent_permutations: bool = False
     target_error: typing.Dict[str, str] = dataclasses.field(default_factory=dict)
     threads: str = ""
-    tier: str = "30"
+    tier: str = "DF4"
     use_raidbots: bool = False
     write_humanreadable_secondary_distribution_file: bool = False
     apikey: str = ""
@@ -70,12 +70,20 @@ class Config:
 
     def __post_init__(self, *args, **kwargs) -> None:
         self.target_error["patchwerk"] = "0.1"
+        self.target_error["castingpatchwerk"] = "0.1"
         self.target_error["hecticaddcleave"] = "0.2"
         self.target_error["beastlord"] = "0.2"
-        self.set_simc_hash()
+        try:
+            self.set_simc_hash()
+        except ValueError as e:
+            logger.debug(
+                "Setting simc hash failed. This is usually ok, because the default path is probably incorrect.",
+                exc_info=e,
+            )
+            pass
 
     def set_simc_hash(self) -> None:
-        new_hash = get_simc_hash(self.executable, self.log_warnings)
+        new_hash = get_simc_hash(self.executable)
         if new_hash:
             self.simc_hash = new_hash
 

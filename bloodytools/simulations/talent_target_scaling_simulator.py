@@ -161,9 +161,9 @@ class TalentTargetScalingSimulator(Simulator):
             )
 
             if simulation_group.json_data:
-                data_dict["profile"]["character"][
-                    "talents"
-                ] = simulation_group.json_data["sim"]["players"][0]["talents"]
+                data_dict["profile"]["character"]["talents"] = (
+                    simulation_group.json_data["sim"]["players"][0]["talents"]
+                )
 
         logger.debug("Starting post processing")
         data_dict = self.post_processing(data_dict)

@@ -84,7 +84,7 @@ class Simulation_Data:
         ptr: str = "0",
         ready_trigger: str = "1",
         profile: dict = {},
-        simc_arguments: list = [],
+        simc_arguments: typing.Union[typing.List[str], str] = [],
         target_error: str = "0.1",
         threads: str = "",
         remove_files: bool = True,
@@ -187,6 +187,7 @@ class Simulation_Data:
             self.simc_arguments = [simc_arguments]
         # craft simc input for a proper profile
         if profile:
+            self._raw_profile = profile
             # prepend created character profile input
             self.simc_arguments = (
                 self.get_simc_arguments_from_profile(profile) + self.simc_arguments
@@ -229,7 +230,7 @@ class Simulation_Data:
                 "When providing a profile it must have 'character' and 'items' keys."
             )
 
-        character = []
+        character: typing.List[str] = []
         for name in profile["character"]:
             if name != "class":
                 character.append("{}={}".format(name, profile["character"][name]))
@@ -429,6 +430,9 @@ class Simulation_Data:
         argument.append("iterations=" + self.iterations)
         argument.append("target_error=" + self.target_error)
         argument.append("fight_style=" + simc_fight_style)
+        # this feature should only be used by single profiles anyway and augmentation evokers are special
+        argument.append("single_actor_batch=0")
+        argument.append("profileset_metric=raid_dps")
         argument.append(special_remark)
         argument.append("fixed_time=" + self.fixed_time)
         argument.append("optimize_expressions=" + self.optimize_expressions)
@@ -447,6 +451,8 @@ class Simulation_Data:
 
         # drop empty, pseudo empty, and comment args
         argument = [a for a in argument if a and a.strip() and a.strip()[0] != "#"]
+
+        logger.debug(f"Starting simulation using the following args: '{argument}'")
 
         fail_counter = 0
         simulation_output: typing.Optional[subprocess.CompletedProcess] = None
@@ -556,8 +562,12 @@ class Simulation_Data:
           data {dict} -- json data from SimulationCraft json report
         """
         logger.debug("Setting dps for baseprofile.")
+        # self.set_dps(
+        #     data["sim"]["players"][0]["collected_data"]["dps"]["mean"],
+        #     external=False,
+        # )
         self.set_dps(
-            data["sim"]["players"][0]["collected_data"]["dps"]["mean"],
+            data["sim"]["statistics"]["raid_dps"]["mean"],
             external=False,
         )
         logger.debug("Set dps for profile.")
@@ -707,7 +717,14 @@ class Simulation_Group:
                         self.profiles[0].calculate_scale_factors
                     )
                 )
-                f.write("profileset_metric={}\n".format(",".join(["dps"])))
+                if (
+                    self.profiles[0]._raw_profile["character"]["class"] == "evoker"
+                    and self.profiles[0]._raw_profile["character"]["spec"]
+                    == "augmentation"
+                ):
+                    f.write("profileset_metric={}\n".format(",".join(["raid_dps"])))
+                else:
+                    f.write("profileset_metric={}\n".format(",".join(["dps"])))
                 f.write(
                     "calculate_scale_factors={}\n".format(
                         self.profiles[0].calculate_scale_factors
@@ -748,12 +765,19 @@ class Simulation_Group:
                 simc_wow_class_names = [
                     wow_class.simc_name.replace("_", "") for wow_class in WOWCLASSES
                 ]
+                # remove class declaration, profilesets are allergic
                 filtered_arguments = [
                     arg
                     for arg in profile.simc_arguments
                     if arg.split("=")[0] not in simc_wow_class_names
                 ]
-                for argument in filtered_arguments:
+
+                unique_arguments: typing.Dict[str, str] = {}
+                for arg in filtered_arguments:
+                    identifier = arg.split("=")[0]
+                    unique_arguments[identifier] = arg
+
+                for argument in unique_arguments.values():
                     f.write(
                         'profileset."{profile_name}"+={argument}\n'.format(
                             profile_name=profile.name,
@@ -796,7 +820,7 @@ class Simulation_Group:
         self.set_simulation_start_time()
 
         if len(self.profiles) == 1:
-            # if only one profiles is in the group this profile is simulated normally
+            # if only one profile is in the group this profile is simulated normally
             try:
                 self.profiles[0].simulate()
             except Exception as e:
@@ -827,7 +851,9 @@ class Simulation_Group:
                 and FightStyle.CASTINGPATCHWERK != self.profiles[0].fight_style
             ):
                 simc_fight_style = FightStyle.CASTINGPATCHWERK
-                special_remark = "desired_targets=" + self.profiles[0].fight_style[-1]
+                special_remark = "desired_targets=" + self.profiles[
+                    0
+                ].fight_style.replace(FightStyle.CASTINGPATCHWERK, "")
             else:
                 simc_fight_style = self.profiles[0].fight_style
                 special_remark = ""
@@ -836,6 +862,8 @@ class Simulation_Group:
             self.write_profileset_file(
                 fight_style=simc_fight_style, special_remark=special_remark
             )
+
+            logger.info(f"Simulating {len(self.profiles)} profiles")
 
             # counter of failed simulation attempts
             fail_counter = 0
@@ -1179,7 +1207,7 @@ class Simulation_Group:
         logger.debug("Setting dps for baseprofile.")
         self.set_dps_of(
             profileset_data["sim"]["players"][0]["name"],
-            profileset_data["sim"]["players"][0]["collected_data"]["dps"]["mean"],
+            profileset_data["sim"]["statistics"]["raid_dps"]["mean"],
         )
         logger.debug("Set dps for baseprofile.")
 

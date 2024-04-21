@@ -4,9 +4,13 @@
 #   - spec_talents=talent_name_d:1/talent_name_e:0/talent_name_f:3
 # Cool Other Build:
 #   - talents=WOW_EXPORT_STRING
+Coil Single Target:
+   - talents=BwPAAAAAAAAAAAAAAAAAAAAAAAAIikEJiERISECJJJRAAAAAAAAAgSSSICAAIJh0SkkkIJA
+   
 Disease: 
    - talents=BwPAAAAAAAAAAAAAAAAAAAAAAAAIkkQiIRESSECJJJRAAAAAAAAAgCJRISSaAAkIFRSSikE
+   - trinket1=pips_emerald_friendship_badge,id=207168,bonus_id=7187/1520
    
 Busting_Sores:
-   - talents=BwPAAAAAAAAAAAAAAAAAAAAAAAACkkQiIRCSSEikkIRAAAAAAAAAAkkESSSKAAkIFRSSikA
-   
+   - talents=BwPAAAAAAAAAAAAAAAAAAAAAAAAiQSCJiEJISEikkIRAAAAAAAAAgCJRkkkkCAAJSTkkkIJA
+   - trinket1=pips_emerald_friendship_badge,id=207168,bonus_id=7187/1520
