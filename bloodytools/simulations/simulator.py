@@ -399,7 +399,7 @@ class Simulator(abc.ABC):
         except EmptyFileError:
             custom_profile = False
 
-        profile_name = "T" + self.settings.tier
+        profile_name = self.settings.tier
         if custom_profile:
             profile_name = "custom profile"
 
