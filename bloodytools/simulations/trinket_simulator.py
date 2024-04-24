@@ -162,6 +162,11 @@ NON_DPS_TRINKET_IDS = [
     "207170",  # Smoldering Seedling
     "137315",  # Writhing Heart of Darkness
     "110019",  # Xeri'tac's Unhatched Egg Sac
+    # season 4
+    "206475",  # Paracausal Fragment of Seschenal
+    "193748",  # Kyrakka's Searing Embers
+    "206958",  # Paracausal Fragment of Val'anyr
+    "207552",  # Echoing Tyrstone
 ]
 
 
