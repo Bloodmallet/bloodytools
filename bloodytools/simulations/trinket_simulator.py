@@ -24,7 +24,7 @@ ALLOWED_NON_SEASONAL_DUNGEON_ITEMS = (
     # 193743,  # Irideus Frament
     # 193791,  # Time-Breaching Talon
     # 193773,  # Spoils of Neltharus
-    193701,  # Algeth'ar Puzzle Box
+    # 193701,  # Algeth'ar Puzzle Box
 )
 DARKMOON_DECK_BOX_BONUS_IDS: typing.Dict[str, int] = {
     "Emberscale": 8858,
@@ -180,9 +180,10 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     trinket_list = [t for t in trinket_list if wow_spec.stat in t.stats or not t.stats]
 
     allowed_season = [
-        Season.SEASON_1,
-        Season.SEASON_2,
-        Season.SEASON_3,
+        # Season.SEASON_1,
+        # Season.SEASON_2,
+        # Season.SEASON_3,
+        Season.SEASON_4,
     ]
 
     already_added_trinkets: typing.Set[str] = set()
