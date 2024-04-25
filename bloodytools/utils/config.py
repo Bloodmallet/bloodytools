@@ -30,7 +30,7 @@ class Config:
     iterations: str = "60000"
     keep_files: bool = False
     # affects trinkets
-    max_ilevel: int = 528
+    max_ilevel: int = 535
     # affects trinkets
     min_ilevel: int = 480
     pretty: bool = False
