@@ -4,7 +4,7 @@ level=70
 race=dwarf
 role=spell
 position=ranged_back
-talents=BsQAAAAAAAAAAAAAAAAAAAAAAggkEJJQaKEpdgkESLKJSCSElgWpdgkAAAAAAAAAAAAAokkkA
+talents=BsQAAAAAAAAAAAAAAAAAAAAAAggkEJJQaKEpdgkESLIJSJSElgWpcgkAAAAAAAAAAAAAokkkA
 
 head=lost_scholars_timely_hat,id=207116,bonus_id=4800/4786/1517/9575/523,ilevel=528,gem_id=192982,enchant_id=7052
 neck=terross_captive_core,id=195502,bonus_id=4800/4786/1498/8782,ilevel=528,gem_id=192925/192925/192925
