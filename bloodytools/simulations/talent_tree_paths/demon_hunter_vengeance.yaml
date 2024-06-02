@@ -5,8 +5,12 @@
 # Cool Other Build:
 #   - talents=WOW_EXPORT_STRING
 
-M+ test:
+M_test:
    - talents=BUkAzqt9tQbK6xteCyjwasgfTCASikkIEIJhEItkIJaJRSiEEplk0kEJhEAAAAQSCA
 
-M+ Tank:
-   - talents=BUkAzqt9tQbK6xteCyjwasgfTCASiEJiEIJhES0SikoJhkIBRaJJNJRSIBAAAAkkA   
+M_Tank:
+   - talents=BUkAzqt9tQbK6xteCyjwasgfTCASiEJiEIJhES0SikoJhkIBRaJJNJRSIBAAAAkkA
+
+No_Soulcrush:
+   - talents=BUkAzqt9tQbK6xteCyjwasgfTCASikkIEIJhESSLikolEJJwBEplk0kEJhEAAAAQSCA
+
