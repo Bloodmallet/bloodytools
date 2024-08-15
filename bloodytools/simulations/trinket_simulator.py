@@ -12,8 +12,8 @@ from simc_support.game_data.Trinket import (
 from simc_support.game_data.WowSpec import WowSpec, get_wow_spec
 from simc_support.game_data.Season import Season
 from simc_support.game_data.Source import Source
-from simc_support.game_data.ItemLevel import _s3_champion as _champion
-from simc_support.game_data.ItemLevel import _s3_hero as _hero
+from simc_support.game_data.ItemLevel import _df_s3_champion
+from simc_support.game_data.ItemLevel import _df_s3_hero
 
 logger = logging.getLogger(__name__)
 
@@ -185,10 +185,7 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
     trinket_list = [t for t in trinket_list if wow_spec.stat in t.stats or not t.stats]
 
     allowed_season = [
-        # Season.SEASON_1,
-        # Season.SEASON_2,
-        # Season.SEASON_3,
-        Season.SEASON_4,
+        Season.TWW_SEASON_1,
     ]
 
     already_added_trinkets: typing.Set[str] = set()
@@ -243,10 +240,14 @@ def _get_second_trinket(wow_spec: WowSpec) -> Trinket:
 def _get_reduced_itemlevel_list(
     trinket: Trinket, wow_spec: WowSpec, settings: Config
 ) -> typing.List[int]:
-    # _champion = [415, 418, 421, 424, 428, 431, 434, 437]
-    # _hero = [428, 431, 434, 437, 441]
-    allowed_champion_itemlevels = [_champion[0], _champion[3], _champion[-1]]
-    allowed_hero_itemlevels = [_hero[0], _hero[-1]]
+    # _df_s3_champion = [415, 418, 421, 424, 428, 431, 434, 437]
+    # _df_s3_hero = [428, 431, 434, 437, 441]
+    allowed_champion_itemlevels = [
+        _df_s3_champion[0],
+        _df_s3_champion[3],
+        _df_s3_champion[-1],
+    ]
+    allowed_hero_itemlevels = [_df_s3_hero[0], _df_s3_hero[-1]]
 
     # for each available itemlevel of the trinket
     itemlevels = [i for i in trinket.itemlevels if _is_valid_itemlevel(i, settings)]
@@ -254,11 +255,11 @@ def _get_reduced_itemlevel_list(
         itemlevels = [M0_ITEMLEVEL, *PREVIOUS_SEASON_ITEMLEVELS]
 
     # filter out champion and hero itemlevels
-    if all((ilvl in itemlevels for ilvl in _champion)):
-        itemlevels = [ilvl for ilvl in itemlevels if ilvl not in _champion]
+    if all((ilvl in itemlevels for ilvl in _df_s3_champion)):
+        itemlevels = [ilvl for ilvl in itemlevels if ilvl not in _df_s3_champion]
         itemlevels += allowed_champion_itemlevels
-    if all((ilvl in itemlevels for ilvl in _hero)):
-        itemlevels = [ilvl for ilvl in itemlevels if ilvl not in _hero]
+    if all((ilvl in itemlevels for ilvl in _df_s3_hero)):
+        itemlevels = [ilvl for ilvl in itemlevels if ilvl not in _df_s3_hero]
         itemlevels += allowed_hero_itemlevels
     itemlevels = sorted(itemlevels)
 
