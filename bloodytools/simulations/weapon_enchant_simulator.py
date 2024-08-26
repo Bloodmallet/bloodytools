@@ -26,29 +26,31 @@ class DKEnchant(SimcObject):
 
 
 WEAPON_ENCHANTS = [
-    WeaponEnchant(name="Sophic Writ", item_id="199971"),
-    WeaponEnchant(name="Wafting Writ", item_id="199975"),
-    WeaponEnchant(name="Earthen Writ", item_id="199969"),
-    WeaponEnchant(name="Frozen Writ", item_id="199973"),
-    WeaponEnchant(name="Burning Writ", item_id="199967"),
-    WeaponEnchant(name="Sophic Devotion", item_id="199970"),
-    WeaponEnchant(name="Wafting Devotion", item_id="199974"),
-    WeaponEnchant(name="Frozen Devotion", item_id="199972"),
-    WeaponEnchant(name="Shadowflame Wreathe", item_id="204621"),
+    # dmg absorb
+    # WeaponEnchant(name="Authority of Air", item_id="223775"),
+    # healing
+    # WeaponEnchant(name="Authority of Fiery Resolve", item_id="223778"),
+    WeaponEnchant(name="Authority of Radiant Power", item_id="223781"),
+    WeaponEnchant(name="Authority of Storms", item_id="223772"),
+    WeaponEnchant(name="Authority of the Depths", item_id="223784"),
+    WeaponEnchant(name="Council's Guile", item_id="223759"),
+    WeaponEnchant(name="Oathsworn's Tenacity", item_id="223768"),
+    WeaponEnchant(name="Stonebound Artistry", item_id="223765"),
+    WeaponEnchant(name="Stormrider's Fury", item_id="223762"),
 ]
 
-RANGED_HUNTER_ENCHANTS = [
-    WeaponEnchant(name="Projectile Propulsion Pinion", item_id="198313"),
-    WeaponEnchant(name="Gyroscopic Kaleidoscope", item_id="198310"),
-    WeaponEnchant(name="High Intensity Thermal Scanner", item_id="198316"),
-]
+# RANGED_HUNTER_ENCHANTS = [
+#     WeaponEnchant(name="Projectile Propulsion Pinion", item_id="198313"),
+#     WeaponEnchant(name="Gyroscopic Kaleidoscope", item_id="198310"),
+#     WeaponEnchant(name="High Intensity Thermal Scanner", item_id="198316"),
+# ]
 
-THERMAL_SCANNER_STATS = {
-    "critical strike": "target_race=elemental",
-    "haste": "target_race=demon",
-    "mastery": "target_race=mechanical",
-    "versatility": "target_race=undead",
-}
+# THERMAL_SCANNER_STATS = {
+#     "critical strike": "target_race=elemental",
+#     "haste": "target_race=demon",
+#     "mastery": "target_race=mechanical",
+#     "versatility": "target_race=undead",
+# }
 
 DK_ENCHANTS = [
     DKEnchant(name="Rune of Hysteria", spell_id="326911"),
@@ -125,8 +127,8 @@ class WeaponEnchantmentSimulator(Simulator):
         enchants: typing.List[typing.Union[WeaponEnchant, DKEnchant]] = list(
             WEAPON_ENCHANTS.copy()
         )
-        if self.wow_spec in (BEASTMASTERY, MARKSMANSHIP):
-            enchants = list(RANGED_HUNTER_ENCHANTS)
+        # if self.wow_spec in (BEASTMASTERY, MARKSMANSHIP):
+        #     enchants = list(RANGED_HUNTER_ENCHANTS)
 
         if self.wow_spec.wow_class == DEATHKNIGHT:
             enchants += DK_ENCHANTS
@@ -135,29 +137,30 @@ class WeaponEnchantmentSimulator(Simulator):
             if isinstance(enchant, WeaponEnchant):
                 for rank in enchant.ranks:
                     if enchant.full_name == "High Intensity Thermal Scanner":
-                        for stat, target_race in THERMAL_SCANNER_STATS.items():
-                            stat_adjusted_name = enchant.full_name + f" [{stat}]"
-                            scaled_name = self.get_profile_name(
-                                stat_adjusted_name, str(rank)
-                            )
-                            scaled_simc_string = f"{weapon_base_string},enchant={enchant.simc_name}_{rank}"
+                        pass
+                        # for stat, target_race in THERMAL_SCANNER_STATS.items():
+                        #     stat_adjusted_name = enchant.full_name + f" [{stat}]"
+                        #     scaled_name = self.get_profile_name(
+                        #         stat_adjusted_name, str(rank)
+                        #     )
+                        #     scaled_simc_string = f"{weapon_base_string},enchant={enchant.simc_name}_{rank}"
 
-                            simulation_data = Simulation_Data(
-                                name=scaled_name,
-                                fight_style=self.fight_style,
-                                profile=profile,
-                                simc_arguments=[scaled_simc_string, target_race],
-                                target_error=self.settings.target_error.get(
-                                    self.fight_style, "0.1"
-                                ),
-                                ptr=self.settings.ptr,
-                                default_actions=self.settings.default_actions,
-                                executable=self.settings.executable,
-                                iterations=self.settings.iterations,
-                                remove_files=not self.settings.keep_files,
-                            )
+                        #     simulation_data = Simulation_Data(
+                        #         name=scaled_name,
+                        #         fight_style=self.fight_style,
+                        #         profile=profile,
+                        #         simc_arguments=[scaled_simc_string, target_race],
+                        #         target_error=self.settings.target_error.get(
+                        #             self.fight_style, "0.1"
+                        #         ),
+                        #         ptr=self.settings.ptr,
+                        #         default_actions=self.settings.default_actions,
+                        #         executable=self.settings.executable,
+                        #         iterations=self.settings.iterations,
+                        #         remove_files=not self.settings.keep_files,
+                        #     )
 
-                            simulation_group.add(simulation_data)
+                        #     simulation_group.add(simulation_data)
 
                     else:
                         scaled_name = self.get_profile_name(
@@ -227,8 +230,8 @@ class WeaponEnchantmentSimulator(Simulator):
         enchants: typing.List[typing.Union[WeaponEnchant, DKEnchant]] = list(
             WEAPON_ENCHANTS.copy()
         )
-        if self.wow_spec in (BEASTMASTERY, MARKSMANSHIP):
-            enchants = list(RANGED_HUNTER_ENCHANTS)
+        # if self.wow_spec in (BEASTMASTERY, MARKSMANSHIP):
+        #     enchants = list(RANGED_HUNTER_ENCHANTS)
         if self.wow_spec.wow_class == DEATHKNIGHT:
             enchants += DK_ENCHANTS
 
@@ -242,12 +245,12 @@ class WeaponEnchantmentSimulator(Simulator):
         if self.wow_spec in (BEASTMASTERY, MARKSMANSHIP):
             base_name = "High Intensity Thermal Scanner"
             stat_changing_enchant = None
-            for enchant in RANGED_HUNTER_ENCHANTS:
-                if enchant.full_name == base_name:
-                    stat_changing_enchant = enchant
-            if stat_changing_enchant:
-                for stat in THERMAL_SCANNER_STATS.keys():
-                    stated_name = f"{base_name} [{stat}]"
-                    data_dict["item_ids"][stated_name] = stat_changing_enchant.item_id
+            # for enchant in RANGED_HUNTER_ENCHANTS:
+            #     if enchant.full_name == base_name:
+            #         stat_changing_enchant = enchant
+            # if stat_changing_enchant:
+            #     for stat in THERMAL_SCANNER_STATS.keys():
+            #         stated_name = f"{base_name} [{stat}]"
+            #         data_dict["item_ids"][stated_name] = stat_changing_enchant.item_id
 
         return data_dict
