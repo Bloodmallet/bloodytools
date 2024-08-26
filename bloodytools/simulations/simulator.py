@@ -415,6 +415,10 @@ class Simulator(abc.ABC):
                 "class_talents=" + data_dict["profile"]["character"]["class_talents"],
                 "spec_talents=" + data_dict["profile"]["character"]["spec_talents"],
             ]
+        if "hero_talents" in data_dict["profile"]["character"]:
+            data_dict["data_profile_overrides"][profile_name].append(  # type: ignore
+                "hero_talents=" + data_dict["profile"]["character"]["hero_talents"]
+            )
 
         # load predefined talent paths from file
         file_path = os.path.join(

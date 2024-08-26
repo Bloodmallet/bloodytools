@@ -49,7 +49,12 @@ Edit `bloodytools/settings.py` to your liking using a text editor like Notepad++
 ```sh
 $ cd ~/bloodytools
 $ <env_name>/Scripts/activate
-(<env_name>)$ python -m bloodytools
+# show parameters
+(<env_name>)$ python -m bloodytools -h
+# run a trinket simulation
+(<env_name>)$ python -m bloodytools -s trinkets,shaman,elemental,castingpatchwerk
+# run a trinket simulation utilizing a custom profile from `custom_profile.txt`
+(<env_name>)$ python -m bloodytools -s trinkets,shaman,elemental,castingpatchwerk --custom_profile
 ```
 
 ## Development

@@ -30,6 +30,11 @@ class SpecTalentString(TalentString):
         return f"spec_talents={self.string}"
 
 
+class HeroTalentString(TalentString):
+    def __str__(self) -> str:
+        return f"hero_talents={self.string}"
+
+
 class SecondaryDistributionSimulator(Simulator):
     @classmethod
     def name(cls) -> str:
@@ -106,25 +111,27 @@ class SecondaryDistributionSimulator(Simulator):
             talent_combinations["baseline"] = (
                 "talents=" + data_dict["profile"]["character"]["talents"],
             )
+        else:
+            combinations: typing.List[TalentString] = []
+            if "class_talents" in data_dict["profile"]["character"]:
+                combinations.append(
+                    ClassTalentString(
+                        data_dict["profile"]["character"]["class_talents"]
+                    )
+                )
+            if "hero_talents" in data_dict["profile"]["character"]:
+                combinations.append(
+                    SpecTalentString(data_dict["profile"]["character"]["hero_talents"])
+                )
+            if "hero_talents" in data_dict["profile"]["character"]:
+                combinations.append(
+                    HeroTalentString(data_dict["profile"]["character"]["hero_talents"])
+                )
 
-        elif (
-            "class_talents" in data_dict["profile"]["character"]
-            and "spec_talents" in data_dict["profile"]["character"]
-        ):
-            talent_combinations["baseline"] = (
-                ClassTalentString(data_dict["profile"]["character"]["class_talents"]),
-                SpecTalentString(data_dict["profile"]["character"]["spec_talents"]),
-            )
+            talent_combinations["baseline"] = tuple(combinations)
 
-        elif "class_talents" in data_dict["profile"]["character"]:
-            talent_combinations["baseline"] = (
-                ClassTalentString(data_dict["profile"]["character"]["class_talents"]),
-            )
-
-        elif "spec_talents" in data_dict["profile"]["character"]:
-            talent_combinations["baseline"] = (
-                SpecTalentString(data_dict["profile"]["character"]["spec_talents"]),
-            )
+        if data_dict["data_profile_overrides"]:
+            talent_combinations = {}
 
         for i, k_v in enumerate(data_dict["data_profile_overrides"].items()):
             human_name, simc_args = k_v
@@ -143,6 +150,7 @@ class SecondaryDistributionSimulator(Simulator):
             "talents=",
             "spec_talents=",
             "class_talents=",
+            "hero_talents=",
         ]
 
         for human_name, talent_combination in talent_combinations.items():

@@ -88,6 +88,7 @@ class TalentAddSimulator(Simulator):
                 if args.startswith("talents=")
                 or args.startswith("class_talents=")
                 or args.startswith("spec_talents=")
+                or args.startswith("hero_talents=")
             ]
             other_args = [arg for arg in simc_args if arg not in talent_strings]
             # for talent prefixed string
