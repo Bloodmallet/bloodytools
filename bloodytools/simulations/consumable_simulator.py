@@ -133,28 +133,22 @@ class PotionSimulator(ConsumableSimulator):
 
     def consumables(self) -> typing.Dict[str, str]:
         return {
-            # breaks simc
-            # Unable to initialize consumable 'potion' from 'potion_of_frozen_fatality_3': Unable to find consumable.
-            # "Potion of Frozen Fatality": "",
-            "Bottled Putrescence": "",
-            # Unable to initialize consumable 'potion' from 'residual_neural_channeling_agent_3': Unable to find consumable.
-            # "Residual Neural Channeling Agent": "",
-            "Elemental Potion of Ultimate Power": "",
-            "Elemental Potion of Power": "",
-            "Potion of Shocking Disclosure": "",
+            # armor & max life, tank pot
+            # "Frontline Potion": "",
+            # become a healing puddle after death
+            # "Grotesque Vial": "",
+            "Tempered Potion": "",
+            "Potion of Unwavering Focus": "",
         }
 
     def item_ids(self) -> typing.Dict[str, str]:
         return {
-            # breaks simc
-            # Unable to initialize consumable 'potion' from 'potion_of_frozen_fatality_3': Unable to find consumable.
-            # "Potion of Frozen Fatality": "",
-            "Bottled Putrescence": "191360",
-            # Unable to initialize consumable 'potion' from 'residual_neural_channeling_agent_3': Unable to find consumable.
-            # "Residual Neural Channeling Agent": "",
-            "Elemental Potion of Ultimate Power": "191381",
-            "Elemental Potion of Power": "191387",
-            "Potion of Shocking Disclosure": "191399",
+            # armor & max life, tank pot
+            # "Frontline Potion": "212262",
+            # become a healing puddle after death
+            # "Grotesque Vial": "212256",
+            "Tempered Potion": "212265",
+            "Potion of Unwavering Focus": "212259",
         }
 
 
@@ -168,26 +162,22 @@ class PhialSimulator(ConsumableSimulator):
 
     def consumables(self) -> typing.Dict[str, str]:
         return {
-            # Unable to initialize consumable 'flask' from 'phial_of_the_eye_in_the_storm_3': First special effect initialization phase could not deduce a proper consumable to create.
-            # "Phial of the Eye in the Storm": "",
-            "Iced Phial of Corrupting Rage": "",
-            "Phial of Charged Isolation": "",
-            "Phial of Glacial Fury": "",
-            "Phial of Static Empowerment": "",
-            "Phial of Tepid Versatility": "",
-            # "Charged Phial of Alacrity": "",
-            "Phial of Elemental Chaos": "",
+            "Flask of Alchemical Chaos": "",
+            "Flask of Tempered Mastery": "",
+            "Flask of Tempered Swiftness": "",
+            "Flask of Tempered Versatility": "",
+            "Flask of Tempered Aggression": "",
+            # emergency healing done
+            # "Flask of Saving Graces": "",
         }
 
     def item_ids(self) -> typing.Dict[str, str]:
         return {
-            # Unable to initialize consumable 'flask' from 'phial_of_the_eye_in_the_storm_3': First special effect initialization phase could not deduce a proper consumable to create.
-            # "Phial of the Eye in the Storm": "",
-            "Iced Phial of Corrupting Rage": "191327",
-            "Phial of Charged Isolation": "191330",
-            "Phial of Glacial Fury": "191333",
-            "Phial of Static Empowerment": "191336",
-            "Phial of Tepid Versatility": "191339",
-            # "Charged Phial of Alacrity": "191348",
-            "Phial of Elemental Chaos": "191357",
+            "Flask of Alchemical Chaos": "212283",
+            "Flask of Tempered Mastery": "212280",
+            "Flask of Tempered Swiftness": "212274",
+            "Flask of Tempered Versatility": "212277",
+            "Flask of Tempered Aggression": "212271",
+            # emergency healing done
+            # "Flask of Saving Graces": "212301",
         }
