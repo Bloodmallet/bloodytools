@@ -53,7 +53,7 @@ WEAPON_ENCHANTS = [
 # }
 
 DK_ENCHANTS = [
-    DKEnchant(name="Rune of Hysteria", spell_id="326911"),
+    # DKEnchant(name="Rune of Hysteria", spell_id="326911"),
     DKEnchant(name="Rune of Razorice", spell_id="53343"),
     DKEnchant(name="Rune of Sanguination", spell_id="326805"),
     DKEnchant(name="Rune of the Apocalypse", spell_id="327082"),
