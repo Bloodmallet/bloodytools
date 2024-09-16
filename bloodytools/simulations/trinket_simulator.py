@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 # special cases
 M0_ITEMLEVEL = 593
-PREVIOUS_SEASON_ITEMLEVELS: list[int] = []
+PREVIOUS_SEASON_ITEMLEVELS: typing.List[int] = []
 ALLOWED_NON_SEASONAL_DUNGEON_ITEMS = (
     # 193743,  # Irideus Frament
     # 193791,  # Time-Breaching Talon
