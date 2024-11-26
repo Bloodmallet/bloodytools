@@ -12,7 +12,11 @@ from bloodytools.utils.config import Config
 from bloodytools.utils.data_type import DataType
 from bloodytools.utils.simulation_objects import Simulation_Group
 from bloodytools.utils.utils import create_base_json_dict
-from bloodytools.utils.profile_extraction import extract_profile, EmptyFileError
+from bloodytools.utils.profile_extraction import (
+    CharacterSource,
+    extract_profile,
+    EmptyFileError,
+)
 from simc_support.game_data.WowSpec import WowSpec
 
 logger = logging.getLogger(__name__)
@@ -394,7 +398,11 @@ class Simulator(abc.ABC):
             data_dict["profile"]["character"] = {}
 
         try:
-            extract_profile("custom_profile.txt", self.wow_spec.wow_class)
+            extract_profile(
+                "custom_profile.txt",
+                self.wow_spec.wow_class,
+                character_source=CharacterSource.CUSTOM_PROFILE,
+            )
             custom_profile = True
         except EmptyFileError:
             custom_profile = False
