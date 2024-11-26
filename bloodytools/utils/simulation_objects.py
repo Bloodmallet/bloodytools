@@ -771,6 +771,10 @@ class Simulation_Group:
                     for arg in profile.simc_arguments
                     if arg.split("=")[0] not in simc_wow_class_names
                 ]
+                # remove comments
+                filtered_arguments = [
+                    arg for arg in filtered_arguments if not arg.startswith("#")
+                ]
 
                 unique_arguments: typing.Dict[str, str] = {}
                 for arg in filtered_arguments:
