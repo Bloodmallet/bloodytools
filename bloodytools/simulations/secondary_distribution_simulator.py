@@ -60,6 +60,10 @@ class SecondaryDistributionSimulator(Simulator):
             default_actions=self.settings.default_actions,
             executable=self.settings.executable,
         )
+        simulation.simc_arguments.append("# not-a-real-apl")
+        # actions=auto_attack
+        simulation.simc_arguments.append("actions=auto_attack")
+
         simulation.simulate()
 
         stats = 0
