@@ -17,6 +17,11 @@ from simc_support.game_data.ItemLevel import _df_s3_hero
 
 logger = logging.getLogger(__name__)
 
+ALLOWED_SEASONS = [
+    Season.TWW_SEASON_1,
+    Season.TWW_SEASON_2,
+]
+
 # special cases
 M0_ITEMLEVEL = 593
 PREVIOUS_SEASON_ITEMLEVELS: typing.List[int] = []
@@ -184,9 +189,7 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
 
     trinket_list = [t for t in trinket_list if wow_spec.stat in t.stats or not t.stats]
 
-    allowed_season = [
-        Season.TWW_SEASON_1,
-    ]
+    allowed_season = ALLOWED_SEASONS
 
     already_added_trinkets: typing.Set[str] = set()
     new_trinket_list: typing.List[Trinket] = []

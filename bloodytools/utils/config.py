@@ -30,9 +30,9 @@ class Config:
     iterations: str = "60000"
     keep_files: bool = False
     # affects trinkets
-    max_ilevel: int = 640
+    max_ilevel: int = 680
     # affects trinkets
-    min_ilevel: int = 600
+    min_ilevel: int = 635
     pretty: bool = False
     profileset_work_threads: str = "2"
     ptr: str = "0"
