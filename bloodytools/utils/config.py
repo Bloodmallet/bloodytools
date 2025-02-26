@@ -55,7 +55,7 @@ class Config:
     talent_permutations: bool = False
     target_error: typing.Dict[str, str] = dataclasses.field(default_factory=dict)
     threads: str = ""
-    tier: str = "TWW1"
+    tier: str = "TWW2"
     use_raidbots: bool = False
     write_humanreadable_secondary_distribution_file: bool = False
     apikey: str = ""
