@@ -1,0 +1,37 @@
+hunter="TWW2_Hunter_Beast_Mastery_PackLeader"
+source=default
+spec=beast_mastery
+level=80
+race=dwarf
+role=attack
+position=ranged_back
+talents=C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsBzwQDbAAAAAAYMmtZegxMzAzMmhFzMmZMmZMZGzYGzMGzMmhxYGDzyMYZGsBAAAAAAA
+
+head=tireless_collectors_chained_cowl,id=229271,bonus_id=4795/1808,ilevel=678,gem_id=213743
+neck=semicharmed_amulet,id=228841,bonus_id=4795/8781,ilevel=678,gem_id=213458/213482
+shoulders=epaulettes_of_failed_enforcers,id=228860,bonus_id=4795,ilevel=678
+back=consecrated_cloak,id=222817,bonus_id=8790/11303/8960,ilevel=675
+chest=tireless_collectors_battlegear,id=229274,bonus_id=4795,ilevel=678,enchant_id=7364
+wrists=glyphetched_vambraces,id=219342,bonus_id=8790/1808/11303/8960,ilevel=675,gem_id=213482,enchant_id=7385
+hands=tireless_collectors_gauntlets,id=229272,bonus_id=4795,ilevel=678
+waist=portable_power_generator,id=234501,bonus_id=4795/1808,ilevel=678,gem_id=213482
+legs=tireless_collectors_armored_breeches,id=229270,bonus_id=4795,ilevel=678,enchant_id=7601
+feet=boots_of_shuddering_matter,id=178796,bonus_id=4795,ilevel=678,enchant_id=7424
+finger1=faded_championship_ring,id=228840,bonus_id=4795/8781,ilevel=678,gem_id=213482/213482,enchant_id=7340
+finger2=the_jastor_diamond,id=231265,bonus_id=4795/8781,ilevel=678,gem_id=213473/213494,enchant_id=7340
+trinket1=improvised_seaforium_pacemaker,id=232541,bonus_id=4795,ilevel=678
+trinket2=eye_of_kezan,id=230198,bonus_id=4795,ilevel=678
+main_hand=tiny_pal,id=228893,ilevel=678,enchant_id=7445
+
+# Gear Summary
+# gear_ilvl=677.60
+# gear_agility=51214
+# gear_stamina=392419
+# gear_crit_rating=17616
+# gear_haste_rating=17291
+# gear_mastery_rating=11975
+# gear_versatility_rating=147
+# gear_avoidance_rating=1090
+# gear_armor=48977
+# set_bonus=thewarwithin_season_2_2pc=1
+# set_bonus=thewarwithin_season_2_4pc=1
