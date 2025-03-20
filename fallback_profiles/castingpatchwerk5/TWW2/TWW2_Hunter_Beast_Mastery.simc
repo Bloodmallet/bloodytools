@@ -5,7 +5,7 @@ level=80
 race=dwarf
 role=attack
 position=ranged_back
-talents=C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsBzwQDbAAAAAAYMmtZegxMzAzMmhFzMmZMmZMZGzYGzMGzMmhxYGDzyMYZGsBAAAAAAA
+talents=C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsBzwQDbAAAAAAYYGz8AWmZMYmZmZsYMmZMmZmJzYGzYmxYmxMMGzYYWGYZmhNAAAAAAA
 
 head=tireless_collectors_chained_cowl,id=229271,bonus_id=4795/1808,ilevel=678,gem_id=213743
 neck=semicharmed_amulet,id=228841,bonus_id=4795/8781,ilevel=678,gem_id=213458/213482
