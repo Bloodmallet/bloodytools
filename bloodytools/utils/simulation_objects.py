@@ -88,6 +88,7 @@ class Simulation_Data:
         target_error: str = "0.1",
         threads: str = "",
         remove_files: bool = True,
+        comment: str = "",
     ) -> None:
         super(Simulation_Data, self).__init__()
 
@@ -208,6 +209,8 @@ class Simulation_Data:
         else:
             self.threads = ""
         self.remove_files = remove_files
+        # optional comment about the profile
+        self.comment = comment
 
         # set independent default values
         # creation time of the simulation object
@@ -443,6 +446,9 @@ class Simulation_Data:
             argument.append("ptr=" + self.ptr)
         argument.append("threads=" + self.threads)
 
+        if self.comment:
+            argument.append("# " + self.comment)
+
         for simc_argument in self.simc_arguments:
             argument.append(simc_argument)
         argument.append(f'name="{self.name}"')
@@ -544,6 +550,7 @@ class Simulation_Data:
             simc_arguments=list(self.simc_arguments).copy(),
             target_error=self.target_error,
             threads=self.threads,
+            comment=self.comment,
         )
 
         new_sim_data.so_creation_time = self.so_creation_time
@@ -754,6 +761,8 @@ class Simulation_Group:
             # write first profile
             logger.debug("simc_arguments of first profile of simulation_group")
             logger.debug(self.profiles[0].simc_arguments)
+            if self.profiles[0].comment:
+                f.write(f"# {self.profiles[0].comment}\n")
             for argument in self.profiles[0].simc_arguments:
                 f.write("{}\n".format(argument))
             f.write('name="{}"\n\n# Profileset start\n'.format(self.profiles[0].name))
@@ -781,6 +790,8 @@ class Simulation_Group:
                     identifier = arg.split("=")[0]
                     unique_arguments[identifier] = arg
 
+                if profile.comment:
+                    f.write(f"# {profile.comment}\n")
                 for argument in unique_arguments.values():
                     f.write(
                         'profileset."{profile_name}"+={argument}\n'.format(
