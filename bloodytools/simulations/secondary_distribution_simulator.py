@@ -4,7 +4,11 @@ import os
 import typing
 
 from bloodytools.simulations.simulator import Simulator
-from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
+from bloodytools.utils.simulation_objects import (
+    Simulation_Data,
+    Simulation_Group,
+    SimulationError,
+)
 from bloodytools.utils.profile_extraction import create_simc_profile_path
 
 logger = logging.getLogger(__name__)
@@ -64,7 +68,12 @@ class SecondaryDistributionSimulator(Simulator):
         # actions=auto_attack
         simulation.simc_arguments.append("actions=auto_attack")
 
-        simulation.simulate()
+        try:
+            simulation.simulate()
+        except SimulationError as e:
+            if "unable to create action: auto_attack" in str(e.message):
+                simulation.simc_arguments.pop()
+                simulation.simc_arguments.pop()
 
         stats = 0
         for stat in rating_names:
