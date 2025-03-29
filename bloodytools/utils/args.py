@@ -109,7 +109,14 @@ def arg_parse_config():
         action="store_const",
         const=True,
         default=False,
-        help="Keep generated simc input and output files.",
+        help="Keep generated simc input (.simc) and output files (.json and if --html also .html).",
+    )
+    parser.add_argument(
+        "--html",
+        action="store_const",
+        const=True,
+        default=False,
+        help="Generate simc html file.",
     )
     parser.add_argument(
         "--pretty",

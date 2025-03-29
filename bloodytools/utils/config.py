@@ -27,6 +27,8 @@ class Config:
     default_actions: str = "1"
     executable: str = "../SimulationCraft/simc"
     """Path to the executable, including the executable"""
+    html: bool = False
+    """True if html files should get generated."""
     iterations: str = "60000"
     keep_files: bool = False
     # affects trinkets
@@ -160,6 +162,7 @@ class Config:
         config.use_raidbots = args.raidbots  # type: ignore
         config.keep_files = args.keep_files  # type: ignore
         config.pretty = args.pretty  # type: ignore
+        config.html = args.html  # type: ignore
 
         config.set_simc_hash()
 

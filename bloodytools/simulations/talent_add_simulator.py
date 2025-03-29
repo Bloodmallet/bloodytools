@@ -46,6 +46,7 @@ class TalentAddSimulator(Simulator):
                 default_actions=self.settings.default_actions,
                 executable=self.settings.executable,
                 iterations=self.settings.iterations,
+                generate_html=self.settings.html,
             )
 
             # get talent string
@@ -104,7 +105,8 @@ class TalentAddSimulator(Simulator):
                     talent_id, invested_points = talent.split(":")
 
                     # TODO: replace with comparison to talent.max_rank once simc_support has talent data
-                    if int(invested_points) > 1:
+                    # TODO: Elemental lost all multi talent point talents
+                    if int(invested_points) >= 1:
                         continue
 
                     other_talents = [
@@ -136,6 +138,7 @@ class TalentAddSimulator(Simulator):
                         default_actions=self.settings.default_actions,
                         executable=self.settings.executable,
                         iterations=self.settings.iterations,
+                        generate_html=self.settings.html,
                     )
                     simulation_group.add(simulation)
 

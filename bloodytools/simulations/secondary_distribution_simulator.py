@@ -63,6 +63,7 @@ class SecondaryDistributionSimulator(Simulator):
             ptr=self.settings.ptr,
             default_actions=self.settings.default_actions,
             executable=self.settings.executable,
+            generate_html=self.settings.html,
         )
         simulation.simc_arguments.append("# not-a-real-apl")
         # actions=auto_attack
@@ -200,6 +201,7 @@ class SecondaryDistributionSimulator(Simulator):
                     ptr=self.settings.ptr,
                     default_actions=self.settings.default_actions,
                     executable=self.settings.executable,
+                    generate_html=self.settings.html,
                 )
 
                 if (crit, haste, mastery, vers) == distribution_multipliers[0] and (

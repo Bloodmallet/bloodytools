@@ -88,6 +88,7 @@ class Simulator(abc.ABC):
             profileset_work_threads=self.settings.profileset_work_threads,
             executable=self.settings.executable,
             remove_files=not self.settings.keep_files,
+            generate_html=self.settings.html,
         )
         self.add_simulation_data(
             simulation_group,

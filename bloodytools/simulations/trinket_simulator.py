@@ -383,6 +383,7 @@ class TrinketSimulator(Simulator):
             ptr=self.settings.ptr,
             default_actions=self.settings.default_actions,
             executable=self.settings.executable,
+            generate_html=self.settings.html,
         )
 
         if self.settings.custom_apl:
@@ -422,6 +423,7 @@ class TrinketSimulator(Simulator):
                     default_actions=self.settings.default_actions,
                     executable=self.settings.executable,
                     comment=f"'{trinket.full_name}' at itemlevel '{itemlevel}'",
+                    generate_html=self.settings.html,
                 )
                 simulation_group.add(simulation_data)
 
