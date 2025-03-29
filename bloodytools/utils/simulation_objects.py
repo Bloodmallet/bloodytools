@@ -9,7 +9,7 @@ import sys
 import typing
 import threading
 import time
-import uuid
+import uuid as uuid_mod
 
 # wow game data and simc input checks
 from simc_support.simc_data import FightStyle
@@ -70,6 +70,7 @@ class Simulation_Data:
 
     def __init__(
         self,
+        base_filename: str = "",
         calculate_scale_factors: str = "0",
         default_actions: str = "1",
         default_skill: str = "1.0",
@@ -155,11 +156,15 @@ class Simulation_Data:
             self.log = log
         else:
             self.log = "0"
-        # optional name for the data
-        if not name:
-            self.name = str(uuid.uuid4())
+        if base_filename:
+            self.base_filename = base_filename
         else:
+            self.base_filename = str(uuid_mod.uuid4())
+        # optional name for the data
+        if name:
             self.name = name
+        else:
+            self.name = self.base_filename
         # simc setting to enable/disable optimize expressions
         if optimize_expressions == "0" or optimize_expressions == "1":
             self.optimize_expressions = optimize_expressions
@@ -408,10 +413,9 @@ class Simulation_Data:
             int -- DPS of the simulation
         """
         # temporary file names
-        self.uuid = str(uuid.uuid4())
-        self.filename = "{}.simc".format(self.uuid)
-        self.json_filename = "{}.json".format(self.uuid)
-        self.html_filename = "{}.html".format(self.uuid)
+        self.filename = "{}.simc".format(self.base_filename)
+        self.json_filename = "{}.json".format(self.base_filename)
+        self.html_filename = "{}.html".format(self.base_filename)
 
         if (
             FightStyle.CASTINGPATCHWERK in self.fight_style
@@ -587,6 +591,7 @@ class Simulation_Group:
         self,
         simulation_instance: Union[None, Simulation_Data, List[Simulation_Data]] = None,
         name: str = "",
+        base_filename: str = "",
         threads: str = "",
         profileset_work_threads: str = "",
         executable: str = "",
@@ -596,6 +601,10 @@ class Simulation_Group:
         logger.debug("simulation_group initiated.")
 
         self.name = name
+        if base_filename:
+            self.base_filename: str = base_filename
+        else:
+            self.base_filename = str(uuid_mod.uuid4())
         self.filename: str = ""
         self.json_filename: str = ""
         self.html_filename: str = ""
@@ -860,10 +869,9 @@ class Simulation_Group:
                 )
 
             # temporary file names
-            self.uuid = str(uuid.uuid4())
-            self.filename = "{}.simc".format(self.uuid)
-            self.json_filename = "{}.json".format(self.uuid)
-            self.html_filename = "{}.html".format(self.uuid)
+            self.filename = "{}.simc".format(self.base_filename)
+            self.json_filename = "{}.json".format(self.base_filename)
+            self.html_filename = "{}.html".format(self.base_filename)
 
             if (
                 FightStyle.CASTINGPATCHWERK in self.profiles[0].fight_style
@@ -1043,16 +1051,7 @@ class Simulation_Group:
             simc_fight_style = self.profiles[0].fight_style
             special_remark = ""
 
-        self.filename = str(uuid.uuid4()) + ".simc"
-
-        # if somehow the random naming function created the same name twice
-        if os.path.isfile(self.filename):
-            logger.debug(
-                "Somehow the random filename generator generated a name ('{}') that is already on use.".format(
-                    self.filename
-                )
-            )
-            self.filename = str(uuid.uuid4()) + ".simc"
+        self.filename = self.base_filename + ".simc"
 
         self.write_profileset_file(
             fight_style=simc_fight_style,

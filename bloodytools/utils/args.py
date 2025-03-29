@@ -105,6 +105,12 @@ def arg_parse_config():
         help="Overwrites target_error for all simulations. Default: whatever is in setting.py",
     )
     parser.add_argument(
+        "--file_name",
+        metavar="STRING",
+        type=str,
+        help="Set the base file name to be used for file generation. Optional. Defaults to auto-generated uuid.",
+    )
+    parser.add_argument(
         "--keep_files",
         action="store_const",
         const=True,

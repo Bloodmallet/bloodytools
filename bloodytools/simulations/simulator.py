@@ -89,6 +89,7 @@ class Simulator(abc.ABC):
             executable=self.settings.executable,
             remove_files=not self.settings.keep_files,
             generate_html=self.settings.html,
+            base_filename=self.settings.base_filename,
         )
         self.add_simulation_data(
             simulation_group,
