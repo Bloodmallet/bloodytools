@@ -1,6 +1,6 @@
 setuptools
 # Lib with World of Warcraft game data for simulations and some input checks for SimulationCraft.
-simc-support~=11.0.2.0
+simc-support~=11.1.0.0
 requests
 # load special cases
 pyyaml

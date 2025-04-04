@@ -30,6 +30,7 @@ class RaceSimulator(Simulator):
                 executable=self.settings.executable,
                 iterations=self.settings.iterations,
                 remove_files=not self.settings.keep_files,
+                generate_html=self.settings.html,
             )
 
             if race == self.wow_spec.wow_class.races[0]:

@@ -17,6 +17,11 @@ from simc_support.game_data.ItemLevel import _df_s3_hero
 
 logger = logging.getLogger(__name__)
 
+ALLOWED_SEASONS = [
+    Season.TWW_SEASON_1,
+    Season.TWW_SEASON_2,
+]
+
 # special cases
 M0_ITEMLEVEL = 593
 PREVIOUS_SEASON_ITEMLEVELS: typing.List[int] = []
@@ -184,9 +189,7 @@ def _get_trinkets(wow_spec: WowSpec, settings: Config) -> typing.List[Trinket]:
 
     trinket_list = [t for t in trinket_list if wow_spec.stat in t.stats or not t.stats]
 
-    allowed_season = [
-        Season.TWW_SEASON_1,
-    ]
+    allowed_season = ALLOWED_SEASONS
 
     already_added_trinkets: typing.Set[str] = set()
     new_trinket_list: typing.List[Trinket] = []
@@ -380,6 +383,7 @@ class TrinketSimulator(Simulator):
             ptr=self.settings.ptr,
             default_actions=self.settings.default_actions,
             executable=self.settings.executable,
+            generate_html=self.settings.html,
         )
 
         if self.settings.custom_apl:
@@ -403,9 +407,10 @@ class TrinketSimulator(Simulator):
 
             for itemlevel in filtered_itemlevels:
                 simulation_data = Simulation_Data(
-                    name=self.profile_split_character().join(
-                        [trinket.name, str(itemlevel)]
-                    ),
+                    name=self.get_profile_name(str(trinket.item_id), str(itemlevel)),
+                    # name=self.profile_split_character().join(
+                    #     [str(trinket.item_id), str(itemlevel)]
+                    # ),
                     fight_style=self.fight_style,
                     iterations=self.settings.iterations,
                     target_error=self.settings.target_error.get(
@@ -417,6 +422,8 @@ class TrinketSimulator(Simulator):
                     ptr=self.settings.ptr,
                     default_actions=self.settings.default_actions,
                     executable=self.settings.executable,
+                    comment=f"'{trinket.full_name}' at itemlevel '{itemlevel}'",
+                    generate_html=self.settings.html,
                 )
                 simulation_group.add(simulation_data)
 
@@ -429,8 +436,9 @@ class TrinketSimulator(Simulator):
                             + f",bonus_id={SPECIAL_CASE_BONUS_IDS[trinket.item_id][stat]}"
                         )
                         new_data.name = self.get_profile_name(
-                            f"{trinket.name} [{stat.title()}]", str(itemlevel)
+                            f"{trinket.item_id} [{stat.title()}]", str(itemlevel)
                         )
+                        new_data.comment = f"'{trinket.full_name}' with special case '{stat.title()}' at itemlevel '{itemlevel}'"
 
                         simulation_group.add(new_data)
 
@@ -455,13 +463,35 @@ class TrinketSimulator(Simulator):
                             )
 
                         new_data.name = self.get_profile_name(
-                            f"{trinket.name} [{option.title()}]", str(itemlevel)
+                            f"{trinket.item_id} [{option.title()}]", str(itemlevel)
                         )
+                        new_data.comment = f"'{trinket.full_name}' with special case '{option.title()}' at itemlevel '{itemlevel}'"
 
                         simulation_group.add(new_data)
 
     def post_processing(self, data_dict: dict) -> dict:
         data_dict = super().post_processing(data_dict)
+
+        # transform trinket ids back to names
+        trinket_list = _get_trinkets(self.wow_spec, self.settings)
+        trinket_dict = {t.item_id: t for t in trinket_list}
+        new_data_dict: typing.Dict[str, typing.Dict[str, int]] = {}
+        for item_id, subdict in data_dict["data"].items():
+            if " [" in item_id:
+                actual_item_id, special_case = item_id.split(" [")
+                special_case = " [" + special_case
+                actual_item_id = int(actual_item_id)
+                new_data_dict[trinket_dict[actual_item_id].full_name + special_case] = (
+                    subdict
+                )
+            else:
+                try:
+                    actual_number = int(item_id)
+                except ValueError:
+                    new_data_dict[item_id] = subdict
+                else:
+                    new_data_dict[trinket_dict[actual_number].full_name] = subdict
+        data_dict["data"] = new_data_dict
 
         # derive itemlevel list from simulated information
         simulated_steps = set()

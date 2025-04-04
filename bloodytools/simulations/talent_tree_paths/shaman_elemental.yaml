@@ -1,9 +1,6 @@
-# class_talents=frost_shock:1/fire_and_ice:1/earth_elemental:1/natures_fury:1/spiritwalkers_grace:1/thunderstorm:1/totemic_focus:1/enhanced_imbues:1/graceful_spirit:1/lightning_lasso:1/totemic_surge:1/thundershock:1/totemic_recall:1/natures_swiftness:1/call_of_the_elements:1
-# spec_talents=earth_shock:0/elemental_blast:0/elemental_fury:0/fire_elemental:0/storm_elemental:0/flash_of_lightning:0/aftershock:0/surge_of_power:0/echo_of_the_elements:0/icefury:0/unrelenting_calamity:0/master_of_the_elements:0/fusion_of_elements:0/storm_frenzy:0/swelling_maelstrom:0/primordial_fury:0/flow_of_power:0/elemental_unity:0/flux_melting:0/lightning_conduit:0/power_of_the_maelstrom:0/improved_flametongue_weapon:0/everlasting_elements:0/flames_of_the_cauldron:0/eye_of_the_storm:0/thunderstrike_ward:0/echo_chamber:0/searing_flames:0/earthen_rage:0/elemental_equilibrium:0/ascendance:0/stormkeeper:0/echo_of_the_elementals:0/primordial_wave:0/mountains_will_fall:0/first_ascendant:0/preeminence:0/fury_of_the_storms:0/skybreakers_fiery_demise:0/magma_chamber:0/splintered_elements:0/echoes_of_great_sundering:0/deeply_rooted_elements:0/lightning_rod:0/primal_elementalist:0/liquid_magma_totem:0
-# # Farseer
-# hero_talents=call_of_the_ancestors:1/latent_wisdom:1/ancient_fellowship:1/heed_my_call:1/routine_communication:1/elemental_reverb:1/offering_from_beyond:1/primordial_capacity:1/spiritwalkers_momentum:1/maelstrom_supremacy:1/final_calling:1/ancestral_swiftness:1
-# # Stormbringer
-# hero_talents=tempest:1/unlimited_power:1/stormcaller:1/supercharge:1/storm_swell:1/arc_discharge:1/rolling_thunder:1/voltaic_surge:1/conductive_energy:1/awakening_storms:1
-
-m+:
-  - talents=CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAAMbzy2MjxwMbMmZwMzAAAAAgFzsBDYAzCTgZBAMbTzMD2WYmphZMjhlZMDGjFLzMzMzYGzwA
+## Example
+# My Awesome Build:
+#   - class_talents=talent_name_a:2/talent_name_b:1/talent_name_c:0
+#   - spec_talents=talent_name_d:1/talent_name_e:0/talent_name_f:3
+# Cool Other Build:
+#   - talents=WOW_EXPORT_STRING

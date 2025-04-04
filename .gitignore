@@ -32,3 +32,5 @@ Makefile
 /*.simc
 *.log
 coverage.xml
+*.json
+*.html
