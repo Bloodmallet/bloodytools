@@ -1,0 +1,35 @@
+druid=TWW_Druid_Balance
+level=80
+race=night_elf
+role=spell
+spec=balance
+talents=CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALUmtmxYmBYWYZmZWYMzsYWmZZmZbmZmZmZxsMGGshFAMW2mZDjZbEYCAAAwCzYA2MGG
+
+head=,id=229307,bonus_id=1527/11996/1808,gem_id=213743
+neck=,id=221060,bonus_id=4795/8781,gem_id=213494/213494,ilevel=678
+shoulder=,id=229305,bonus_id=1527/11996
+back=,id=222817,bonus_id=10421/9633/8902/12043/12040/1485/11303/8960,enchant_id=7403,crafted_stats=49/36
+chest=,id=229310,bonus_id=1527/11996,enchant_id=7364
+wrist=,id=219334,bonus_id=10421/9633/8902/9627/8793/10222/11307/12043/12040/10520/8960,enchant_id=7385,gem_id=213494,ilevel=675,crafted_stats=36/32
+hands=,id=221036,bonus_id=4795,ilevel=678
+waist=,id=168957,bonus_id=4795/1808,gem_id=213482,ilevel=678
+legs=,id=229306,bonus_id=1527/11996,enchant_id=7534
+feet=,id=221120,bonus_id=4795,enchant_id=7418,ilevel=678
+finger1=,id=228411,bonus_id=12025/1502,enchant_id=7346,gem_id=228638/228639/228640,ilevel=658
+finger2=,id=231265,bonus_id=6652/10394/10392/10356/11996/1527/10255/8781,enchant_id=7346,gem_id=213494/213494
+trinket1=,id=230192,bonus_id=4795,ilevel=678
+trinket2=,id=230027,bonus_id=4795,ilevel=678
+main_hand=,id=232805,bonus_id=6652/10356/11996/9418/1527/10255,enchant_id=7460
+
+# Gear Summary
+# gear_ilvl=676.27
+# gear_stamina=386486
+# gear_intellect=75206
+# gear_crit_rating=4105
+# gear_haste_rating=12061
+# gear_mastery_rating=18606
+# gear_speed_rating=250
+# gear_avoidance_rating=1635
+# gear_armor=33935
+# set_bonus=thewarwithin_season_2_2pc=1
+# set_bonus=thewarwithin_season_2_4pc=1

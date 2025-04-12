@@ -4,5 +4,6 @@
 #   - spec_talents=talent_name_d:1/talent_name_e:0/talent_name_f:3
 # Cool Other Build:
 #   - talents=WOW_EXPORT_STRING
-M+ Bladestorm:
-- talents=BcEAAAAAAAAAAAAAAAAAAAAAAAQplIRkQOQiWpkkAAAAABRIKkAFRAJikEaSECQ4AhAAAAAAAAQiWiIgQ0QA
+
+Multitarget:
+- talents=CcEAAAAAAAAAAAAAAAAAAAAAAAGmZGzYGjZb2WWGzAAAAwgphZmlxMMWGzMjNzMDzghBAAAAAAgZMbjxAslZAbmxwCMwMajGwC

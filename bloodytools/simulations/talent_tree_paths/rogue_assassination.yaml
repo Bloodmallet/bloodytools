@@ -1,12 +1,6 @@
-Arterial Shock + Blindside/VenomRush Dslice:
-  - talents=BMQAAAAAAAAAAAAAAAAAAAAAAQSkkIBAAAAAAItkItkAAAAAAAtWSCSgkkSKBRkEJJJJRrViEA
-Arterial Shock + TinyToxic/FlyingDagger Dslice:
-  - talents=BMQAAAAAAAAAAAAAAAAAAAAAAQSkkIBAAAAAAItkItkAAAAAAAtWSCSgkkSKBJRSkkEJRpViEA
-Hybrid Dslice:
-  - talents=BMQAAAAAAAAAAAAAAAAAAAAAAEJJJJSAAAAAAASLJSLJAAAAAAQrlkgEIJpkSSEkEJBJJalIBA
-Utilitarian:
-  - talents=BMQAAAAAAAAAAAAAAAAAAAAAAEJJJJSQAAAAAAItkItkAAAAAAAtGJkkAJKpkEBJRSQSiWJJBA
-HybridNoCT 3Tar:
-  - talents=BMQAAAAAAAAAAAAAAAAAAAAAAEJJJSSQAAAAAAIlkItkAAAAAAAaJJIBSSKpFJBJRSQSSRJSAA
-Hybrid 5Tar:
-  - talents=BMQAAAAAAAAAAAAAAAAAAAAAAEJJJJSQAAAAAAIlkItkAAAAAAAaJJIBSSKpFJBJRSQSSRJSAA
+## Example
+# My Awesome Build:
+#   - class_talents=talent_name_a:2/talent_name_b:1/talent_name_c:0
+#   - spec_talents=talent_name_d:1/talent_name_e:0/talent_name_f:3
+# Cool Other Build:
+#   - talents=WOW_EXPORT_STRING

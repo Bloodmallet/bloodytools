@@ -2,7 +2,7 @@ import dataclasses
 import logging
 import sys
 import typing
-
+import uuid
 from bloodytools.utils.data_type import DataType
 from simc_support.game_data.WowSpec import WowSpec, get_wow_spec
 
@@ -27,12 +27,16 @@ class Config:
     default_actions: str = "1"
     executable: str = "../SimulationCraft/simc"
     """Path to the executable, including the executable"""
+    base_filename: str = ""
+    """Base file name for the generated simc input and output files."""
+    html: bool = False
+    """True if html files should get generated."""
     iterations: str = "60000"
     keep_files: bool = False
     # affects trinkets
-    max_ilevel: int = 640
+    max_ilevel: int = 680
     # affects trinkets
-    min_ilevel: int = 600
+    min_ilevel: int = 635
     pretty: bool = False
     profileset_work_threads: str = "2"
     ptr: str = "0"
@@ -55,7 +59,7 @@ class Config:
     talent_permutations: bool = False
     target_error: typing.Dict[str, str] = dataclasses.field(default_factory=dict)
     threads: str = ""
-    tier: str = "TWW1"
+    tier: str = "TWW2"
     use_raidbots: bool = False
     write_humanreadable_secondary_distribution_file: bool = False
     apikey: str = ""
@@ -73,6 +77,8 @@ class Config:
         self.target_error["castingpatchwerk"] = "0.1"
         self.target_error["hecticaddcleave"] = "0.2"
         self.target_error["beastlord"] = "0.2"
+        if not self.base_filename:
+            self.base_filename = str(uuid.uuid4())
         try:
             self.set_simc_hash()
         except ValueError as e:
@@ -157,9 +163,13 @@ class Config:
             for fight_style in config.target_error.keys():
                 config.target_error[fight_style] = args.target_error  # type: ignore
 
+        if args.file_name:  # type: ignore
+            config.base_filename = args.file_name  # type: ignore
+
         config.use_raidbots = args.raidbots  # type: ignore
         config.keep_files = args.keep_files  # type: ignore
         config.pretty = args.pretty  # type: ignore
+        config.html = args.html  # type: ignore
 
         config.set_simc_hash()
 

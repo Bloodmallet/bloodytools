@@ -53,7 +53,7 @@ WEAPON_ENCHANTS = [
 # }
 
 DK_ENCHANTS = [
-    DKEnchant(name="Rune of Hysteria", spell_id="326911"),
+    # DKEnchant(name="Rune of Hysteria", spell_id="326911"),
     DKEnchant(name="Rune of Razorice", spell_id="53343"),
     DKEnchant(name="Rune of Sanguination", spell_id="326805"),
     DKEnchant(name="Rune of the Apocalypse", spell_id="327082"),
@@ -98,6 +98,7 @@ class WeaponEnchantmentSimulator(Simulator):
             executable=self.settings.executable,
             iterations=self.settings.iterations,
             remove_files=not self.settings.keep_files,
+            generate_html=self.settings.html,
         )
 
         custom_apl = None
@@ -183,6 +184,7 @@ class WeaponEnchantmentSimulator(Simulator):
                             executable=self.settings.executable,
                             iterations=self.settings.iterations,
                             remove_files=not self.settings.keep_files,
+                            generate_html=self.settings.html,
                         )
 
                         simulation_group.add(simulation_data)
@@ -208,6 +210,7 @@ class WeaponEnchantmentSimulator(Simulator):
                     executable=self.settings.executable,
                     iterations=self.settings.iterations,
                     remove_files=not self.settings.keep_files,
+                    generate_html=self.settings.html,
                 )
 
                 simulation_group.add(simulation_data)

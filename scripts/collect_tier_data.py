@@ -116,7 +116,7 @@ def custom_table(
 
 
 def filter_by_existing_profiles(
-    specs: typing.List[typing.Tuple[str, str]]
+    specs: typing.List[typing.Tuple[str, str]],
 ) -> typing.List[typing.Tuple[str, str]]:
     simc_path = os.path.join(*EXECUTABLE.split("/")[:-1])
     return [

@@ -1,10 +1,6 @@
-VF Yogg CThun VF_yogg_cthun_119242215601071_Flay_ME:
-  - talents=BIQAAAAAAAAAAAAAAAAAAAAAAgAJBAAAAAAAAAAAAIkiDEJJtISSSEJCShkkEpRgICpItQSQBJA
-DA CThun DA_cthun_80589590852527_Spike_DR:
-  - talents=BIQAAAAAAAAAAAAAAAAAAAAAAASkEAAAAAAAAAAAAgQaEJJl4ASSSkkIIFSSSkGBiIki0CJBFIB
-DA NZoth CThun DA_nzoth_cthun_98189156546479_Spike_DR:
-  - talents=BIQAAAAAAAAAAAAAAAAAAAAAAEISOQAAAAAAAAAAAAASoFRiUCSSSSSigUIJJRaEIiQKSLkEUgE
-VF NZoth Yogg CThun VF_nzoth_yogg_cthun_129962384799663_Flay_DR:
-  - talents=BIQAAAAAAAAAAAAAAAAAAAAAAECiEAAAAAAAAAAAAgQaSkk0CSSSSkIIFSSSkGBiIki0CJBFkA
-VF NZoth Yogg CThun VF_nzoth_yogg_cthun_129962384799663_Flay_ME:
-  - talents=BIQAAAAAAAAAAAAAAAAAAAAAAECiEAAAAAAAAAAAAgQKSkk0CSSSSkIIFSSSkGBiIki0CJBFkA
+## Example
+# My Awesome Build:
+#   - class_talents=talent_name_a:2/talent_name_b:1/talent_name_c:0
+#   - spec_talents=talent_name_d:1/talent_name_e:0/talent_name_f:3
+# Cool Other Build:
+#   - talents=WOW_EXPORT_STRING

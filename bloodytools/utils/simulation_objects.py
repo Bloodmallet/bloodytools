@@ -9,7 +9,7 @@ import sys
 import typing
 import threading
 import time
-import uuid
+import uuid as uuid_mod
 
 # wow game data and simc input checks
 from simc_support.simc_data import FightStyle
@@ -70,13 +70,13 @@ class Simulation_Data:
 
     def __init__(
         self,
+        base_filename: str = "",
         calculate_scale_factors: str = "0",
         default_actions: str = "1",
         default_skill: str = "1.0",
         executable: str = "",
         fight_style: str = "patchwerk",
         fixed_time: str = "1",
-        html: str = "",
         iterations: str = "250000",
         log: str = "0",
         name: str = "",
@@ -88,6 +88,8 @@ class Simulation_Data:
         target_error: str = "0.1",
         threads: str = "",
         remove_files: bool = True,
+        generate_html: bool = False,
+        comment: str = "",
     ) -> None:
         super(Simulation_Data, self).__init__()
 
@@ -145,11 +147,6 @@ class Simulation_Data:
             self.fixed_time = fixed_time
         else:
             self.fixed_time = "1"
-        # simc setting to enable html output
-        if type(html) == str:
-            self.html = html
-        else:
-            self.html = ""
         # simc setting to determine the maximum number of run iterations
         #   (target_error and iterations determine the actually simulated
         #   iterations count)
@@ -159,11 +156,15 @@ class Simulation_Data:
             self.log = log
         else:
             self.log = "0"
-        # optional name for the data
-        if not name:
-            self.name = str(uuid.uuid4())
+        if base_filename:
+            self.base_filename = base_filename
         else:
+            self.base_filename = str(uuid_mod.uuid4())
+        # optional name for the data
+        if name:
             self.name = name
+        else:
+            self.name = self.base_filename
         # simc setting to enable/disable optimize expressions
         if optimize_expressions == "0" or optimize_expressions == "1":
             self.optimize_expressions = optimize_expressions
@@ -208,6 +209,9 @@ class Simulation_Data:
         else:
             self.threads = ""
         self.remove_files = remove_files
+        self.generate_html = generate_html
+        # optional comment about the profile
+        self.comment = comment
 
         # set independent default values
         # creation time of the simulation object
@@ -256,7 +260,7 @@ class Simulation_Data:
         """Determines if the current and given simulation_data share the
         same base. The following attributes are considered base:
         calculate_scale_factors, default_actions, default_skill,
-        executable, fight_style, fixed_time, html, iterations, log,
+        executable, fight_style, fixed_time, iterations, log,
         optimize_expressions, ptr, ready_trigger, target_error, threads
 
         Arguments:
@@ -282,8 +286,6 @@ class Simulation_Data:
         if self.fight_style != simulation_instance.fight_style:
             return False
         if self.fixed_time != simulation_instance.fixed_time:
-            return False
-        if self.html != simulation_instance.html:
             return False
         if self.iterations != simulation_instance.iterations:
             return False
@@ -411,9 +413,9 @@ class Simulation_Data:
             int -- DPS of the simulation
         """
         # temporary file names
-        self.uuid = str(uuid.uuid4())
-        self.filename = "{}.simc".format(self.uuid)
-        self.json_filename = "{}.json".format(self.uuid)
+        self.filename = "{}.simc".format(self.base_filename)
+        self.json_filename = "{}.json".format(self.base_filename)
+        self.html_filename = "{}.html".format(self.base_filename)
 
         if (
             FightStyle.CASTINGPATCHWERK in self.fight_style
@@ -427,6 +429,8 @@ class Simulation_Data:
 
         argument = [self.executable]
         argument.append("json=" + self.json_filename)
+        if self.generate_html:
+            argument.append("html=" + self.html_filename)
         argument.append("iterations=" + self.iterations)
         argument.append("target_error=" + self.target_error)
         argument.append("fight_style=" + simc_fight_style)
@@ -442,6 +446,9 @@ class Simulation_Data:
         if self.ptr == "1":
             argument.append("ptr=" + self.ptr)
         argument.append("threads=" + self.threads)
+
+        if self.comment:
+            argument.append("# " + self.comment)
 
         for simc_argument in self.simc_arguments:
             argument.append(simc_argument)
@@ -516,6 +523,8 @@ class Simulation_Data:
         # remove json file after parsing
         if self.json_filename is not None and self.remove_files:
             os.remove(self.json_filename)
+        if self.remove_files and self.generate_html:
+            os.remove(self.html_filename)
 
         self.set_simulation_end_time()
 
@@ -534,7 +543,6 @@ class Simulation_Data:
             executable=self.executable,
             fight_style=self.fight_style,
             fixed_time=self.fixed_time,
-            html=self.html,
             iterations=self.iterations,
             log=self.log,
             name=self.name,
@@ -544,6 +552,9 @@ class Simulation_Data:
             simc_arguments=list(self.simc_arguments).copy(),
             target_error=self.target_error,
             threads=self.threads,
+            comment=self.comment,
+            remove_files=self.remove_files,
+            generate_html=self.generate_html,
         )
 
         new_sim_data.so_creation_time = self.so_creation_time
@@ -580,19 +591,27 @@ class Simulation_Group:
         self,
         simulation_instance: Union[None, Simulation_Data, List[Simulation_Data]] = None,
         name: str = "",
+        base_filename: str = "",
         threads: str = "",
         profileset_work_threads: str = "",
         executable: str = "",
         remove_files: bool = True,
+        generate_html: bool = False,
     ) -> None:
         logger.debug("simulation_group initiated.")
 
         self.name = name
+        if base_filename:
+            self.base_filename: str = base_filename
+        else:
+            self.base_filename = str(uuid_mod.uuid4())
         self.filename: str = ""
         self.json_filename: str = ""
+        self.html_filename: str = ""
         self.json_data: typing.Optional[dict] = None
         self.threads = threads
         self.remove_files = remove_files
+        self.generate_html = generate_html
         # simulationcrafts own multithreading
         self.profileset_work_threads = profileset_work_threads
         self.executable = executable
@@ -709,8 +728,8 @@ class Simulation_Group:
             # local
             if local_simulation:
                 f.write("json={}\n".format(self.json_filename))
-                if self.profiles[0].html != "":
-                    f.write("html={}\n".format(self.profiles[0].html))
+                if self.generate_html:
+                    f.write("html={}\n".format(self.html_filename))
                 f.write("log={}\n".format(self.profiles[0].log))
                 f.write(
                     "calculate_scale_factors={}\n".format(
@@ -754,6 +773,8 @@ class Simulation_Group:
             # write first profile
             logger.debug("simc_arguments of first profile of simulation_group")
             logger.debug(self.profiles[0].simc_arguments)
+            if self.profiles[0].comment:
+                f.write(f"# {self.profiles[0].comment}\n")
             for argument in self.profiles[0].simc_arguments:
                 f.write("{}\n".format(argument))
             f.write('name="{}"\n\n# Profileset start\n'.format(self.profiles[0].name))
@@ -771,12 +792,18 @@ class Simulation_Group:
                     for arg in profile.simc_arguments
                     if arg.split("=")[0] not in simc_wow_class_names
                 ]
+                # remove comments
+                filtered_arguments = [
+                    arg for arg in filtered_arguments if not arg.startswith("#")
+                ]
 
                 unique_arguments: typing.Dict[str, str] = {}
                 for arg in filtered_arguments:
                     identifier = arg.split("=")[0]
                     unique_arguments[identifier] = arg
 
+                if profile.comment:
+                    f.write(f"# {profile.comment}\n")
                 for argument in unique_arguments.values():
                     f.write(
                         'profileset."{profile_name}"+={argument}\n'.format(
@@ -842,9 +869,9 @@ class Simulation_Group:
                 )
 
             # temporary file names
-            self.uuid = str(uuid.uuid4())
-            self.filename = "{}.simc".format(self.uuid)
-            self.json_filename = "{}.json".format(self.uuid)
+            self.filename = "{}.simc".format(self.base_filename)
+            self.json_filename = "{}.json".format(self.base_filename)
+            self.html_filename = "{}.html".format(self.base_filename)
 
             if (
                 FightStyle.CASTINGPATCHWERK in self.profiles[0].fight_style
@@ -946,11 +973,6 @@ class Simulation_Group:
 
                 raise SimulationError(self.error)
 
-            elif self.remove_files:
-                # remove profilesets file
-                os.remove(self.filename)
-                self.filename = ""
-
             logger.debug(self.simulation_output)
 
             # get dps of the first profile
@@ -965,9 +987,15 @@ class Simulation_Group:
             if self.json_data:
                 self.set_dps_from_profiletset_data(self.json_data)
 
-            # remove json file after parsing
-            if self.json_filename is not None and self.remove_files:
-                os.remove(self.json_filename)
+            # remove profilesets file
+            if self.remove_files:
+                os.remove(self.filename)
+                self.filename = ""
+                # remove json file after parsing
+                if self.json_filename:
+                    os.remove(self.json_filename)
+                if self.generate_html:
+                    os.remove(self.html_filename)
 
         else:
             raise NotSetYetError(
@@ -1023,16 +1051,7 @@ class Simulation_Group:
             simc_fight_style = self.profiles[0].fight_style
             special_remark = ""
 
-        self.filename = str(uuid.uuid4()) + ".simc"
-
-        # if somehow the random naming function created the same name twice
-        if os.path.isfile(self.filename):
-            logger.debug(
-                "Somehow the random filename generator generated a name ('{}') that is already on use.".format(
-                    self.filename
-                )
-            )
-            self.filename = str(uuid.uuid4()) + ".simc"
+        self.filename = self.base_filename + ".simc"
 
         self.write_profileset_file(
             fight_style=simc_fight_style,

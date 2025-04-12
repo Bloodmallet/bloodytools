@@ -1,0 +1,37 @@
+warrior="TWW2_Warrior_Arms"
+source=default
+spec=arms
+level=80
+race=void_elf
+role=attack
+position=back
+talents=CcEAAAAAAAAAAAAAAAAAAAAAAAGmZGzYGjZb2WWGzAAAAwgphZmlxMMWGzMjNzMDzghBAAAAAAgZMbjxAslZAbmxwCMwMajGwC
+
+head=waxsteel_greathelm,id=221100,bonus_id=523,ilevel=678,gem_id=213743
+neck=semicharmed_amulet,id=228841,bonus_id=1527/11996/11964/8781,ilevel=678,gem_id=213482/213482
+shoulders=enforcers_backalley_shoulderplates,id=229233,bonus_id=11996/10356/11962/6652/1579/10255,ilevel=678
+back=consecrated_cloak,id=222817,bonus_id=10421/9633/8902/12043/12040/1485/11304/8960/8795,ilevel=675,crafted_stats=32/36
+chest=enforcers_backalley_vestplate,id=229238,ilevel=678,enchant=crystalline_radiance_3
+wrists=everforged_vambraces,id=222435,bonus_id=10421/9633/8902/12043/12040/1485/1808/11304/8960,gem_id=213482,crafted_stats=32/36
+hands=enforcers_backalley_crushers,id=229236,bonus_id=11996/10356/11959/6652/1579/10255,ilevel=678
+waist=enforcers_backalley_girdle,id=229232,bonus_id=11996/10356/6652/12176/1579/10255/1808,ilevel=678,gem_id=213467
+legs=enforcers_backalley_chausses,id=229234,bonus_id=11996/10356/11961/6652/1579/10255,ilevel=678,enchant=defenders_armor_kit_3
+feet=sabatons_of_rampaging_elements,id=159679,bonus_id=11359/11996/11964,enchant_id=7424
+finger1=the_jastor_diamond,id=231265,bonus_id=1527/10376/8781,ilevel=678,gem_id=213491/213455,enchant=radiant_haste_3
+finger2=faded_championship_ring,id=228840,bonus_id=12028/1511,ilevel=678,gem_id=213479/213455,enchant=radiant_critical_strike_3
+trinket1=eye_of_kezan,id=230198,bonus_id=6652/10356/11996/1527/10255,ilevel=678
+trinket2=house_of_cards,id=230027,bonus_id=1527/11996/11964,ilevel=678
+main_hand=bestinslots,id=232526,bonus_id=1527/11996/11964,ilevel=678,enchant=authority_of_the_depths_3
+
+# Gear Summary
+# gear_ilvl=677.60
+# gear_strength=51214
+# gear_stamina=391524
+# gear_crit_rating=14567
+# gear_haste_rating=17480
+# gear_mastery_rating=10240
+# gear_versatility_rating=2359
+# gear_armor=72548
+# gear_bonus_armor=980
+# set_bonus=thewarwithin_season_2_2pc=1
+# set_bonus=thewarwithin_season_2_4pc=1

@@ -328,7 +328,9 @@ def create_custom_profiles_path(wow_spec: WowSpec) -> str:
     return custom_profiles_path
 
 
-def extract_profile(path: str, wow_class: WowClass) -> dict:
+def extract_profile(
+    path: str, wow_class: WowClass, character_source: CharacterSource
+) -> dict:
     """Extract all character specific data from a given file.
     These options are expansion specific, so be careful when using this with other SimulatonCraft versions.
 
@@ -355,6 +357,7 @@ def extract_profile(path: str, wow_class: WowClass) -> dict:
             "race": "",
             "role": "",
             "spec": "",
+            "# source": "",
         },
         "items": {
             "back": {},
@@ -399,7 +402,10 @@ def extract_profile(path: str, wow_class: WowClass) -> dict:
             ],
         ],
     ] = {
-        "character": {"class": wow_class.simc_name},
+        "character": {
+            "class": wow_class.simc_name,
+            "# source": character_source.name.lower(),
+        },
         "items": {},
     }
 
@@ -575,19 +581,21 @@ def extract_profile(path: str, wow_class: WowClass) -> dict:
 
 
 def _get_profile(
-    profile_type: str,
+    character_source: CharacterSource,
     path: str,
     wow_class: WowClass,
     *,
     accepted_errors: typing.Tuple[typing.Type[Exception], ...] = (FileNotFoundError,),
 ) -> dict:
     try:
-        profile = extract_profile(path, wow_class)
+        profile = extract_profile(path, wow_class, character_source=character_source)
     except accepted_errors:
         profile = {}
-        logger.debug(f"{profile_type.title()} profile not found at '{path}'. Skipping")
+        logger.info(
+            f"{character_source.name.title()} profile not found at '{path}'. Skipping"
+        )
     if profile:
-        logger.debug(f"{profile_type.title()} profile found at '{path}'.")
+        logger.info(f"{character_source.name.title()} profile found at '{path}'.")
     return profile
 
 
@@ -614,7 +622,7 @@ def get_profile(wow_spec: WowSpec, fight_style: str, settings: Config) -> dict:
 
     if settings.custom_profile:
         custom_profile = _get_profile(
-            "custom",
+            CharacterSource.CUSTOM_PROFILE,
             "custom_profile.txt",
             wow_spec.wow_class,
             accepted_errors=(FileNotFoundError, EmptyFileError),
@@ -627,7 +635,7 @@ def get_profile(wow_spec: WowSpec, fight_style: str, settings: Config) -> dict:
             return custom_profile
 
     fallback_profile = _get_profile(
-        "fallback",
+        CharacterSource.FALLBACK_PROFILE,
         create_fallback_profile_path(wow_spec, settings.tier, fight_style),
         wow_spec.wow_class,
     )
@@ -635,7 +643,7 @@ def get_profile(wow_spec: WowSpec, fight_style: str, settings: Config) -> dict:
         return fallback_profile
 
     simc_profile = _get_profile(
-        "SimulationCraft",
+        CharacterSource.SIMULATIONCRAFT,
         create_simc_profile_path(wow_spec, settings.tier, settings.executable),
         wow_spec.wow_class,
     )

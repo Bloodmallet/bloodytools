@@ -17,15 +17,8 @@ count_commits_from_version_file = false
 
 [tool.mypy]
 warn_return_any = true
-exclude = [
-    '^env/',
-    '^.*simulation[s]?\.py$',
-]
+exclude = ['^env/', '^.*simulation[s]?\.py$']
 
 [[tool.mypy.overrides]]
-module = [
-    "pkg_resources",
-    "requests.packages.urllib3",
-    "yaml",
-]
+module = ["pkg_resources", "requests.packages.urllib3", "yaml"]
 ignore_missing_imports = true

@@ -4,7 +4,3 @@
 #   - spec_talents=talent_name_d:1/talent_name_e:0/talent_name_f:3
 # Cool Other Build:
 #   - talents=WOW_EXPORT_STRING
-
-M+:
-   - class_talents=lay_on_hands:1/blessing_of_freedom:1/hammer_of_wrath:1/cleanse_toxins:1/auras_of_swift_vengeance:1/fist_of_justice:1/divine_steed:1/greater_judgment:1/blinding_light:1/cavalier:1/rebuke:1/holy_aegis:2/avenging_wrath:1/justification:1/blessing_of_sacrifice:1/sanctified_plates:2/blessing_of_protection:1/lightforged_blessing:1/healing_hands:1/unbreakable_spirit:1/crusaders_reprieve:1/seal_of_might:2/seal_of_alacrity:2/of_dusk_and_dawn:1/divine_toll:1/seal_of_the_crusader:2/seal_of_order:1/divine_resonance:1/vengeful_wrath:1
-   - spec_talents=blade_of_justice:1/divine_storm:1/swift_justice:1/expurgation:1/improved_blade_of_justice:1/final_verdict:1/guided_prayer:1/art_of_war:1/jurisdiction:1/tempest_of_the_lightbringer:1/shield_of_vengeance:1/zealots_fervor:1/improved_judgment:1/crusading_strikes:1/blade_of_vengeance:1/vanguard_of_justice:1/avenging_wrath_might:1/blessed_champion:2/empyrean_power:1/adjudication:1/aegis_of_protection:1/penitence:1/blades_of_light:1/final_reckoning:1/wake_of_ashes:1/burning_crusade:1/seething_flames:1/truths_wake:1/searing_light:1

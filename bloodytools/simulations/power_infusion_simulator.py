@@ -162,6 +162,7 @@ class PowerInfusionSimulator(Simulator):
                     executable=self.settings.executable,
                     iterations=self.settings.iterations,
                     remove_files=not self.settings.keep_files,
+                    generate_html=self.settings.html,
                 )
 
                 simulation_group.add(simulation_data)
@@ -201,6 +202,7 @@ class PowerInfusionSimulator(Simulator):
                     executable=self.settings.executable,
                     iterations=self.settings.iterations,
                     remove_files=not self.settings.keep_files,
+                    generate_html=self.settings.html,
                 )
 
                 fallback_data = simulation_data.simulate()

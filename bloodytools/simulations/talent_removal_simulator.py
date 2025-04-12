@@ -46,6 +46,7 @@ class TalentRemovalSimulator(Simulator):
                 default_actions=self.settings.default_actions,
                 executable=self.settings.executable,
                 iterations=self.settings.iterations,
+                generate_html=self.settings.html,
             )
 
             # get talent string
@@ -133,6 +134,7 @@ class TalentRemovalSimulator(Simulator):
                         default_actions=self.settings.default_actions,
                         executable=self.settings.executable,
                         iterations=self.settings.iterations,
+                        generate_html=self.settings.html,
                     )
                     simulation_group.add(simulation)
 
