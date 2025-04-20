@@ -75,6 +75,7 @@ class SecondaryDistributionSimulator(Simulator):
             if "unable to create action: auto_attack" in str(e.message):
                 simulation.simc_arguments.pop()
                 simulation.simc_arguments.pop()
+                simulation.simulate()
             else:
                 raise e
 
