@@ -99,23 +99,9 @@ class WeaponEnchantmentSimulator(Simulator):
             iterations=self.settings.iterations,
             remove_files=not self.settings.keep_files,
             generate_html=self.settings.html,
+            load_custom_fight_style=self.settings.custom_fight_style,
+            load_custom_apl=self.settings.custom_apl,
         )
-
-        custom_apl = None
-        if self.settings.custom_apl:
-            with open("custom_apl.txt") as f:
-                custom_apl = f.read()
-        if custom_apl:
-            simulation_data.simc_arguments.append("# custom_apl")
-            simulation_data.simc_arguments.append(custom_apl)
-
-        custom_fight_style = None
-        if self.settings.custom_fight_style:
-            with open("custom_fight_style.txt") as f:
-                custom_fight_style = f.read()
-        if custom_fight_style:
-            simulation_data.simc_arguments.append("# custom_fight_style")
-            simulation_data.simc_arguments.append(custom_fight_style)
 
         simulation_group.add(simulation_data)
 

@@ -90,6 +90,8 @@ class Simulation_Data:
         remove_files: bool = True,
         generate_html: bool = False,
         comment: str = "",
+        load_custom_fight_style: bool = False,
+        load_custom_apl: bool = False,
     ) -> None:
         super(Simulation_Data, self).__init__()
 
@@ -139,7 +141,9 @@ class Simulation_Data:
             self.fight_style = fight_style
         else:
             logger.warning(
-                "{} -- Using default (patchwerk) value instead.".format(fight_style)
+                "Unknown fight style '{}' -- Using default (patchwerk) value instead.".format(
+                    fight_style
+                )
             )
             self.fight_style = "patchwerk"
         # simc setting to enable/diable the fixed fight length
@@ -212,6 +216,14 @@ class Simulation_Data:
         self.generate_html = generate_html
         # optional comment about the profile
         self.comment = comment
+        self.custom_fight_style: str = ""
+        if load_custom_fight_style:
+            with open("custom_fight_style.txt") as f:
+                self.custom_fight_style = f.read()
+        self.custom_apl: str = ""
+        if load_custom_apl:
+            with open("custom_apl.txt") as f:
+                self.custom_apl = f.read()
 
         # set independent default values
         # creation time of the simulation object
@@ -777,7 +789,15 @@ class Simulation_Group:
                 f.write(f"# {self.profiles[0].comment}\n")
             for argument in self.profiles[0].simc_arguments:
                 f.write("{}\n".format(argument))
-            f.write('name="{}"\n\n# Profileset start\n'.format(self.profiles[0].name))
+            f.write('name="{}"\n'.format(self.profiles[0].name))
+
+            f.write("\n# custom apl\n")
+            if self.profiles[0].custom_apl:
+                f.write(self.profiles[0].custom_apl)
+            else:
+                f.write("# none\n")
+
+            f.write("\n# Profileset start\n")
             # or else in wrong scope
             f.write("ready_trigger={}\n".format(self.profiles[0].ready_trigger))
 
@@ -820,6 +840,13 @@ class Simulation_Group:
                 #             iterations=self.profiles[0].iterations,
                 #         )
                 #     )
+
+            # custom fight style
+            f.write("\n# custom fight style\n")
+            if self.profiles[0].custom_fight_style:
+                f.write(self.profiles[0].custom_fight_style)
+            else:
+                f.write("# none")
 
         with open(self.filename, "r") as f:
             logger.debug(f.read())
