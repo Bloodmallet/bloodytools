@@ -3,7 +3,7 @@ requires = [
     "setuptools>=45",
     "wheel",
     "setuptools-git-versioning",
-    "simc_support>=11.1.7.0",
+    "simc_support>=11.2.0.0",
 ]
 build-backend = "setuptools.build_meta"
 

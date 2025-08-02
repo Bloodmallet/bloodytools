@@ -34,9 +34,9 @@ class Config:
     iterations: str = "60000"
     keep_files: bool = False
     # affects trinkets
-    max_ilevel: int = 690
+    max_ilevel: int = 725
     # affects trinkets
-    min_ilevel: int = 635
+    min_ilevel: int = 680
     pretty: bool = False
     profileset_work_threads: str = "2"
     ptr: str = "0"
@@ -59,7 +59,7 @@ class Config:
     talent_permutations: bool = False
     target_error: typing.Dict[str, str] = dataclasses.field(default_factory=dict)
     threads: str = ""
-    tier: str = "TWW2"
+    tier: str = "TWW3"
     use_raidbots: bool = False
     write_humanreadable_secondary_distribution_file: bool = False
     apikey: str = ""

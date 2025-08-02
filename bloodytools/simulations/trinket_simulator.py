@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 ALLOWED_SEASONS = [
     Season.TWW_SEASON_1,
     Season.TWW_SEASON_2,
+    Season.TWW_SEASON_3,
 ]
 
 # special cases
