@@ -1,0 +1,36 @@
+hunter="TWW3_Hunter_Beast_Mastery"
+source=default
+spec=beast_mastery
+level=80
+race=dwarf
+role=attack
+position=ranged_back
+talents=C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsBzwQDbAAAAAAYMjZeALzMDzMGsMjZmxYmZmMjZMjZmhZGzwYYMMLDz2yMYDAAAAAAmB
+
+head=midnight_heralds_cowl,id=237646,bonus_id=1808,ilevel=723,gem_id=213743
+neck=sin_stained_pendant,id=178827,bonus_id=8781,ilevel=723,gem_id=213467/213491
+shoulders=midnight_heralds_shadowguards,id=237644,ilevel=723
+back=reshii_wraps,id=235499,bonus_id=12401/9893,ilevel=730,gem_id=238044
+chest=midnight_heralds_hauberk,id=237649,ilevel=723,enchant_id=7364
+wrists=glyphetched_vambraces,id=219342,bonus_id=10421/9633/8902/12053/12050/1485/11303/8960/1808/8791,gem_id=213479,crafted_stats=32/36
+hands=glyphetched_gauntlets,id=219341,bonus_id=10421/9633/8902/12053/12050/1485/11303/8960/8790,crafted_stats=32/36
+waist=durable_information_securing_container,id=245965,bonus_id=1489/12352/12239,gem_id=213479,titan_disc_id=1236275
+legs=midnight_heralds_petticoat,id=237645,ilevel=723,enchant_id=7601
+feet=interlopers_chain_boots,id=243308,bonus_id=13504,ilevel=723
+finger1=band_of_the_shattered_soul,id=242405,bonus_id=8781,ilevel=723,gem_id=213479/213479,enchant_id=7334
+finger2=logic_gate_omega,id=237570,bonus_id=8781,ilevel=723,gem_id=213479/213455,enchant_id=7334
+trinket1=astral_antenna,id=242395,ilevel=723
+trinket2=arakara_sacbrood,id=219314,ilevel=723
+main_hand=piercing_strandbow,id=237732,ilevel=723,enchant_id=7445
+
+# Gear Summary
+# gear_ilvl=721.60
+# gear_agility=76043
+# gear_stamina=652742
+# gear_crit_rating=13653
+# gear_haste_rating=24142
+# gear_mastery_rating=16624
+# gear_versatility_rating=147
+# gear_armor=63546
+# set_bonus=name=thewarwithin_season_3,pc=2,hero_tree=pack_leader,enable=1
+# set_bonus=name=thewarwithin_season_3,pc=4,hero_tree=pack_leader,enable=1

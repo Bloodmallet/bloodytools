@@ -1,0 +1,36 @@
+hunter="TWW3_Hunter_Survival"
+source=default
+spec=survival
+level=80
+race=maghar_orc
+role=attack
+position=back
+talents=C8PAAAAAAAAAAAAAAAAAAAAAAMgxMGWgNYGGawyMzsMzMzMmZGjZmBjxMjZBAAAAAAoZMjZMzMMDzwYYmhxwssMD2AAAAAgBAA
+
+head=midnight_heralds_cowl,id=237646,bonus_id=1808,ilevel=723,gem_id=213743
+neck=sin_stained_pendant,id=178827,bonus_id=8781,ilevel=723,gem_id=213743/213455
+shoulders=midnight_heralds_shadowguards,id=237644,ilevel=723
+back=reshii_wraps,id=235499,bonus_id=12401/9893,ilevel=730,gem_id=238044
+chest=midnight_heralds_hauberk,id=237649,ilevel=723,enchant_id=7364
+wrists=glyphetched_vambraces,id=219342,bonus_id=10421/9633/8902/12053/12050/1485/11303/8960/1808,gem_id=213497,crafted_stats=32/49
+hands=glyphetched_gauntlets,id=219341,bonus_id=10421/9633/8902/12053/12050/1485/11303/8960/8790,crafted_stats=32/49
+waist=clasp_of_furious_freedom,id=237554,bonus_id=1808,ilevel=723,gem_id=213497
+legs=midnight_heralds_petticoat,id=237645,ilevel=723,enchant_id=7601
+feet=interlopers_chain_boots,id=243308,bonus_id=13504,ilevel=723
+finger1=logic_gate_omega,id=237570,bonus_id=8781,ilevel=723,gem_id=213497/213470,enchant_id=7340
+finger2=signet_of_the_false_accuser,id=178824,bonus_id=8781,ilevel=723,gem_id=213482/213455,enchant_id=7340
+trinket1=arazs_ritual_forge,id=242402,ilevel=723
+trinket2=astral_antenna,id=242395,ilevel=723
+main_hand=spellstrike_warplance,id=242481,ilevel=723,enchant_id=7439
+
+# Gear Summary
+# gear_ilvl=723.07
+# gear_agility=77378
+# gear_stamina=663573
+# gear_crit_rating=12688
+# gear_haste_rating=19131
+# gear_mastery_rating=24352
+# gear_versatility_rating=294
+# gear_armor=64531
+# set_bonus=name=thewarwithin_season_3,pc=2,hero_tree=pack_leader,enable=1
+# set_bonus=name=thewarwithin_season_3,pc=4,hero_tree=pack_leader,enable=1

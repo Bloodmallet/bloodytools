@@ -1,0 +1,36 @@
+hunter="TWW3_Hunter_Marksmanship"
+source=default
+spec=marksmanship
+level=80
+race=dwarf
+role=attack
+position=ranged_back
+talents=C4PAAAAAAAAAAAAAAAAAAAAAAwADsNGNWGAzG2AAAAAAAAAAAAAgZMjZMzMMjmZMGGDzywssMD2GDzMLbbbzMGYmZMzMzswYWGmZA
+
+head=midnight_heralds_cowl,id=237646,bonus_id=1808,ilevel=723,gem_id=213743
+neck=ornately_engraved_amplifier,id=185842,bonus_id=8781,ilevel=723,gem_id=213458/213491
+shoulders=midnight_heralds_shadowguards,id=237644,ilevel=723
+back=reshii_wraps,id=235499,bonus_id=12401/9893,ilevel=730,gem_id=238044
+chest=midnight_heralds_hauberk,id=237649,ilevel=723,enchant_id=7364
+wrists=glyphetched_vambraces,id=219342,bonus_id=10421/9633/8902/12053/12050/1485/11303/8960/1808/8791,gem_id=213467,crafted_stats=32/36
+hands=glyphetched_gauntlets,id=219341,bonus_id=10421/9633/8902/12053/12050/1485/11303/8960/8791,crafted_stats=32/36
+waist=durable_information_securing_container,id=245965,bonus_id=1489/12352/12239,gem_id=213467,titan_disc_id=1236275
+legs=midnight_heralds_petticoat,id=237645,ilevel=723,enchant_id=7601
+feet=interlopers_chain_boots,id=243308,bonus_id=13504,ilevel=723
+finger1=logic_gate_alpha,id=237567,bonus_id=8781,ilevel=723,gem_id=213467/213467,enchant_id=7334
+finger2=radiant_necromancers_band,id=221200,bonus_id=8781,ilevel=723,gem_id=213467/213479,enchant_id=7334
+trinket1=astral_antenna,id=242395,ilevel=723
+trinket2=unyielding_netherprism,id=242396,ilevel=723
+main_hand=yasahm_the_riftbreaker,id=185783,ilevel=723,enchant_id=7439
+
+# Gear Summary
+# gear_ilvl=721.60
+# gear_agility=76043
+# gear_stamina=652742
+# gear_crit_rating=23762
+# gear_haste_rating=9485
+# gear_mastery_rating=13753
+# gear_versatility_rating=5571
+# gear_armor=63546
+# set_bonus=name=thewarwithin_season_3,pc=2,hero_tree=dark_ranger,enable=1
+# set_bonus=name=thewarwithin_season_3,pc=4,hero_tree=dark_ranger,enable=1
