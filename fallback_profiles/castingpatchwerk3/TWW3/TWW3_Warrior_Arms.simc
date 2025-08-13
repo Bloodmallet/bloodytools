@@ -1,0 +1,38 @@
+warrior="TWW3_Warrior_Arms"
+source=default
+spec=arms
+level=80
+race=void_elf
+role=attack
+position=back
+talents=CcEAAAAAAAAAAAAAAAAAAAAAAghZmxMmZmHY2mtllxMAAAADmGMzyYGGLjZmxiZmxMDGGAAAAAAAmxsNYAbxAWMjhFYgZ0GNgFA
+
+head=living_weapons_faceshield,id=237610,bonus_id=523/10356,ilevel=723,gem_id=213743
+neck=salhadaars_folly,id=242406,bonus_id=10356/8781,ilevel=723,gem_id=213470/213485
+shoulders=living_weapons_ramparts,id=237608,bonus_id=10356,ilevel=723
+back=reshii_wraps,id=235499,bonus_id=12401/9893,gem_id=238045,enchant=chant_of_winged_grace_3
+chest=living_weapons_bulwark,id=237613,bonus_id=10356,ilevel=723,enchant=crystalline_radiance_3
+wrists=everforged_vambraces,id=222435,bonus_id=1485/11304/8960/12053/12050/1808,gem_id=213485,crafted_stats=32/36
+hands=living_weapons_crushers,id=237611,bonus_id=10356,ilevel=723
+waist=everforged_greatbelt,id=222431,bonus_id=1485/11304/8960/12053/12050/1808,gem_id=213485,crafted_stats=32/36
+legs=living_weapons_legguards,id=237609,bonus_id=10356,ilevel=723,enchant=defenders_armor_kit_3
+feet=interlopers_plated_sabatons,id=243307,bonus_id=10356/13504,ilevel=723,enchant=defenders_march_3
+finger1=signet_of_collapsing_stars,id=185813,bonus_id=657/12052/5877/10390/12361/12053/8781,ilevel=723,gem_id=213485/213494,enchant=radiant_critical_strike_3
+finger2=band_of_the_shattered_soul,id=242405,bonus_id=10356/8781,ilevel=723,gem_id=213482/213455,enchant=radiant_critical_strike_3
+trinket1=astral_antenna,id=242395,bonus_id=10356,ilevel=723
+trinket2=eradicating_arcanocore,id=242394,bonus_id=10356,ilevel=723
+main_hand=maw_of_the_void,id=243365,bonus_id=10356,ilevel=723,enchant=oathsworns_tenacity_3
+
+# Gear Summary
+# gear_ilvl=723.07
+# gear_strength=85087
+# gear_stamina=663573
+# gear_crit_rating=12561
+# gear_haste_rating=23554
+# gear_mastery_rating=12276
+# gear_versatility_rating=6273
+# gear_avoidance_rating=545
+# gear_armor=97070
+# gear_bonus_armor=980
+# set_bonus=name=thewarwithin_season_3,pc=2,hero_tree=slayer,enable=1
+# set_bonus=name=thewarwithin_season_3,pc=4,hero_tree=slayer,enable=1

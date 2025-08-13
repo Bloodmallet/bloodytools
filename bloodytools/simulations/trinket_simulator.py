@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 ALLOWED_SEASONS = [
     Season.TWW_SEASON_1,
     Season.TWW_SEASON_2,
+    Season.TWW_SEASON_3,
 ]
 
 # special cases
@@ -384,19 +385,9 @@ class TrinketSimulator(Simulator):
             default_actions=self.settings.default_actions,
             executable=self.settings.executable,
             generate_html=self.settings.html,
+            load_custom_fight_style=self.settings.custom_fight_style,
+            load_custom_apl=self.settings.custom_apl,
         )
-
-        if self.settings.custom_apl:
-            with open("custom_apl.txt") as f:
-                custom_apl = f.read()
-            simulation_data.simc_arguments.append("# custom_apl")
-            simulation_data.simc_arguments.append(custom_apl)
-
-        if self.settings.custom_fight_style:
-            with open("custom_fight_style.txt") as f:
-                custom_fight_style = f.read()
-            simulation_data.simc_arguments.append("# custom_fight_style")
-            simulation_data.simc_arguments.append(custom_fight_style)
 
         simulation_group.add(simulation_data)
 

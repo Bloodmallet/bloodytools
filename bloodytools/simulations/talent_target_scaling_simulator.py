@@ -79,6 +79,9 @@ class TalentTargetScalingSimulator(Simulator):
                 default_actions=self.settings.default_actions,
                 executable=self.settings.executable,
                 iterations=self.settings.iterations,
+                # no custom fight style else it would collide with the target scaling of this simulator
+                # load_custom_fight_style=self.settings.custom_fight_style,
+                load_custom_apl=self.settings.custom_apl if i == 0 else False,
             )
 
             # get talent string

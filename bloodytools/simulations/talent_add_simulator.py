@@ -47,6 +47,10 @@ class TalentAddSimulator(Simulator):
                 executable=self.settings.executable,
                 iterations=self.settings.iterations,
                 generate_html=self.settings.html,
+                load_custom_apl=self.settings.custom_apl if i == 0 else False,
+                load_custom_fight_style=(
+                    self.settings.custom_fight_style if i == 0 else False
+                ),
             )
 
             # get talent string
@@ -66,19 +70,6 @@ class TalentAddSimulator(Simulator):
                     data_dict["data_profile_overrides"][human_name].append(
                         talent_string
                     )
-
-            if i == 0:
-                if self.settings.custom_apl:
-                    with open("custom_apl.txt") as f:
-                        custom_apl = f.read()
-                    simulation.simc_arguments.append("# custom_apl")
-                    simulation.simc_arguments.append(custom_apl)
-
-                if self.settings.custom_fight_style:
-                    with open("custom_fight_style.txt") as f:
-                        custom_fight_style = f.read()
-                    simulation.simc_arguments.append("# custom_fight_style")
-                    simulation.simc_arguments.append(custom_fight_style)
 
             simulation_group.add(simulation)
 
