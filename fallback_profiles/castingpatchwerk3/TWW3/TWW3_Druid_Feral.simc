@@ -1,0 +1,39 @@
+druid="TWW3_Druid_Feral_DOTC"
+source=default
+spec=feral
+level=80
+race=night_elf
+timeofday=night
+role=attack
+position=back
+talents=CcGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbzmZwMzMzmNzYbmZm5BmZAAAAAAWCmNDMzomxsYWmZmlxMmBAAAAAAAAAAA0MLzyMz2ACsAzMAswgB
+
+head=skymane_of_the_mother_eagle,id=237682,bonus_id=12361/10356/12231/6652/12921/12676/1533/10255/1808,gem_id=213743
+neck=salhaddars_folly,id=242406,bonus_id=8781,ilevel=723,gem_id=213482/213470
+shoulders=ritual_pauldrons_of_the_mother_eagle,id=237680,bonus_id=12361/10356/12233/6652/12675/1533/10255
+back=reshii_wraps,id=235499,bonus_id=12401/9893,gem_id=238045,enchant_id=7403
+chest=soazmis_fractal_vest,id=185786,ilevel=723,enchant_id=7364
+wrists=runebranded_armbands,id=219334,bonus_id=10421/9633/8902/12053/12050/1485/1808/11304/8960,gem_id=213470,enchant_id=7391,crafted_stats=49/36
+hands=wings_of_the_mother_eagle,id=237683,bonus_id=12361/10356/12230/6652/12675/1533/10255
+waist=runebranded_waistband,id=219331,bonus_id=10421/9633/8902/12053/12050/1485/1808/11304/8960,gem_id=213470,crafted_stats=49/36
+legs=breeches_of_the_mother_eagle,id=237681,bonus_id=12361/10356/12232/6652/12676/1533/10255,enchant_id=7601
+feet=interlopers_reinforced_sandals,id=243306,bonus_id=6652/10356/12361/1533/10255/13504,enchant_id=7424
+finger1=radiant_necromancers_band,id=221200,bonus_id=10879,ilevel=723,gem_id=213470/213470,enchant_id=7346
+finger2=ring_of_the_panoply,id=246281,bonus_id=10879,ilevel=723,gem_id=213494/213458,enchant_id=7346
+trinket1=astral_antenna,id=242395,ilevel=723
+trinket2=arazs_ritual_forge,id=242402,bonus_id=6652/10356/12361/1533/10255
+main_hand=harvesters_interdiction,id=221159,ilevel=723,enchant_id=7445
+
+# Gear Summary
+# gear_ilvl=723.07
+# gear_agility=77197
+# gear_stamina=664468
+# gear_crit_rating=9613
+# gear_haste_rating=16051
+# gear_mastery_rating=22806
+# gear_versatility_rating=8189
+# gear_leech_rating=2040
+# gear_avoidance_rating=545
+# gear_armor=43761
+# set_bonus=name=thewarwithin_season_3,pc=2,hero_tree=druid_of_the_claw,enable=1
+# set_bonus=name=thewarwithin_season_3,pc=4,hero_tree=druid_of_the_claw,enable=1
