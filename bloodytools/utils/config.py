@@ -36,7 +36,7 @@ class Config:
     # affects trinkets
     max_ilevel: int = 725
     # affects trinkets
-    min_ilevel: int = 680
+    min_ilevel: int = 678
     pretty: bool = False
     profileset_work_threads: str = "2"
     ptr: str = "0"
