@@ -3,7 +3,7 @@ requires = [
     "setuptools>=45",
     "wheel",
     "setuptools-git-versioning",
-    "simc_support>=11.2.0.0",
+    "simc_support>=12.0.1.0",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -20,5 +20,5 @@ warn_return_any = true
 exclude = ['^env/', '^.*simulation[s]?\.py$']
 
 [[tool.mypy.overrides]]
-module = ["pkg_resources", "requests.packages.urllib3", "yaml"]
+module = ["requests.packages.urllib3", "yaml"]
 ignore_missing_imports = true

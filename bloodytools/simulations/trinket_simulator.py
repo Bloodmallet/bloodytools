@@ -18,13 +18,11 @@ from simc_support.game_data.ItemLevel import _df_s3_hero
 logger = logging.getLogger(__name__)
 
 ALLOWED_SEASONS = [
-    Season.TWW_SEASON_1,
-    Season.TWW_SEASON_2,
-    Season.TWW_SEASON_3,
+    Season.MID_SEASON_1,
 ]
 
 # special cases
-M0_ITEMLEVEL = 593
+M0_ITEMLEVEL = 246
 PREVIOUS_SEASON_ITEMLEVELS: typing.List[int] = []
 ALLOWED_NON_SEASONAL_DUNGEON_ITEMS = (
     # 193743,  # Irideus Frament

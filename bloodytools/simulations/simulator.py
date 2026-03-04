@@ -3,7 +3,7 @@ import dataclasses
 import json
 import logging
 import os
-import pkg_resources
+import importlib.resources
 import typing
 import yaml
 
@@ -435,8 +435,9 @@ class Simulator(abc.ABC):
             "talent_tree_paths",
             f"{self.wow_spec.wow_class.simc_name}_{self.wow_spec.simc_name}.yaml",
         )
+        ref = importlib.resources.files(__name__).joinpath(file_path)
         try:
-            with pkg_resources.resource_stream(__name__, file_path) as f:
+            with ref.open("rb") as f:
                 loaded_data = yaml.safe_load(f)
         except FileNotFoundError as e:
             raise MissingTalentTreePathFileError() from e
