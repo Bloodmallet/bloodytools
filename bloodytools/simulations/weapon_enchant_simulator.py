@@ -14,7 +14,7 @@ class WeaponEnchant(SimcObject):
     def __init__(self, name: str, item_id: str):
         super().__init__(full_name=name)
 
-        self.ranks: typing.Tuple[int, ...] = (1, 2, 3)
+        self.ranks: typing.Tuple[int, ...] = (1, 2)
         self.item_id: str = item_id
 
 
@@ -30,13 +30,21 @@ WEAPON_ENCHANTS = [
     # WeaponEnchant(name="Authority of Air", item_id="223775"),
     # healing
     # WeaponEnchant(name="Authority of Fiery Resolve", item_id="223778"),
-    WeaponEnchant(name="Authority of Radiant Power", item_id="223781"),
-    WeaponEnchant(name="Authority of Storms", item_id="223772"),
-    WeaponEnchant(name="Authority of the Depths", item_id="223784"),
-    WeaponEnchant(name="Council's Guile", item_id="223759"),
-    WeaponEnchant(name="Oathsworn's Tenacity", item_id="223768"),
-    WeaponEnchant(name="Stonebound Artistry", item_id="223765"),
-    WeaponEnchant(name="Stormrider's Fury", item_id="223762"),
+    # WeaponEnchant(name="Authority of Radiant Power", item_id="223781"),
+    # WeaponEnchant(name="Authority of Storms", item_id="223772"),
+    # WeaponEnchant(name="Authority of the Depths", item_id="223784"),
+    # WeaponEnchant(name="Council's Guile", item_id="223759"),
+    # WeaponEnchant(name="Oathsworn's Tenacity", item_id="223768"),
+    # WeaponEnchant(name="Stonebound Artistry", item_id="223765"),
+    # WeaponEnchant(name="Stormrider's Fury", item_id="223762"),
+    # WeaponEnchant(name="Acuity of the Ren'dorei", item_id="244029"),
+    WeaponEnchant(name="Arcane Mastery", item_id="244031"),
+    WeaponEnchant(name="Berserker's Rage", item_id="243973"),
+    WeaponEnchant(name="Flames of the Sin'dorei", item_id="244027"),
+    WeaponEnchant(name="Jan'alai's Precision", item_id="243971"),
+    WeaponEnchant(name="Strength of Halazzi", item_id="243969"),
+    # something breaks sim
+    WeaponEnchant(name="Worldsoul Tenacity", item_id="244001"),
 ]
 
 # RANGED_HUNTER_ENCHANTS = [
@@ -153,8 +161,9 @@ class WeaponEnchantmentSimulator(Simulator):
                         scaled_name = self.get_profile_name(
                             enchant.full_name, str(rank)
                         )
+                        ranked_name = f"enchant_weapon__{enchant.simc_name}_{rank}"
                         scaled_simc_string = (
-                            f"{weapon_base_string},enchant={enchant.simc_name}_{rank}"
+                            f"{weapon_base_string},enchant={ranked_name}"
                         )
 
                         simulation_data = Simulation_Data(
