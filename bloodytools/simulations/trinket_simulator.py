@@ -22,7 +22,7 @@ ALLOWED_SEASONS = [
 ]
 
 # special cases
-M0_ITEMLEVEL = 246
+M0_ITEMLEVEL = 240
 PREVIOUS_SEASON_ITEMLEVELS: typing.List[int] = []
 ALLOWED_NON_SEASONAL_DUNGEON_ITEMS = (
     # 193743,  # Irideus Frament
