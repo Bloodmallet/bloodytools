@@ -13,7 +13,6 @@ from bloodytools.utils.utils import create_base_json_dict
 from bloodytools.utils.profile_extraction import get_profile
 from simc_support.game_data.WowSpec import WOWSPECS
 
-
 logger = logging.getLogger(__name__)
 
 

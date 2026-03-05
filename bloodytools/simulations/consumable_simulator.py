@@ -6,7 +6,6 @@ import typing
 from bloodytools.simulations.simulator import Simulator
 from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Group
 
-
 logger = logging.getLogger(__name__)
 
 

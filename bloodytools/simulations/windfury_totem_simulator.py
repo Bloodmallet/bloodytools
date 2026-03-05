@@ -10,7 +10,6 @@ from simc_support.game_data.WowSpec import WOWSPECS, ENHANCEMENT
 from simc_support.game_data.Role import Role
 from simc_support.game_data.Stat import Stat
 
-
 logger = logging.getLogger(__name__)
 
 ENHANCEMENT_EXTERNAL_WINDFURY: typing.Dict[str, typing.List[str]] = {

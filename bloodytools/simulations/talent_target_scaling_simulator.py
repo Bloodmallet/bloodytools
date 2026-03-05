@@ -5,7 +5,6 @@ from bloodytools.utils.simulation_objects import Simulation_Data, Simulation_Gro
 from bloodytools.simulations.simulator import Simulator
 from bloodytools.utils.utils import create_base_json_dict
 
-
 logger = logging.getLogger(__name__)
 
 
