@@ -38,7 +38,7 @@ class ConsumableSimulator(Simulator, abc.ABC):
 
     @property
     def max_rank(self) -> int:
-        return 3
+        return 2
 
     def get_simulation_steps(self) -> typing.List[int]:
         return list(range(1, self.max_rank + 1))
@@ -127,6 +127,10 @@ class PotionSimulator(ConsumableSimulator):
             # "Grotesque Vial": "",
             "Tempered Potion": "",
             "Potion of Unwavering Focus": "",
+            "Light's Potential": "",
+            "Potion of Zealotry": "",
+            "Potion of Recklessness": "",
+            "Draught of Rampant Abandon": "",
         }
 
     def item_ids(self) -> typing.Dict[str, str]:
@@ -137,6 +141,10 @@ class PotionSimulator(ConsumableSimulator):
             # "Grotesque Vial": "212256",
             "Tempered Potion": "212265",
             "Potion of Unwavering Focus": "212259",
+            "Light's Potential": "241308",
+            "Potion of Zealotry": "241296",
+            "Potion of Recklessness": "241288",
+            "Draught of Rampant Abandon": "241292",
         }
 
 
@@ -150,22 +158,30 @@ class PhialSimulator(ConsumableSimulator):
 
     def consumables(self) -> typing.Dict[str, str]:
         return {
-            "Flask of Alchemical Chaos": "",
-            "Flask of Tempered Mastery": "",
-            "Flask of Tempered Swiftness": "",
-            "Flask of Tempered Versatility": "",
-            "Flask of Tempered Aggression": "",
+            # "Flask of Alchemical Chaos": "",
+            # "Flask of Tempered Mastery": "",
+            # "Flask of Tempered Swiftness": "",
+            # "Flask of Tempered Versatility": "",
+            # "Flask of Tempered Aggression": "",
             # emergency healing done
             # "Flask of Saving Graces": "",
+            "Flask of the Shattered Sun": "",
+            "Flask of the Blood Knights": "",
+            "Flask of the Magisters": "",
+            "Flask of Thalassian Resistance": "",
         }
 
     def item_ids(self) -> typing.Dict[str, str]:
         return {
-            "Flask of Alchemical Chaos": "212283",
-            "Flask of Tempered Mastery": "212280",
-            "Flask of Tempered Swiftness": "212274",
-            "Flask of Tempered Versatility": "212277",
-            "Flask of Tempered Aggression": "212271",
+            # "Flask of Alchemical Chaos": "212283",
+            # "Flask of Tempered Mastery": "212280",
+            # "Flask of Tempered Swiftness": "212274",
+            # "Flask of Tempered Versatility": "212277",
+            # "Flask of Tempered Aggression": "212271",
             # emergency healing done
             # "Flask of Saving Graces": "212301",
+            "Flask of the Shattered Sun": "241326",
+            "Flask of the Blood Knights": "241324",
+            "Flask of the Magisters": "241322",
+            "Flask of Thalassian Resistance": "241320",
         }
