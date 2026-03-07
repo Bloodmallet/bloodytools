@@ -127,6 +127,16 @@ SPECIAL_CASE_SIMC_OPTIONS: typing.Dict[
         "High Tide": "dragonflight.flowstone_starting_state=high",
         "Low Tide": "dragonflight.flowstone_starting_state=low",
     },
+    264507: {  # Crucible of Erratic Energies
+        "violence": "midnight.crucible_of_erratic_energies_violence=1",
+        "sustenance": "midnight.crucible_of_erratic_energies_sustenance=1",
+        "predation": "midnight.crucible_of_erratic_energies_predation=1",
+        "predation+sustenance+violence+": [
+            "midnight.crucible_of_erratic_energies_predation=1",
+            "midnight.crucible_of_erratic_energies_sustenance=1",
+            "midnight.crucible_of_erratic_energies_violence=1",
+        ],
+    },
 }
 
 NON_DPS_TRINKET_IDS = [
@@ -378,6 +388,10 @@ class TrinketSimulator(Simulator):
             profile=data_dict["profile"],
             simc_arguments=[
                 "trinket1=",
+                # reset trinket value selection
+                "midnight.crucible_of_erratic_energies_violence=0",
+                "midnight.crucible_of_erratic_energies_sustenance=0",
+                "midnight.crucible_of_erratic_energies_predation=0",
             ],
             ptr=self.settings.ptr,
             default_actions=self.settings.default_actions,
