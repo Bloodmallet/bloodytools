@@ -60,6 +60,13 @@ SPECIAL_CASE_BONUS_IDS: typing.Dict[int, typing.Dict[str, int]] = {
     194872: DARKMOON_DECK_BOX_BONUS_IDS,
     # Darkmoon Deck Box: Dance
     198478: DARKMOON_DECK_BOX_BONUS_IDS,
+    # Forgotten Farstrider's Insignia
+    250462: {
+        "crit": 606,
+        "haste": 604,
+        "mastery": 605,
+        "versatility": 607,
+    },
 }
 
 SPECIAL_CASE_SIMC_OPTIONS: typing.Dict[
