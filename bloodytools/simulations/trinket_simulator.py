@@ -181,6 +181,16 @@ NON_DPS_TRINKET_IDS = [
     "193748",  # Kyrakka's Searing Embers
     "206958",  # Paracausal Fragment of Val'anyr
     "207552",  # Echoing Tyrstone
+    # Midnight Season 1
+    "250246",  # Refueling Orb
+    "250253",  # Whisper of the Duskwraith
+    "249811",  # Light of the Cosmic Crescendo
+    "249341",  # Volatile Void Suffuser
+    "252411",  # Radiant Sunstone
+    "50235",  # Ick's Rotting Thumb
+    "252418",  # Solar Core Igniter
+    "245751",  # Thalassian Competitor's Medallion
+    "245753",  # Thalassian Competitor's Emblem
 ]
 
 
