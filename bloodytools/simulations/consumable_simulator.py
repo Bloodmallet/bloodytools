@@ -74,7 +74,7 @@ class ConsumableSimulator(Simulator, abc.ABC):
             # if simc_arg is not provided, create it
             if not simc_string:
                 simc_string = self.simc_key()
-                simc_string += name.lower().replace(" ", "_")
+                simc_string += name.lower().replace(" ", "_").replace("'", "")
 
             for rank in self.get_simulation_steps():
                 scaled_name = self.get_profile_name(name, str(rank))
