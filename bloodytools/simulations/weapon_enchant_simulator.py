@@ -37,13 +37,12 @@ WEAPON_ENCHANTS = [
     # WeaponEnchant(name="Oathsworn's Tenacity", item_id="223768"),
     # WeaponEnchant(name="Stonebound Artistry", item_id="223765"),
     # WeaponEnchant(name="Stormrider's Fury", item_id="223762"),
-    # WeaponEnchant(name="Acuity of the Ren'dorei", item_id="244029"),
+    WeaponEnchant(name="Acuity of the Ren'dorei", item_id="244029"),
     WeaponEnchant(name="Arcane Mastery", item_id="244031"),
     WeaponEnchant(name="Berserker's Rage", item_id="243973"),
     WeaponEnchant(name="Flames of the Sin'dorei", item_id="244027"),
     WeaponEnchant(name="Jan'alai's Precision", item_id="243971"),
     WeaponEnchant(name="Strength of Halazzi", item_id="243969"),
-    # something breaks sim
     WeaponEnchant(name="Worldsoul Tenacity", item_id="244001"),
 ]
 
