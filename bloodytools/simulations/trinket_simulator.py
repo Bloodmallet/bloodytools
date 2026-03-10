@@ -198,6 +198,8 @@ NON_DPS_TRINKET_IDS = [
     "252418",  # Solar Core Igniter
     "245751",  # Thalassian Competitor's Medallion
     "245753",  # Thalassian Competitor's Emblem
+    # does no longer drop - publik
+    "193718",  # Emerald Coach's Whistle
 ]
 
 
