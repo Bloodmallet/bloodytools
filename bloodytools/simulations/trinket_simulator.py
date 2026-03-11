@@ -67,6 +67,13 @@ SPECIAL_CASE_BONUS_IDS: typing.Dict[int, typing.Dict[str, int]] = {
         "mastery": 605,
         "versatility": 607,
     },
+    # Drum of Renewed Bonds
+    248583: {
+        "crit": 13183,
+        "haste": 13184,
+        "mastery": 13185,
+        "versatility": 13186,
+    },
 }
 
 SPECIAL_CASE_SIMC_OPTIONS: typing.Dict[
