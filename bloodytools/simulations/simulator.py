@@ -431,11 +431,11 @@ class Simulator(abc.ABC):
             )
 
         # load predefined talent paths from file
-        file_path = os.path.join(
+        upper_module = ".".join(__name__.split(".")[:-1])
+        ref = importlib.resources.files(upper_module).joinpath(
             "talent_tree_paths",
             f"{self.wow_spec.wow_class.simc_name}_{self.wow_spec.simc_name}.yaml",
         )
-        ref = importlib.resources.files(__name__).joinpath(file_path)
         try:
             with ref.open("rb") as f:
                 loaded_data = yaml.safe_load(f)
