@@ -439,9 +439,8 @@ class TrinketSimulator(Simulator):
                     comment=f"'{trinket.full_name}' at itemlevel '{itemlevel}'",
                     generate_html=self.settings.html,
                 )
-                simulation_group.add(simulation_data)
 
-                # special cases
+                # special cases replace the base version
                 if trinket.item_id in SPECIAL_CASE_BONUS_IDS:
                     for stat in SPECIAL_CASE_BONUS_IDS[trinket.item_id]:
                         new_data = simulation_data.copy()
@@ -455,6 +454,8 @@ class TrinketSimulator(Simulator):
                         new_data.comment = f"'{trinket.full_name}' with special case '{stat.title()}' at itemlevel '{itemlevel}'"
 
                         simulation_group.add(new_data)
+                else:
+                    simulation_group.add(simulation_data)
 
                 if trinket.item_id in SPECIAL_CASE_SIMC_OPTIONS:
                     base_simulation = simulation_group.profiles[-1].copy()
