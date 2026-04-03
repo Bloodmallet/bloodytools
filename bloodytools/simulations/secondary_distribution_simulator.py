@@ -1,4 +1,5 @@
 import itertools
+import json
 import logging
 import os
 import typing
@@ -66,8 +67,9 @@ class SecondaryDistributionSimulator(Simulator):
             generate_html=self.settings.html,
         )
         simulation.simc_arguments.append("# not-a-real-apl")
+        simulation.simc_arguments.append("actions=snapshot_stats")
         # actions=auto_attack
-        simulation.simc_arguments.append("actions=auto_attack")
+        simulation.simc_arguments.append("actions+=/auto_attack")
 
         try:
             simulation.simulate()
@@ -79,21 +81,36 @@ class SecondaryDistributionSimulator(Simulator):
             else:
                 raise e
 
-        stats = 0
-        for stat in rating_names:
-            if simulation.json_data:
-                try:
-                    stats += simulation.json_data["sim"]["players"][0][
-                        "collected_data"
-                    ]["buffed_stats"]["stats"][stat]
-                except KeyError:
-                    logger.warning(
-                        f"Stat '{stat}' not found in single iteration simulation data while extracting secondary stats. Assuming 0."
+        # Disable buffed stats for now. I believe these would basically get double-buffed when applied to a profile again.
+        # stats = 0
+        # for stat in rating_names:
+        #     if simulation.json_data:
+        #         try:
+        #             stats += simulation.json_data["sim"]["players"][0][
+        #                 "collected_data"
+        #             ]["buffed_stats"]["stats"][stat]
+        #         except KeyError:
+        #             logger.warning(
+        #                 f"Stat '{stat}' not found in single iteration simulation data while extracting secondary stats. Assuming 0."
+        #             )
+
+        if simulation.json_data:
+            for itemslot in simulation.json_data["sim"]["players"][0]["gear"]:  # type: ignore
+                for stat in rating_names:
+                    secondary_amount += simulation.json_data["sim"]["players"][0]["gear"][  # type: ignore
+                        itemslot
+                    ].get(
+                        stat, 0
                     )
 
-        secondary_amount = int(stats)
-
         logger.debug("Extracted secondary_amount: {}".format(secondary_amount))
+
+        if secondary_amount == 0:
+            with open("simc_error.json", "w") as f:
+                json.dump(simulation.json_data, f)
+            raise ValueError(
+                "No secondary stats found. Were no items in the profile? This makes no sense and makes this sim pointless."
+            )
 
         return secondary_amount
 
