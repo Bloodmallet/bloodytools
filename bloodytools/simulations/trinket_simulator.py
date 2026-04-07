@@ -412,6 +412,9 @@ class TrinketSimulator(Simulator):
             load_custom_apl=self.settings.custom_apl,
         )
 
+        if ("demon_hunter", "devourer") in self.settings.wow_class_spec_names:
+            simulation_data.simc_arguments.append("potion=lights_potential_2")
+
         simulation_group.add(simulation_data)
 
         for trinket in trinket_list:
