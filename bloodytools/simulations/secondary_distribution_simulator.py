@@ -218,6 +218,10 @@ class SecondaryDistributionSimulator(Simulator):
                         "gear_versatility_rating={}".format(
                             int(secondaries * (vers / 100))
                         ),
+                        # Force everyone to use primary stat pot. Otherwise
+                        # the dps data could get exacerbated by a flip-flopping
+                        # pot.
+                        "potion=lights_potential_2",
                     ],
                     ptr=self.settings.ptr,
                     default_actions=self.settings.default_actions,
