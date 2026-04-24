@@ -61,7 +61,7 @@ $ <env_name>/Scripts/activate
 If you see a lack of features somewhere or ways to improve the quality of the code, please contact me or create an [issue](https://github.com/Bloodmallet/bloodytools/issues). You can also fork this project and create a pull request with your ideas. Please use `black` to format your code.
 
 ## Contact
-Meet me in [Discord](https://discord.gg/sXfmMkm). My username is Bloodmallet(EU)#8246.
+Meet me in [Discord](https://discord.gg/sXfmMkm). My username is bloodmallet (original: Bloodmallet(EU)#8246).
 
 ## Support the creator
 If you want to support the development: [![PayPal link](https://img.shields.io/badge/PayPal-donate-blue.svg)](https://www.paypal.me/bloodmallet) [![Patreon link](https://img.shields.io/badge/Patreon-pledge-blue.svg)](https://www.patreon.com/bloodmallet)
