@@ -416,10 +416,11 @@ class TrinketSimulator(Simulator):
         # properly utilize this they rely heavily on a specific secondary stat
         # distribution. By replacing the trinkets this can screw data a lot.
         # Therefore the current solution is to use a different but weaker pot.
-        if ("demon_hunter", "devourer") in self.settings.wow_class_spec_names or (
-            "demon_hunter",
-            "havoc",
-        ) in self.settings.wow_class_spec_names:
+        if (
+            ("demon_hunter", "devourer") in self.settings.wow_class_spec_names
+            or ("demon_hunter", "havoc") in self.settings.wow_class_spec_names
+            or ("monk", "windwalker") in self.settings.wow_class_spec_names
+        ):
             simulation_data.simc_arguments.append("potion=lights_potential_2")
 
         simulation_group.add(simulation_data)
