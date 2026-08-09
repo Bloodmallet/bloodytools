@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 ALLOWED_SEASONS = [
     Season.MID_SEASON_1,
+    Season.MID_SEASON_2,
 ]
 
 # special cases
