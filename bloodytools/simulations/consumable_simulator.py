@@ -130,6 +130,8 @@ class PotionSimulator(ConsumableSimulator):
             "Potion of Zealotry": "",
             "Potion of Recklessness": "",
             "Draught of Rampant Abandon": "",
+            "Alluring Nostrum": "",
+            "Liquid Luster": "",
         }
 
     def item_ids(self) -> typing.Dict[str, str]:
@@ -144,6 +146,8 @@ class PotionSimulator(ConsumableSimulator):
             "Potion of Zealotry": "241296",
             "Potion of Recklessness": "241288",
             "Draught of Rampant Abandon": "241292",
+            "Alluring Nostrum": "271890",
+            "Liquid Luster": "271887",
         }
 
 
