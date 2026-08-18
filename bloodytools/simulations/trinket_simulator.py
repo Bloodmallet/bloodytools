@@ -418,7 +418,8 @@ class TrinketSimulator(Simulator):
         # distribution. By replacing the trinkets this can screw data a lot.
         # Therefore the current solution is to use a different but weaker pot.
         if (
-            ("demon_hunter", "devourer") in self.settings.wow_class_spec_names
+            ("death_knight", "blood") in self.settings.wow_class_spec_names
+            or ("demon_hunter", "devourer") in self.settings.wow_class_spec_names
             or ("demon_hunter", "havoc") in self.settings.wow_class_spec_names
             or ("monk", "windwalker") in self.settings.wow_class_spec_names
         ):
