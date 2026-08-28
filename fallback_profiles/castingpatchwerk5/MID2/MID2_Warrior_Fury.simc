@@ -1,0 +1,42 @@
+warrior="MID2_Warrior_Fury"
+source=default
+spec=fury
+level=90
+race=dwarf
+role=attack
+position=back
+talents=CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDjxMzmZmZmZmZMzMzMzYmlZMmZMbmZmBAAixy2ALgJYGmAzwGwMzmBAAYmhxsMwgxA
+omnium_talents=136822:1/136823:1/136817:1/136818:1/136814:1
+
+head=tempered_horns_of_the_jade_warlord,id=271456,bonus_id=12854/13335/13750,gem_id=240967,enchant_id=7961
+neck=aqirbane_reliquary,id=268265,bonus_id=13335/13848/13987,gem_id=240918/240892
+shoulders=raging_pauldrons_of_the_jade_warlord,id=271454,bonus_id=12854/13335,enchant_id=8001
+back=silken_voodoo_drape,id=268253,bonus_id=13335/13848
+chest=cuirass_of_the_jade_warlord,id=271459,bonus_id=13335/13848,enchant_id=7987,redirected_base_stats=268222
+wrists=spellbreakers_bracers,id=237834,bonus_id=8793/8960/12384/13750/13751/13836/12497,ilevel=331,gem_id=240908
+hands=jeweled_gauntlets_of_the_jade_warlord,id=271457,bonus_id=12854/13335,redirected_base_stats=159413
+waist=girdle_of_toxic_regret,id=268259,bonus_id=13335/13750/13848,gem_id=240900
+legs=chausses_of_unbound_rancor,id=271878,bonus_id=13335/13708/13848,enchant_id=8163
+feet=scaled_fiends_warboots,id=268260,bonus_id=12854/13335,enchant_id=7963
+finger1=ritual_binders_ring,id=159459,bonus_id=12854/12854/13440,gem_id=240900,enchant_id=7967
+finger2=sickening_signet_of_atroxus,id=252258,bonus_id=12854/12854/13440,gem_id=240900,enchant_id=7967
+trinket1=voracious_heart_of_ulatek,id=270175,bonus_id=13335/13848
+trinket2=zuljins_guillotine_technique,id=270173,bonus_id=13335/13848
+main_hand=mazeroa_warlords_fury,id=268213,bonus_id=13335/13848,ilevel=344,enchant_id=8689
+off_hand=blood_knights_impetus,id=237847,bonus_id=8793/8960/13751/13771/13836/12497,enchant_id=8689
+
+# Gear Summary
+# gear_ilvl=338.63
+# gear_strength=2101
+# gear_stamina=44612
+# gear_crit_rating=1007
+# gear_haste_rating=1167
+# gear_mastery_rating=1018
+# gear_versatility_rating=262
+# gear_leech_rating=55
+# gear_avoidance_rating=130
+# gear_armor=2575
+# gear_bonus_armor=27
+# set_bonus=midnight_season_2_2pc=1
+# set_bonus=midnight_season_2_4pc=1
+# set_bonus=bite_of_zuljan_2pc=1
