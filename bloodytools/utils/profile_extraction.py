@@ -470,6 +470,7 @@ def extract_profile(
         "class_talents",
         "spec_talents",
         "hero_talents",
+        "omnium_talents",
         "spec",
         "default_pet",
         r"set_bonus=[\"']?tier28_2pc[\"']?",
