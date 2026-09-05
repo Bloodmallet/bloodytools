@@ -44,6 +44,7 @@ WEAPON_ENCHANTS = [
     WeaponEnchant(name="Jan'alai's Precision", item_id="243971"),
     WeaponEnchant(name="Strength of Halazzi", item_id="243969"),
     WeaponEnchant(name="Worldsoul Tenacity", item_id="244001"),
+    WeaponEnchant(name="Rite of the Hash'ey", item_id="273071"),
 ]
 
 # RANGED_HUNTER_ENCHANTS = [
