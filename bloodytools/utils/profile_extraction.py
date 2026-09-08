@@ -452,6 +452,7 @@ def extract_profile(
         "enchant_id",
         "crafted_stats",
         "drop_level",
+        "redirected_base_stats",
     ]
     pattern_element: typing.Dict[str, re.Pattern] = {}
     # don't recompile this for each slot
